@@ -1,0 +1,119 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "error": "Something went wrong",
+    "success": "Success",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "save": "Save",
+    "back": "Back",
+    "next": "Next",
+    "submit": "Submit",
+    "required": "Required",
+    "optional": "Optional"
+  },
+  "nav": {
+    "home": "Home",
+    "products": "Products",
+    "dashboard": "Member Portal",
+    "register": "Register Product",
+    "signIn": "Sign In",
+    "signUp": "Sign Up",
+    "signOut": "Sign Out"
+  },
+  "auth": {
+    "signInTitle": "Sign In",
+    "signUpTitle": "Create Account",
+    "signInDescription": "Sign in to your member account",
+    "signUpDescription": "Create a new member account"
+  },
+  "dashboard": {
+    "title": "Member Portal",
+    "welcome": "Welcome back",
+    "myProducts": "My Products",
+    "noProducts": "You have not registered any products yet",
+    "registerFirst": "Register a Product",
+    "status": {
+      "PENDING": "Under Review",
+      "RETURNED": "Needs Correction",
+      "REGISTERED_NO_WARRANTY": "Registered",
+      "REGISTERED_WITH_WARRANTY": "Registered (With Warranty)"
+    },
+    "viewWarranty": "View Warranty Card",
+    "editInfo": "Update Info"
+  },
+  "registration": {
+    "title": "Product Registration",
+    "subtitle": "Complete the form below to register your product",
+    "steps": {
+      "1": "Basic Info",
+      "2": "Serial Number",
+      "3": "Attachments"
+    },
+    "step1": {
+      "title": "Basic Information",
+      "model": "Product Model",
+      "modelPlaceholder": "Select a product model",
+      "installationDate": "Installation Date",
+      "installationAddressState": "Province / Municipality",
+      "installationAddressStatePlaceholder": "Select a province",
+      "installationAddressDetail": "Address Detail",
+      "installationAddressDetailPlaceholder": "Street, building, unit number etc.",
+      "contactPerson": "Contact Person",
+      "contactPersonPlaceholder": "Enter contact person name",
+      "phoneNumber": "Phone Number",
+      "phoneNumberPlaceholder": "Enter phone number (optional)",
+      "purchaseDate": "Purchase Date",
+      "dealerName": "Dealer / Seller",
+      "dealerNamePlaceholder": "Enter dealer name (optional)"
+    },
+    "step2": {
+      "title": "Serial Number Verification",
+      "serialNumber": "Product Serial Number",
+      "serialNumberPlaceholder": "Enter the product serial number",
+      "serialNumberHint": "The serial number consists of 4 groups of codes — enter the complete number",
+      "validate": "Validate Serial Number",
+      "validating": "Validating...",
+      "valid": "Serial number is valid",
+      "invalid": "Serial number is invalid — please double-check",
+      "proceedAnyway": "Serial number validation failed. Do you want to continue? Your submission will be flagged for manual review.",
+      "proceedLabel": "I confirm the serial number is correct and want to proceed"
+    },
+    "step3": {
+      "title": "Upload Attachments",
+      "warrantyCard": "Warranty Card Photo",
+      "warrantyCardHint": "Upload a clear photo of the front of your warranty card",
+      "serialNumberImage": "Serial Number Photo",
+      "serialNumberImageHint": "Upload a clear photo of the product serial number",
+      "uploading": "Uploading...",
+      "uploadSuccess": "Upload successful",
+      "uploadError": "Upload failed — please try again",
+      "clickToUpload": "Click to upload or drag and drop",
+      "fileTypes": "JPG, PNG, HEIC up to 10MB"
+    },
+    "success": {
+      "title": "Registration Submitted",
+      "message": "Your product registration has been submitted. We will review it within 3–5 business days and notify you by email.",
+      "backToDashboard": "Back to Member Portal"
+    }
+  },
+  "warranty": {
+    "title": "Electronic Warranty Card",
+    "cardTitle": "Product Warranty Certificate",
+    "product": "Product Model",
+    "registrationId": "Registration ID",
+    "customerName": "Customer Name",
+    "installationDate": "Installation Date",
+    "warrantyExpiry": "Warranty Expiry Date",
+    "print": "Print Warranty Card",
+    "save": "Save as PDF",
+    "notFound": "Warranty record not found"
+  },
+  "validation": {
+    "required": "This field is required",
+    "invalidDate": "Please enter a valid date",
+    "invalidPhone": "Please enter a valid phone number",
+    "fileTooLarge": "File size must not exceed 10MB",
+    "invalidFileType": "Only JPG, PNG, and HEIC formats are supported"
+  }
+}

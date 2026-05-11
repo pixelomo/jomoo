@@ -1,0 +1,119 @@
+{
+  "common": {
+    "loading": "加载中...",
+    "error": "出错了",
+    "success": "成功",
+    "cancel": "取消",
+    "confirm": "确认",
+    "save": "保存",
+    "back": "返回",
+    "next": "下一步",
+    "submit": "提交",
+    "required": "必填",
+    "optional": "选填"
+  },
+  "nav": {
+    "home": "首页",
+    "products": "产品",
+    "dashboard": "会员中心",
+    "register": "产品登记",
+    "signIn": "登录",
+    "signUp": "注册",
+    "signOut": "退出登录"
+  },
+  "auth": {
+    "signInTitle": "登录",
+    "signUpTitle": "注册账号",
+    "signInDescription": "登录您的会员账号",
+    "signUpDescription": "创建新的会员账号"
+  },
+  "dashboard": {
+    "title": "会员中心",
+    "welcome": "欢迎回来",
+    "myProducts": "我的产品",
+    "noProducts": "您还没有登记任何产品",
+    "registerFirst": "立即登记产品",
+    "status": {
+      "PENDING": "审核中",
+      "RETURNED": "需修正",
+      "REGISTERED_NO_WARRANTY": "已登记",
+      "REGISTERED_WITH_WARRANTY": "已登记（含延保）"
+    },
+    "viewWarranty": "查看保修卡",
+    "editInfo": "更新信息"
+  },
+  "registration": {
+    "title": "产品登记",
+    "subtitle": "请按步骤完成产品登记",
+    "steps": {
+      "1": "基本信息",
+      "2": "序列号",
+      "3": "附件上传"
+    },
+    "step1": {
+      "title": "基本信息",
+      "model": "产品型号",
+      "modelPlaceholder": "请选择产品型号",
+      "installationDate": "安装日期",
+      "installationAddressState": "省份/直辖市",
+      "installationAddressStatePlaceholder": "请选择省份",
+      "installationAddressDetail": "详细地址",
+      "installationAddressDetailPlaceholder": "请输入街道、门牌号等详细信息",
+      "contactPerson": "联系人",
+      "contactPersonPlaceholder": "请输入联系人姓名",
+      "phoneNumber": "联系电话",
+      "phoneNumberPlaceholder": "请输入联系电话（选填）",
+      "purchaseDate": "购买日期",
+      "dealerName": "经销商/销售商",
+      "dealerNamePlaceholder": "请输入经销商名称（选填）"
+    },
+    "step2": {
+      "title": "序列号验证",
+      "serialNumber": "产品序列号",
+      "serialNumberPlaceholder": "请输入产品序列号",
+      "serialNumberHint": "序列号由4组编码组成，请完整输入",
+      "validate": "验证序列号",
+      "validating": "验证中...",
+      "valid": "序列号验证通过",
+      "invalid": "序列号无效，请重新检查",
+      "proceedAnyway": "序列号验证失败，是否继续提交？提交后将由人工审核。",
+      "proceedLabel": "我确认序列号正确，继续提交"
+    },
+    "step3": {
+      "title": "上传附件",
+      "warrantyCard": "保修卡照片",
+      "warrantyCardHint": "请上传清晰的保修卡正面照片",
+      "serialNumberImage": "序列号照片",
+      "serialNumberImageHint": "请上传产品序列号的清晰照片",
+      "uploading": "上传中...",
+      "uploadSuccess": "上传成功",
+      "uploadError": "上传失败，请重试",
+      "clickToUpload": "点击上传或拖放文件",
+      "fileTypes": "支持 JPG、PNG、HEIC 格式，最大 10MB"
+    },
+    "success": {
+      "title": "登记提交成功",
+      "message": "您的产品登记申请已提交，我们将在3-5个工作日内完成审核，审核结果将通过邮件通知您。",
+      "backToDashboard": "返回会员中心"
+    }
+  },
+  "warranty": {
+    "title": "电子保修卡",
+    "cardTitle": "产品保修证书",
+    "product": "产品型号",
+    "registrationId": "登记编号",
+    "customerName": "客户姓名",
+    "installationDate": "安装日期",
+    "warrantyExpiry": "保修到期日",
+    "print": "打印保修卡",
+    "save": "保存为PDF",
+    "notFound": "未找到保修记录"
+  },
+  "validation": {
+    "required": "此项为必填",
+    "invalidDate": "请输入有效日期",
+    "invalidPhone": "请输入有效电话号码",
+    "fileTooLarge": "文件大小不能超过10MB",
+    "invalidFileType": "仅支持 JPG、PNG、HEIC 格式"
+  }
+}
