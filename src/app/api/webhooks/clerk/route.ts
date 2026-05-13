@@ -70,7 +70,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Database insert failed' }, { status: 500 })
     }
   } else {
-    // user.updated — sync email if changed
+    // user.updated - sync email if changed
     const { error } = await supabase
       .from('users')
       .update({ email })

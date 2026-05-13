@@ -12,7 +12,7 @@ function getAnonKey() {
   return key
 }
 
-// Lazy singleton — browser / server-component client (anon key, RLS applies)
+// Lazy singleton - browser / server-component client (anon key, RLS applies)
 let _supabase: SupabaseClient | null = null
 export function getSupabaseClient(): SupabaseClient {
   if (!_supabase) {
@@ -28,7 +28,7 @@ export const supabase = new Proxy({} as SupabaseClient, {
   },
 })
 
-// Server-side admin client (service role key, bypasses RLS — use only in API routes)
+// Server-side admin client (service role key, bypasses RLS - use only in API routes)
 export function createAdminClient(): SupabaseClient {
   const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
   if (!serviceRoleKey) throw new Error('SUPABASE_SERVICE_ROLE_KEY is not set')

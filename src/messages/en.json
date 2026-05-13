@@ -71,11 +71,11 @@
       "title": "Serial Number Verification",
       "serialNumber": "Product Serial Number",
       "serialNumberPlaceholder": "Enter the product serial number",
-      "serialNumberHint": "The serial number consists of 4 groups of codes — enter the complete number",
+      "serialNumberHint": "The serial number consists of 4 groups of codes - enter the complete number",
       "validate": "Validate Serial Number",
       "validating": "Validating...",
       "valid": "Serial number is valid",
-      "invalid": "Serial number is invalid — please double-check",
+      "invalid": "Serial number is invalid - please double-check",
       "proceedAnyway": "Serial number validation failed. Do you want to continue? Your submission will be flagged for manual review.",
       "proceedLabel": "I confirm the serial number is correct and want to proceed"
     },
@@ -87,7 +87,7 @@
       "serialNumberImageHint": "Upload a clear photo of the product serial number",
       "uploading": "Uploading...",
       "uploadSuccess": "Upload successful",
-      "uploadError": "Upload failed — please try again",
+      "uploadError": "Upload failed - please try again",
       "clickToUpload": "Click to upload or drag and drop",
       "fileTypes": "JPG, PNG, HEIC up to 10MB"
     },

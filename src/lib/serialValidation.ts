@@ -4,7 +4,7 @@
  * Abstracts the client CRM integration so the endpoint and auth method
  * can be swapped when client IT provides the final spec.
  *
- * ⚠️  MOCK DATA in use — replace MOCK_SERIAL_NUMBERS with real CRM lookup
+ * ⚠️  MOCK DATA in use - replace MOCK_SERIAL_NUMBERS with real CRM lookup
  * before MVP launch (July 21, 2026). Set SERIAL_VALIDATION_ENDPOINT env var
  * and mockValidation becomes unreachable.
  */

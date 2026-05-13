@@ -1,4 +1,4 @@
-// ⚠️  MOCK DATA — must be replaced with live CRM lookup before MVP launch (July 21, 2026)
+// ⚠️  MOCK DATA - must be replaced with live CRM lookup before MVP launch (July 21, 2026)
 // This file stands in for the client's serial number database.
 // The real validation path is: SERIAL_VALIDATION_ENDPOINT env var → src/lib/serialValidation.ts
 // When the client IT team provides the CRM endpoint, set SERIAL_VALIDATION_ENDPOINT and this

@@ -22,7 +22,7 @@ export default function WarrantyCard({ registration, warranty, customerName, t }
 
   return (
     <div className="max-w-2xl mx-auto">
-      {/* Print button — hidden in print */}
+      {/* Print button - hidden in print */}
       <div className="flex justify-end mb-6 print:hidden">
         <button
           onClick={handlePrint}
@@ -35,7 +35,7 @@ export default function WarrantyCard({ registration, warranty, customerName, t }
         </button>
       </div>
 
-      {/* Warranty card — printable */}
+      {/* Warranty card - printable */}
       <div className="rounded-xl border-2 border-zinc-200 bg-white p-8 print:border-none print:shadow-none shadow-sm">
         {/* Header */}
         <div className="text-center mb-8 pb-6 border-b border-zinc-100">
