@@ -1,4 +1,4 @@
-import { auth } from '@clerk/nextjs/server'
+import { auth, currentUser } from '@clerk/nextjs/server'
 import { NextResponse } from 'next/server'
 import { RegistrationSchema } from '@/types/registration'
 import { createAdminClient } from '@/lib/supabase'
@@ -28,19 +28,34 @@ export async function POST(req: Request) {
   const data = parsed.data
   const supabase = createAdminClient()
 
-  // Get internal user record
-  const { data: user, error: userError } = await supabase
+  // Get internal user record, auto-creating if the Clerk webhook hasn't synced yet
+  let { data: user } = await supabase
     .from('users')
     .select('id, email, nickname')
     .eq('clerk_id', userId)
     .single()
 
-  if (userError || !user) {
-    return NextResponse.json({ error: 'User not found' }, { status: 404 })
+  if (!user) {
+    const clerkUser = await currentUser()
+    const email = clerkUser?.emailAddresses.find(
+      (e) => e.id === clerkUser.primaryEmailAddressId
+    )?.emailAddress
+    if (!email) {
+      return NextResponse.json({ error: 'Could not resolve user email' }, { status: 500 })
+    }
+    const { data: created } = await supabase
+      .from('users')
+      .insert({ clerk_id: userId, email })
+      .select('id, email, nickname')
+      .single()
+    if (!created) {
+      return NextResponse.json({ error: 'Failed to create user record' }, { status: 500 })
+    }
+    user = created
   }
 
-  // Determine if serial number is flagged for review
-  const flagged = data.proceedDespiteInvalid === true && data.serialNumberValid === false
+  // Flag for review if serial validation failed (user proceeded without a valid serial)
+  const flagged = data.serialNumberValid === false
 
   const { data: registration, error: insertError } = await supabase
     .from('product_registrations')
