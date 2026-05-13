@@ -1,0 +1,28 @@
+// ⚠️  MOCK DATA — must be replaced with live CRM lookup before MVP launch (July 21, 2026)
+// This file stands in for the client's serial number database.
+// The real validation path is: SERIAL_VALIDATION_ENDPOINT env var → src/lib/serialValidation.ts
+// When the client IT team provides the CRM endpoint, set SERIAL_VALIDATION_ENDPOINT and this
+// file becomes dead code (mockValidation is only called when SERIAL_VALIDATION_ENDPOINT is unset).
+
+export const MOCK_SERIAL_NUMBERS: ReadonlySet<string> = new Set([
+  'J1234567890123456789',
+  'J9876543210987654321',
+  'J1111111111111111111',
+  'J2222222222222222222',
+  'J3333333333333333333',
+  'J4444444444444444444',
+  'J5555555555555555555',
+  'J6666666666666666666',
+  'J7777777777777777777',
+  'J8888888888888888888',
+  'J9999999999999999999',
+  'J1357924680135792468',
+  'J2468013579246801357',
+  'J1122334455667788990',
+  'J9988776655443322110',
+  'J0000000000000000001',
+  'J0000000000000000002',
+  'J0000000000000000003',
+  'J1234500000000000000',
+  'J9876500000000000000',
+])

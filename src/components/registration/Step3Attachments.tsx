@@ -44,7 +44,11 @@ async function uploadToCloudinary(
     `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`,
     { method: 'POST', body: formData }
   )
-  if (!uploadRes.ok) throw new Error('Cloudinary upload failed')
+  if (!uploadRes.ok) {
+    const errorBody = await uploadRes.text().catch(() => '(unreadable)')
+    console.error('[Cloudinary] upload failed', uploadRes.status, errorBody)
+    throw new Error('Cloudinary upload failed')
+  }
 
   const result = await uploadRes.json()
   return result.secure_url as string

@@ -4,8 +4,12 @@
  * Abstracts the client CRM integration so the endpoint and auth method
  * can be swapped when client IT provides the final spec.
  *
- * Currently returns a mock response.
+ * ⚠️  MOCK DATA in use — replace MOCK_SERIAL_NUMBERS with real CRM lookup
+ * before MVP launch (July 21, 2026). Set SERIAL_VALIDATION_ENDPOINT env var
+ * and mockValidation becomes unreachable.
  */
+
+import { MOCK_SERIAL_NUMBERS } from '@/data/mockSerialNumbers'
 
 export interface SerialValidationResult {
   valid: boolean
@@ -18,7 +22,6 @@ export async function validateSerialNumber(
   const endpoint = process.env.SERIAL_VALIDATION_ENDPOINT
   const apiKey = process.env.SERIAL_VALIDATION_API_KEY
 
-  // When the real endpoint is available, replace this block:
   if (!endpoint) {
     return mockValidation(serialNumber)
   }
@@ -47,9 +50,8 @@ export async function validateSerialNumber(
   }
 }
 
-// Stub: treats serial numbers starting with "VALID" as valid, everything else invalid
 function mockValidation(serialNumber: string): SerialValidationResult {
-  const isValid = serialNumber.trim().toUpperCase().startsWith('VALID')
+  const isValid = MOCK_SERIAL_NUMBERS.has(serialNumber.trim())
   return {
     valid: isValid,
     message: isValid ? undefined : 'serial_not_found',

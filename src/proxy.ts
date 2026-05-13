@@ -20,8 +20,10 @@ export default clerkMiddleware(async (auth, req: NextRequest) => {
 
 export const config = {
   matcher: [
-    // Skip Next.js internals, static files, and Sanity Studio
-    '/((?!_next/static|_next/image|favicon.ico|studio|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|txt|xml|json)$).*)',
+    // Skip Next.js internals, static files, Sanity Studio, and API routes
+    // API routes are excluded because auth() is called directly in each handler
+    // and next-intl must not rewrite /api/... to /en/api/...
+    '/((?!_next/static|_next/image|favicon.ico|studio|api|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|txt|xml|json)$).*)',
     '/',
   ],
 }
