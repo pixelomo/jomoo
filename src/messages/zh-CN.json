@@ -128,6 +128,25 @@
     "save": "保存为PDF",
     "notFound": "未找到保修记录"
   },
+  "footer": {
+    "tagline": "产品登记与保修服务",
+    "home": "首页",
+    "portal": "会员中心",
+    "register": "产品登记",
+    "rights": "保留所有权利。"
+  },
+  "home": {
+    "headline": "产品登记",
+    "subheadline": "简单快捷的产品登记与保修管理，专为 JoMoo 客户服务。",
+    "ctaRegister": "立即登记产品",
+    "ctaPortal": "会员中心",
+    "feat1Title": "快速登记",
+    "feat1Desc": "按步骤引导，几分钟内完成产品登记。",
+    "feat2Title": "保修服务",
+    "feat2Desc": "查看保修状态，下载电子保修证书。",
+    "feat3Title": "专属支持",
+    "feat3Desc": "随时联系我们的团队获取产品支持。"
+  },
   "validation": {
     "required": "此项为必填",
     "invalidDate": "请输入有效日期",

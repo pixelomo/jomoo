@@ -5,6 +5,8 @@ import { notFound } from 'next/navigation'
 import { Geist } from 'next/font/google'
 import { routing } from '@/i18n/routing'
 import type { Metadata } from 'next'
+import Header from '@/components/layout/Header'
+import Footer from '@/components/layout/Footer'
 import '../globals.css'
 
 const geistSans = Geist({
@@ -40,7 +42,11 @@ export default async function LocaleLayout({
       <body className="min-h-full flex flex-col bg-white text-zinc-900">
         <ClerkProvider>
           <NextIntlClientProvider messages={messages}>
-            {children}
+            <Header />
+            <div className="flex flex-col flex-1">
+              {children}
+            </div>
+            <Footer />
           </NextIntlClientProvider>
         </ClerkProvider>
       </body>
