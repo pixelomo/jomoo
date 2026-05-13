@@ -40,7 +40,26 @@
       "REGISTERED_WITH_WARRANTY": "Registered (With Warranty)"
     },
     "viewWarranty": "View Warranty Card",
-    "editInfo": "Update Info"
+    "editInfo": "Update Info",
+    "editRegistration": "Edit",
+    "deleteRegistration": "Delete",
+    "confirmDelete": "Delete this registration? This cannot be undone.",
+    "editTitle": "Edit Registration",
+    "warrantyCardPhoto": "Warranty Card",
+    "serialNumberPhoto": "Serial No.",
+    "profile": {
+      "title": "My Profile",
+      "email": "Email",
+      "nickname": "Display Name",
+      "gender": "Gender",
+      "dateOfBirth": "Date of Birth",
+      "notSet": "Not set",
+      "saveError": "Failed to save - please try again",
+      "gender_male": "Male",
+      "gender_female": "Female",
+      "gender_other": "Other",
+      "gender_prefer_not_to_say": "Prefer not to say"
+    }
   },
   "registration": {
     "title": "Product Registration",

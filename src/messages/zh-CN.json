@@ -40,7 +40,26 @@
       "REGISTERED_WITH_WARRANTY": "已登记（含延保）"
     },
     "viewWarranty": "查看保修卡",
-    "editInfo": "更新信息"
+    "editInfo": "更新信息",
+    "editRegistration": "编辑",
+    "deleteRegistration": "删除",
+    "confirmDelete": "确定要删除此登记记录吗？此操作无法撤销。",
+    "editTitle": "编辑登记信息",
+    "warrantyCardPhoto": "保修卡",
+    "serialNumberPhoto": "序列号",
+    "profile": {
+      "title": "我的资料",
+      "email": "邮箱",
+      "nickname": "昵称",
+      "gender": "性别",
+      "dateOfBirth": "出生日期",
+      "notSet": "未填写",
+      "saveError": "保存失败，请重试",
+      "gender_male": "男",
+      "gender_female": "女",
+      "gender_other": "其他",
+      "gender_prefer_not_to_say": "不愿透露"
+    }
   },
   "registration": {
     "title": "产品登记",
