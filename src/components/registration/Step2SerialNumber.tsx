@@ -20,28 +20,23 @@ export default function Step2SerialNumber({ defaultValues, onSubmit, onBack }: P
   const tc = useTranslations('common')
 
   const [validationState, setValidationState] = useState<ValidationState>('idle')
-  const [showProceed, setShowProceed] = useState(false)
 
   const {
     register,
     handleSubmit,
     getValues,
     setValue,
-    watch,
     formState: { errors },
   } = useForm<Step2Data>({
     resolver: zodResolver(Step2Schema),
     defaultValues,
   })
 
-  const proceedDespiteInvalid = watch('proceedDespiteInvalid')
-
   const handleValidate = async () => {
     const serialNumber = getValues('serialNumber')
     if (!serialNumber.trim()) return
 
     setValidationState('validating')
-    setShowProceed(false)
 
     try {
       const res = await fetch('/api/serial-validate', {
@@ -54,23 +49,19 @@ export default function Step2SerialNumber({ defaultValues, onSubmit, onBack }: P
       if (data.valid) {
         setValidationState('valid')
         setValue('serialNumberValid', true)
-        setValue('proceedDespiteInvalid', false)
-        setShowProceed(false)
       } else {
         setValidationState('invalid')
         setValue('serialNumberValid', false)
-        setShowProceed(true)
       }
     } catch {
       setValidationState('invalid')
       setValue('serialNumberValid', false)
-      setShowProceed(true)
     }
   }
 
-  const canProceed =
-    validationState === 'valid' ||
-    (validationState === 'invalid' && proceedDespiteInvalid)
+  // Users may proceed whether valid or invalid; invalid submissions are
+  // flagged as "Abnormal Serial Number" for reviewer attention.
+  const canProceed = validationState === 'valid' || validationState === 'invalid'
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
@@ -111,17 +102,7 @@ export default function Step2SerialNumber({ defaultValues, onSubmit, onBack }: P
 
       {validationState === 'invalid' && (
         <div className="rounded-md bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">
-          <p className="mb-3">{t('invalid')}</p>
-          {showProceed && (
-            <label className="flex items-start gap-2 cursor-pointer">
-              <input
-                type="checkbox"
-                className="mt-0.5 rounded border-zinc-300"
-                {...register('proceedDespiteInvalid')}
-              />
-              <span>{t('proceedLabel')}</span>
-            </label>
-          )}
+          {t('invalid')}
         </div>
       )}
 
