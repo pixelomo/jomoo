@@ -36,7 +36,81 @@ export async function getProductModels(): Promise<{ _id: string; name: string; m
       }`
     )
   } catch {
-    // Return empty array during build / when Sanity is not configured
+    return []
+  }
+}
+
+export interface ProductSpec {
+  label: { zhCN: string; en: string }
+  value: string
+}
+
+export interface ProductFeature {
+  icon: string
+  title: { zhCN: string; en: string }
+  description: { zhCN: string; en: string }
+}
+
+export interface ProductVideo {
+  embedUrl: string
+  title: { zhCN: string; en: string }
+}
+
+export interface ProductSpecTable {
+  dimensions?: string
+  material?: string
+  power?: string
+  drainageMethod?: string
+  waterConsumption?: string
+  weight?: string
+  color?: string
+  certification?: string
+}
+
+export interface ProductDetail {
+  _id: string
+  modelCode: string
+  series: string
+  name: { zhCN: string; en: string }
+  slug: { current: string }
+  tagline?: { zhCN: string; en: string }
+  longDescription?: { zhCN: unknown[]; en: unknown[] }
+  features?: ProductFeature[]
+  specTable?: ProductSpecTable
+  specs?: ProductSpec[]
+  images?: Array<{ _key: string; asset: { _ref: string }; alt?: string; caption?: string }>
+  featureVideos?: ProductVideo[]
+}
+
+export async function getProductDetail(series: string, slug: string): Promise<ProductDetail | null> {
+  try {
+    const result = await getSanityClient().fetch(
+      `*[_type == "product" && series == $series && slug.current == $slug][0] {
+        _id, modelCode, series,
+        name, slug, tagline,
+        longDescription,
+        features[] { icon, title, description },
+        specTable,
+        specs[] { label, value },
+        images[] { _key, asset, alt, caption },
+        featureVideos[] { embedUrl, title }
+      }`,
+      { series, slug }
+    )
+    return result ?? null
+  } catch {
+    return null
+  }
+}
+
+export async function getProductSlugs(series: string): Promise<string[]> {
+  try {
+    const results = await getSanityClient().fetch(
+      `*[_type == "product" && series == $series && defined(slug.current)] { "slug": slug.current }`,
+      { series }
+    )
+    return results.map((r: { slug: string }) => r.slug)
+  } catch {
     return []
   }
 }

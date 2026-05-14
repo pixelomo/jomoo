@@ -2,7 +2,7 @@ import { ClerkProvider } from '@clerk/nextjs'
 import { NextIntlClientProvider } from 'next-intl'
 import { getMessages } from 'next-intl/server'
 import { notFound } from 'next/navigation'
-import { Geist } from 'next/font/google'
+import { Geist, Noto_Sans_JP, Noto_Serif_JP } from 'next/font/google'
 import { routing } from '@/i18n/routing'
 import type { Metadata } from 'next'
 import Header from '@/components/layout/Header'
@@ -12,6 +12,20 @@ import '../globals.css'
 const geistSans = Geist({
   variable: '--font-geist-sans',
   subsets: ['latin'],
+})
+
+const notoSansJP = Noto_Sans_JP({
+  variable: '--font-noto-sans-jp',
+  subsets: ['latin'],
+  weight: ['300', '400', '500', '600', '700', '900'],
+  display: 'swap',
+})
+
+const notoSerifJP = Noto_Serif_JP({
+  variable: '--font-noto-serif-jp',
+  subsets: ['latin'],
+  weight: ['400', '600'],
+  display: 'swap',
 })
 
 export const metadata: Metadata = {
@@ -38,7 +52,7 @@ export default async function LocaleLayout({
   const messages = await getMessages()
 
   return (
-    <html lang={locale} className={`${geistSans.variable} h-full antialiased`}>
+    <html lang={locale} className={`${geistSans.variable} ${notoSansJP.variable} ${notoSerifJP.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col bg-white text-zinc-900">
         <ClerkProvider>
           <NextIntlClientProvider messages={messages}>

@@ -3,6 +3,19 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+
+  /* JOMOO brand */
+  --gold: #C9A84C;
+  --gold-soft: #b89538;
+  --nav-grey: #7a7a7a;
+  --mid-grey: #8a8a8a;
+  --img-grey: #c5bfb8;
+  --footer-grey: #5a5a5a;
+  --footer-grey-dark: #4a4a4a;
+  --text-soft: #5a5a5a;
+  --text-muted: #8a8a8a;
+  --link-blue: #2a6fb3;
+  --hairline: #e6e6e6;
 }
 
 @theme inline {
@@ -12,15 +25,201 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+a { text-decoration: none; }
+
+/* ─── RESPONSIVE LAYOUT HELPERS ─────────────────────────────────────── */
+
+/* Section wrapper — 80px side padding on desktop, 24px on mobile */
+.section-wrap {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 96px 80px;
+}
+
+/* ─── NAV ───────────────────────────────────────────────────────────── */
+.jm-nav {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  overflow: visible;
+  background: var(--nav-grey);
+  color: #fff;
+  height: 72px;
+  display: flex;
+  align-items: center;
+  padding: 0 40px;
+}
+.jm-nav-inner {
+  width: 100%;
+  max-width: 1440px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 32px;
+}
+.jm-nav-center { display: flex; gap: 48px; align-items: center; }
+.jm-nav-right  { justify-self: end; display: flex; gap: 16px; align-items: center; }
+.jm-nav-link   {
+  color: #fff;
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  opacity: 0.9;
+}
+.jm-nav-link:hover { opacity: 1; }
+.jm-logo {
+  font-weight: 900;
+  font-size: 30px;
+  letter-spacing: 0.08em;
+  color: #fff;
+}
+
+/* Mobile nav */
+.jm-hamburger {
+  display: none;
+  background: transparent;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  padding: 4px;
+}
+.jm-mobile-menu {
+  display: none;
+  flex-direction: column;
+  background: var(--nav-grey);
+  padding: 16px 24px 24px;
+  gap: 16px;
+}
+.jm-mobile-menu.is-open { display: flex; }
+
+/* ─── HERO ──────────────────────────────────────────────────────────── */
+.jm-hero { position: relative; width: 100%; height: 620px; overflow: hidden; }
+.jm-hero-title  { font-size: 84px; }
+.jm-hero-content {
+  position: relative;
+  max-width: 1440px;
+  margin: 0 auto;
+  height: 100%;
+  padding: 0 80px;
+  display: flex;
+  align-items: center;
+}
+
+/* ─── PRODUCT GRID ──────────────────────────────────────────────────── */
+.jm-product-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 56px 48px;
+}
+
+/* ─── MEMBER PORTAL ─────────────────────────────────────────────────── */
+.jm-member-split {
+  display: grid;
+  grid-template-columns: 1.05fr 1fr;
+  background: #f6f4ef;
+  overflow: hidden;
+}
+.jm-member-art   { min-height: 460px; }
+.jm-member-body  { padding: 72px 64px; display: flex; flex-direction: column; justify-content: center; gap: 20px; }
+
+/* ─── PRODUCT DETAIL ────────────────────────────────────────────────── */
+.jm-detail-grid {
+  display: grid;
+  grid-template-columns: 1fr 420px;
+  gap: 64px;
+  align-items: start;
+}
+.jm-detail-carousel { position: sticky; top: 96px; }
+
+/* ─── FOOTER ────────────────────────────────────────────────────────── */
+.jm-footer-mid {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 56px 80px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr) auto;
+  gap: 48px;
+}
+.jm-footer-top {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 56px 80px 36px;
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+.jm-footer-bottom-inner {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 22px 80px;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 24px;
+  align-items: center;
+  font-size: 12px;
+}
+
+/* ─── BREAKPOINTS ───────────────────────────────────────────────────── */
+
+/* Tablet  ≤ 1024px */
+@media (max-width: 1024px) {
+  .section-wrap    { padding: 72px 40px; }
+  .jm-nav          { padding: 0 28px; }
+  .jm-detail-grid  { grid-template-columns: 1fr 340px; gap: 40px; }
+  .jm-footer-mid   { padding: 48px 40px; grid-template-columns: repeat(2, 1fr) auto; }
+  .jm-footer-top   { padding: 48px 40px 28px; }
+  .jm-footer-bottom-inner { padding: 20px 40px; }
+}
+
+/* Mobile  ≤ 768px */
+@media (max-width: 768px) {
+  .section-wrap    { padding: 56px 20px; }
+
+  /* Nav */
+  .jm-nav          { padding: 0 20px; height: 60px; }
+  .jm-nav-inner    { grid-template-columns: 1fr auto; }
+  .jm-nav-center   { display: none; }
+  .jm-hamburger    { display: flex; align-items: center; }
+  .jm-logo         { font-size: 22px; }
+
+  /* Hero */
+  .jm-hero         { height: 420px; }
+  .jm-hero-title   { font-size: 48px !important; }
+  .jm-hero-content { padding: 0 24px; }
+
+  /* Products */
+  .jm-product-grid { grid-template-columns: 1fr; gap: 40px; }
+
+  /* Member portal */
+  .jm-member-split { grid-template-columns: 1fr; }
+  .jm-member-art   { min-height: 260px; }
+  .jm-member-body  { padding: 36px 24px; }
+
+  /* Product detail */
+  .jm-detail-grid       { grid-template-columns: 1fr; gap: 32px; }
+  .jm-detail-carousel   { position: static; }
+
+  /* Footer */
+  .jm-footer-top  { flex-direction: column; align-items: flex-start; padding: 36px 20px 24px; }
+  .jm-footer-mid  { grid-template-columns: 1fr 1fr; padding: 36px 20px; gap: 32px; }
+  .jm-footer-bottom-inner {
+    grid-template-columns: 1fr;
+    padding: 18px 20px;
+    text-align: center;
+    gap: 8px;
+  }
+}
+
+/* Small mobile ≤ 480px */
+@media (max-width: 480px) {
+  .jm-hero-title   { font-size: 36px !important; }
+  .jm-footer-mid   { grid-template-columns: 1fr; }
 }

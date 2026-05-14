@@ -22,7 +22,7 @@ export default function LocaleSwitcher() {
       type="button"
       onClick={toggle}
       disabled={isPending}
-      className="text-sm font-medium text-zinc-500 hover:text-zinc-900 transition-colors disabled:opacity-50"
+      className="text-sm font-medium transition-colors disabled:opacity-50 text-current opacity-80 hover:opacity-100"
     >
       {locale === 'zh-CN' ? 'EN' : '中文'}
     </button>
