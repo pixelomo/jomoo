@@ -5,8 +5,8 @@ import Link from 'next/link'
 export const metadata: Metadata = { title: 'Washstand' }
 
 const models = [
-  { slug: 'ayzm24005-custom', name: 'AYZM24005 Custom',   label: '[ AYZM24005 ]'   },
-  { slug: 'new-economic',     name: 'New Economic Set',    label: '[ Economic Set ]' },
+  { slug: 'ayzm24005-custom', name: 'AYZM24005 Custom',  label: '[ AYZM24005 ]'   },
+  { slug: 'new-economic',     name: 'New Economic Set',   label: '[ Economic Set ]' },
 ]
 
 export default async function WashstandPage() {
@@ -18,26 +18,17 @@ export default async function WashstandPage() {
         {t('washstandName')}
       </h1>
       <div style={{ height: '2px', background: 'var(--gold)', margin: '20px 0 48px' }} />
+      <p style={{ fontSize: '16px', color: 'var(--text-soft)', lineHeight: 1.8, marginBottom: '64px', maxWidth: '600px' }}>
+        {t('washstandDesc')}
+      </p>
 
-      {/* Coming Soon banner */}
-      <div
-        style={{
-          background: '#f6f4ef',
-          border: '1px solid var(--hairline)',
-          padding: '40px',
-          textAlign: 'center',
-          marginBottom: '64px',
-        }}
-      >
-        <p style={{ fontSize: '28px', fontWeight: 700, letterSpacing: '0.12em', margin: '0 0 12px' }}>
-          {t('comingSoon')}
-        </p>
-        <p style={{ fontSize: '15px', color: 'var(--text-soft)', margin: 0 }}>{t('washstandDesc')}</p>
-      </div>
-
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2,1fr)', gap: '40px', opacity: 0.4 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2,1fr)', gap: '40px' }}>
         {models.map(m => (
-          <div key={m.slug} style={{ display: 'flex', flexDirection: 'column' }}>
+          <Link
+            key={m.slug}
+            href={`/products/washstand/${m.slug}`}
+            style={{ display: 'flex', flexDirection: 'column', cursor: 'pointer' }}
+          >
             <div
               style={{
                 position: 'relative',
@@ -59,8 +50,11 @@ export default async function WashstandPage() {
                 {m.label}
               </span>
             </div>
-            <h3 style={{ fontSize: '18px', fontWeight: 600, margin: '0 0 10px' }}>{m.name}</h3>
-          </div>
+            <h3 style={{ fontSize: '18px', fontWeight: 600, margin: '0 0 10px', letterSpacing: '0.02em' }}>{m.name}</h3>
+            <span style={{ fontSize: '13px', color: 'var(--link-blue)', fontWeight: 500, letterSpacing: '0.04em' }}>
+              {t('learnMore')} →
+            </span>
+          </Link>
         ))}
       </div>
     </main>
