@@ -4,7 +4,7 @@
   --background: #ffffff;
   --foreground: #171717;
 
-  /* JOMOO brand */
+  /* JOMOO brand (legacy) */
   --gold: #C9A84C;
   --gold-soft: #b89538;
   --nav-grey: #7a7a7a;
@@ -16,6 +16,21 @@
   --text-muted: #8a8a8a;
   --link-blue: #2a6fb3;
   --hairline: #e6e6e6;
+
+  /* New design system */
+  --ink: #0a0a0a;
+  --ink-2: #3a3a3a;
+  --ink-3: #757575;
+  --ink-4: #a8a8a8;
+  --line: #e6e6e6;
+  --line-2: #f0f0f0;
+  --bg-soft: #f6f7f9;
+  --paper: #ffffff;
+  --accent: #0046E5;
+  --accent-deep: #002E99;
+  --accent-soft: #e8efff;
+  --warn: #c8312c;
+  --warn-soft: #fdecea;
 }
 
 @theme inline {
@@ -86,10 +101,16 @@ a { text-decoration: none; }
   display: none;
   background: transparent;
   border: none;
-  color: #fff;
+  color: var(--ink);
   cursor: pointer;
   padding: 4px;
+  flex-shrink: 0;
 }
+
+/* Desktop-only header elements (hidden on mobile) */
+.jm-header-nav    { display: flex; }
+.jm-header-search { display: block; }
+.jm-header-cta    { display: inline-flex; }
 .jm-mobile-menu {
   display: none;
   flex-direction: column;
@@ -167,6 +188,132 @@ a { text-decoration: none; }
   font-size: 12px;
 }
 
+/* ─── NEW HOMEPAGE LAYOUT ───────────────────────────────────────────── */
+
+/* Utility bar */
+.jm-utility {
+  border-bottom: 1px solid var(--line-2);
+  background: var(--paper);
+  font-size: 12px;
+  color: var(--ink-2);
+}
+.jm-utility-inner {
+  max-width: 1440px; margin: 0 auto;
+  padding: 8px 40px;
+  display: flex; align-items: center; justify-content: space-between; gap: 24px;
+}
+
+/* New sticky header */
+.jm-site-header {
+  position: sticky; top: 0; z-index: 50;
+  background: var(--paper);
+  border-bottom: 1px solid var(--line);
+}
+.jm-header-inner {
+  max-width: 1440px; margin: 0 auto;
+  padding: 16px 40px;
+  display: flex; align-items: center; gap: 32px;
+}
+
+/* Shared section container */
+.jm-sec {
+  padding: 80px 0;
+}
+.jm-sec-inner {
+  max-width: 1440px; margin: 0 auto; padding: 0 40px;
+}
+.jm-sec-head {
+  display: grid; grid-template-columns: 1fr auto;
+  align-items: end; gap: 40px; margin-bottom: 40px;
+}
+
+/* Shortcuts bar */
+.jm-shortcuts { border-bottom: 1px solid var(--line); }
+.jm-sc-inner {
+  max-width: 1440px; margin: 0 auto; padding: 0 40px;
+  display: grid; grid-template-columns: repeat(6, 1fr);
+}
+.jm-sc {
+  padding: 22px 16px;
+  display: flex; align-items: center; gap: 14px;
+  border-right: 1px solid var(--line);
+  font-size: 13px; font-weight: 500;
+}
+.jm-sc:first-child { border-left: 1px solid var(--line); }
+
+/* Product category grid */
+.jm-cats {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px;
+}
+
+/* Space tiles */
+.jm-spaces {
+  display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px;
+}
+
+/* Tech grid */
+.jm-tech-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: center;
+}
+.jm-tech-grid.reverse { direction: rtl; margin-top: 80px; }
+.jm-tech-grid.reverse > * { direction: ltr; }
+
+/* Feature pickup grid */
+.jm-pickup-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;
+}
+
+/* Series rail */
+.jm-series-rail {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px;
+}
+
+/* Stat strip */
+.jm-strip-stats {
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  gap: 32px; padding-top: 32px;
+  border-top: 1px solid rgba(255,255,255,0.15);
+}
+
+/* News grid */
+.jm-news-grid {
+  display: grid; grid-template-columns: 300px 1fr; gap: 64px; align-items: start;
+}
+
+/* Pro portal */
+.jm-pro-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center;
+}
+.jm-pro-feat {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 16px;
+}
+
+/* New footer */
+.jm-footer-new {
+  background: var(--paper); border-top: 1px solid var(--line); padding: 60px 0 0;
+}
+.jm-footer-top-new {
+  max-width: 1440px; margin: 0 auto; padding: 0 40px;
+  display: grid; grid-template-columns: 1.6fr 1fr 1fr 1fr 1fr;
+  gap: 40px; padding-bottom: 40px; border-bottom: 1px solid var(--line);
+}
+
+/* ─── PRODUCT LISTING GRIDS ─────────────────────────────────────────── */
+
+/* 3-column listing (smart-toilet, shower-set) */
+.jm-listing-grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 32px;
+}
+
+/* 2-column listing (faucets, washstand) */
+.jm-listing-grid-2 {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 32px;
+}
+
 /* ─── BREAKPOINTS ───────────────────────────────────────────────────── */
 
 /* Tablet  ≤ 1024px */
@@ -177,11 +324,14 @@ a { text-decoration: none; }
   .jm-footer-mid   { padding: 48px 40px; grid-template-columns: repeat(2, 1fr) auto; }
   .jm-footer-top   { padding: 48px 40px 28px; }
   .jm-footer-bottom-inner { padding: 20px 40px; }
+  .jm-listing-grid-3 { grid-template-columns: repeat(2, 1fr); }
 }
 
 /* Mobile  ≤ 768px */
 @media (max-width: 768px) {
   .section-wrap    { padding: 56px 20px; }
+  .jm-listing-grid-3,
+  .jm-listing-grid-2 { grid-template-columns: 1fr; gap: 20px; }
 
   /* Nav */
   .jm-nav          { padding: 0 20px; height: 60px; }
@@ -189,6 +339,9 @@ a { text-decoration: none; }
   .jm-nav-center   { display: none; }
   .jm-hamburger    { display: flex; align-items: center; }
   .jm-logo         { font-size: 22px; }
+  .jm-header-nav,
+  .jm-header-search,
+  .jm-header-cta   { display: none !important; }
 
   /* Hero */
   .jm-hero         { height: 420px; }
@@ -222,4 +375,35 @@ a { text-decoration: none; }
 @media (max-width: 480px) {
   .jm-hero-title   { font-size: 36px !important; }
   .jm-footer-mid   { grid-template-columns: 1fr; }
+}
+
+/* New homepage responsive */
+@media (max-width: 1080px) {
+  .jm-header-inner  { gap: 16px; }
+  .jm-header-search { display: none !important; }
+  .jm-sc-inner      { grid-template-columns: repeat(3, 1fr); }
+  .jm-spaces        { grid-template-columns: repeat(3, 1fr); }
+  .jm-series-rail   { grid-template-columns: repeat(2, 1fr); }
+  .jm-pickup-grid   { grid-template-columns: 1fr; }
+}
+@media (max-width: 900px) {
+  .jm-utility       { display: none; }
+  .jm-cats          { grid-template-columns: repeat(2, 1fr); }
+  .jm-tech-grid, .jm-tech-grid.reverse { grid-template-columns: 1fr; gap: 32px; direction: ltr; }
+  .jm-news-grid     { grid-template-columns: 1fr; gap: 24px; }
+  .jm-strip-stats   { grid-template-columns: repeat(2, 1fr); }
+  .jm-footer-top-new { grid-template-columns: 1fr 1fr; }
+  .jm-spaces        { grid-template-columns: repeat(2, 1fr); }
+  .jm-sec           { padding: 60px 0; }
+  .jm-sec-head      { grid-template-columns: 1fr; }
+  .jm-pro-grid      { grid-template-columns: 1fr; gap: 32px; }
+}
+@media (max-width: 640px) {
+  .jm-sc-inner      { grid-template-columns: repeat(2, 1fr); }
+  .jm-series-rail   { grid-template-columns: 1fr; }
+  .jm-footer-top-new { grid-template-columns: 1fr; }
+  .jm-sec-inner     { padding: 0 20px; }
+  .jm-header-inner  { padding: 12px 20px; }
+  .jm-utility-inner { padding: 8px 20px; }
+  .jm-pro-feat      { grid-template-columns: 1fr; }
 }

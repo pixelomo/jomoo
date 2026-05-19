@@ -3,6 +3,7 @@
 import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
+import { useClerk } from '@clerk/nextjs'
 import type { DbUser, Gender } from '@/types/database'
 
 interface Props {
@@ -15,7 +16,9 @@ const GENDER_OPTIONS: Gender[] = ['male', 'female', 'other', 'prefer_not_to_say'
 
 export default function UserProfileSection({ user }: Props) {
   const t = useTranslations('dashboard.profile')
+  const tc = useTranslations('common')
   const router = useRouter()
+  const { signOut } = useClerk()
   const [, startTransition] = useTransition()
   const [editing, setEditing] = useState<EditableField | null>(null)
   const [values, setValues] = useState({
@@ -25,6 +28,23 @@ export default function UserProfileSection({ user }: Props) {
   })
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [showDeleteModal, setShowDeleteModal] = useState(false)
+  const [deleteConfirm, setDeleteConfirm] = useState('')
+  const [deleting, setDeleting] = useState(false)
+  const [deleteError, setDeleteError] = useState<string | null>(null)
+
+  const deleteAccount = async () => {
+    setDeleting(true)
+    setDeleteError(null)
+    try {
+      const res = await fetch('/api/user', { method: 'DELETE' })
+      if (!res.ok) throw new Error()
+      await signOut({ redirectUrl: '/' })
+    } catch {
+      setDeleteError(t('deleteAccountError'))
+      setDeleting(false)
+    }
+  }
 
   const startEdit = (field: EditableField) => {
     setError(null)
@@ -139,6 +159,52 @@ export default function UserProfileSection({ user }: Props) {
         </ProfileRow>
       </div>
       {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
+
+      <div className="mt-8 pt-6 border-t border-zinc-100">
+        <button
+          type="button"
+          onClick={() => { setShowDeleteModal(true); setDeleteConfirm(''); setDeleteError(null) }}
+          className="text-sm text-red-500 hover:text-red-700 transition-colors underline underline-offset-2"
+        >
+          {t('deleteAccount')}
+        </button>
+      </div>
+
+      {showDeleteModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-md mx-4 p-6">
+            <h3 className="text-base font-semibold text-zinc-900 mb-2">{t('deleteAccount')}</h3>
+            <p className="text-sm text-zinc-500 mb-4">{t('deleteAccountWarning')}</p>
+            <p className="text-xs text-zinc-500 mb-1">{t('deleteAccountConfirmPrompt')}</p>
+            <input
+              type="text"
+              value={deleteConfirm}
+              onChange={(e) => setDeleteConfirm(e.target.value)}
+              className="w-full rounded-md border border-zinc-200 px-3 py-2 text-sm mb-4 focus:outline-none focus:ring-2 focus:ring-red-400"
+              autoFocus
+            />
+            {deleteError && <p className="text-sm text-red-600 mb-3">{deleteError}</p>}
+            <div className="flex gap-2 justify-end">
+              <button
+                type="button"
+                onClick={() => setShowDeleteModal(false)}
+                disabled={deleting}
+                className="rounded px-3 py-1.5 text-sm border border-zinc-200 hover:bg-zinc-50 disabled:opacity-50 transition-colors"
+              >
+                {tc('cancel')}
+              </button>
+              <button
+                type="button"
+                onClick={deleteAccount}
+                disabled={deleteConfirm !== 'DELETE' || deleting}
+                className="rounded px-3 py-1.5 text-sm bg-red-600 text-white hover:bg-red-700 disabled:opacity-40 transition-colors"
+              >
+                {deleting ? '...' : t('deleteAccountConfirm')}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   )
 }

@@ -1,4 +1,4 @@
-import { auth } from '@clerk/nextjs/server'
+import { auth, clerkClient } from '@clerk/nextjs/server'
 import { NextResponse } from 'next/server'
 import { z } from 'zod'
 import { createAdminClient } from '@/lib/supabase'
@@ -47,5 +47,28 @@ export async function PATCH(req: Request) {
     .eq('clerk_id', userId)
 
   if (error) return NextResponse.json({ error: 'Update failed' }, { status: 500 })
+  return NextResponse.json({ success: true })
+}
+
+export async function DELETE() {
+  const { userId } = await auth()
+  if (!userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+
+  const supabase = createAdminClient()
+
+  const { data: user } = await supabase
+    .from('users')
+    .select('id')
+    .eq('clerk_id', userId)
+    .single()
+
+  if (user) {
+    await supabase.from('product_registrations').delete().eq('user_id', user.id)
+    await supabase.from('users').delete().eq('id', user.id)
+  }
+
+  const clerk = await clerkClient()
+  await clerk.users.deleteUser(userId)
+
   return NextResponse.json({ success: true })
 }
