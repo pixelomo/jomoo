@@ -366,10 +366,10 @@ export default function X40Page() {
             <Image src="/logo.png" alt="JOMOO" width={110} height={32} style={{ objectFit: 'contain' }} priority />
           </Link>
           <div className="x40-nav-links">
-            {(['Features', 'Technology', 'Hygiene', 'Comfort'] as const).map(l => (
+            {(['機能', 'テクノロジー', '衛生', 'コンフォート'] as const).map(l => (
               <a key={l} href="#x40-scroll">{l}</a>
             ))}
-            <Link href="/products/smart-toilet" className="x40-nav-cta">All Products →</Link>
+            <Link href="/products/smart-toilet" className="x40-nav-cta">全製品を見る →</Link>
           </div>
         </div>
       </nav>
@@ -378,9 +378,9 @@ export default function X40Page() {
       <div id="x40-hero-text" ref={heroTextRef}>
         <span className="section-label" style={{ marginBottom: 24 }}>001 / JOMOO JAPAN</span>
         <h1 className="x40-hero-title">X40</h1>
-        <p className="x40-hero-tagline">The Intelligent Toilet.<br />Redefined.</p>
+        <p className="x40-hero-tagline">インテリジェント・トイレ。<br />再定義。</p>
         <div className="x40-hero-scroll-hint">
-          <span>scroll</span>
+          <span>スクロール</span>
           <svg width="18" height="28" viewBox="0 0 18 28" fill="none">
             <rect x="1" y="1" width="16" height="26" rx="8" stroke="rgba(255,255,255,0.3)" strokeWidth="1.5" />
             <circle className="x40-scroll-dot-circle" cx="9" cy="9" r="2.5" fill="rgba(255,255,255,0.7)" />
@@ -403,12 +403,11 @@ export default function X40Page() {
           style={{ top: '25%', transform: 'translateY(-50%)' }}
         >
           <div className="section-inner">
-            <span className="section-label">002 / Design</span>
-            <h2 className="section-heading">640mm.<br />Every millimetre<br />earned.</h2>
+            <span className="section-label">002 / デザイン</span>
+            <h2 className="section-heading">640mm。<br />細部まで、<br />妥協なし。</h2>
             <p className="section-body">
-              At just 640 mm deep, the X40 fits where conventional smart toilets
-              cannot. Seamless nano-glaze repels stains and bacteria — beautiful
-              on day one, still pristine on day one thousand.
+              奥行きわずか640mmのX40は、従来のスマートトイレが設置できなかった空間にも対応します。
+              ナノグレーズ加工のセラミックは汚れと細菌を弾き、初日も、千日目も美しさを保ちます。
             </p>
           </div>
         </section>
@@ -420,12 +419,11 @@ export default function X40Page() {
           style={{ top: '37%', transform: 'translateY(-50%)' }}
         >
           <div className="section-inner">
-            <span className="section-label">003 / Flush</span>
-            <h2 className="section-heading">38 dB.<br />You&apos;ll never<br />hear it.</h2>
+            <span className="section-label">003 / フラッシュ</span>
+            <h2 className="section-heading">38dB。<br />静音の、<br />極致。</h2>
             <p className="section-body">
-              Cyclone spiral jets scour the entire bowl in 3.8 L — 87 % less water
-              than a conventional flush. The result is mathematically cleaner,
-              measurably quieter.
+              サイクロン螺旋ジェットがわずか3.8Lで便器全体を洗浄——従来の洗浄水量より87%削減。
+              数値で証明された清潔さと、体感できる静けさを両立します。
             </p>
           </div>
         </section>
@@ -437,12 +435,11 @@ export default function X40Page() {
           style={{ top: '49%', transform: 'translateY(-50%)' }}
         >
           <div className="section-inner">
-            <span className="section-label">004 / Hygiene</span>
-            <h2 className="section-heading">UV&nbsp;+&nbsp;Platinum.<br />99.9 % bacteria‑free.</h2>
+            <span className="section-label">004 / 衛生</span>
+            <h2 className="section-heading">UV＋プラチナ。<br />除菌率99.9%。</h2>
             <p className="section-body">
-              Built-in UV sterilises the bowl before and after each use. A platinum
-              catalyst converts odour molecules into harmless water vapour — no
-              chemicals, no sprays, no compromise.
+              内蔵UVライトが使用前後に便器を自動除菌。プラチナ触媒が臭気分子を無害な水蒸気に変換——
+              薬品不要、スプレー不要、妥協なし。
             </p>
           </div>
         </section>
@@ -455,10 +452,10 @@ export default function X40Page() {
         >
           <div className="stats-grid">
             {[
-              { value: 640,  suffix: 'mm', label: 'Ultra-Compact Depth' },
-              { value: 38,   suffix: 'dB', label: 'Max Flush Noise' },
-              { value: 99,   suffix: '%',  label: 'Bacteria Eliminated' },
-              { value: 26,   suffix: '',   label: 'Intelligent Features' },
+              { value: 640,  suffix: 'mm', label: '超コンパクト設計' },
+              { value: 38,   suffix: 'dB', label: '最大洗浄音' },
+              { value: 99,   suffix: '%',  label: '除菌率' },
+              { value: 26,   suffix: '',   label: 'スマート機能' },
             ].map(({ value, suffix, label }) => (
               <div key={label} className="stat">
                 <div className="stat-row">
@@ -478,12 +475,11 @@ export default function X40Page() {
           style={{ top: '71.5%', transform: 'translateY(-50%)' }}
         >
           <div className="section-inner">
-            <span className="section-label">006 / Comfort</span>
-            <h2 className="section-heading">Six wash modes.<br />One ritual.</h2>
+            <span className="section-label">006 / コンフォート</span>
+            <h2 className="section-heading">6つのモード。<br />ひとつの習慣。</h2>
             <p className="section-body">
-              Rear, feminine, wide, massage, relief — each adjustable in pressure,
-              temperature, and position. The heated seat adapts to four seasons.
-              Warm water is always instant.
+              後洗浄、ビデ、ワイド、マッサージ、やわらか——水圧・水温・位置はすべて個別調整可能。
+              温熱シートは四季に応答し、温水は常に瞬時に供給されます。
             </p>
           </div>
         </section>
@@ -494,7 +490,7 @@ export default function X40Page() {
           style={{ top: '82%', transform: 'translateY(-50%)', width: '100%', opacity: 0 }}
         >
           <div className="marquee-text">
-            INTELLIGENT&nbsp;·&nbsp;HYGIENIC&nbsp;·&nbsp;SILENT&nbsp;·&nbsp;PRECISE&nbsp;·&nbsp;INTELLIGENT&nbsp;·&nbsp;HYGIENIC&nbsp;·&nbsp;SILENT&nbsp;·&nbsp;PRECISE&nbsp;·&nbsp;INTELLIGENT&nbsp;·
+            インテリジェント&nbsp;·&nbsp;清潔&nbsp;·&nbsp;静音&nbsp;·&nbsp;精密&nbsp;·&nbsp;インテリジェント&nbsp;·&nbsp;清潔&nbsp;·&nbsp;静音&nbsp;·&nbsp;精密&nbsp;·&nbsp;インテリジェント&nbsp;·&nbsp;清潔&nbsp;·&nbsp;静音&nbsp;·&nbsp;
           </div>
         </div>
 
@@ -505,23 +501,23 @@ export default function X40Page() {
           style={{ top: '93%', transform: 'translateY(-50%)' }}
         >
           <div className="cta-inner">
-            <span className="section-label">008 / Experience</span>
-            <h2 className="section-heading cta-heading">Discover<br />the X40.</h2>
+            <span className="section-label">008 / 体験</span>
+            <h2 className="section-heading cta-heading">X40を、<br />体験する。</h2>
             <p className="section-body section-note">
-              Visit a JOMOO showroom or speak with a specialist to find your configuration.
+              JOMOOショールームを訪れるか、専門スタッフにご相談ください。お客様に最適な構成をご提案いたします。
             </p>
             <div className="cta-actions">
-              <Link href="/products/smart-toilet" className="cta-btn cta-btn--white">View All Models →</Link>
-              <a href="#" className="cta-btn cta-btn--ghost">Find a Showroom</a>
+              <Link href="/products/smart-toilet" className="cta-btn cta-btn--white">全モデルを見る →</Link>
+              <a href="#" className="cta-btn cta-btn--ghost">ショールームを探す</a>
             </div>
           </div>
           <div className="cta-footer-bar">
             <Image src="/logo.png" alt="JOMOO" width={90} height={26} style={{ objectFit: 'contain', opacity: 0.5 }} />
             <div className="cta-footer-links">
-              <Link href="/products/smart-toilet">Products</Link>
-              <a href="#">Showrooms</a>
-              <a href="#">Support</a>
-              <Link href="/register">Register</Link>
+              <Link href="/products/smart-toilet">製品</Link>
+              <a href="#">ショールーム</a>
+              <a href="#">サポート</a>
+              <Link href="/register">製品登録</Link>
             </div>
             <p>© {new Date().getFullYear()} JOMOO JAPAN 株式会社</p>
           </div>
