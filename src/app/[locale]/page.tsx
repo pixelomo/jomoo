@@ -195,30 +195,30 @@ export default function X40Page() {
         )
 
         const tl = gsap.timeline({ paused: true })
-        const dur = 0.9
-        const stag = 0.12
+        const dur = 0.5
+        const stag = 0.07
 
         switch (animType) {
           case 'fade-up':
-            tl.from(children, { y: 50, opacity: 0, stagger: stag, duration: dur, ease: 'power3.out' })
+            tl.from(children, { y: 36, opacity: 0, stagger: stag, duration: dur, ease: 'power3.out' })
             break
           case 'slide-left':
-            tl.from(children, { x: -80, opacity: 0, stagger: stag, duration: dur, ease: 'power3.out' })
+            tl.from(children, { x: -60, opacity: 0, stagger: stag, duration: dur, ease: 'power3.out' })
             break
           case 'slide-right':
-            tl.from(children, { x: 80, opacity: 0, stagger: stag, duration: dur, ease: 'power3.out' })
+            tl.from(children, { x: 60, opacity: 0, stagger: stag, duration: dur, ease: 'power3.out' })
             break
           case 'scale-up':
-            tl.from(children, { scale: 0.85, opacity: 0, stagger: stag, duration: 1.0, ease: 'power2.out' })
+            tl.from(children, { scale: 0.9, opacity: 0, stagger: stag, duration: dur, ease: 'power2.out' })
             break
           case 'rotate-in':
-            tl.from(children, { y: 40, rotation: 3, opacity: 0, stagger: 0.1, duration: dur, ease: 'power3.out' })
+            tl.from(children, { y: 30, rotation: 2, opacity: 0, stagger: stag, duration: dur, ease: 'power3.out' })
             break
           case 'stagger-up':
-            tl.from(children, { y: 60, opacity: 0, stagger: 0.15, duration: 0.8, ease: 'power3.out' })
+            tl.from(children, { y: 40, opacity: 0, stagger: stag, duration: dur, ease: 'power3.out' })
             break
           case 'clip-reveal':
-            tl.from(children, { clipPath: 'inset(100% 0 0 0)', opacity: 0, stagger: 0.15, duration: 1.2, ease: 'power4.inOut' })
+            tl.from(children, { clipPath: 'inset(100% 0 0 0)', opacity: 0, stagger: stag, duration: 0.6, ease: 'power3.inOut' })
             break
         }
 
@@ -392,7 +392,7 @@ export default function X40Page() {
         {/* Section 2 — Flush (30–44%) */}
         <section
           className="scroll-section align-right"
-          data-enter="30" data-leave="44" data-animation="slide-right"
+          data-enter="30" data-leave="47" data-animation="slide-right"
           style={{ top: '37%', transform: 'translateY(-50%)' }}
         >
           <div className="section-inner">
@@ -408,7 +408,7 @@ export default function X40Page() {
         {/* Section 3 — Hygiene (42–56%) */}
         <section
           className="scroll-section align-left"
-          data-enter="42" data-leave="56" data-animation="scale-up"
+          data-enter="42" data-leave="60" data-animation="scale-up"
           style={{ top: '49%', transform: 'translateY(-50%)' }}
         >
           <div className="section-inner">
@@ -448,7 +448,7 @@ export default function X40Page() {
         {/* Section 5 — Comfort (65–78%) */}
         <section
           className="scroll-section align-right"
-          data-enter="65" data-leave="78" data-animation="clip-reveal"
+          data-enter="65" data-leave="82" data-animation="clip-reveal"
           style={{ top: '71.5%', transform: 'translateY(-50%)' }}
         >
           <div className="section-inner">

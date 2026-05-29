@@ -531,16 +531,17 @@ a { text-decoration: none; }
 }
 .x40-nav-cta:hover { background: rgba(255,255,255,0.18) !important; }
 
-/* ── Fixed hero text overlay ── */
+/* ── Fixed hero text overlay — left-aligned to match nav logo position ── */
 #x40-hero-text {
   position: fixed;
   inset: 0;
   z-index: 10;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
-  text-align: center;
+  text-align: left;
+  padding-left: 48px;
   pointer-events: none;
   transition: none;
 }
@@ -625,12 +626,9 @@ a { text-decoration: none; }
   letter-spacing: 0.04em;
 }
 
-/* ── Stats section — dark boxes, solid white borders ── */
+/* ── Stats section — dark boxes, solid white borders, full width ── */
 .section-stats {
   padding: 0;
-  display: flex;
-  justify-content: center;
-  width: 100%;
 }
 .stats-grid {
   display: grid;
@@ -638,7 +636,6 @@ a { text-decoration: none; }
   gap: 0;
   border-top: 1px solid #fff;
   border-left: 1px solid #fff;
-  max-width: min(880px, 88vw);
   width: 100%;
 }
 .stat {
@@ -765,9 +762,9 @@ a { text-decoration: none; }
 /* ── Large desktop (1440px+) ── */
 @media (min-width: 1440px) {
   .x40-nav-inner { max-width: 1440px; padding: 24px 80px; }
-  /* Keep same margin ratios — black areas scale proportionally */
   .align-left  { padding: 0 74vw 0 4vw; }
   .align-right { padding: 0 4vw 0 78vw; }
+  #x40-hero-text { padding-left: 80px; }
 }
 
 /* ── Tablet: 768px–1023px ── */
@@ -784,8 +781,10 @@ a { text-decoration: none; }
   .section-heading { font-size: clamp(2.4rem, 5vw, 4rem); }
   .section-body    { font-size: 13px; }
 
-  /* Stats — 2×2 on tablet, centred, dark boxes preserved */
-  .stats-grid  { grid-template-columns: repeat(2, 1fr); max-width: min(600px, 92vw); }
+  #x40-hero-text { padding-left: 32px; }
+
+  /* Stats — 2×2 on tablet, full width, dark boxes preserved */
+  .stats-grid  { grid-template-columns: repeat(2, 1fr); }
   .stat        { padding: 28px 22px; }
   .stat-number { font-size: clamp(2.8rem, 6.5vw, 4.5rem); }
   .stat-suffix { font-size: clamp(1.2rem, 2vw, 2rem); }
@@ -808,6 +807,7 @@ a { text-decoration: none; }
   .x40-hero-title  { font-size: clamp(5.5rem, 22vw, 9rem); }
   .x40-hero-tagline { font-size: clamp(0.85rem, 3.8vw, 1.1rem); letter-spacing: 0.06em; }
   .x40-hero-scroll-hint { margin-top: 36px; font-size: 9px; }
+  #x40-hero-text { padding-left: 20px; }
 
   /* Content sections — full-width on mobile, subtle dark bg since we can't
      avoid toilet overlap; no text shadow, just dark glass per block */
@@ -824,8 +824,8 @@ a { text-decoration: none; }
   .section-heading { font-size: clamp(2.2rem, 9vw, 3.2rem); }
   .section-body    { font-size: 13px; line-height: 1.95; }
 
-  /* Stats — 2×2, dark boxes, solid borders (same treatment, scaled down) */
-  .stats-grid  { grid-template-columns: 1fr 1fr; max-width: min(440px, 92vw); }
+  /* Stats — 2×2, dark boxes, solid borders, full width */
+  .stats-grid  { grid-template-columns: 1fr 1fr; }
   .stat        { padding: 18px 14px; }
   .stat-number { font-size: clamp(2.4rem, 8.5vw, 3.2rem); }
   .stat-suffix { font-size: clamp(1rem, 3vw, 1.5rem); }
@@ -852,6 +852,5 @@ a { text-decoration: none; }
 @media (max-width: 374px) {
   .x40-hero-title  { font-size: 5rem; }
   .section-heading { font-size: 2rem; }
-  .stats-grid      { max-width: 100%; }
   .stat            { padding: 14px 10px; }
 }
