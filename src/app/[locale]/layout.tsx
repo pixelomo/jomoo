@@ -2,10 +2,17 @@ import { ClerkProvider } from '@clerk/nextjs'
 import { NextIntlClientProvider } from 'next-intl'
 import { getMessages } from 'next-intl/server'
 import { notFound } from 'next/navigation'
-import { Geist, Noto_Sans_JP, Noto_Serif_JP } from 'next/font/google'
+import { Bebas_Neue, Geist, Noto_Sans_JP, Noto_Serif_JP } from 'next/font/google'
 import { routing } from '@/i18n/routing'
 import type { Metadata } from 'next'
 import '../globals.css'
+
+const bebasNeue = Bebas_Neue({
+  variable: '--font-bebas',
+  subsets: ['latin'],
+  weight: '400',
+  display: 'swap',
+})
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -50,7 +57,7 @@ export default async function LocaleLayout({
   const messages = await getMessages()
 
   return (
-    <html lang={locale} className={`${geistSans.variable} ${notoSansJP.variable} ${notoSerifJP.variable} h-full antialiased`}>
+    <html lang={locale} className={`${bebasNeue.variable} ${geistSans.variable} ${notoSansJP.variable} ${notoSerifJP.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col bg-white text-zinc-900">
         <ClerkProvider>
           <NextIntlClientProvider messages={messages}>

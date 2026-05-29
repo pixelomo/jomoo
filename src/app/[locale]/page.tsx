@@ -1,392 +1,542 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 
-/* ─── Scroll-reveal hook ─── */
-function useReveal() {
-  useEffect(() => {
-    const els = document.querySelectorAll('.x40-reveal')
-    const io = new IntersectionObserver(
-      (entries) => entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('x40-revealed') }),
-      { threshold: 0.12, rootMargin: '0px 0px -40px 0px' }
-    )
-    els.forEach(el => io.observe(el))
-    return () => io.disconnect()
-  }, [])
-}
+const FRAME_COUNT = 145
+const FRAME_SPEED = 1.9
+const IMAGE_SCALE = 0.88
+const TOTAL_FRAMES_PATH = (i: number) =>
+  `/x40/frames/frame_${String(i).padStart(4, '0')}.webp`
 
-/* ─── Stats counter ─── */
-function StatCounter({ target, suffix = '' }: { target: number; suffix?: string }) {
-  const [val, setVal] = useState(0)
-  const ref = useRef<HTMLDivElement>(null)
+export default function X40Page() {
+  const canvasRef = useRef<HTMLCanvasElement>(null)
+  const heroRef = useRef<HTMLDivElement>(null)
+  const canvasWrapRef = useRef<HTMLDivElement>(null)
+  const overlayRef = useRef<HTMLDivElement>(null)
+  const loaderRef = useRef<HTMLDivElement>(null)
+  const loaderBarRef = useRef<HTMLDivElement>(null)
+  const loaderPctRef = useRef<HTMLSpanElement>(null)
+  const navRef = useRef<HTMLElement>(null)
+
   useEffect(() => {
-    const el = ref.current
-    if (!el) return
-    const io = new IntersectionObserver(([entry]) => {
-      if (!entry.isIntersecting) return
-      io.disconnect()
-      let start = 0
-      const step = target / 60
-      const tick = () => {
-        start += step
-        if (start >= target) { setVal(target); return }
-        setVal(Math.floor(start))
-        requestAnimationFrame(tick)
+    /* ── Guards ── */
+    const canvas = canvasRef.current
+    const hero = heroRef.current
+    const canvasWrap = canvasWrapRef.current
+    const overlay = overlayRef.current
+    const loader = loaderRef.current
+    const loaderBar = loaderBarRef.current
+    const loaderPct = loaderPctRef.current
+    const nav = navRef.current
+    if (!canvas || !hero || !canvasWrap || !overlay || !loader || !nav) return
+
+    const ctx = canvas.getContext('2d')!
+    const frames: HTMLImageElement[] = []
+    let currentFrame = 0
+    let rafPending = false
+    let bgColor = '#000000'
+
+    /* ── DPR-aware canvas resize ── */
+    function resizeCanvas() {
+      if (!canvas) return
+      const dpr = window.devicePixelRatio || 1
+      canvas.width = window.innerWidth * dpr
+      canvas.height = window.innerHeight * dpr
+      canvas.style.width = window.innerWidth + 'px'
+      canvas.style.height = window.innerHeight + 'px'
+      ctx.scale(dpr, dpr)
+      drawFrame(currentFrame)
+    }
+
+    /* ── Sample bg colour from frame corners ── */
+    function sampleBgColor(img: HTMLImageElement) {
+      try {
+        const tmp = document.createElement('canvas')
+        tmp.width = 4; tmp.height = 4
+        const tc = tmp.getContext('2d')!
+        tc.drawImage(img, 0, 0, 4, 4)
+        const d = tc.getImageData(0, 0, 1, 1).data
+        bgColor = `rgb(${d[0]},${d[1]},${d[2]})`
+      } catch { bgColor = '#000' }
+    }
+
+    /* ── Draw a frame ── */
+    function drawFrame(index: number) {
+      const img = frames[index]
+      if (!img?.complete || !img.naturalWidth) return
+      const cw = window.innerWidth
+      const ch = window.innerHeight
+      const iw = img.naturalWidth
+      const ih = img.naturalHeight
+      const scale = Math.max(cw / iw, ch / ih) * IMAGE_SCALE
+      const dw = iw * scale
+      const dh = ih * scale
+      const dx = (cw - dw) / 2
+      const dy = (ch - dh) / 2
+      ctx.fillStyle = bgColor
+      ctx.fillRect(0, 0, cw, ch)
+      ctx.drawImage(img, dx, dy, dw, dh)
+    }
+
+    /* ── Frame preloader ── */
+    function loadFrame(i: number): Promise<void> {
+      return new Promise(resolve => {
+        const img = new window.Image()
+        img.onload = () => { frames[i] = img; resolve() }
+        img.onerror = () => resolve()
+        img.src = TOTAL_FRAMES_PATH(i + 1)
+      })
+    }
+
+    async function preloadFrames() {
+      // Phase 1: first 10 frames fast
+      await Promise.all(Array.from({ length: 10 }, (_, i) => loadFrame(i)))
+      sampleBgColor(frames[0])
+      drawFrame(0)
+      if (loader) loader.style.opacity = '0'
+      setTimeout(() => { if (loader) loader.style.display = 'none' }, 600)
+
+      // Phase 2: rest in background
+      let loaded = 10
+      const remaining = Array.from({ length: FRAME_COUNT - 10 }, (_, i) => i + 10)
+      for (const i of remaining) {
+        await loadFrame(i)
+        loaded++
+        if (i % 20 === 0 && frames[i]) sampleBgColor(frames[i])
+        const pct = Math.round((loaded / FRAME_COUNT) * 100)
+        if (loaderBar) loaderBar.style.width = pct + '%'
+        if (loaderPct) loaderPct.textContent = pct + '%'
       }
-      requestAnimationFrame(tick)
-    }, { threshold: 0.5 })
-    io.observe(el)
-    return () => io.disconnect()
-  }, [target])
-  return <span ref={ref}>{val}{suffix}</span>
-}
+    }
 
-const FEATURES = [
-  { img: '/x40/auto-lid.jpg',             en: 'Auto Lid',           ja: '自動開蓋',     desc: 'Hands-free lid opens as you approach and closes when you leave.' },
-  { img: '/x40/foot-sensor-flush.png',    en: 'Foot Flush',         ja: '脚感冲水',     desc: 'Wave your foot beneath the panel — no touch required.' },
-  { img: '/x40/silent-flush.jpg',         en: '38 dB Flush',        ja: '静音冲',       desc: 'Ultra-quiet cyclone flush so quiet you barely notice it.' },
-  { img: '/x40/seat-heating.jpg',         en: 'Heated Seat',        ja: '座温加热',     desc: 'Four-season adaptive temperature keeps you comfortable year-round.' },
-  { img: '/x40/uv-sterilize.jpg',         en: 'UV Sterilization',   ja: 'UV除菌',       desc: 'UV light eliminates 99.9% of bacteria inside the bowl.' },
-  { img: '/x40/platinum-deodorize.png',   en: 'Platinum Deodorize', ja: '铂金除臭',     desc: 'Platinum catalyst neutralizes odours before they escape.' },
-  { img: '/x40/night-light.jpg',          en: 'Night Light',        ja: '光感夜灯',     desc: 'Ambient sensor dims on at night — gentle enough not to wake you.' },
-  { img: '/x40/antibacterial-glaze.jpg',  en: 'Anti-bacterial',     ja: '釉面抗菌',     desc: 'Nano-glaze coating prevents 99% of bacterial adhesion.' },
-  { img: '/x40/cyclone-flush.jpg',        en: 'Cyclone Flush',      ja: '旋风冲',       desc: 'Spiral water jets clean every surface in a single flush.' },
-  { img: '/x40/auto-flush.jpg',           en: 'Auto Flush',         ja: '离座自冲',     desc: 'Seat sensor triggers an automatic flush the moment you stand.' },
-  { img: '/x40/magic-bubble.jpg',         en: 'Magic Bubble',       ja: '旋转魔力泡',   desc: 'Pre-coating foam reduces sticking — less water, cleaner bowl.' },
-  { img: '/x40/removable-nozzle.jpg',     en: 'Clean Nozzle',       ja: '喷嘴自洁',     desc: 'Detachable antibacterial nozzle for thorough manual cleaning.' },
-]
+    /* ── Lazy load GSAP + Lenis ── */
+    let cleanup: (() => void) | undefined
 
-const COMFORT = [
-  { img: '/x40/rear-wash.png',         en: 'Rear Wash',         ja: '臀洗',     desc: 'Adjustable pressure and position for personalised cleansing.' },
-  { img: '/x40/feminine-wash.png',     en: 'Feminine Wash',     ja: '妇洗',     desc: "Gentle, targeted stream designed for women's hygiene needs." },
-  { img: '/x40/wide-wash.jpg',         en: 'Wide Wash',         ja: '宽幅强洗', desc: 'Oscillating wide-spray covers a broader area for superior clean.' },
-  { img: '/x40/massage-wash.jpg',      en: 'Moving Massage',    ja: '移动按摩', desc: 'Pulsating massage mode for therapeutic relief and comfort.' },
-  { img: '/x40/constipation-wash.png', en: 'Relief Wash',       ja: '助便强洗', desc: 'Targeted strong stream helps ease discomfort naturally.' },
-  { img: '/x40/temp-sensing.jpg',      en: 'Warm Water',        ja: '四季温感', desc: 'Instant warm water — no cold-start wait, always the right temperature.' },
-]
+    Promise.all([
+      import('gsap'),
+      import('gsap/ScrollTrigger'),
+      import('lenis'),
+    ]).then(([gsapMod, stMod, lenisMod]) => {
+      const gsap = gsapMod.default || gsapMod.gsap
+      const { ScrollTrigger } = stMod
+      const Lenis = lenisMod.default
 
-export default function X40LandingPage() {
-  const [scrolled, setScrolled] = useState(false)
-  const [menuOpen, setMenuOpen] = useState(false)
-  useReveal()
+      gsap.registerPlugin(ScrollTrigger)
 
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 60)
-    window.addEventListener('scroll', onScroll, { passive: true })
-    return () => window.removeEventListener('scroll', onScroll)
+      /* Lenis smooth scroll */
+      const lenis = new Lenis({
+        duration: 1.2,
+        easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+        smoothWheel: true,
+      } as ConstructorParameters<typeof Lenis>[0])
+      lenis.on('scroll', ScrollTrigger.update)
+      gsap.ticker.add((time: number) => lenis.raf(time * 1000))
+      gsap.ticker.lagSmoothing(0)
+
+      /* Nav scroll detect */
+      ScrollTrigger.create({
+        trigger: document.body,
+        start: 'top -60px',
+        onEnter: () => nav.classList.add('x40-nav--scrolled'),
+        onLeaveBack: () => nav.classList.remove('x40-nav--scrolled'),
+      })
+
+      const scrollEl = document.getElementById('x40-scroll')!
+
+      /* ── Hero → Canvas circle-wipe transition ── */
+      ScrollTrigger.create({
+        trigger: scrollEl,
+        start: 'top top',
+        end: 'bottom bottom',
+        scrub: true,
+        onUpdate: (self) => {
+          const p = self.progress
+          // Hero fades out fast
+          if (hero) hero.style.opacity = String(Math.max(0, 1 - p * 18))
+          // Canvas circle-wipe in
+          const wipe = Math.min(1, Math.max(0, (p - 0.005) / 0.07))
+          const radius = wipe * 80
+          canvasWrap.style.clipPath = `circle(${radius}% at 50% 50%)`
+        },
+      })
+
+      /* ── Frame scroll binding ── */
+      ScrollTrigger.create({
+        trigger: scrollEl,
+        start: 'top top',
+        end: 'bottom bottom',
+        scrub: true,
+        onUpdate: (self) => {
+          const accelerated = Math.min(self.progress * FRAME_SPEED, 1)
+          const idx = Math.min(Math.floor(accelerated * FRAME_COUNT), FRAME_COUNT - 1)
+          if (idx !== currentFrame) {
+            currentFrame = idx
+            if (!rafPending) {
+              rafPending = true
+              requestAnimationFrame(() => {
+                drawFrame(currentFrame)
+                rafPending = false
+              })
+            }
+          }
+        },
+      })
+
+      /* ── Dark overlay for stats section ── */
+      const OVERLAY_ENTER = 0.54
+      const OVERLAY_LEAVE = 0.67
+      const FADE = 0.03
+      ScrollTrigger.create({
+        trigger: scrollEl,
+        start: 'top top',
+        end: 'bottom bottom',
+        scrub: true,
+        onUpdate: (self) => {
+          const p = self.progress
+          let op = 0
+          if (p >= OVERLAY_ENTER - FADE && p < OVERLAY_ENTER)
+            op = (p - (OVERLAY_ENTER - FADE)) / FADE
+          else if (p >= OVERLAY_ENTER && p <= OVERLAY_LEAVE)
+            op = 0.9
+          else if (p > OVERLAY_LEAVE && p <= OVERLAY_LEAVE + FADE)
+            op = 0.9 * (1 - (p - OVERLAY_LEAVE) / FADE)
+          overlay.style.opacity = String(op)
+        },
+      })
+
+      /* ── Section animations ── */
+      const sections = document.querySelectorAll<HTMLElement>('.scroll-section[data-enter]')
+      sections.forEach(section => {
+        const enter = parseFloat(section.dataset.enter!) / 100
+        const leave = parseFloat(section.dataset.leave!) / 100
+        const animType = section.dataset.animation || 'fade-up'
+        const persist = section.dataset.persist === 'true'
+
+        const children = Array.from(
+          section.querySelectorAll<HTMLElement>(
+            '.section-label, .section-heading, .section-body, .section-note, .cta-btn, .stat'
+          )
+        )
+
+        const tl = gsap.timeline({ paused: true })
+        const dur = 0.9
+        const stag = 0.12
+
+        switch (animType) {
+          case 'fade-up':
+            tl.from(children, { y: 50, opacity: 0, stagger: stag, duration: dur, ease: 'power3.out' })
+            break
+          case 'slide-left':
+            tl.from(children, { x: -80, opacity: 0, stagger: stag, duration: dur, ease: 'power3.out' })
+            break
+          case 'slide-right':
+            tl.from(children, { x: 80, opacity: 0, stagger: stag, duration: dur, ease: 'power3.out' })
+            break
+          case 'scale-up':
+            tl.from(children, { scale: 0.85, opacity: 0, stagger: stag, duration: 1.0, ease: 'power2.out' })
+            break
+          case 'rotate-in':
+            tl.from(children, { y: 40, rotation: 3, opacity: 0, stagger: 0.1, duration: dur, ease: 'power3.out' })
+            break
+          case 'stagger-up':
+            tl.from(children, { y: 60, opacity: 0, stagger: 0.15, duration: 0.8, ease: 'power3.out' })
+            break
+          case 'clip-reveal':
+            tl.from(children, { clipPath: 'inset(100% 0 0 0)', opacity: 0, stagger: 0.15, duration: 1.2, ease: 'power4.inOut' })
+            break
+        }
+
+        let played = false
+
+        ScrollTrigger.create({
+          trigger: scrollEl,
+          start: 'top top',
+          end: 'bottom bottom',
+          scrub: false,
+          onUpdate: (self) => {
+            const p = self.progress
+            const mid = (enter + leave) / 2
+            const range = (leave - enter) / 2
+            const dist = Math.abs(p - mid)
+            const visible = dist < range
+
+            if (visible && !played) {
+              played = true
+              tl.play()
+            } else if (!visible && played && !persist) {
+              played = false
+              tl.reverse()
+            }
+          },
+        })
+      })
+
+      /* ── Counter animations ── */
+      document.querySelectorAll<HTMLElement>('.stat-number').forEach(el => {
+        const target = parseFloat(el.dataset.value || '0')
+        const decimals = parseInt(el.dataset.decimals || '0')
+        gsap.from(el, {
+          textContent: 0,
+          duration: 2.2,
+          ease: 'power1.out',
+          snap: { textContent: decimals === 0 ? 1 : 0.01 },
+          scrollTrigger: {
+            trigger: el.closest('.scroll-section'),
+            start: 'top 70%',
+            toggleActions: 'play none none reverse',
+          },
+        })
+      })
+
+      /* ── Marquee ── */
+      const marqueeWrap = document.querySelector<HTMLElement>('.marquee-wrap')
+      const marqueeText = document.querySelector<HTMLElement>('.marquee-text')
+      if (marqueeWrap && marqueeText) {
+        gsap.to(marqueeText, {
+          xPercent: -28,
+          ease: 'none',
+          scrollTrigger: {
+            trigger: scrollEl,
+            start: 'top top',
+            end: 'bottom bottom',
+            scrub: true,
+          },
+        })
+
+        const MENTER = 0.76
+        const MLEAVE = 0.88
+        ScrollTrigger.create({
+          trigger: scrollEl,
+          start: 'top top',
+          end: 'bottom bottom',
+          scrub: true,
+          onUpdate: (self) => {
+            const p = self.progress
+            let op = 0
+            if (p >= MENTER && p < MENTER + 0.03) op = (p - MENTER) / 0.03
+            else if (p >= MENTER + 0.03 && p <= MLEAVE - 0.03) op = 1
+            else if (p > MLEAVE - 0.03 && p <= MLEAVE) op = 1 - (p - (MLEAVE - 0.03)) / 0.03
+            marqueeWrap.style.opacity = String(op)
+          },
+        })
+      }
+
+      cleanup = () => {
+        lenis.destroy()
+        ScrollTrigger.killAll()
+      }
+    })
+
+    /* ── Resize handler ── */
+    window.addEventListener('resize', resizeCanvas)
+    resizeCanvas()
+    preloadFrames()
+
+    return () => {
+      window.removeEventListener('resize', resizeCanvas)
+      cleanup?.()
+    }
   }, [])
 
   return (
     <div className="x40-page">
 
-      {/* ═══════════ FIXED NAV ═══════════ */}
-      <nav className={`x40-nav${scrolled ? ' x40-nav--scrolled' : ''}`}>
+      {/* ── Loader ── */}
+      <div id="x40-loader" ref={loaderRef}>
+        <div className="x40-loader-brand">
+          <Image src="/logo.png" alt="JOMOO" width={120} height={36} style={{ objectFit: 'contain', opacity: 0.8 }} priority />
+          <span>X40</span>
+        </div>
+        <div className="x40-loader-track">
+          <div className="x40-loader-bar" ref={loaderBarRef} />
+        </div>
+        <span className="x40-loader-pct" ref={loaderPctRef}>0%</span>
+      </div>
+
+      {/* ── Fixed canvas wrap (circle-wipe reveal) ── */}
+      <div id="x40-canvas-wrap" ref={canvasWrapRef} style={{ clipPath: 'circle(0% at 50% 50%)' }}>
+        <canvas id="x40-canvas" ref={canvasRef} />
+      </div>
+
+      {/* ── Dark overlay (stats section) ── */}
+      <div id="x40-dark-overlay" ref={overlayRef} />
+
+      {/* ── Fixed nav ── */}
+      <nav className="x40-nav" ref={navRef}>
         <div className="x40-nav-inner">
           <Link href="/" className="x40-logo-link">
-            <Image src="/logo.png" alt="JOMOO" width={120} height={36} style={{ objectFit: 'contain' }} priority />
+            <Image src="/logo.png" alt="JOMOO" width={110} height={32} style={{ objectFit: 'contain' }} priority />
           </Link>
-
-          <div className={`x40-nav-links${menuOpen ? ' x40-nav-links--open' : ''}`}>
-            {[['#features', 'Features'], ['#technology', 'Technology'], ['#comfort', 'Comfort'], ['#specs', 'Specs']].map(([href, label]) => (
-              <a key={href} href={href} onClick={() => setMenuOpen(false)}>{label}</a>
+          <div className="x40-nav-links">
+            {(['Features', 'Technology', 'Hygiene', 'Comfort'] as const).map(l => (
+              <a key={l} href="#x40-scroll">{l}</a>
             ))}
-            <Link href="/products/smart-toilet" className="x40-nav-cta" onClick={() => setMenuOpen(false)}>
-              View All Products →
-            </Link>
+            <Link href="/products/smart-toilet" className="x40-nav-cta">All Products →</Link>
           </div>
-
-          <button className="x40-hamburger" onClick={() => setMenuOpen(v => !v)} aria-label="Menu">
-            <span /><span /><span />
-          </button>
         </div>
       </nav>
 
-      {/* ═══════════ HERO ═══════════ */}
-      <section className="x40-hero">
-        <video
-          className="x40-hero-video"
-          autoPlay muted loop playsInline
-          poster="/x40/product-main.jpg"
-        >
-          <source src="/x40/x40.mp4" type="video/mp4" />
-        </video>
-        <div className="x40-hero-overlay" />
-        <div className="x40-hero-content x40-animate-up">
-          <p className="x40-hero-eyebrow">JOMOO — Introducing</p>
+      {/* ══════════════════════════════════
+          STANDALONE HERO (100vh, solid black)
+          z-index 5 — sits above canvas initially
+      ══════════════════════════════════ */}
+      <div className="x40-hero-standalone" ref={heroRef}>
+        <div className="x40-hero-inner">
+          <span className="section-label" style={{ marginBottom: 24 }}>001 / JOMOO JAPAN</span>
           <h1 className="x40-hero-title">X40</h1>
-          <p className="x40-hero-lead">The intelligent smart toilet.<br />Redefined for modern living.</p>
-          <div className="x40-hero-actions">
-            <a href="#features" className="x40-btn x40-btn--white">Explore Features</a>
-            <Link href="/products/smart-toilet" className="x40-btn x40-btn--ghost">View Products</Link>
+          <p className="x40-hero-tagline">The Intelligent Toilet.<br />Redefined.</p>
+          <div className="x40-hero-scroll-hint">
+            <span>scroll</span>
+            <svg width="18" height="28" viewBox="0 0 18 28" fill="none">
+              <rect x="1" y="1" width="16" height="26" rx="8" stroke="rgba(255,255,255,0.3)" strokeWidth="1.5" />
+              <rect className="x40-scroll-dot" x="7.5" y="5" width="3" height="6" rx="1.5" fill="rgba(255,255,255,0.7)" />
+            </svg>
           </div>
         </div>
-        <div className="x40-scroll-indicator">
-          <span />
-        </div>
-      </section>
+      </div>
 
-      {/* ═══════════ TAGLINE ═══════════ */}
-      <section className="x40-tagline x40-reveal">
-        <p className="x40-tagline-text">
-          "Every detail engineered<br />for the moments that matter."
-        </p>
-        <p className="x40-tagline-sub">
-          The X40 combines 26 intelligent features with a 640 mm compact footprint —
-          bringing luxury, hygiene, and silent performance to any bathroom.
-        </p>
-      </section>
+      {/* ══════════════════════════════════
+          SCROLL CONTAINER — 900vh
+          Canvas shows through beneath
+      ══════════════════════════════════ */}
+      <div id="x40-scroll" style={{ position: 'relative', height: '900vh', zIndex: 3 }}>
 
-      {/* ═══════════ STATS STRIP ═══════════ */}
-      <section className="x40-stats" id="specs">
-        {[
-          { num: 640,  suffix: 'mm', label: 'Ultra-Compact Depth' },
-          { num: 38,   suffix: 'dB', label: 'Maximum Flush Noise' },
-          { num: 26,   suffix: '',   label: 'Intelligent Features' },
-          { num: 99,   suffix: '%',  label: 'Bacteria Eliminated' },
-        ].map(({ num, suffix, label }, i) => (
-          <div key={label} className={`x40-stat x40-reveal`} style={{ transitionDelay: `${i * 0.1}s` }}>
-            <div className="x40-stat-num">
-              <StatCounter target={num} suffix={suffix} />
-            </div>
-            <div className="x40-stat-label">{label}</div>
-          </div>
-        ))}
-      </section>
+        {/* 0–18%: pure video reveal, no text */}
 
-      {/* ═══════════ PRODUCT HERO SHOT ═══════════ */}
-      <section className="x40-product-shot x40-reveal">
-        <div className="x40-product-shot-inner">
-          <div className="x40-product-shot-text">
-            <span className="x40-eyebrow">Design</span>
-            <h2 className="x40-section-title">Crafted for space.<br />Built for beauty.</h2>
-            <p className="x40-body-text">
-              At just 640 mm deep, the X40 fits where conventional smart toilets cannot.
-              The seamless glaze surface repels stains and bacteria — a product that looks
-              as pristine on day 1,000 as it did on day one.
-            </p>
-            <div className="x40-product-feat-row">
-              <div>
-                <img src="/x40/compact-640.gif" alt="640mm compact" style={{ width: 80, height: 'auto', opacity: 0.85 }} />
-                <span>640mm footprint</span>
-              </div>
-              <div>
-                <img src="/x40/seamless-interior.png" alt="Seamless interior" style={{ width: 80, height: 'auto', opacity: 0.85 }} />
-                <span>Nano-glaze bowl</span>
-              </div>
-              <div>
-                <img src="/x40/soft-close-lid.png" alt="Soft close" style={{ width: 80, height: 'auto', opacity: 0.85 }} />
-                <span>Soft-close lid</span>
-              </div>
-            </div>
-          </div>
-          <div className="x40-product-shot-img">
-            <Image
-              src="/x40/product-alt.png"
-              alt="JOMOO X40 Smart Toilet"
-              width={600}
-              height={700}
-              style={{ width: '100%', height: 'auto', objectFit: 'contain' }}
-            />
-          </div>
-        </div>
-      </section>
-
-      {/* ═══════════ FEATURE BENTO GRID ═══════════ */}
-      <section className="x40-features" id="features">
-        <div className="x40-sec-inner">
-          <div className="x40-sec-header x40-reveal">
-            <span className="x40-eyebrow">Intelligence</span>
-            <h2 className="x40-section-title">26 features.<br />One seamless experience.</h2>
-          </div>
-
-          <div className="x40-bento">
-            {FEATURES.map(({ img, en, ja, desc }, i) => (
-              <div
-                key={en}
-                className="x40-bento-card x40-reveal"
-                style={{ transitionDelay: `${(i % 4) * 0.08}s` }}
-              >
-                <div className="x40-bento-img-wrap">
-                  <img src={img} alt={en} />
-                </div>
-                <div className="x40-bento-body">
-                  <div className="x40-bento-labels">
-                    <span className="x40-bento-en">{en}</span>
-                    <span className="x40-bento-ja">{ja}</span>
-                  </div>
-                  <p className="x40-bento-desc">{desc}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ═══════════ TECHNOLOGY DEEP-DIVE ═══════════ */}
-      <section className="x40-tech" id="technology">
-        <div className="x40-sec-inner">
-          <div className="x40-sec-header x40-reveal">
-            <span className="x40-eyebrow">Technology</span>
-            <h2 className="x40-section-title">Engineered to<br />outlast expectation.</h2>
-          </div>
-
-          {/* Row 1: Cyclone flush */}
-          <div className="x40-tech-row x40-reveal">
-            <div className="x40-tech-img-col">
-              <img src="/x40/cyclone-flush.jpg" alt="Cyclone Flush" />
-            </div>
-            <div className="x40-tech-text-col">
-              <span className="x40-eyebrow">Flush System</span>
-              <h3>Cyclone Flush Technology</h3>
-              <p>
-                Spiral water jets scour the entire inner surface in a single 3.8 L flush.
-                The result: a mathematically cleaner bowl using 87% less water than a conventional toilet.
-              </p>
-              <div className="x40-tech-stats">
-                <div><strong>3.8<small>L</small></strong><span>Per flush</span></div>
-                <div><strong>38<small>dB</small></strong><span>Maximum noise</span></div>
-                <div><strong>87<small>%</small></strong><span>Water saved</span></div>
-              </div>
-            </div>
-          </div>
-
-          {/* Row 2: UV + Platinum (reversed) */}
-          <div className="x40-tech-row x40-tech-row--rev x40-reveal">
-            <div className="x40-tech-img-col">
-              <img src="/x40/uv-sterilize.jpg" alt="UV Sterilization" />
-            </div>
-            <div className="x40-tech-text-col">
-              <span className="x40-eyebrow">Hygiene System</span>
-              <h3>UV + Platinum Protection</h3>
-              <p>
-                A built-in UV lamp sterilises the bowl before and after each use.
-                The platinum catalyst deodoriser converts odour molecules into harmless
-                water vapour — no sprays, no chemicals, no compromise.
-              </p>
-              <div className="x40-tech-stats">
-                <div><strong>99.9<small>%</small></strong><span>Bacteria eliminated</span></div>
-                <div><strong>0<small>s</small></strong><span>Reaction time</span></div>
-                <div><strong>24<small>h</small></strong><span>Active protection</span></div>
-              </div>
-            </div>
-          </div>
-
-          {/* Row 3: Auto lid + foot sensor */}
-          <div className="x40-tech-row x40-reveal">
-            <div className="x40-tech-img-col">
-              <img src="/x40/auto-lid.jpg" alt="Auto Lid" />
-            </div>
-            <div className="x40-tech-text-col">
-              <span className="x40-eyebrow">Smart Sensing</span>
-              <h3>Touch-Free Automation</h3>
-              <p>
-                Proximity sensors open the lid as you approach and close it when you leave.
-                The foot-activated flush panel means your hands never touch the toilet.
-                Power-outage mode ensures manual flush always works.
-              </p>
-              <ul className="x40-check-list">
-                {['Auto-open lid on approach', 'Foot-sensor flush + lid toggle', 'Auto-flush on departure', 'Emergency flush during power outage'].map(f => (
-                  <li key={f}><span className="x40-check">✓</span>{f}</li>
-                ))}
-              </ul>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ═══════════ COMFORT GRID ═══════════ */}
-      <section className="x40-comfort" id="comfort">
-        <div className="x40-sec-inner">
-          <div className="x40-sec-header x40-reveal">
-            <span className="x40-eyebrow">Personal Care</span>
-            <h2 className="x40-section-title">Comfort,<br />precisely calibrated.</h2>
-            <p className="x40-sec-sub">
-              Six wash modes — each adjustable in pressure, temperature, and position —
-              adapt to every member of the household.
+        {/* Section 1 — Design (18–32%) */}
+        <section
+          className="scroll-section align-left"
+          data-enter="18" data-leave="32" data-animation="slide-left"
+          style={{ top: '25%', transform: 'translateY(-50%)' }}
+        >
+          <div className="section-inner">
+            <span className="section-label">002 / Design</span>
+            <h2 className="section-heading">640mm.<br />Every millimetre<br />earned.</h2>
+            <p className="section-body">
+              At just 640 mm deep, the X40 fits where conventional smart toilets
+              cannot. Seamless nano-glaze repels stains and bacteria — beautiful
+              on day one, still pristine on day one thousand.
             </p>
           </div>
+        </section>
 
-          <div className="x40-comfort-grid">
-            {COMFORT.map(({ img, en, ja, desc }, i) => (
-              <div key={en} className="x40-comfort-card x40-reveal" style={{ transitionDelay: `${(i % 3) * 0.1}s` }}>
-                <div className="x40-comfort-img">
-                  <img src={img} alt={en} />
-                </div>
-                <div className="x40-comfort-body">
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-                    <strong>{en}</strong>
-                    <span style={{ fontSize: 12, color: '#666', fontFamily: 'ui-monospace,monospace' }}>{ja}</span>
-                  </div>
-                  <p>{desc}</p>
-                </div>
-              </div>
-            ))}
+        {/* Section 2 — Flush (30–44%) */}
+        <section
+          className="scroll-section align-right"
+          data-enter="30" data-leave="44" data-animation="slide-right"
+          style={{ top: '37%', transform: 'translateY(-50%)' }}
+        >
+          <div className="section-inner">
+            <span className="section-label">003 / Flush</span>
+            <h2 className="section-heading">38 dB.<br />You&apos;ll never<br />hear it.</h2>
+            <p className="section-body">
+              Cyclone spiral jets scour the entire bowl in 3.8 L — 87 % less water
+              than a conventional flush. The result is mathematically cleaner,
+              measurably quieter.
+            </p>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* ═══════════ POWER-OUTAGE / MISC ═══════════ */}
-      <section className="x40-misc x40-reveal">
-        <div className="x40-sec-inner">
-          <div className="x40-misc-grid">
+        {/* Section 3 — Hygiene (42–56%) */}
+        <section
+          className="scroll-section align-left"
+          data-enter="42" data-leave="56" data-animation="scale-up"
+          style={{ top: '49%', transform: 'translateY(-50%)' }}
+        >
+          <div className="section-inner">
+            <span className="section-label">004 / Hygiene</span>
+            <h2 className="section-heading">UV&nbsp;+&nbsp;Platinum.<br />99.9 % bacteria‑free.</h2>
+            <p className="section-body">
+              Built-in UV sterilises the bowl before and after each use. A platinum
+              catalyst converts odour molecules into harmless water vapour — no
+              chemicals, no sprays, no compromise.
+            </p>
+          </div>
+        </section>
+
+        {/* Section 4 — Stats (54–67%, dark overlay) */}
+        <section
+          className="scroll-section section-stats"
+          data-enter="54" data-leave="67" data-animation="stagger-up"
+          style={{ top: '60.5%', transform: 'translateY(-50%)' }}
+        >
+          <div className="stats-grid">
             {[
-              { img: '/x40/power-outage-flush.jpg', title: 'Power-Outage Flush', body: 'A dedicated manual flush valve keeps the toilet functional even during a blackout.' },
-              { img: '/x40/auto-descale.jpg',       title: 'Auto Descaling',     body: 'Automated needle descaling dissolves limescale deposits inside the nozzle.' },
-              { img: '/x40/nozzle-clean.png',       title: 'Self-Clean Nozzle',  body: 'The nozzle pre-rinses itself before and after every use without prompting.' },
-              { img: '/x40/antibacterial.jpg',      title: 'Dual Antibacterial', body: 'Both the seat ring and spray nozzle are treated with antibacterial coating.' },
-            ].map(({ img, title, body }, i) => (
-              <div key={title} className="x40-misc-card x40-reveal" style={{ transitionDelay: `${i * 0.1}s` }}>
-                <div className="x40-misc-img"><img src={img} alt={title} /></div>
-                <strong>{title}</strong>
-                <p>{body}</p>
+              { value: 640,  suffix: 'mm', label: 'Ultra-Compact Depth' },
+              { value: 38,   suffix: 'dB', label: 'Max Flush Noise' },
+              { value: 99,   suffix: '%',  label: 'Bacteria Eliminated' },
+              { value: 26,   suffix: '',   label: 'Intelligent Features' },
+            ].map(({ value, suffix, label }) => (
+              <div key={label} className="stat">
+                <div className="stat-row">
+                  <span className="stat-number" data-value={value} data-decimals="0">{value}</span>
+                  <span className="stat-suffix">{suffix}</span>
+                </div>
+                <span className="stat-label">{label}</span>
               </div>
             ))}
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* ═══════════ CTA ═══════════ */}
-      <section className="x40-cta">
-        <div className="x40-cta-bg" />
-        <div className="x40-cta-content x40-reveal">
-          <span className="x40-eyebrow" style={{ color: 'rgba(255,255,255,0.6)' }}>JOMOO X40</span>
-          <h2 className="x40-cta-title">Experience it<br />in person.</h2>
-          <p className="x40-cta-body">
-            Visit a JOMOO showroom to see the X40 in a live environment,
-            or speak with a specialist to find the right configuration for your space.
-          </p>
-          <div className="x40-cta-actions">
-            <Link href="/products/smart-toilet" className="x40-btn x40-btn--white">Explore All Models</Link>
-            <a href="#" className="x40-btn x40-btn--ghost">Find a Showroom</a>
+        {/* Section 5 — Comfort (65–78%) */}
+        <section
+          className="scroll-section align-right"
+          data-enter="65" data-leave="78" data-animation="clip-reveal"
+          style={{ top: '71.5%', transform: 'translateY(-50%)' }}
+        >
+          <div className="section-inner">
+            <span className="section-label">006 / Comfort</span>
+            <h2 className="section-heading">Six wash modes.<br />One ritual.</h2>
+            <p className="section-body">
+              Rear, feminine, wide, massage, relief — each adjustable in pressure,
+              temperature, and position. The heated seat adapts to four seasons.
+              Warm water is always instant.
+            </p>
+          </div>
+        </section>
+
+        {/* Section 6 — Marquee (76–88%) */}
+        <div
+          className="marquee-wrap scroll-section"
+          style={{ top: '82%', transform: 'translateY(-50%)', width: '100%', opacity: 0 }}
+        >
+          <div className="marquee-text">
+            INTELLIGENT&nbsp;·&nbsp;HYGIENIC&nbsp;·&nbsp;SILENT&nbsp;·&nbsp;PRECISE&nbsp;·&nbsp;INTELLIGENT&nbsp;·&nbsp;HYGIENIC&nbsp;·&nbsp;SILENT&nbsp;·&nbsp;PRECISE&nbsp;·&nbsp;INTELLIGENT&nbsp;·
           </div>
         </div>
-        <div className="x40-cta-img x40-reveal">
-          <Image
-            src="/x40/product-main.jpg"
-            alt="JOMOO X40"
-            width={520}
-            height={620}
-            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-          />
-        </div>
-      </section>
 
-      {/* ═══════════ FOOTER ═══════════ */}
-      <footer className="x40-footer">
-        <div className="x40-footer-inner">
-          <Image src="/logo.png" alt="JOMOO" width={100} height={30} style={{ objectFit: 'contain', opacity: 0.7 }} />
-          <div className="x40-footer-links">
-            <Link href="/products/smart-toilet">Products</Link>
-            <a href="#">Showrooms</a>
-            <a href="#">Support</a>
-            <Link href="/register">Register</Link>
+        {/* Section 7 — CTA (86–100%, persists) */}
+        <section
+          className="scroll-section section-cta"
+          data-enter="86" data-leave="100" data-animation="fade-up" data-persist="true"
+          style={{ top: '93%', transform: 'translateY(-50%)' }}
+        >
+          <div className="cta-inner">
+            <span className="section-label">008 / Experience</span>
+            <h2 className="section-heading cta-heading">Discover<br />the X40.</h2>
+            <p className="section-body section-note">
+              Visit a JOMOO showroom or speak with a specialist to find your configuration.
+            </p>
+            <div className="cta-actions">
+              <Link href="/products/smart-toilet" className="cta-btn cta-btn--white">View All Models →</Link>
+              <a href="#" className="cta-btn cta-btn--ghost">Find a Showroom</a>
+            </div>
           </div>
-          <p className="x40-footer-copy">© {new Date().getFullYear()} JOMOO JAPAN 株式会社. All rights reserved.</p>
-        </div>
-      </footer>
+          <div className="cta-footer-bar">
+            <Image src="/logo.png" alt="JOMOO" width={90} height={26} style={{ objectFit: 'contain', opacity: 0.5 }} />
+            <div className="cta-footer-links">
+              <Link href="/products/smart-toilet">Products</Link>
+              <a href="#">Showrooms</a>
+              <a href="#">Support</a>
+              <Link href="/register">Register</Link>
+            </div>
+            <p>© {new Date().getFullYear()} JOMOO JAPAN 株式会社</p>
+          </div>
+        </section>
 
+      </div>{/* end #x40-scroll */}
     </div>
   )
 }
