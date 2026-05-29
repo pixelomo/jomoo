@@ -2,7 +2,7 @@ import { ClerkProvider } from '@clerk/nextjs'
 import { NextIntlClientProvider } from 'next-intl'
 import { getMessages } from 'next-intl/server'
 import { notFound } from 'next/navigation'
-import { Bebas_Neue, Geist, Noto_Sans_JP, Noto_Serif_JP } from 'next/font/google'
+import { Bebas_Neue, Geist, Noto_Sans_JP } from 'next/font/google'
 import { routing } from '@/i18n/routing'
 import type { Metadata } from 'next'
 import '../globals.css'
@@ -26,19 +26,25 @@ const notoSansJP = Noto_Sans_JP({
   display: 'swap',
 })
 
-const notoSerifJP = Noto_Serif_JP({
-  variable: '--font-noto-serif-jp',
-  subsets: ['latin'],
-  weight: ['400', '600'],
-  display: 'swap',
-})
-
 export const metadata: Metadata = {
   title: {
-    template: '%s | JoMoo',
-    default: 'JoMoo',
+    template: '%s | JOMOO',
+    default: 'JOMOO X40 — インテリジェントトイレ | スマートウォシュレット',
   },
-  description: '产品登记与保修服务 / Product Registration & Warranty',
+  description: 'JOMOO X40 インテリジェントトイレ。UV除菌・プラチナ触媒・サイクロン洗浄・奥行き640mm超コンパクト設計。最先端スマートウォシュレットで快適なバスルーム体験を。',
+  keywords: ['JOMOO', 'X40', 'インテリジェントトイレ', 'スマートトイレ', 'ウォシュレット', 'UV除菌', 'スマートバスルーム', '温水洗浄便座', 'JOMOO JAPAN', 'smart toilet'],
+  openGraph: {
+    title: 'JOMOO X40 — インテリジェントトイレ',
+    description: 'UV除菌・プラチナ触媒・サイクロン洗浄・640mm超コンパクト設計のインテリジェントトイレ',
+    siteName: 'JOMOO JAPAN',
+    locale: 'ja_JP',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'JOMOO X40 — インテリジェントトイレ',
+    description: 'UV除菌・プラチナ触媒・サイクロン洗浄・640mm超コンパクト設計',
+  },
 }
 
 export default async function LocaleLayout({
@@ -57,7 +63,7 @@ export default async function LocaleLayout({
   const messages = await getMessages()
 
   return (
-    <html lang={locale} className={`${bebasNeue.variable} ${geistSans.variable} ${notoSansJP.variable} ${notoSerifJP.variable} h-full antialiased`}>
+    <html lang={locale} className={`${bebasNeue.variable} ${geistSans.variable} ${notoSansJP.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col bg-white text-zinc-900">
         <ClerkProvider>
           <NextIntlClientProvider messages={messages}>

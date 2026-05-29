@@ -195,7 +195,7 @@ export default function X40Page() {
           if (p >= OVERLAY_ENTER - FADE && p < OVERLAY_ENTER)
             op = (p - (OVERLAY_ENTER - FADE)) / FADE
           else if (p >= OVERLAY_ENTER && p <= OVERLAY_LEAVE)
-            op = 0.9
+            op = 1.0
           else if (p > OVERLAY_LEAVE && p <= OVERLAY_LEAVE + FADE)
             op = 0.9 * (1 - (p - OVERLAY_LEAVE) / FADE)
           overlay.style.opacity = String(op)
@@ -376,7 +376,6 @@ export default function X40Page() {
 
       {/* ── Fixed hero text overlay (fades out on scroll) ── */}
       <div id="x40-hero-text" ref={heroTextRef}>
-        <span className="section-label" style={{ marginBottom: 24 }}>001 / JOMOO JAPAN</span>
         <h1 className="x40-hero-title">X40</h1>
         <p className="x40-hero-tagline">インテリジェント・トイレ。<br />再定義。</p>
         <div className="x40-hero-scroll-hint">
