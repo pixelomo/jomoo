@@ -5,14 +5,14 @@ import Image from 'next/image'
 import Link from 'next/link'
 
 const FRAME_COUNT = 145
-const FRAME_SPEED = 1.9
+const FRAME_SPEED = 1.0
 const IMAGE_SCALE = 0.88
 const TOTAL_FRAMES_PATH = (i: number) =>
   `/x40/frames/frame_${String(i).padStart(4, '0')}.webp`
 
 export default function X40Page() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
-  const heroRef = useRef<HTMLDivElement>(null)
+  const heroTextRef = useRef<HTMLDivElement>(null)
   const canvasWrapRef = useRef<HTMLDivElement>(null)
   const overlayRef = useRef<HTMLDivElement>(null)
   const loaderRef = useRef<HTMLDivElement>(null)
@@ -23,14 +23,14 @@ export default function X40Page() {
   useEffect(() => {
     /* ── Guards ── */
     const canvas = canvasRef.current
-    const hero = heroRef.current
+    const heroText = heroTextRef.current
     const canvasWrap = canvasWrapRef.current
     const overlay = overlayRef.current
     const loader = loaderRef.current
     const loaderBar = loaderBarRef.current
     const loaderPct = loaderPctRef.current
     const nav = navRef.current
-    if (!canvas || !hero || !canvasWrap || !overlay || !loader || !nav) return
+    if (!canvas || !canvasWrap || !overlay || !loader || !nav) return
 
     const ctx = canvas.getContext('2d')!
     const frames: HTMLImageElement[] = []
@@ -145,20 +145,16 @@ export default function X40Page() {
 
       const scrollEl = document.getElementById('x40-scroll')!
 
-      /* ── Hero → Canvas circle-wipe transition ── */
+      /* ── Hero text fade-out ── */
       ScrollTrigger.create({
         trigger: scrollEl,
         start: 'top top',
         end: 'bottom bottom',
         scrub: true,
         onUpdate: (self) => {
-          const p = self.progress
-          // Hero fades out fast
-          if (hero) hero.style.opacity = String(Math.max(0, 1 - p * 18))
-          // Canvas circle-wipe in
-          const wipe = Math.min(1, Math.max(0, (p - 0.005) / 0.07))
-          const radius = wipe * 80
-          canvasWrap.style.clipPath = `circle(${radius}% at 50% 50%)`
+          if (heroText) {
+            heroText.style.opacity = String(Math.max(0, 1 - self.progress * 12))
+          }
         },
       })
 
@@ -355,8 +351,8 @@ export default function X40Page() {
         <span className="x40-loader-pct" ref={loaderPctRef}>0%</span>
       </div>
 
-      {/* ── Fixed canvas wrap (circle-wipe reveal) ── */}
-      <div id="x40-canvas-wrap" ref={canvasWrapRef} style={{ clipPath: 'circle(0% at 50% 50%)' }}>
+      {/* ── Fixed canvas wrap ── */}
+      <div id="x40-canvas-wrap" ref={canvasWrapRef}>
         <canvas id="x40-canvas" ref={canvasRef} />
       </div>
 
@@ -378,22 +374,17 @@ export default function X40Page() {
         </div>
       </nav>
 
-      {/* ══════════════════════════════════
-          STANDALONE HERO (100vh, solid black)
-          z-index 5 — sits above canvas initially
-      ══════════════════════════════════ */}
-      <div className="x40-hero-standalone" ref={heroRef}>
-        <div className="x40-hero-inner">
-          <span className="section-label" style={{ marginBottom: 24 }}>001 / JOMOO JAPAN</span>
-          <h1 className="x40-hero-title">X40</h1>
-          <p className="x40-hero-tagline">The Intelligent Toilet.<br />Redefined.</p>
-          <div className="x40-hero-scroll-hint">
-            <span>scroll</span>
-            <svg width="18" height="28" viewBox="0 0 18 28" fill="none">
-              <rect x="1" y="1" width="16" height="26" rx="8" stroke="rgba(255,255,255,0.3)" strokeWidth="1.5" />
-              <rect className="x40-scroll-dot" x="7.5" y="5" width="3" height="6" rx="1.5" fill="rgba(255,255,255,0.7)" />
-            </svg>
-          </div>
+      {/* ── Fixed hero text overlay (fades out on scroll) ── */}
+      <div id="x40-hero-text" ref={heroTextRef}>
+        <span className="section-label" style={{ marginBottom: 24 }}>001 / JOMOO JAPAN</span>
+        <h1 className="x40-hero-title">X40</h1>
+        <p className="x40-hero-tagline">The Intelligent Toilet.<br />Redefined.</p>
+        <div className="x40-hero-scroll-hint">
+          <span>scroll</span>
+          <svg width="18" height="28" viewBox="0 0 18 28" fill="none">
+            <rect x="1" y="1" width="16" height="26" rx="8" stroke="rgba(255,255,255,0.3)" strokeWidth="1.5" />
+            <circle className="x40-scroll-dot-circle" cx="9" cy="9" r="2.5" fill="rgba(255,255,255,0.7)" />
+          </svg>
         </div>
       </div>
 
