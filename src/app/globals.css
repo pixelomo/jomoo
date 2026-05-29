@@ -555,16 +555,14 @@ a { text-decoration: none; }
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  filter: drop-shadow(2px 3px 0 rgba(0,0,0,1)) drop-shadow(3px 5px 6px rgba(0,0,0,0.75));
 }
 .x40-hero-tagline {
   font-family: var(--font-noto-sans-jp, sans-serif);
   font-size: clamp(1rem, 1.8vw, 1.4rem);
   font-weight: 400;
   line-height: 1.9;
-  color: rgba(255,255,255,0.92);
+  color: rgba(255,255,255,0.88);
   letter-spacing: 0.08em;
-  text-shadow: 2px 3px 0 rgba(0,0,0,0.95), 2px 4px 8px rgba(0,0,0,0.7);
 }
 .x40-hero-scroll-hint {
   display: flex;
@@ -577,7 +575,6 @@ a { text-decoration: none; }
   letter-spacing: 0.2em;
   text-transform: uppercase;
   color: rgba(255,255,255,0.45);
-  text-shadow: 1px 1px 0 rgba(0,0,0,0.9), 1px 2px 4px rgba(0,0,0,0.6);
 }
 
 /* ── Scroll dot animation ── */
@@ -594,11 +591,9 @@ a { text-decoration: none; }
   pointer-events: none;
 }
 
-/* ── Side alignment zones ── */
-.align-left  { padding: 0 52vw 0 5vw; }
-.align-right { padding: 0 5vw 0 52vw; }
-.align-left .section-inner,
-.align-right .section-inner { max-width: 40vw; }
+/* ── Side alignment zones — text sits in the black margins beside the toilet ── */
+.align-left  { padding: 0 73vw 0 4vw; }
+.align-right { padding: 0 4vw 0 77vw; }
 
 /* ── Section inner ── */
 .section-inner { padding: 0; }
@@ -607,48 +602,50 @@ a { text-decoration: none; }
 .section-label {
   display: block;
   font-family: var(--font-noto-sans-jp, sans-serif);
-  font-size: 0.68rem;
-  letter-spacing: 0.2em;
+  font-size: 0.65rem;
+  letter-spacing: 0.22em;
   text-transform: uppercase;
   color: #6690ff;
-  margin-bottom: 16px;
-  text-shadow: 1px 2px 0 rgba(0,0,0,0.95), 1px 2px 5px rgba(0,0,0,0.7);
+  margin-bottom: 14px;
 }
 .section-heading {
-  font-family: var(--font-bebas, sans-serif);
-  font-size: clamp(3.2rem, 5.5vw, 6.5rem);
+  font-family: var(--font-bebas), var(--font-noto-sans-jp), sans-serif;
+  font-size: clamp(2.8rem, 4.5vw, 5.5rem);
   line-height: 1.05;
   letter-spacing: 0.02em;
   color: #fff;
-  margin: 0 0 20px;
-  text-shadow: 2px 3px 0 rgba(0,0,0,1), 3px 5px 8px rgba(0,0,0,0.7);
+  margin: 0 0 18px;
 }
 .section-body {
   font-family: var(--font-noto-sans-jp, sans-serif);
-  font-size: clamp(13px, 1.05vw, 15px);
+  font-size: clamp(12px, 0.95vw, 14px);
   line-height: 2.1;
-  color: rgba(255,255,255,0.88);
-  max-width: 360px;
+  color: rgba(255,255,255,0.82);
   margin: 0;
   letter-spacing: 0.04em;
-  text-shadow: 1px 2px 0 rgba(0,0,0,0.9), 2px 3px 6px rgba(0,0,0,0.65);
 }
 
-/* ── Stats section ── */
+/* ── Stats section — dark boxes, solid white borders ── */
 .section-stats {
-  padding: 0 5vw;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  width: 100%;
 }
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 0;
-  border-top: 1px solid rgba(255,255,255,0.12);
-  border-left: 1px solid rgba(255,255,255,0.12);
+  border-top: 1px solid #fff;
+  border-left: 1px solid #fff;
+  max-width: min(880px, 88vw);
+  width: 100%;
 }
 .stat {
-  padding: 40px 32px;
-  border-right: 1px solid rgba(255,255,255,0.12);
-  border-bottom: 1px solid rgba(255,255,255,0.12);
+  background: rgba(0,0,0,0.70);
+  padding: 36px 28px;
+  border-right: 1px solid #fff;
+  border-bottom: 1px solid #fff;
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -661,24 +658,21 @@ a { text-decoration: none; }
 }
 .stat-number {
   font-family: var(--font-bebas, sans-serif);
-  font-size: clamp(3.5rem, 6vw, 6rem);
+  font-size: clamp(3rem, 5.5vw, 5.5rem);
   color: #fff;
   letter-spacing: -0.01em;
-  text-shadow: 2px 3px 0 rgba(0,0,0,1), 3px 5px 8px rgba(0,0,0,0.7);
 }
 .stat-suffix {
   font-family: var(--font-bebas, sans-serif);
-  font-size: clamp(1.5rem, 2.5vw, 2.5rem);
-  color: rgba(255,255,255,0.5);
+  font-size: clamp(1.3rem, 2.2vw, 2.2rem);
+  color: rgba(255,255,255,0.55);
   margin-left: 2px;
-  text-shadow: 1px 2px 0 rgba(0,0,0,0.9);
 }
 .stat-label {
   font-family: var(--font-noto-sans-jp, sans-serif);
   font-size: 11px;
   letter-spacing: 0.06em;
-  color: rgba(255,255,255,0.6);
-  text-shadow: 1px 1px 0 rgba(0,0,0,0.9), 1px 2px 4px rgba(0,0,0,0.6);
+  color: rgba(255,255,255,0.65);
 }
 
 /* ── Marquee ── */
@@ -771,8 +765,9 @@ a { text-decoration: none; }
 /* ── Large desktop (1440px+) ── */
 @media (min-width: 1440px) {
   .x40-nav-inner { max-width: 1440px; padding: 24px 80px; }
-  .align-left  { padding: 0 54vw 0 6vw; }
-  .align-right { padding: 0 6vw 0 54vw; }
+  /* Keep same margin ratios — black areas scale proportionally */
+  .align-left  { padding: 0 74vw 0 4vw; }
+  .align-right { padding: 0 4vw 0 78vw; }
 }
 
 /* ── Tablet: 768px–1023px ── */
@@ -781,24 +776,25 @@ a { text-decoration: none; }
   .x40-nav-links  { gap: 20px; }
   .x40-nav-links a { font-size: 12px; }
 
-  .align-left, .align-right { padding: 0 6vw; }
-  .align-left .section-inner,
-  .align-right .section-inner { max-width: 68vw; }
+  /* On tablet the toilet takes up more of the viewport proportionally
+     — keep text in outer zones but slightly wider */
+  .align-left  { padding: 0 62vw 0 4vw; }
+  .align-right { padding: 0 4vw 0 66vw; }
 
-  .section-heading { font-size: clamp(2.8rem, 6vw, 4.5rem); }
-  .section-body   { font-size: 14px; max-width: 100%; }
+  .section-heading { font-size: clamp(2.4rem, 5vw, 4rem); }
+  .section-body    { font-size: 13px; }
 
-  /* Stats — 2×2 grid on tablet, contained width */
-  .section-stats  { padding: 0 8vw; }
-  .stats-grid     { grid-template-columns: repeat(2, 1fr); }
-  .stat           { padding: 32px 28px; }
-  .stat-number    { font-size: clamp(3rem, 7vw, 5rem); }
+  /* Stats — 2×2 on tablet, centred, dark boxes preserved */
+  .stats-grid  { grid-template-columns: repeat(2, 1fr); max-width: min(600px, 92vw); }
+  .stat        { padding: 28px 22px; }
+  .stat-number { font-size: clamp(2.8rem, 6.5vw, 4.5rem); }
+  .stat-suffix { font-size: clamp(1.2rem, 2vw, 2rem); }
 
-  .x40-hero-title  { font-size: clamp(7rem, 18vw, 14rem); }
-  .x40-hero-tagline { font-size: clamp(1rem, 2.2vw, 1.3rem); }
+  .x40-hero-title   { font-size: clamp(7rem, 18vw, 14rem); }
+  .x40-hero-tagline { font-size: clamp(0.95rem, 2vw, 1.25rem); }
 
-  .cta-inner      { max-width: 80vw; }
-  #x40-scroll     { height: 750vh !important; }
+  .cta-inner   { max-width: 70vw; }
+  #x40-scroll  { height: 750vh !important; }
 }
 
 /* ── Mobile: 〜767px (スマートフォン) ── */
@@ -810,39 +806,36 @@ a { text-decoration: none; }
 
   /* Hero */
   .x40-hero-title  { font-size: clamp(5.5rem, 22vw, 9rem); }
-  .x40-hero-tagline {
-    font-size: clamp(0.85rem, 3.8vw, 1.1rem);
-    letter-spacing: 0.06em;
-  }
+  .x40-hero-tagline { font-size: clamp(0.85rem, 3.8vw, 1.1rem); letter-spacing: 0.06em; }
   .x40-hero-scroll-hint { margin-top: 36px; font-size: 9px; }
 
-  /* Content sections — full width, strong text shadows */
-  .align-left, .align-right { padding: 0 20px; }
-  .align-left .section-inner,
-  .align-right .section-inner { max-width: 100%; }
+  /* Content sections — full-width on mobile, subtle dark bg since we can't
+     avoid toilet overlap; no text shadow, just dark glass per block */
+  .align-left, .align-right { padding: 0 16px; }
 
-  .section-heading {
-    font-size: clamp(2.4rem, 9.5vw, 3.4rem);
-  }
-  .section-body {
-    font-size: 13px;
-    line-height: 2.0;
-    max-width: 100%;
+  .section-inner {
+    background: rgba(0,0,0,0.55);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    padding: 20px 18px;
+    display: inline-block;
   }
 
-  /* Stats — 2 col, contained, text shadows for legibility */
-  .section-stats  { padding: 0 16px; }
-  .stats-grid     { grid-template-columns: 1fr 1fr; max-width: 480px; margin: 0 auto; }
-  .stat           { padding: 20px 14px; }
-  .stat-number    { font-size: clamp(2.6rem, 9vw, 3.5rem); }
-  .stat-suffix    { font-size: clamp(1.1rem, 3.5vw, 1.6rem); }
-  .stat-label     { font-size: 9.5px; }
+  .section-heading { font-size: clamp(2.2rem, 9vw, 3.2rem); }
+  .section-body    { font-size: 13px; line-height: 1.95; }
+
+  /* Stats — 2×2, dark boxes, solid borders (same treatment, scaled down) */
+  .stats-grid  { grid-template-columns: 1fr 1fr; max-width: min(440px, 92vw); }
+  .stat        { padding: 18px 14px; }
+  .stat-number { font-size: clamp(2.4rem, 8.5vw, 3.2rem); }
+  .stat-suffix { font-size: clamp(1rem, 3vw, 1.5rem); }
+  .stat-label  { font-size: 10px; }
 
   /* Marquee */
-  .marquee-text   { font-size: 15vw; }
+  .marquee-text { font-size: 15vw; }
 
   /* CTA */
-  .section-cta    { padding: 0 20px; }
+  .section-cta    { padding: 0 16px; }
   .cta-inner      { max-width: 100%; }
   .cta-heading    { font-size: clamp(2.8rem, 13vw, 4.5rem) !important; }
   .cta-actions    { flex-direction: column; gap: 10px; }
@@ -858,7 +851,7 @@ a { text-decoration: none; }
 /* ── Very small (iPhone SE etc. 〜374px) ── */
 @media (max-width: 374px) {
   .x40-hero-title  { font-size: 5rem; }
-  .section-heading { font-size: 2.1rem; }
-  .stats-grid      { grid-template-columns: 1fr 1fr; }
-  .stat            { padding: 16px 10px; }
+  .section-heading { font-size: 2rem; }
+  .stats-grid      { max-width: 100%; }
+  .stat            { padding: 14px 10px; }
 }
