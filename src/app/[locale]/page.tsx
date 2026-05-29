@@ -180,28 +180,6 @@ export default function X40Page() {
         },
       })
 
-      /* ── Dark overlay for stats section ── */
-      const OVERLAY_ENTER = 0.54
-      const OVERLAY_LEAVE = 0.67
-      const FADE = 0.03
-      ScrollTrigger.create({
-        trigger: scrollEl,
-        start: 'top top',
-        end: 'bottom bottom',
-        scrub: true,
-        onUpdate: (self) => {
-          const p = self.progress
-          let op = 0
-          if (p >= OVERLAY_ENTER - FADE && p < OVERLAY_ENTER)
-            op = (p - (OVERLAY_ENTER - FADE)) / FADE
-          else if (p >= OVERLAY_ENTER && p <= OVERLAY_LEAVE)
-            op = 1.0
-          else if (p > OVERLAY_LEAVE && p <= OVERLAY_LEAVE + FADE)
-            op = 0.9 * (1 - (p - OVERLAY_LEAVE) / FADE)
-          overlay.style.opacity = String(op)
-        },
-      })
-
       /* ── Section animations ── */
       const sections = document.querySelectorAll<HTMLElement>('.scroll-section[data-enter]')
       sections.forEach(section => {
