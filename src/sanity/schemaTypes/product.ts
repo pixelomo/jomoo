@@ -196,6 +196,35 @@ export const product = defineType({
     }),
 
     defineField({
+      name: 'featureImages',
+      title: 'Feature Images (grid)',
+      type: 'array',
+      group: 'media',
+      description: 'Feature illustration images shown in a grid below the product description.',
+      of: [
+        {
+          type: 'image',
+          options: { hotspot: true },
+          fields: [
+            defineField({
+              name: 'caption',
+              title: 'Caption',
+              type: 'object',
+              fields: [
+                defineField({ name: 'zhCN', title: '中文', type: 'string' }),
+                defineField({ name: 'en',   title: 'English', type: 'string' }),
+              ],
+            }),
+          ],
+          preview: {
+            select: { title: 'caption.en', media: 'asset' },
+            prepare: ({ title, media }) => ({ title: title ?? 'Feature image', media }),
+          },
+        },
+      ],
+    }),
+
+    defineField({
       name: 'featureVideos',
       title: 'Feature Videos',
       type: 'array',

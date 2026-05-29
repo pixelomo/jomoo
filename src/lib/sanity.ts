@@ -25,6 +25,16 @@ export function urlFor(source: any) {
   return imageUrlBuilder(getSanityClient()).image(source)
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function imgUrl(source: any, width: number, quality = 82): string {
+  const ref: string = source?._ref ?? ''
+  const builder = urlFor(source).width(width)
+  // GIF refs end with '-gif'; converting to WebP strips animation
+  return ref.endsWith('-gif')
+    ? builder.url()
+    : builder.format('webp').quality(quality).url()
+}
+
 // Fetch all active products for the model dropdown
 export async function getProductModels(): Promise<{ _id: string; name: string; modelCode: string }[]> {
   try {
@@ -79,6 +89,7 @@ export interface ProductDetail {
   specTable?: ProductSpecTable
   specs?: ProductSpec[]
   images?: Array<{ _key: string; asset: { _ref: string }; alt?: string; caption?: string }>
+  featureImages?: Array<{ _key: string; asset: { _ref: string }; caption?: { zhCN: string; en: string } }>
   featureVideos?: ProductVideo[]
 }
 
@@ -93,6 +104,7 @@ export async function getProductDetail(series: string, slug: string): Promise<Pr
         specTable,
         specs[] { label, value },
         images[] { _key, asset, alt, caption },
+        featureImages[] { _key, asset, caption },
         featureVideos[] { embedUrl, title }
       }`,
       { series, slug }

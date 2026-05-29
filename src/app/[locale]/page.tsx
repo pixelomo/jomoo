@@ -1,509 +1,392 @@
-import { getTranslations } from 'next-intl/server'
-import { Show } from '@clerk/nextjs'
-import Link from 'next/link'
-import HeroSection from '@/components/home/HeroSection'
-import SeriesSection from '@/components/home/SeriesSection'
-import type { HeroSlide } from '@/components/home/HeroSection'
+'use client'
 
-const newsItems = [
-  { date: '2026.05.08', tag: '重要', tagWarn: true, text: 'システムメンテナンス実施のお知らせ (5月20日 2:00〜6:00)' },
-  { date: '2026.05.08', tag: '新製品', tagWarn: false, text: '新シリーズ「澄(SUMI)」全国12ショールームで展示開始のお知らせ' },
-  { date: '2026.04.22', tag: 'イベント', tagWarn: false, text: '建築家・井上彩氏を招いたトークイベントを青山店にて開催します' },
-  { date: '2026.04.05', tag: 'プレス', tagWarn: false, text: 'JOMOO Japan、グッドデザイン賞2026に4製品が選出されました' },
-  { date: '2026.03.18', tag: 'サポート', tagWarn: false, text: 'ゴールデンウィーク期間中のお問い合わせ窓口営業について' },
-  { date: '2026.03.02', tag: '新製品', tagWarn: false, text: 'センサー水栓「霞(KASUMI)」シリーズにマットブラック仕上げを追加' },
+import { useEffect, useRef, useState } from 'react'
+import Image from 'next/image'
+import Link from 'next/link'
+
+/* ─── Scroll-reveal hook ─── */
+function useReveal() {
+  useEffect(() => {
+    const els = document.querySelectorAll('.x40-reveal')
+    const io = new IntersectionObserver(
+      (entries) => entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('x40-revealed') }),
+      { threshold: 0.12, rootMargin: '0px 0px -40px 0px' }
+    )
+    els.forEach(el => io.observe(el))
+    return () => io.disconnect()
+  }, [])
+}
+
+/* ─── Stats counter ─── */
+function StatCounter({ target, suffix = '' }: { target: number; suffix?: string }) {
+  const [val, setVal] = useState(0)
+  const ref = useRef<HTMLDivElement>(null)
+  useEffect(() => {
+    const el = ref.current
+    if (!el) return
+    const io = new IntersectionObserver(([entry]) => {
+      if (!entry.isIntersecting) return
+      io.disconnect()
+      let start = 0
+      const step = target / 60
+      const tick = () => {
+        start += step
+        if (start >= target) { setVal(target); return }
+        setVal(Math.floor(start))
+        requestAnimationFrame(tick)
+      }
+      requestAnimationFrame(tick)
+    }, { threshold: 0.5 })
+    io.observe(el)
+    return () => io.disconnect()
+  }, [target])
+  return <span ref={ref}>{val}{suffix}</span>
+}
+
+const FEATURES = [
+  { img: '/x40/auto-lid.jpg',             en: 'Auto Lid',           ja: '自動開蓋',     desc: 'Hands-free lid opens as you approach and closes when you leave.' },
+  { img: '/x40/foot-sensor-flush.png',    en: 'Foot Flush',         ja: '脚感冲水',     desc: 'Wave your foot beneath the panel — no touch required.' },
+  { img: '/x40/silent-flush.jpg',         en: '38 dB Flush',        ja: '静音冲',       desc: 'Ultra-quiet cyclone flush so quiet you barely notice it.' },
+  { img: '/x40/seat-heating.jpg',         en: 'Heated Seat',        ja: '座温加热',     desc: 'Four-season adaptive temperature keeps you comfortable year-round.' },
+  { img: '/x40/uv-sterilize.jpg',         en: 'UV Sterilization',   ja: 'UV除菌',       desc: 'UV light eliminates 99.9% of bacteria inside the bowl.' },
+  { img: '/x40/platinum-deodorize.png',   en: 'Platinum Deodorize', ja: '铂金除臭',     desc: 'Platinum catalyst neutralizes odours before they escape.' },
+  { img: '/x40/night-light.jpg',          en: 'Night Light',        ja: '光感夜灯',     desc: 'Ambient sensor dims on at night — gentle enough not to wake you.' },
+  { img: '/x40/antibacterial-glaze.jpg',  en: 'Anti-bacterial',     ja: '釉面抗菌',     desc: 'Nano-glaze coating prevents 99% of bacterial adhesion.' },
+  { img: '/x40/cyclone-flush.jpg',        en: 'Cyclone Flush',      ja: '旋风冲',       desc: 'Spiral water jets clean every surface in a single flush.' },
+  { img: '/x40/auto-flush.jpg',           en: 'Auto Flush',         ja: '离座自冲',     desc: 'Seat sensor triggers an automatic flush the moment you stand.' },
+  { img: '/x40/magic-bubble.jpg',         en: 'Magic Bubble',       ja: '旋转魔力泡',   desc: 'Pre-coating foam reduces sticking — less water, cleaner bowl.' },
+  { img: '/x40/removable-nozzle.jpg',     en: 'Clean Nozzle',       ja: '喷嘴自洁',     desc: 'Detachable antibacterial nozzle for thorough manual cleaning.' },
 ]
 
-export default async function HomePage() {
-  const t = await getTranslations('home')
+const COMFORT = [
+  { img: '/x40/rear-wash.png',         en: 'Rear Wash',         ja: '臀洗',     desc: 'Adjustable pressure and position for personalised cleansing.' },
+  { img: '/x40/feminine-wash.png',     en: 'Feminine Wash',     ja: '妇洗',     desc: "Gentle, targeted stream designed for women's hygiene needs." },
+  { img: '/x40/wide-wash.jpg',         en: 'Wide Wash',         ja: '宽幅强洗', desc: 'Oscillating wide-spray covers a broader area for superior clean.' },
+  { img: '/x40/massage-wash.jpg',      en: 'Moving Massage',    ja: '移动按摩', desc: 'Pulsating massage mode for therapeutic relief and comfort.' },
+  { img: '/x40/constipation-wash.png', en: 'Relief Wash',       ja: '助便强洗', desc: 'Targeted strong stream helps ease discomfort naturally.' },
+  { img: '/x40/temp-sensing.jpg',      en: 'Warm Water',        ja: '四季温感', desc: 'Instant warm water — no cold-start wait, always the right temperature.' },
+]
 
-  const slides: HeroSlide[] = [
-    {
-      badge: t('heroBadge1'),
-      title: t('heroTitle1'),
-      lead: t('heroLead1'),
-      btn1Label: t('heroBtn1'),
-      btn1Href: '/products/smart-toilet',
-      btn2Label: t('heroBtn2'),
-      btn2Href: '#',
-      bg: 'dark',
-    },
-    {
-      badge: t('heroBadge2'),
-      title: t('heroTitle2'),
-      lead: t('heroLead2'),
-      btn1Label: t('heroBtn3'),
-      btn1Href: '/products/smart-toilet',
-      btn2Label: t('heroBtn4'),
-      btn2Href: '#',
-      bg: 'blue',
-    },
-    {
-      badge: t('heroBadge3'),
-      title: t('heroTitle3'),
-      lead: t('heroLead3'),
-      btn1Label: t('heroBtn5'),
-      btn1Href: '#',
-      btn2Label: t('heroBtn6'),
-      btn2Href: '#',
-      bg: 'light',
-    },
-  ]
+export default function X40LandingPage() {
+  const [scrolled, setScrolled] = useState(false)
+  const [menuOpen, setMenuOpen] = useState(false)
+  useReveal()
 
-  const seriesTabs = [
-    t('seriesTabAll'), t('seriesTabToilet'), t('seriesTabFaucet'),
-    t('seriesTabShower'), t('seriesTabWash'), t('seriesTabNew'),
-  ]
-
-  const seriesCards = [
-    { img: 'SUMI Z-7600', catPill: t('seriesTabToilet') + ' · スマート', code: 'Z-7600', title: '澄 / SUMI シリーズ', desc: '最小奥行640mm。狭小空間にも美しく収まる、フラッグシップ・スマートトイレ。', price: '¥328,000〜', tab: t('seriesTabToilet') },
-    { img: 'KASUMI F-3201', catPill: t('seriesTabFaucet') + ' · センサー', code: 'F-3201', title: '霞 / KASUMI', desc: '手の動きを読むタッチレス水栓。4色展開。', price: '¥86,000〜', tab: t('seriesTabFaucet') },
-    { img: 'RIN S-8804', catPill: t('seriesTabShower') + ' · システム', code: 'S-8804', title: '凛 / RIN レインシャワー', desc: '300mm幅オーバーヘッド + 3モード手元。サーモスタット式。', price: '¥152,000〜', tab: t('seriesTabShower') },
-    { img: 'HAKU B-2401', catPill: t('seriesTabWash') + ' · カウンター', code: 'B-2401', title: '白 / HAKU カウンター', desc: 'マットセラミック仕上げ。1200/1500/1800mm幅。', price: '¥218,000〜', tab: t('seriesTabWash') },
-  ]
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 60)
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
 
   return (
-    <main>
-      {/* ── HERO ── */}
-      <HeroSection slides={slides} />
+    <div className="x40-page">
 
-      {/* ── QUICK SHORTCUTS ── */}
-      <div className="jm-shortcuts">
-        <div className="jm-sc-inner">
-          {[
-            { icon: 'grid', label: t('shortcutsProducts'), sub: 'PRODUCTS', href: '/products/smart-toilet' },
-            { icon: 'home', label: t('shortcutsShowroom'), sub: 'SHOWROOM', href: '#' },
-            { icon: 'doc', label: t('shortcutsCatalog'), sub: 'CATALOG', href: '#' },
-            { icon: 'clock', label: t('shortcutsSupport'), sub: 'SUPPORT', href: '#' },
-            { icon: 'file', label: t('shortcutsDownload'), sub: 'DOWNLOAD', href: '#' },
-            { icon: 'refresh', label: t('shortcutsInstaller'), sub: 'INSTALLER', href: '#' },
-          ].map(({ icon, label, sub, href }) => (
-            <Link key={sub} href={href} className="jm-sc" style={{ textDecoration: 'none', color: 'var(--ink)' }}>
-              <span style={{ width: 36, height: 36, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', background: 'var(--accent-soft)', color: 'var(--accent)', flexShrink: 0 }}>
-                <ShortcutIcon type={icon} />
-              </span>
-              <span style={{ display: 'flex', flexDirection: 'column', gap: 2, lineHeight: 1.3 }}>
-                {label}
-                <small style={{ fontFamily: 'ui-monospace,monospace', fontSize: 10, color: 'var(--ink-3)', letterSpacing: '0.06em' }}>{sub}</small>
-              </span>
-            </Link>
-          ))}
-        </div>
-      </div>
+      {/* ═══════════ FIXED NAV ═══════════ */}
+      <nav className={`x40-nav${scrolled ? ' x40-nav--scrolled' : ''}`}>
+        <div className="x40-nav-inner">
+          <Link href="/" className="x40-logo-link">
+            <Image src="/logo.png" alt="JOMOO" width={120} height={36} style={{ objectFit: 'contain' }} priority />
+          </Link>
 
-      {/* ── PRODUCT CATEGORIES ── */}
-      <section className="jm-sec">
-        <div className="jm-sec-inner">
-          <div className="jm-sec-head">
-            <div>
-              <div style={{ fontFamily: 'ui-monospace,monospace', fontSize: 12, letterSpacing: '0.1em', color: 'var(--ink-3)', fontWeight: 600, marginBottom: 14 }}>
-                01 / {t('catSectionNum')}
-              </div>
-              <h2 style={{ fontSize: 28, fontWeight: 700, lineHeight: 1.4, letterSpacing: '0.01em', paddingBottom: 14, borderBottom: '4px solid var(--accent)', display: 'inline-block', marginBottom: 12 }}>
-                {t('catSectionTitle')}
-              </h2>
-              <p style={{ fontSize: 14, color: 'var(--ink-3)', marginTop: 12 }}>{t('catSectionSub')}</p>
-            </div>
-            <Link href="/products/smart-toilet" style={{ fontSize: 13, fontWeight: 700, color: 'var(--ink)', display: 'inline-flex', gap: 8, alignItems: 'center', padding: '10px 18px', border: '1px solid var(--line)', textDecoration: 'none', whiteSpace: 'nowrap' }}>
-              {t('catMore')} →
+          <div className={`x40-nav-links${menuOpen ? ' x40-nav-links--open' : ''}`}>
+            {[['#features', 'Features'], ['#technology', 'Technology'], ['#comfort', 'Comfort'], ['#specs', 'Specs']].map(([href, label]) => (
+              <a key={href} href={href} onClick={() => setMenuOpen(false)}>{label}</a>
+            ))}
+            <Link href="/products/smart-toilet" className="x40-nav-cta" onClick={() => setMenuOpen(false)}>
+              View All Products →
             </Link>
           </div>
 
-          <div className="jm-cats">
-            {([
-              { slug: 'smart-toilet', num: 'CATEGORY 01', count: t('cat1Count'), title: t('cat1Title'), desc: t('cat1Desc'), subs: [t('cat1Sub1'), t('cat1Sub2'), t('cat1Sub3'), t('cat1Sub4')], bg: 'dark' as const },
-              { slug: 'faucets',      num: 'CATEGORY 02', count: t('cat2Count'), title: t('cat2Title'), desc: t('cat2Desc'), subs: [t('cat2Sub1'), t('cat2Sub2'), t('cat2Sub3'), t('cat2Sub4')], bg: 'light' as const },
-              { slug: 'shower-set',  num: 'CATEGORY 03', count: t('cat3Count'), title: t('cat3Title'), desc: t('cat3Desc'), subs: [t('cat3Sub1'), t('cat3Sub2'), t('cat3Sub3'), t('cat3Sub4')], bg: 'dark' as const },
-              { slug: 'washstand',   num: 'CATEGORY 04', count: t('cat4Count'), title: t('cat4Title'), desc: t('cat4Desc'), subs: [t('cat4Sub1'), t('cat4Sub2'), t('cat4Sub3'), t('cat4Sub4')], bg: 'light' as const },
-            ] as const).map(({ slug, num, count, title, desc, subs, bg }) => (
-              <Link key={slug} href={`/products/${slug}`} style={{ display: 'flex', flexDirection: 'column', background: 'var(--paper)', border: '1px solid var(--line)', textDecoration: 'none', color: 'var(--ink)' }}>
-                <div style={{ position: 'relative', aspectRatio: '4/3', background: '#f5f5f5', overflow: 'hidden' }}>
-                  <div style={{
-                    position: 'absolute', inset: 0,
-                    background: bg === 'dark'
-                      ? 'repeating-linear-gradient(45deg,rgba(0,0,0,0.04) 0 1px,transparent 1px 16px),linear-gradient(180deg,#d8d3c6 0%,#b8b1a0 100%)'
-                      : 'repeating-linear-gradient(45deg,rgba(0,0,0,0.03) 0 1px,transparent 1px 16px),linear-gradient(180deg,#efece4 0%,#d6d1c5 100%)',
-                    display: 'flex', alignItems: 'flex-end', padding: 12,
-                  }}>
-                    <span style={{ fontFamily: 'ui-monospace,monospace', fontSize: 10, letterSpacing: '0.08em', opacity: 0.7, color: bg === 'dark' ? '#cfd3d8' : '#4a4a4a' }}>
-                      {title}
-                    </span>
-                  </div>
-                </div>
-                <div style={{ padding: 20, display: 'flex', flexDirection: 'column', gap: 12, flex: 1 }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontFamily: 'ui-monospace,monospace', fontSize: 11, letterSpacing: '0.06em', color: 'var(--ink-3)' }}>
-                    <span style={{ color: 'var(--accent)', fontWeight: 700 }}>{num}</span>
-                    <span>{count}</span>
-                  </div>
-                  <div style={{ fontSize: 20, fontWeight: 700, lineHeight: 1.4 }}>{title}</div>
-                  <p style={{ fontSize: 12, lineHeight: 1.85, color: 'var(--ink-2)' }}>{desc}</p>
-                  <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexWrap: 'wrap', gap: 6, marginTop: 4 }}>
-                    {subs.map(s => (
-                      <li key={s} style={{ fontSize: 11, padding: '4px 9px', background: 'var(--bg-soft)', color: 'var(--ink-2)', border: '1px solid var(--line)' }}>{s}</li>
-                    ))}
-                  </ul>
-                  <div style={{ marginTop: 'auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingTop: 14, borderTop: '1px solid var(--line)', fontSize: 13, fontWeight: 700 }}>
-                    {t('catLink')} →
-                  </div>
-                </div>
-              </Link>
-            ))}
+          <button className="x40-hamburger" onClick={() => setMenuOpen(v => !v)} aria-label="Menu">
+            <span /><span /><span />
+          </button>
+        </div>
+      </nav>
+
+      {/* ═══════════ HERO ═══════════ */}
+      <section className="x40-hero">
+        <video
+          className="x40-hero-video"
+          autoPlay muted loop playsInline
+          poster="/x40/product-main.jpg"
+        >
+          <source src="/x40/x40.mp4" type="video/mp4" />
+        </video>
+        <div className="x40-hero-overlay" />
+        <div className="x40-hero-content x40-animate-up">
+          <p className="x40-hero-eyebrow">JOMOO — Introducing</p>
+          <h1 className="x40-hero-title">X40</h1>
+          <p className="x40-hero-lead">The intelligent smart toilet.<br />Redefined for modern living.</p>
+          <div className="x40-hero-actions">
+            <a href="#features" className="x40-btn x40-btn--white">Explore Features</a>
+            <Link href="/products/smart-toilet" className="x40-btn x40-btn--ghost">View Products</Link>
           </div>
+        </div>
+        <div className="x40-scroll-indicator">
+          <span />
         </div>
       </section>
 
-      {/* ── BROWSE BY SPACE ── */}
-      <section className="jm-sec" style={{ background: 'var(--bg-soft)' }}>
-        <div className="jm-sec-inner">
-          <div className="jm-sec-head">
-            <div>
-              <div style={{ fontFamily: 'ui-monospace,monospace', fontSize: 12, letterSpacing: '0.1em', color: 'var(--ink-3)', fontWeight: 600, marginBottom: 14 }}>
-                02 / {t('spaceSectionNum')}
-              </div>
-              <h2 style={{ fontSize: 28, fontWeight: 700, lineHeight: 1.4, paddingBottom: 14, borderBottom: '4px solid var(--accent)', display: 'inline-block', marginBottom: 12 }}>
-                {t('spaceSectionTitle')}
-              </h2>
-              <p style={{ fontSize: 14, color: 'var(--ink-3)', marginTop: 12 }}>{t('spaceSectionSub')}</p>
-            </div>
-            <a href="#" style={{ fontSize: 13, fontWeight: 700, color: 'var(--ink)', display: 'inline-flex', gap: 8, alignItems: 'center', padding: '10px 18px', border: '1px solid var(--line)', textDecoration: 'none', whiteSpace: 'nowrap' }}>
-              {t('spaceMore')} →
-            </a>
-          </div>
-
-          <div className="jm-spaces">
-            {([
-              { label: t('space1'), en: 'BATHROOM',    bg: 'linear-gradient(180deg,#e8e6e0 0%,#cdc8bd 100%)' },
-              { label: t('space2'), en: 'POWDER ROOM', bg: 'linear-gradient(180deg,#d6dde5 0%,#afbcc9 100%)' },
-              { label: t('space3'), en: 'TOILET',      bg: 'linear-gradient(180deg,#ddd4cb 0%,#c0b3a4 100%)' },
-              { label: t('space4'), en: 'KITCHEN',     bg: 'linear-gradient(180deg,#ced3d8 0%,#a0a8b0 100%)' },
-              { label: t('space5'), en: 'PUBLIC',      bg: 'linear-gradient(180deg,#e3dcd0 0%,#c6bba8 100%)' },
-            ]).map(({ label, en, bg }) => (
-              <a key={en} href="#" style={{ background: 'var(--paper)', border: '1px solid var(--line)', aspectRatio: '4/5', position: 'relative', overflow: 'hidden', display: 'block', textDecoration: 'none' }}>
-                <div style={{ position: 'absolute', inset: 0, background: bg }} />
-                <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg,transparent 50%,rgba(0,0,0,0.55) 100%)' }} />
-                <div style={{ position: 'absolute', left: 16, right: 16, bottom: 16, color: '#fff', zIndex: 2 }}>
-                  <div style={{ fontFamily: 'ui-monospace,monospace', fontSize: 11, letterSpacing: '0.1em', opacity: 0.8 }}>{en}</div>
-                  <div style={{ fontSize: 18, fontWeight: 700, marginTop: 4, display: 'flex', alignItems: 'center', gap: 8 }}>{label} →</div>
-                </div>
-              </a>
-            ))}
-          </div>
-        </div>
+      {/* ═══════════ TAGLINE ═══════════ */}
+      <section className="x40-tagline x40-reveal">
+        <p className="x40-tagline-text">
+          "Every detail engineered<br />for the moments that matter."
+        </p>
+        <p className="x40-tagline-sub">
+          The X40 combines 26 intelligent features with a 640 mm compact footprint —
+          bringing luxury, hygiene, and silent performance to any bathroom.
+        </p>
       </section>
 
-      {/* ── TECHNOLOGY ── */}
-      <section className="jm-sec">
-        <div className="jm-sec-inner">
-          <div className="jm-sec-head">
-            <div>
-              <div style={{ fontFamily: 'ui-monospace,monospace', fontSize: 12, letterSpacing: '0.1em', color: 'var(--ink-3)', fontWeight: 600, marginBottom: 14 }}>
-                03 / {t('techSectionNum')}
-              </div>
-              <h2 style={{ fontSize: 28, fontWeight: 700, lineHeight: 1.4, paddingBottom: 14, borderBottom: '4px solid var(--accent)', display: 'inline-block', marginBottom: 12 }}>
-                {t('techSectionTitle')}
-              </h2>
-              <p style={{ fontSize: 14, color: 'var(--ink-3)', marginTop: 12 }}>{t('techSectionSub')}</p>
+      {/* ═══════════ STATS STRIP ═══════════ */}
+      <section className="x40-stats" id="specs">
+        {[
+          { num: 640,  suffix: 'mm', label: 'Ultra-Compact Depth' },
+          { num: 38,   suffix: 'dB', label: 'Maximum Flush Noise' },
+          { num: 26,   suffix: '',   label: 'Intelligent Features' },
+          { num: 99,   suffix: '%',  label: 'Bacteria Eliminated' },
+        ].map(({ num, suffix, label }, i) => (
+          <div key={label} className={`x40-stat x40-reveal`} style={{ transitionDelay: `${i * 0.1}s` }}>
+            <div className="x40-stat-num">
+              <StatCounter target={num} suffix={suffix} />
             </div>
-            <a href="#" style={{ fontSize: 13, fontWeight: 700, color: 'var(--ink)', display: 'inline-flex', gap: 8, alignItems: 'center', padding: '10px 18px', border: '1px solid var(--line)', textDecoration: 'none', whiteSpace: 'nowrap' }}>
-              {t('techMore')} →
-            </a>
+            <div className="x40-stat-label">{label}</div>
           </div>
+        ))}
+      </section>
 
-          {/* Tech story 1 */}
-          <div className="jm-tech-grid">
-            <TechVisual dark specs={[['SAMPLE', 'NG-04 / CERAMIC'], ['SURFACE', 'Ra 0.04 μm'], ['ANGLE', '105°']]} caption="断面図 · ナノガラスコーティング" />
-            <TechBody
-              badge={t('tech1Badge')}
-              title={t('tech1Title')}
-              lead={t('tech1Lead')}
-              stats={[
-                { num: '87', unit: '%', label: t('tech1Stat1Label') },
-                { num: '3.8', unit: 'L', label: t('tech1Stat2Label') },
-                { num: '30', unit: t('tech1Stat3Unit'), label: t('tech1Stat3Label') },
-              ]}
-              feats={[t('tech1Feat1'), t('tech1Feat2'), t('tech1Feat3')]}
-            />
+      {/* ═══════════ PRODUCT HERO SHOT ═══════════ */}
+      <section className="x40-product-shot x40-reveal">
+        <div className="x40-product-shot-inner">
+          <div className="x40-product-shot-text">
+            <span className="x40-eyebrow">Design</span>
+            <h2 className="x40-section-title">Crafted for space.<br />Built for beauty.</h2>
+            <p className="x40-body-text">
+              At just 640 mm deep, the X40 fits where conventional smart toilets cannot.
+              The seamless glaze surface repels stains and bacteria — a product that looks
+              as pristine on day 1,000 as it did on day one.
+            </p>
+            <div className="x40-product-feat-row">
+              <div>
+                <img src="/x40/compact-640.gif" alt="640mm compact" style={{ width: 80, height: 'auto', opacity: 0.85 }} />
+                <span>640mm footprint</span>
+              </div>
+              <div>
+                <img src="/x40/seamless-interior.png" alt="Seamless interior" style={{ width: 80, height: 'auto', opacity: 0.85 }} />
+                <span>Nano-glaze bowl</span>
+              </div>
+              <div>
+                <img src="/x40/soft-close-lid.png" alt="Soft close" style={{ width: 80, height: 'auto', opacity: 0.85 }} />
+                <span>Soft-close lid</span>
+              </div>
+            </div>
           </div>
-
-          {/* Tech story 2 (reversed) */}
-          <div className="jm-tech-grid reverse">
-            <TechVisual specs={[['NOISE', '42 dB MAX'], ['PRESSURE', '0.05 MPa MIN'], ['CYCLE', '2.4 s']]} caption="マクロ写真 · 給水ノズル" />
-            <TechBody
-              badge={t('tech2Badge')}
-              title={t('tech2Title')}
-              lead={t('tech2Lead')}
-              stats={[
-                { num: '42', unit: 'dB', label: t('tech2Stat1Label') },
-                { num: '0.05', unit: 'MPa', label: t('tech2Stat2Label') },
-                { num: '5', unit: t('tech2Stat3Unit'), label: t('tech2Stat3Label') },
-              ]}
-              feats={[t('tech2Feat1'), t('tech2Feat2'), t('tech2Feat3')]}
+          <div className="x40-product-shot-img">
+            <Image
+              src="/x40/product-alt.png"
+              alt="JOMOO X40 Smart Toilet"
+              width={600}
+              height={700}
+              style={{ width: '100%', height: 'auto', objectFit: 'contain' }}
             />
           </div>
         </div>
       </section>
 
-      {/* ── FEATURE BANNERS ── */}
-      <section className="jm-sec" style={{ background: 'var(--bg-soft)' }}>
-        <div className="jm-sec-inner">
-          <div className="jm-sec-head">
-            <div>
-              <div style={{ fontFamily: 'ui-monospace,monospace', fontSize: 12, letterSpacing: '0.1em', color: 'var(--ink-3)', fontWeight: 600, marginBottom: 14 }}>
-                04 / {t('featSectionNum')}
-              </div>
-              <h2 style={{ fontSize: 28, fontWeight: 700, lineHeight: 1.4, paddingBottom: 14, borderBottom: '4px solid var(--accent)', display: 'inline-block' }}>
-                {t('featSectionTitle')}
-              </h2>
-            </div>
-            <a href="#" style={{ fontSize: 13, fontWeight: 700, color: 'var(--ink)', display: 'inline-flex', gap: 8, alignItems: 'center', padding: '10px 18px', border: '1px solid var(--line)', textDecoration: 'none', whiteSpace: 'nowrap' }}>
-              {t('featMore')} →
-            </a>
+      {/* ═══════════ FEATURE BENTO GRID ═══════════ */}
+      <section className="x40-features" id="features">
+        <div className="x40-sec-inner">
+          <div className="x40-sec-header x40-reveal">
+            <span className="x40-eyebrow">Intelligence</span>
+            <h2 className="x40-section-title">26 features.<br />One seamless experience.</h2>
           </div>
 
-          <div className="jm-pickup-grid">
-            {([
-              { tag: t('feat1Tag'), title: t('feat1Title'), bg: 'linear-gradient(180deg,#2a2f36 0%,#15181d 100%)' },
-              { tag: t('feat2Tag'), title: t('feat2Title'), bg: 'linear-gradient(180deg,#2452c7 0%,#0a2a82 100%)' },
-              { tag: t('feat3Tag'), title: t('feat3Title'), bg: 'linear-gradient(180deg,#d8d3c6 0%,#b8b1a0 100%)' },
-            ]).map(({ tag, title, bg }) => (
-              <a key={tag} href="#" style={{ aspectRatio: '16/9', background: 'var(--bg-soft)', border: '1px solid var(--line)', position: 'relative', overflow: 'hidden', display: 'flex', textDecoration: 'none' }}>
-                <div style={{ position: 'absolute', inset: 0, background: bg }} />
-                <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg,rgba(0,0,0,0) 40%,rgba(0,0,0,0.65) 100%)' }} />
-                <div style={{ position: 'relative', zIndex: 2, padding: 24, color: '#fff', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', width: '100%' }}>
-                  <span style={{ fontFamily: 'ui-monospace,monospace', fontSize: 10, letterSpacing: '0.08em', background: 'rgba(255,255,255,0.18)', padding: '3px 8px', alignSelf: 'flex-start' }}>
-                    {tag}
-                  </span>
-                  <div>
-                    <h4 style={{ fontSize: 20, fontWeight: 700, lineHeight: 1.4, marginBottom: 8 }}>{title}</h4>
-                    <span style={{ fontFamily: 'ui-monospace,monospace', fontSize: 13, alignSelf: 'flex-end' }}>{t('featRead')} →</span>
+          <div className="x40-bento">
+            {FEATURES.map(({ img, en, ja, desc }, i) => (
+              <div
+                key={en}
+                className="x40-bento-card x40-reveal"
+                style={{ transitionDelay: `${(i % 4) * 0.08}s` }}
+              >
+                <div className="x40-bento-img-wrap">
+                  <img src={img} alt={en} />
+                </div>
+                <div className="x40-bento-body">
+                  <div className="x40-bento-labels">
+                    <span className="x40-bento-en">{en}</span>
+                    <span className="x40-bento-ja">{ja}</span>
                   </div>
+                  <p className="x40-bento-desc">{desc}</p>
                 </div>
-              </a>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── SERIES LINEUP (client — tabs) ── */}
-      <SeriesSection
-        sectionNum={`05 / ${t('seriesSectionNum')}`}
-        sectionTitle={t('seriesSectionTitle')}
-        moreLabel={t('seriesMore')}
-        moreHref="#"
-        tabs={seriesTabs}
-        cards={seriesCards}
-      />
-
-      {/* ── STAT STRIP ── */}
-      <section style={{ background: 'var(--ink)', color: 'var(--paper)', padding: '80px 0', position: 'relative', overflow: 'hidden' }}>
-        <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(circle at 80% 10%,rgba(0,70,229,0.3),transparent 50%),radial-gradient(circle at 10% 90%,rgba(0,70,229,0.18),transparent 50%)', pointerEvents: 'none' }} />
-        <div className="jm-sec-inner" style={{ position: 'relative', zIndex: 2 }}>
-          <div style={{ fontFamily: 'ui-monospace,monospace', fontSize: 12, letterSpacing: '0.1em', color: 'rgba(255,255,255,0.5)', fontWeight: 600, marginBottom: 14 }}>
-            06 / NUMBERS · {t('statSectionNum')}
-          </div>
-          <h2 style={{ fontSize: 32, fontWeight: 700, lineHeight: 1.4, maxWidth: 900, paddingBottom: 14, borderBottom: '4px solid var(--accent)', display: 'inline-block', marginBottom: 56 }}>
-            {t('statSectionTitle')}
-          </h2>
-          <div className="jm-strip-stats">
-            {([
-              { num: t('stat1Num'), unit: t('stat1Unit'), label: t('stat1Label') },
-              { num: t('stat2Num'), unit: t('stat2Unit'), label: t('stat2Label') },
-              { num: t('stat3Num'), unit: t('stat3Unit'), label: t('stat3Label') },
-              { num: t('stat4Num'), unit: t('stat4Unit'), label: t('stat4Label') },
-            ]).map(({ num, unit, label }) => (
-              <div key={label}>
-                <div style={{ fontFamily: 'ui-monospace,monospace', fontSize: 52, fontWeight: 700, display: 'flex', alignItems: 'baseline', gap: 4, letterSpacing: '-0.02em' }}>
-                  {num}
-                  <small style={{ fontSize: 14, color: 'rgba(255,255,255,0.6)', fontWeight: 500 }}>{unit}</small>
-                </div>
-                <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.6)', marginTop: 8, lineHeight: 1.6 }}>{label}</div>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ── NEWS ── */}
-      <section className="jm-sec">
-        <div className="jm-sec-inner">
-          <div className="jm-news-grid">
-            {/* Sidebar */}
-            <aside>
-              <div style={{ fontFamily: 'ui-monospace,monospace', fontSize: 12, letterSpacing: '0.1em', color: 'var(--ink-3)', fontWeight: 600, marginBottom: 14 }}>
-                07 / {t('newsSectionNum')}
+      {/* ═══════════ TECHNOLOGY DEEP-DIVE ═══════════ */}
+      <section className="x40-tech" id="technology">
+        <div className="x40-sec-inner">
+          <div className="x40-sec-header x40-reveal">
+            <span className="x40-eyebrow">Technology</span>
+            <h2 className="x40-section-title">Engineered to<br />outlast expectation.</h2>
+          </div>
+
+          {/* Row 1: Cyclone flush */}
+          <div className="x40-tech-row x40-reveal">
+            <div className="x40-tech-img-col">
+              <img src="/x40/cyclone-flush.jpg" alt="Cyclone Flush" />
+            </div>
+            <div className="x40-tech-text-col">
+              <span className="x40-eyebrow">Flush System</span>
+              <h3>Cyclone Flush Technology</h3>
+              <p>
+                Spiral water jets scour the entire inner surface in a single 3.8 L flush.
+                The result: a mathematically cleaner bowl using 87% less water than a conventional toilet.
+              </p>
+              <div className="x40-tech-stats">
+                <div><strong>3.8<small>L</small></strong><span>Per flush</span></div>
+                <div><strong>38<small>dB</small></strong><span>Maximum noise</span></div>
+                <div><strong>87<small>%</small></strong><span>Water saved</span></div>
               </div>
-              <h2 style={{ fontSize: 26, fontWeight: 700, paddingBottom: 14, borderBottom: '4px solid var(--accent)', display: 'inline-block', marginBottom: 32 }}>
-                {t('newsSectionTitle')}
-              </h2>
-              <div style={{ display: 'flex', flexDirection: 'column' }}>
-                {[
-                  { label: t('newsFilterAll'), count: '24', active: true },
-                  { label: t('newsFilterNew'), count: '9', active: false },
-                  { label: t('newsFilterEvent'), count: '6', active: false },
-                  { label: t('newsFilterPress'), count: '5', active: false },
-                  { label: t('newsFilterSupport'), count: '4', active: false },
-                ].map(({ label, count, active }) => (
-                  <a key={label} href="#" style={{ padding: '14px 0', borderTop: '1px solid var(--line)', fontSize: 13, display: 'flex', justifyContent: 'space-between', alignItems: 'center', color: active ? 'var(--accent)' : 'var(--ink)', fontWeight: active ? 700 : 400, textDecoration: 'none' }}>
-                    <span>{label}</span>
-                    <span style={{ fontFamily: 'ui-monospace,monospace', fontSize: 11, color: 'var(--ink-3)', letterSpacing: '0.04em' }}>{count}</span>
-                  </a>
+            </div>
+          </div>
+
+          {/* Row 2: UV + Platinum (reversed) */}
+          <div className="x40-tech-row x40-tech-row--rev x40-reveal">
+            <div className="x40-tech-img-col">
+              <img src="/x40/uv-sterilize.jpg" alt="UV Sterilization" />
+            </div>
+            <div className="x40-tech-text-col">
+              <span className="x40-eyebrow">Hygiene System</span>
+              <h3>UV + Platinum Protection</h3>
+              <p>
+                A built-in UV lamp sterilises the bowl before and after each use.
+                The platinum catalyst deodoriser converts odour molecules into harmless
+                water vapour — no sprays, no chemicals, no compromise.
+              </p>
+              <div className="x40-tech-stats">
+                <div><strong>99.9<small>%</small></strong><span>Bacteria eliminated</span></div>
+                <div><strong>0<small>s</small></strong><span>Reaction time</span></div>
+                <div><strong>24<small>h</small></strong><span>Active protection</span></div>
+              </div>
+            </div>
+          </div>
+
+          {/* Row 3: Auto lid + foot sensor */}
+          <div className="x40-tech-row x40-reveal">
+            <div className="x40-tech-img-col">
+              <img src="/x40/auto-lid.jpg" alt="Auto Lid" />
+            </div>
+            <div className="x40-tech-text-col">
+              <span className="x40-eyebrow">Smart Sensing</span>
+              <h3>Touch-Free Automation</h3>
+              <p>
+                Proximity sensors open the lid as you approach and close it when you leave.
+                The foot-activated flush panel means your hands never touch the toilet.
+                Power-outage mode ensures manual flush always works.
+              </p>
+              <ul className="x40-check-list">
+                {['Auto-open lid on approach', 'Foot-sensor flush + lid toggle', 'Auto-flush on departure', 'Emergency flush during power outage'].map(f => (
+                  <li key={f}><span className="x40-check">✓</span>{f}</li>
                 ))}
-              </div>
-            </aside>
-
-            {/* News list */}
-            <div style={{ display: 'flex', flexDirection: 'column' }}>
-              {newsItems.map(item => (
-                <a key={item.date + item.text} href="#" style={{ padding: '18px 0', borderTop: '1px solid var(--line)', display: 'grid', gridTemplateColumns: '100px 90px 1fr 20px', gap: 20, alignItems: 'center', textDecoration: 'none', color: 'var(--ink)' }}>
-                  <span style={{ fontFamily: 'ui-monospace,monospace', fontSize: 12, color: 'var(--ink-3)', letterSpacing: '0.04em' }}>{item.date}</span>
-                  <span style={{ fontSize: 10, letterSpacing: '0.05em', color: item.tagWarn ? 'var(--warn)' : 'var(--accent)', padding: '3px 8px', background: item.tagWarn ? 'var(--warn-soft)' : 'var(--accent-soft)', justifySelf: 'start', fontWeight: 600 }}>
-                    {item.tag}
-                  </span>
-                  <h5 style={{ fontSize: 14, fontWeight: 500, lineHeight: 1.6, margin: 0 }}>{item.text}</h5>
-                  <span style={{ color: 'var(--ink-3)', justifySelf: 'end' }}>→</span>
-                </a>
-              ))}
-              <div style={{ borderTop: '1px solid var(--line)' }} />
-              <div style={{ marginTop: 24 }}>
-                <a href="#" style={{ fontSize: 13, fontWeight: 700, color: 'var(--accent)', textDecoration: 'none' }}>{t('newsMore')} →</a>
-              </div>
+              </ul>
             </div>
           </div>
         </div>
       </section>
 
-      {/* ── PRO PORTAL ── */}
-      <section style={{ background: 'var(--ink)', color: 'var(--paper)', padding: '0' }}>
-        <div className="jm-sec-inner" style={{ padding: '60px 40px' }}>
-          <div className="jm-pro-grid">
-            <div>
-              <div style={{ fontFamily: 'ui-monospace,monospace', fontSize: 11, letterSpacing: '0.1em', color: 'rgba(255,255,255,0.6)' }}>
-                {t('proLabel')}
+      {/* ═══════════ COMFORT GRID ═══════════ */}
+      <section className="x40-comfort" id="comfort">
+        <div className="x40-sec-inner">
+          <div className="x40-sec-header x40-reveal">
+            <span className="x40-eyebrow">Personal Care</span>
+            <h2 className="x40-section-title">Comfort,<br />precisely calibrated.</h2>
+            <p className="x40-sec-sub">
+              Six wash modes — each adjustable in pressure, temperature, and position —
+              adapt to every member of the household.
+            </p>
+          </div>
+
+          <div className="x40-comfort-grid">
+            {COMFORT.map(({ img, en, ja, desc }, i) => (
+              <div key={en} className="x40-comfort-card x40-reveal" style={{ transitionDelay: `${(i % 3) * 0.1}s` }}>
+                <div className="x40-comfort-img">
+                  <img src={img} alt={en} />
+                </div>
+                <div className="x40-comfort-body">
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+                    <strong>{en}</strong>
+                    <span style={{ fontSize: 12, color: '#666', fontFamily: 'ui-monospace,monospace' }}>{ja}</span>
+                  </div>
+                  <p>{desc}</p>
+                </div>
               </div>
-              <h3 style={{ fontSize: 30, fontWeight: 700, margin: '12px 0 16px', lineHeight: 1.4, paddingBottom: 14, borderBottom: '4px solid var(--accent)', display: 'inline-block' }}>
-                {t('proTitle')}
-              </h3>
-              <p style={{ fontSize: 14, lineHeight: 1.9, color: 'rgba(255,255,255,0.85)', maxWidth: 460 }}>{t('proLead')}</p>
-              <div style={{ display: 'flex', gap: 10, marginTop: 24 }}>
-                <Show when="signed-out">
-                  <Link href="/sign-in" style={{ background: 'var(--paper)', color: 'var(--ink)', padding: '12px 22px', fontSize: 13, fontWeight: 700, display: 'inline-flex', gap: 10, alignItems: 'center', textDecoration: 'none' }}>
-                    {t('proLogin')} →
-                  </Link>
-                  <Link href="/sign-up" style={{ background: 'transparent', color: '#fff', border: '1px solid rgba(255,255,255,0.4)', padding: '12px 22px', fontSize: 13, fontWeight: 700, display: 'inline-flex', gap: 10, alignItems: 'center', textDecoration: 'none' }}>
-                    {t('proRegister')}
-                  </Link>
-                </Show>
-                <Show when="signed-in">
-                  <Link href="/dashboard" style={{ background: 'var(--paper)', color: 'var(--ink)', padding: '12px 22px', fontSize: 13, fontWeight: 700, display: 'inline-flex', gap: 10, alignItems: 'center', textDecoration: 'none' }}>
-                    {t('memberTitle')} →
-                  </Link>
-                </Show>
-              </div>
-            </div>
-            <div className="jm-pro-feat">
-              {([
-                { title: t('pro1Title'), desc: t('pro1Desc') },
-                { title: t('pro2Title'), desc: t('pro2Desc') },
-                { title: t('pro3Title'), desc: t('pro3Desc') },
-                { title: t('pro4Title'), desc: t('pro4Desc') },
-              ]).map(({ title, desc }) => (
-                <a key={title} href="#" style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.12)', padding: 18, display: 'flex', flexDirection: 'column', gap: 6, textDecoration: 'none', color: '#fff' }}>
-                  <span style={{ fontSize: 14, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 8 }}>{title} <span style={{ marginLeft: 'auto', fontWeight: 400 }}>→</span></span>
-                  <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.6)', lineHeight: 1.6 }}>{desc}</span>
-                </a>
-              ))}
-            </div>
+            ))}
           </div>
         </div>
       </section>
-    </main>
-  )
-}
 
-/* ── Small helper components ── */
-
-function ShortcutIcon({ type }: { type: string }) {
-  const paths: Record<string, React.ReactNode> = {
-    grid: <><rect x="4" y="4" width="16" height="16" rx="1" /><path d="M4 9h16M9 4v16" /></>,
-    home: <><path d="M3 12 12 4l9 8" /><path d="M5 11v9h14v-9" /></>,
-    doc:  <><path d="M4 7h16M4 12h16M4 17h10" /></>,
-    clock:<><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 2" /></>,
-    file: <><rect x="4" y="2" width="12" height="20" rx="1" /><path d="M8 7h8M8 11h8M8 15h5" /></>,
-    refresh:<><path d="M21 12a9 9 0 1 1-9-9" /><path d="m15 3 6 3-3 6" /></>,
-  }
-  return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-      {paths[type]}
-    </svg>
-  )
-}
-
-function TechVisual({ dark, specs, caption }: { dark?: boolean; specs: [string, string][]; caption: string }) {
-  return (
-    <div style={{ aspectRatio: '5/6', position: 'relative', background: dark ? 'linear-gradient(180deg,#2a2f36 0%,#15181d 100%)' : 'linear-gradient(180deg,#efece4 0%,#d6d1c5 100%)', overflow: 'hidden' }}>
-      {/* Corner brackets */}
-      {(['tl','tr','bl','br'] as const).map(c => (
-        <div key={c} style={{
-          position: 'absolute', width: 16, height: 16, zIndex: 3,
-          ...(c[0] === 't' ? { top: 6 } : { bottom: 6 }),
-          ...(c[1] === 'l' ? { left: 6 } : { right: 6 }),
-          border: '1px solid rgba(255,255,255,0.6)',
-          borderRight: c[1] === 'l' ? 'none' : '1px solid rgba(255,255,255,0.6)',
-          borderLeft: c[1] === 'r' ? 'none' : '1px solid rgba(255,255,255,0.6)',
-          borderBottom: c[0] === 't' ? 'none' : '1px solid rgba(255,255,255,0.6)',
-          borderTop: c[0] === 'b' ? 'none' : '1px solid rgba(255,255,255,0.6)',
-        }} />
-      ))}
-      {/* Data overlay */}
-      <div style={{ position: 'absolute', left: 16, top: 16, fontFamily: 'ui-monospace,monospace', fontSize: 10, color: '#fff', background: 'rgba(0,0,0,0.7)', padding: '8px 10px', letterSpacing: '0.06em', lineHeight: 1.7, zIndex: 3 }}>
-        {specs.map(([label, val]) => (
-          <div key={label} style={{ display: 'flex', gap: 16, justifyContent: 'space-between' }}>
-            <span style={{ color: 'rgba(255,255,255,0.6)' }}>{label}</span>
-            <span>{val}</span>
+      {/* ═══════════ POWER-OUTAGE / MISC ═══════════ */}
+      <section className="x40-misc x40-reveal">
+        <div className="x40-sec-inner">
+          <div className="x40-misc-grid">
+            {[
+              { img: '/x40/power-outage-flush.jpg', title: 'Power-Outage Flush', body: 'A dedicated manual flush valve keeps the toilet functional even during a blackout.' },
+              { img: '/x40/auto-descale.jpg',       title: 'Auto Descaling',     body: 'Automated needle descaling dissolves limescale deposits inside the nozzle.' },
+              { img: '/x40/nozzle-clean.png',       title: 'Self-Clean Nozzle',  body: 'The nozzle pre-rinses itself before and after every use without prompting.' },
+              { img: '/x40/antibacterial.jpg',      title: 'Dual Antibacterial', body: 'Both the seat ring and spray nozzle are treated with antibacterial coating.' },
+            ].map(({ img, title, body }, i) => (
+              <div key={title} className="x40-misc-card x40-reveal" style={{ transitionDelay: `${i * 0.1}s` }}>
+                <div className="x40-misc-img"><img src={img} alt={title} /></div>
+                <strong>{title}</strong>
+                <p>{body}</p>
+              </div>
+            ))}
           </div>
-        ))}
-      </div>
-      {/* Caption */}
-      <div style={{ position: 'absolute', bottom: 16, left: 16, fontFamily: 'ui-monospace,monospace', fontSize: 10, letterSpacing: '0.08em', textTransform: 'uppercase', padding: '3px 8px', border: '1px solid currentColor', opacity: 0.7, color: dark ? '#cfd3d8' : '#4a4a4a' }}>
-        {caption}
-      </div>
-    </div>
-  )
-}
+        </div>
+      </section>
 
-function TechBody({ badge, title, lead, stats, feats }: {
-  badge: string; title: string; lead: string;
-  stats: { num: string; unit: string; label: string }[];
-  feats: string[];
-}) {
-  return (
-    <div style={{ paddingRight: 24 }}>
-      <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8, fontFamily: 'ui-monospace,monospace', fontSize: 11, fontWeight: 600, letterSpacing: '0.08em', padding: '5px 10px', background: 'var(--accent-soft)', color: 'var(--accent)' }}>
-        ● {badge}
-      </span>
-      <h3 style={{ fontSize: 26, fontWeight: 700, lineHeight: 1.4, margin: '16px 0', paddingBottom: 14, borderBottom: '4px solid var(--accent)', display: 'inline-block' }}>
-        {title}
-      </h3>
-      <p style={{ fontSize: 14, lineHeight: 2, color: 'var(--ink-2)', marginTop: 8 }}>{lead}</p>
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 20, marginTop: 32, paddingTop: 24, borderTop: '1px solid var(--line)' }}>
-        {stats.map(({ num, unit, label }) => (
-          <div key={label}>
-            <div style={{ fontFamily: 'ui-monospace,monospace', fontSize: 32, fontWeight: 700, color: 'var(--accent)', display: 'flex', alignItems: 'baseline', gap: 4, letterSpacing: '-0.02em' }}>
-              {num}<small style={{ fontSize: 14, color: 'var(--ink-2)', fontWeight: 500 }}>{unit}</small>
-            </div>
-            <div style={{ fontSize: 12, letterSpacing: '0.04em', color: 'var(--ink-3)', marginTop: 4 }}>{label}</div>
+      {/* ═══════════ CTA ═══════════ */}
+      <section className="x40-cta">
+        <div className="x40-cta-bg" />
+        <div className="x40-cta-content x40-reveal">
+          <span className="x40-eyebrow" style={{ color: 'rgba(255,255,255,0.6)' }}>JOMOO X40</span>
+          <h2 className="x40-cta-title">Experience it<br />in person.</h2>
+          <p className="x40-cta-body">
+            Visit a JOMOO showroom to see the X40 in a live environment,
+            or speak with a specialist to find the right configuration for your space.
+          </p>
+          <div className="x40-cta-actions">
+            <Link href="/products/smart-toilet" className="x40-btn x40-btn--white">Explore All Models</Link>
+            <a href="#" className="x40-btn x40-btn--ghost">Find a Showroom</a>
           </div>
-        ))}
-      </div>
-      <ul style={{ listStyle: 'none', margin: '24px 0 0', padding: 0, display: 'flex', flexDirection: 'column' }}>
-        {feats.map(feat => (
-          <li key={feat} style={{ padding: '12px 0', borderTop: '1px solid var(--line)', display: 'grid', gridTemplateColumns: '24px 1fr', gap: 12, fontSize: 13, lineHeight: 1.7 }}>
-            <span style={{ width: 18, height: 18, background: 'var(--accent)', color: '#fff', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, marginTop: 1 }}>✓</span>
-            <span>{feat}</span>
-          </li>
-        ))}
-        <li style={{ borderTop: '1px solid var(--line)' }} />
-      </ul>
+        </div>
+        <div className="x40-cta-img x40-reveal">
+          <Image
+            src="/x40/product-main.jpg"
+            alt="JOMOO X40"
+            width={520}
+            height={620}
+            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+          />
+        </div>
+      </section>
+
+      {/* ═══════════ FOOTER ═══════════ */}
+      <footer className="x40-footer">
+        <div className="x40-footer-inner">
+          <Image src="/logo.png" alt="JOMOO" width={100} height={30} style={{ objectFit: 'contain', opacity: 0.7 }} />
+          <div className="x40-footer-links">
+            <Link href="/products/smart-toilet">Products</Link>
+            <a href="#">Showrooms</a>
+            <a href="#">Support</a>
+            <Link href="/register">Register</Link>
+          </div>
+          <p className="x40-footer-copy">© {new Date().getFullYear()} JOMOO JAPAN 株式会社. All rights reserved.</p>
+        </div>
+      </footer>
+
     </div>
   )
 }
