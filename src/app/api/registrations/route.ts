@@ -2,7 +2,7 @@ import { auth, currentUser } from '@clerk/nextjs/server'
 import { NextResponse } from 'next/server'
 import { RegistrationSchema } from '@/types/registration'
 import { createAdminClient } from '@/lib/supabase'
-import { sendRegistrationConfirmation } from '@/lib/resend'
+import { sendRegistrationConfirmation, sendWarrantyIssuedEmail } from '@/lib/resend'
 
 export async function POST(req: Request) {
   const { userId } = await auth()
@@ -110,13 +110,26 @@ export async function POST(req: Request) {
     }
   }
 
-  // Send confirmation email (non-blocking)
-  sendRegistrationConfirmation({
-    to: user.email,
-    name: user.nickname ?? data.contactPerson,
-    modelName: data.modelName,
-    registrationId: registration.id,
-  }).catch((err) => console.error('Email send error:', err))
+  // Send the appropriate email non-blocking
+  if (finalStatus === 'REGISTERED_WITH_WARRANTY') {
+    const installDate = data.installationDate ? new Date(data.installationDate) : new Date()
+    const expiry = new Date(installDate)
+    expiry.setFullYear(expiry.getFullYear() + 2)
+    sendWarrantyIssuedEmail({
+      to: user.email,
+      name: user.nickname ?? data.contactPerson,
+      modelName: data.modelName,
+      registrationId: registration.id,
+      expiryDate: expiry.toISOString().split('T')[0],
+    }).catch((err) => console.error('Warranty email error:', err))
+  } else {
+    sendRegistrationConfirmation({
+      to: user.email,
+      name: user.nickname ?? data.contactPerson,
+      modelName: data.modelName,
+      registrationId: registration.id,
+    }).catch((err) => console.error('Confirmation email error:', err))
+  }
 
   return NextResponse.json({ id: registration.id, status: finalStatus }, { status: 201 })
 }
