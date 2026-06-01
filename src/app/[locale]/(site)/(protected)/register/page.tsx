@@ -1,12 +1,13 @@
-import { auth } from '@clerk/nextjs/server'
 import { redirect } from 'next/navigation'
+import { headers } from 'next/headers'
 import { getTranslations } from 'next-intl/server'
+import { auth } from '@/lib/auth'
 import { getProductModels } from '@/lib/sanity'
 import RegistrationForm from '@/components/registration/RegistrationForm'
 
 export default async function RegisterPage() {
-  const { userId } = await auth()
-  if (!userId) redirect('/sign-in')
+  const session = await auth.api.getSession({ headers: await headers() })
+  if (!session) redirect('/sign-in')
 
   const t = await getTranslations('registration')
   const models = await getProductModels()

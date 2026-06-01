@@ -1,74 +1,54 @@
-import { auth, clerkClient } from '@clerk/nextjs/server'
 import { NextResponse } from 'next/server'
+import { auth } from '@/lib/auth'
+import { db } from '@/lib/db'
+import { user } from '@/lib/db/schema'
+import { eq } from 'drizzle-orm'
 import { z } from 'zod'
-import { createAdminClient } from '@/lib/supabase'
 
 const UpdateUserSchema = z.object({
-  nickname: z.string().min(1).max(100).optional(),
+  name: z.string().min(1).max(100).optional(),
   gender: z.enum(['male', 'female', 'other', 'prefer_not_to_say']).nullable().optional(),
-  date_of_birth: z.string().nullable().optional(),
+  dateOfBirth: z.string().nullable().optional(),
 })
 
-export async function GET() {
-  const { userId } = await auth()
-  if (!userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-
-  const supabase = createAdminClient()
-  const { data: user } = await supabase
-    .from('users')
-    .select('id, email, nickname, gender, date_of_birth')
-    .eq('clerk_id', userId)
-    .single()
-
-  if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 })
-  return NextResponse.json({ user })
+export async function GET(req: Request) {
+  const session = await auth.api.getSession({ headers: req.headers })
+  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  return NextResponse.json({ user: session.user })
 }
 
 export async function PATCH(req: Request) {
-  const { userId } = await auth()
-  if (!userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  const session = await auth.api.getSession({ headers: req.headers })
+  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-  let body: unknown
-  try {
-    body = await req.json()
-  } catch {
+  let rawBody: unknown
+  try { rawBody = await req.json() } catch {
     return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 })
   }
 
-  const parsed = UpdateUserSchema.safeParse(body)
+  const parsed = UpdateUserSchema.safeParse(rawBody)
   if (!parsed.success) {
     return NextResponse.json({ error: 'Invalid data', details: parsed.error.flatten() }, { status: 422 })
   }
 
-  const supabase = createAdminClient()
-  const { error } = await supabase
-    .from('users')
-    .update(parsed.data)
-    .eq('clerk_id', userId)
+  const d = parsed.data
+  await db.update(user).set({
+    ...(d.name !== undefined && { name: d.name }),
+    ...(d.gender !== undefined && { gender: d.gender }),
+    ...(d.dateOfBirth !== undefined && { dateOfBirth: d.dateOfBirth }),
+    updatedAt: new Date(),
+  }).where(eq(user.id, session.user.id))
 
-  if (error) return NextResponse.json({ error: 'Update failed' }, { status: 500 })
   return NextResponse.json({ success: true })
 }
 
-export async function DELETE() {
-  const { userId } = await auth()
-  if (!userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+export async function DELETE(req: Request) {
+  const session = await auth.api.getSession({ headers: req.headers })
+  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-  const supabase = createAdminClient()
-
-  const { data: user } = await supabase
-    .from('users')
-    .select('id')
-    .eq('clerk_id', userId)
-    .single()
-
-  if (user) {
-    await supabase.from('product_registrations').delete().eq('user_id', user.id)
-    await supabase.from('users').delete().eq('id', user.id)
-  }
-
-  const clerk = await clerkClient()
-  await clerk.users.deleteUser(userId)
+  // Deleting the user record cascades to product_registrations, warranty_records,
+  // sessions, and accounts via FK ON DELETE CASCADE in the schema.
+  await db.delete(user).where(eq(user.id, session.user.id))
 
   return NextResponse.json({ success: true })
 }

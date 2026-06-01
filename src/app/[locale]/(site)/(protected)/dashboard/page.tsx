@@ -1,49 +1,46 @@
-import { auth } from '@clerk/nextjs/server'
 import { redirect } from 'next/navigation'
+import { headers } from 'next/headers'
 import { getTranslations } from 'next-intl/server'
-import { createAdminClient } from '@/lib/supabase'
-import type { DbProductRegistration, DbUser } from '@/types/database'
+import { auth } from '@/lib/auth'
+import { db } from '@/lib/db'
+import { productRegistration } from '@/lib/db/schema'
+import { eq, desc } from 'drizzle-orm'
 import Link from 'next/link'
 import UserProfileSection from '@/components/dashboard/UserProfileSection'
 import RegistrationCard from '@/components/dashboard/RegistrationCard'
+import type { DbProductRegistration } from '@/types/database'
 
 export default async function DashboardPage() {
-  const { userId } = await auth()
-  if (!userId) redirect('/sign-in')
+  const session = await auth.api.getSession({ headers: await headers() })
+  if (!session) redirect('/sign-in')
 
   const t = await getTranslations('dashboard')
-  const supabase = createAdminClient()
+  const u = session.user
 
-  const { data: user } = await supabase
-    .from('users')
-    .select('id, email, nickname, gender, date_of_birth')
-    .eq('clerk_id', userId)
-    .single()
-
-  let registrations: DbProductRegistration[] = []
-  if (user) {
-    const { data } = await supabase
-      .from('product_registrations')
-      .select('*')
-      .eq('user_id', user.id)
-      .order('submitted_at', { ascending: false })
-    registrations = data ?? []
-  }
+  const registrations = await db
+    .select()
+    .from(productRegistration)
+    .where(eq(productRegistration.userId, u.id))
+    .orderBy(desc(productRegistration.submittedAt))
 
   return (
     <main className="flex-1 px-4 py-12 max-w-4xl mx-auto w-full">
       <div className="mb-8">
         <h1 className="text-2xl font-bold">{t('title')}</h1>
-        {user?.nickname && (
-          <p className="text-zinc-500 mt-1">{t('welcome')}，{user.nickname}</p>
+        {u.name && (
+          <p className="text-zinc-500 mt-1">{t('welcome')}，{u.name}</p>
         )}
       </div>
 
-      {user && (
-        <UserProfileSection
-          user={user as Pick<DbUser, 'email' | 'nickname' | 'gender' | 'date_of_birth'>}
-        />
-      )}
+      <UserProfileSection
+        user={{
+          email: u.email,
+          name: u.name,
+          gender: (u as { gender?: string | null }).gender ?? null,
+          dateOfBirth: (u as { dateOfBirth?: string | null }).dateOfBirth ?? null,
+          twoFactorEnabled: (u as { twoFactorEnabled?: boolean | null }).twoFactorEnabled ?? false,
+        }}
+      />
 
       <section>
         <div className="flex items-center justify-between mb-4">
@@ -59,17 +56,14 @@ export default async function DashboardPage() {
         {registrations.length === 0 ? (
           <div className="rounded-lg border border-dashed border-zinc-200 px-8 py-16 text-center">
             <p className="text-zinc-500">{t('noProducts')}</p>
-            <Link
-              href="/register"
-              className="mt-4 inline-flex items-center text-sm font-medium text-zinc-900 underline-offset-4 hover:underline"
-            >
+            <Link href="/register" className="mt-4 inline-flex items-center text-sm font-medium text-zinc-900 underline-offset-4 hover:underline">
               {t('registerFirst')}
             </Link>
           </div>
         ) : (
           <div className="space-y-3">
             {registrations.map((reg) => (
-              <RegistrationCard key={reg.id} registration={reg} />
+              <RegistrationCard key={reg.id} registration={reg as unknown as DbProductRegistration} />
             ))}
           </div>
         )}

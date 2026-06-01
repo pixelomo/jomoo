@@ -21,6 +21,9 @@ const globalSecurityHeaders = [
 ]
 
 const nextConfig: NextConfig = {
+  // Better Auth's internal Kysely adapter bundles SQLite native modules that
+  // cannot be processed by webpack. Mark better-auth as external on the server.
+  serverExternalPackages: ['better-auth', '@better-auth/kysely-adapter', 'kysely'],
   images: {
     remotePatterns: [
       { protocol: 'https', hostname: 'res.cloudinary.com' },

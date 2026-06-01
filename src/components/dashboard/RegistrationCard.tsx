@@ -55,17 +55,17 @@ export default function RegistrationCard({ registration: initial }: Props) {
         {/* Header row */}
         <div className="flex items-start justify-between gap-4">
           <div>
-            <p className="font-semibold text-zinc-900">{reg.model_name}</p>
+            <p className="font-semibold text-zinc-900">{reg.modelName}</p>
             <p className="text-sm text-zinc-500 mt-0.5">
-              {tr('installationDate')}: {reg.installation_date}
+              {tr('installationDate')}: {reg.installationDate}
             </p>
             <p className="text-sm text-zinc-500">
-              {reg.installation_address_state
-                ? PROVINCES.find((p) => p.value === reg.installation_address_state)?.[
+              {reg.installationAddressState
+                ? PROVINCES.find((p) => p.value === reg.installationAddressState)?.[
                     locale === 'zh-CN' ? 'labelZh' : 'labelEn'
-                  ] ?? reg.installation_address_state
+                  ] ?? reg.installationAddressState
                 : null}
-              {reg.installation_address_detail ? `, ${reg.installation_address_detail}` : null}
+              {reg.installationAddressDetail ? `, ${reg.installationAddressDetail}` : null}
             </p>
           </div>
           <span
@@ -76,20 +76,20 @@ export default function RegistrationCard({ registration: initial }: Props) {
         </div>
 
         {/* Image thumbnails */}
-        {(reg.warranty_card_url || reg.serial_number_image_url) && (
+        {(reg.warrantyCardUrl || reg.serialNumberImageUrl) && (
           <div className="flex gap-3">
-            {reg.warranty_card_url && (
+            {reg.warrantyCardUrl && (
               <Thumbnail
-                url={reg.warranty_card_url}
+                url={reg.warrantyCardUrl}
                 label={t('warrantyCardPhoto')}
-                onClick={() => setLightbox(reg.warranty_card_url!)}
+                onClick={() => setLightbox(reg.warrantyCardUrl!)}
               />
             )}
-            {reg.serial_number_image_url && (
+            {reg.serialNumberImageUrl && (
               <Thumbnail
-                url={reg.serial_number_image_url}
+                url={reg.serialNumberImageUrl}
                 label={t('serialNumberPhoto')}
-                onClick={() => setLightbox(reg.serial_number_image_url!)}
+                onClick={() => setLightbox(reg.serialNumberImageUrl!)}
               />
             )}
           </div>
@@ -240,13 +240,13 @@ function EditModal({
   const locale = useLocale()
 
   const [fields, setFields] = useState({
-    installation_date: registration.installation_date ?? '',
-    installation_address_state: registration.installation_address_state ?? '',
-    installation_address_detail: registration.installation_address_detail ?? '',
-    contact_person: registration.contact_person ?? '',
-    phone_number: registration.phone_number ?? '',
-    purchase_date: registration.purchase_date ?? '',
-    dealer_name: registration.dealer_name ?? '',
+    installation_date: registration.installationDate ?? '',
+    installation_address_state: registration.installationAddressState ?? '',
+    installation_address_detail: registration.installationAddressDetail ?? '',
+    contact_person: registration.contactPerson ?? '',
+    phone_number: registration.phoneNumber ?? '',
+    purchase_date: registration.purchaseDate ?? '',
+    dealer_name: registration.dealerName ?? '',
   })
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)

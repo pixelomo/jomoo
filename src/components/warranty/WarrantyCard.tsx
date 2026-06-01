@@ -58,7 +58,7 @@ export default function WarrantyCard({ registration, warranty, customerName, t }
         <div className="bg-zinc-50 border-b border-zinc-200 px-8 py-4 flex items-center gap-4">
           <div className="flex-1">
             <p className="text-xs font-medium uppercase tracking-wider text-zinc-500 mb-1">{t.warrantyExpiry}</p>
-            <p className="text-2xl font-bold text-zinc-900">{formatDate(warranty.expiry_date)}</p>
+            <p className="text-2xl font-bold text-zinc-900">{formatDate(warranty.expiryDate)}</p>
           </div>
           <div className="w-12 h-12 rounded-full bg-zinc-900 flex items-center justify-center shrink-0">
             <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
@@ -70,14 +70,14 @@ export default function WarrantyCard({ registration, warranty, customerName, t }
         {/* Fields */}
         <div className="px-8 py-6">
           <dl className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-5">
-            <CardField label={t.product} value={registration.model_name} />
+            <CardField label={t.product} value={registration.modelName} />
             <CardField label={t.customerName} value={customerName} />
-            <CardField label={t.serialNumber} value={registration.serial_number} mono />
-            <CardField label={t.purchaseDate} value={registration.purchase_date ? formatDate(registration.purchase_date) : '—'} />
-            <CardField label={t.installationDate} value={formatDate(registration.installation_date)} />
+            <CardField label={t.serialNumber} value={registration.serialNumber} mono />
+            <CardField label={t.purchaseDate} value={registration.purchaseDate ? formatDate(registration.purchaseDate) : '—'} />
+            <CardField label={t.installationDate} value={formatDate(registration.installationDate)} />
             <CardField
               label={t.issuedOn}
-              value={formatDate(warranty.created_at)}
+              value={formatDate(warranty.createdAt)}
             />
           </dl>
         </div>

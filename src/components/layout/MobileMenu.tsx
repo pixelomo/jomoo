@@ -1,10 +1,12 @@
 'use client'
 
 import { useState } from 'react'
-import { useClerk } from '@clerk/nextjs'
+import { authClient } from '@/lib/auth-client'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 
 interface Props {
+  isSignedIn: boolean
   productsLabel: string
   spacesLabel: string
   technologyLabel: string
@@ -21,6 +23,7 @@ interface Props {
 }
 
 export default function MobileMenu({
+  isSignedIn,
   productsLabel,
   spacesLabel,
   technologyLabel,
@@ -36,18 +39,25 @@ export default function MobileMenu({
   consultationLabel,
 }: Props) {
   const [open, setOpen] = useState(false)
-  const { user, signOut } = useClerk()
+  const router = useRouter()
   const close = () => setOpen(false)
 
   const navItems = [
     { href: '/products/smart-toilet', label: productsLabel },
-    { href: '#',                      label: spacesLabel    },
-    { href: '#',                      label: technologyLabel },
-    { href: '#',                      label: styleLabel     },
-    { href: '#',                      label: showroomLabel  },
-    { href: '#',                      label: supportLabel   },
-    { href: '#',                      label: brandLabel     },
+    { href: '#', label: spacesLabel },
+    { href: '#', label: technologyLabel },
+    { href: '#', label: styleLabel },
+    { href: '#', label: showroomLabel },
+    { href: '#', label: supportLabel },
+    { href: '#', label: brandLabel },
   ]
+
+  const handleSignOut = async () => {
+    await authClient.signOut()
+    close()
+    router.push('/')
+    router.refresh()
+  }
 
   return (
     <>
@@ -67,32 +77,15 @@ export default function MobileMenu({
 
       {open && (
         <div style={{
-          position: 'absolute',
-          top: '100%',
-          left: 0,
-          right: 0,
-          background: 'var(--paper)',
-          zIndex: 100,
+          position: 'absolute', top: '100%', left: 0, right: 0,
+          background: 'var(--paper)', zIndex: 100,
           borderTop: '1px solid var(--line)',
           borderBottom: '2px solid var(--accent)',
           boxShadow: '0 8px 24px rgba(0,0,0,0.08)',
         }}>
           <div style={{ padding: '8px 0' }}>
             {navItems.map(({ href, label }) => (
-              <Link
-                key={href + label}
-                href={href}
-                onClick={close}
-                style={{
-                  color: 'var(--ink)',
-                  fontSize: 15,
-                  fontWeight: 500,
-                  padding: '14px 20px',
-                  borderBottom: '1px solid var(--line-2)',
-                  display: 'block',
-                  textDecoration: 'none',
-                }}
-              >
+              <Link key={href + label} href={href} onClick={close} style={{ color: 'var(--ink)', fontSize: 15, fontWeight: 500, padding: '14px 20px', borderBottom: '1px solid var(--line-2)', display: 'block', textDecoration: 'none' }}>
                 {label}
               </Link>
             ))}
@@ -102,16 +95,12 @@ export default function MobileMenu({
             <Link href="/register" onClick={close} style={{ background: 'var(--accent)', color: '#fff', fontSize: 13, fontWeight: 700, padding: '10px 16px', textDecoration: 'none', display: 'inline-block' }}>
               {consultationLabel} →
             </Link>
-            {user ? (
+            {isSignedIn ? (
               <>
                 <Link href="/dashboard" onClick={close} style={{ color: 'var(--ink-2)', fontSize: 13, fontWeight: 500, textDecoration: 'none' }}>
                   {dashboardLabel}
                 </Link>
-                <button
-                  type="button"
-                  onClick={() => { signOut(); close() }}
-                  style={{ color: 'var(--ink-3)', fontSize: 13, background: 'transparent', border: 'none', cursor: 'pointer', padding: 0 }}
-                >
+                <button type="button" onClick={handleSignOut} style={{ color: 'var(--ink-3)', fontSize: 13, background: 'transparent', border: 'none', cursor: 'pointer', padding: 0 }}>
                   {signOutLabel}
                 </button>
               </>

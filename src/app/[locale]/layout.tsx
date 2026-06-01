@@ -1,4 +1,3 @@
-import { ClerkProvider } from '@clerk/nextjs'
 import { NextIntlClientProvider } from 'next-intl'
 import { getMessages } from 'next-intl/server'
 import { notFound } from 'next/navigation'
@@ -65,11 +64,9 @@ export default async function LocaleLayout({
   return (
     <html lang={locale} className={`${bebasNeue.variable} ${geistSans.variable} ${notoSansJP.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col bg-white text-zinc-900">
-        <ClerkProvider>
-          <NextIntlClientProvider messages={messages}>
-            {children}
-          </NextIntlClientProvider>
-        </ClerkProvider>
+        <NextIntlClientProvider messages={messages}>
+          {children}
+        </NextIntlClientProvider>
       </body>
     </html>
   )

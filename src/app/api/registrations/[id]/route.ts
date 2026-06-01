@@ -1,7 +1,9 @@
-import { auth } from '@clerk/nextjs/server'
 import { NextResponse } from 'next/server'
+import { auth } from '@/lib/auth'
+import { db } from '@/lib/db'
+import { productRegistration } from '@/lib/db/schema'
+import { eq, and } from 'drizzle-orm'
 import { z } from 'zod'
-import { createAdminClient } from '@/lib/supabase'
 
 const EditableFieldsSchema = z.object({
   installation_date: z.string().optional(),
@@ -15,41 +17,30 @@ const EditableFieldsSchema = z.object({
 
 const MUTABLE_STATUSES = ['PENDING', 'RETURNED']
 
-async function resolveOwnedRegistration(userId: string, regId: string) {
-  const supabase = createAdminClient()
-  const { data: user } = await supabase
-    .from('users')
-    .select('id')
-    .eq('clerk_id', userId)
-    .single()
-  if (!user) return null
-
-  const { data: reg } = await supabase
-    .from('product_registrations')
-    .select('id, status')
-    .eq('id', regId)
-    .eq('user_id', user.id)
-    .single()
+async function getOwnedRegistration(userId: string, regId: string) {
+  const [reg] = await db
+    .select({ id: productRegistration.id, status: productRegistration.status })
+    .from(productRegistration)
+    .where(and(eq(productRegistration.id, regId), eq(productRegistration.userId, userId)))
+    .limit(1)
   return reg ?? null
 }
 
 export async function DELETE(
-  _req: Request,
+  req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const { userId } = await auth()
-  if (!userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  const session = await auth.api.getSession({ headers: req.headers })
+  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const { id } = await params
-  const reg = await resolveOwnedRegistration(userId, id)
+  const reg = await getOwnedRegistration(session.user.id, id)
   if (!reg) return NextResponse.json({ error: 'Not found' }, { status: 404 })
   if (!MUTABLE_STATUSES.includes(reg.status)) {
     return NextResponse.json({ error: 'Cannot delete an approved registration' }, { status: 403 })
   }
 
-  const supabase = createAdminClient()
-  const { error } = await supabase.from('product_registrations').delete().eq('id', id)
-  if (error) return NextResponse.json({ error: 'Delete failed' }, { status: 500 })
+  await db.delete(productRegistration).where(eq(productRegistration.id, id))
   return NextResponse.json({ success: true })
 }
 
@@ -57,15 +48,13 @@ export async function PATCH(
   req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const { userId } = await auth()
-  if (!userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  const session = await auth.api.getSession({ headers: req.headers })
+  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const { id } = await params
 
   let body: unknown
-  try {
-    body = await req.json()
-  } catch {
+  try { body = await req.json() } catch {
     return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 })
   }
 
@@ -74,18 +63,23 @@ export async function PATCH(
     return NextResponse.json({ error: 'Invalid data', details: parsed.error.flatten() }, { status: 422 })
   }
 
-  const reg = await resolveOwnedRegistration(userId, id)
+  const reg = await getOwnedRegistration(session.user.id, id)
   if (!reg) return NextResponse.json({ error: 'Not found' }, { status: 404 })
   if (!MUTABLE_STATUSES.includes(reg.status)) {
     return NextResponse.json({ error: 'Cannot edit an approved registration' }, { status: 403 })
   }
 
-  const supabase = createAdminClient()
-  const { error } = await supabase
-    .from('product_registrations')
-    .update(parsed.data)
-    .eq('id', id)
+  const d = parsed.data
+  await db.update(productRegistration).set({
+    ...(d.installation_date !== undefined && { installationDate: d.installation_date }),
+    ...(d.installation_address_state !== undefined && { installationAddressState: d.installation_address_state }),
+    ...(d.installation_address_detail !== undefined && { installationAddressDetail: d.installation_address_detail }),
+    ...(d.contact_person !== undefined && { contactPerson: d.contact_person }),
+    ...(d.phone_number !== undefined && { phoneNumber: d.phone_number }),
+    ...(d.purchase_date !== undefined && { purchaseDate: d.purchase_date }),
+    ...(d.dealer_name !== undefined && { dealerName: d.dealer_name }),
+    updatedAt: new Date(),
+  }).where(eq(productRegistration.id, id))
 
-  if (error) return NextResponse.json({ error: 'Update failed' }, { status: 500 })
   return NextResponse.json({ success: true })
 }

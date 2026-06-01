@@ -6,63 +6,65 @@ export type RegistrationStatus =
   | 'REGISTERED_NO_WARRANTY'
   | 'REGISTERED_WITH_WARRANTY'
 
+// Better Auth user (with our custom additionalFields)
 export interface DbUser {
   id: string
-  clerk_id: string
+  name: string
   email: string
-  nickname: string | null
+  emailVerified: boolean
   gender: Gender | null
-  date_of_birth: string | null
-  created_at: string
-  updated_at: string
+  dateOfBirth: string | null
+  twoFactorEnabled: boolean | null
+  createdAt: string
+  updatedAt: string
 }
 
 export interface DbProductRegistration {
   id: string
-  user_id: string
-  model_id: string
-  model_name: string
-  installation_date: string
-  installation_address_state: string
-  installation_address_detail: string
-  contact_person: string
-  phone_number: string | null
-  purchase_date: string | null
-  dealer_name: string | null
-  serial_number: string
-  serial_number_valid: boolean | null
-  warranty_card_url: string | null
-  serial_number_image_url: string | null
+  userId: string
+  modelId: string
+  modelName: string
+  installationDate: string
+  installationAddressState: string
+  installationAddressDetail: string
+  contactPerson: string
+  phoneNumber: string | null
+  purchaseDate: string | null
+  dealerName: string | null
+  serialNumber: string
+  serialNumberValid: boolean | null
+  warrantyCardUrl: string | null
+  serialNumberImageUrl: string | null
   status: RegistrationStatus
-  flagged_for_review: boolean
-  submitted_at: string
-  reviewed_at: string | null
-  reviewer_id: string | null
-  review_notes: string | null
-  created_at: string
-  updated_at: string
+  flaggedForReview: boolean
+  submittedAt: string
+  reviewedAt: string | null
+  reviewerId: string | null
+  reviewNotes: string | null
+  createdAt: string
+  updatedAt: string
 }
 
 export interface DbWarrantyRecord {
   id: string
-  registration_id: string
-  expiry_date: string
-  card_generated: boolean
-  created_at: string
-  updated_at: string
+  registrationId: string
+  expiryDate: string
+  cardGenerated: boolean
+  createdAt: string
+  updatedAt: string
 }
 
 export interface DbOwnershipTransfer {
   id: string
-  registration_id: string
-  changed_by: string
-  previous_address_state: string | null
-  previous_address_detail: string | null
-  previous_contact_person: string | null
-  previous_phone_number: string | null
-  new_address_state: string | null
-  new_address_detail: string | null
-  new_contact_person: string | null
-  new_phone_number: string | null
-  created_at: string
+  registrationId: string
+  changedBy: string
+  previousAddressState: string | null
+  previousAddressDetail: string | null
+  previousContactPerson: string | null
+  previousPhoneNumber: string | null
+  newAddressState: string | null
+  newAddressDetail: string | null
+  newContactPerson: string | null
+  newPhoneNumber: string | null
+  createdAt: string
 }
