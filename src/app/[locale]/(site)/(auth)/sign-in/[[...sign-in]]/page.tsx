@@ -25,9 +25,15 @@ export default function SignInPage() {
     setLoading(true)
     setError(null)
 
-    const { error: err } = await authClient.signIn.email({ email, password })
+    const { data, error: err } = await authClient.signIn.email({ email, password })
 
     if (!err) {
+      // twoFactorRedirect comes back as data (status 200), not as an error
+      if ((data as { twoFactorRedirect?: boolean } | null)?.twoFactorRedirect) {
+        setStep('totp')
+        setLoading(false)
+        return
+      }
       router.push('/dashboard')
       router.refresh()
       return

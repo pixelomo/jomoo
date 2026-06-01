@@ -4,11 +4,12 @@ import { useEffect, useRef } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 
-const FRAME_COUNT = 145
-const FRAME_SPEED = 1.0
-const IMAGE_SCALE = 0.88
-const TOTAL_FRAMES_PATH = (i: number) =>
-  `/x40/frames/frame_${String(i).padStart(4, '0')}.webp`
+const FRAME_COUNT = 240        // 10s @ 24fps
+const FRAME_SPEED = 1.0        // linear 1:1 mapping of frames across the full scroll
+const IMAGE_SCALE = 1.0   // true cover — no padded black band at top/bottom
+const BATCH = 20               // lazy-load images in batches of 20
+const pad = (i: number) => String(i).padStart(4, '0')
+const FRAME_PATH = (i: number) => `/x40/frames/frame_${pad(i)}.webp`
 
 export default function X40Page() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
@@ -16,6 +17,7 @@ export default function X40Page() {
   const canvasWrapRef = useRef<HTMLDivElement>(null)
   const overlayRef = useRef<HTMLDivElement>(null)
   const loaderRef = useRef<HTMLDivElement>(null)
+  const loaderContentRef = useRef<HTMLDivElement>(null)
   const loaderBarRef = useRef<HTMLDivElement>(null)
   const loaderPctRef = useRef<HTMLSpanElement>(null)
   const navRef = useRef<HTMLElement>(null)
@@ -33,10 +35,12 @@ export default function X40Page() {
     if (!canvas || !canvasWrap || !overlay || !loader || !nav) return
 
     const ctx = canvas.getContext('2d')!
-    const frames: HTMLImageElement[] = []
+    const loaderContent = loaderContentRef.current
+    const frames: HTMLImageElement[] = []      // single forward set, scrubbed both ways
     let currentFrame = 0
     let rafPending = false
     let bgColor = '#000000'
+    let loadedCount = 0
 
     /* ── DPR-aware canvas resize ── */
     function resizeCanvas() {
@@ -62,53 +66,115 @@ export default function X40Page() {
       } catch { bgColor = '#000' }
     }
 
-    /* ── Draw a frame ── */
+    /* ── Resolve the image for a given index. Scrubbing the single forward set
+          backwards is exactly the reverse playback, so no second set is needed.
+          Falls back to the nearest loaded neighbour so the canvas never blanks. ── */
+    function pickImage(index: number): HTMLImageElement | undefined {
+      const ready = (img?: HTMLImageElement) => img?.complete && img.naturalWidth > 0
+      if (ready(frames[index])) return frames[index]
+      for (let d = 1; d < FRAME_COUNT; d++) {
+        if (ready(frames[index - d])) return frames[index - d]
+        if (ready(frames[index + d])) return frames[index + d]
+      }
+      return undefined
+    }
+
+    /* ── Draw a frame ──
+          Desktop: cover (fills viewport).
+          Mobile (<768px): contain + ~2.5rem black padding so the whole frame
+          is visible small, rather than cropping to a central vertical strip. ── */
     function drawFrame(index: number) {
-      const img = frames[index]
-      if (!img?.complete || !img.naturalWidth) return
+      const img = pickImage(index)
+      if (!img) return
       const cw = window.innerWidth
       const ch = window.innerHeight
       const iw = img.naturalWidth
       const ih = img.naturalHeight
-      const scale = Math.max(cw / iw, ch / ih) * IMAGE_SCALE
+      let scale: number
+      if (cw < 768) {
+        const pad = 40 // ~2.5rem of black padding around the frame
+        const availW = Math.max(1, cw - pad * 2)
+        const availH = Math.max(1, ch - pad * 2)
+        scale = Math.min(availW / iw, availH / ih)
+      } else {
+        scale = Math.max(cw / iw, ch / ih) * IMAGE_SCALE
+      }
       const dw = iw * scale
       const dh = ih * scale
       const dx = (cw - dw) / 2
       const dy = (ch - dh) / 2
-      ctx.fillStyle = bgColor
+      ctx.fillStyle = cw < 768 ? '#000' : bgColor
       ctx.fillRect(0, 0, cw, ch)
       ctx.drawImage(img, dx, dy, dw, dh)
     }
 
-    /* ── Frame preloader ── */
-    function loadFrame(i: number): Promise<void> {
+    /* ── Single image loader ── */
+    function loadImage(i: number): Promise<void> {
       return new Promise(resolve => {
+        if (frames[i]) return resolve()
         const img = new window.Image()
         img.onload = () => { frames[i] = img; resolve() }
         img.onerror = () => resolve()
-        img.src = TOTAL_FRAMES_PATH(i + 1)
+        img.src = FRAME_PATH(i + 1)
       })
     }
 
-    async function preloadFrames() {
-      // Phase 1: first 10 frames fast
-      await Promise.all(Array.from({ length: 10 }, (_, i) => loadFrame(i)))
-      sampleBgColor(frames[0])
-      drawFrame(0)
-      if (loader) loader.style.opacity = '0'
-      setTimeout(() => { if (loader) loader.style.display = 'none' }, 600)
-
-      // Phase 2: rest in background
-      let loaded = 10
-      const remaining = Array.from({ length: FRAME_COUNT - 10 }, (_, i) => i + 10)
-      for (const i of remaining) {
-        await loadFrame(i)
-        loaded++
-        if (i % 20 === 0 && frames[i]) sampleBgColor(frames[i])
-        const pct = Math.round((loaded / FRAME_COUNT) * 100)
+    /* ── Batch loader (20 frames per batch), idempotent ── */
+    const batches = new Set<number>()
+    function loadBatch(b: number): Promise<void> {
+      if (b < 0 || b * BATCH >= FRAME_COUNT || batches.has(b)) return Promise.resolve()
+      batches.add(b)
+      const start = b * BATCH
+      const end = Math.min(start + BATCH, FRAME_COUNT)
+      const proms: Promise<void>[] = []
+      for (let i = start; i < end; i++) proms.push(loadImage(i))
+      return Promise.all(proms).then(() => {
+        loadedCount = batches.size * BATCH
+        const pct = Math.min(100, Math.round((loadedCount / FRAME_COUNT) * 100))
         if (loaderBar) loaderBar.style.width = pct + '%'
         if (loaderPct) loaderPct.textContent = pct + '%'
+      })
+    }
+
+    /* ── Reveal the site with an expanding see-through circular hole ── */
+    function revealSite() {
+      if (loaderContent) loaderContent.style.opacity = '0'
+      const start = performance.now()
+      const dur = 1100
+      const ease = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2)
+      function step(now: number) {
+        if (!loader) return
+        const t = Math.min((now - start) / dur, 1)
+        const hole = ease(t) * 160          // transparent hole grows 0% → 160%
+        const edge = hole + 6
+        const mask = `radial-gradient(circle at 50% 50%, transparent ${hole}%, #000 ${edge}%)`
+        loader.style.webkitMaskImage = mask
+        loader.style.maskImage = mask
+        if (t < 1) requestAnimationFrame(step)
+        else loader.style.display = 'none'
       }
+      requestAnimationFrame(step)
+    }
+
+    /* ── Initial load: draw frame 0 fast, then preload ALL frames (in batches
+          of 20) before revealing — eliminates scroll stutter in both directions. ── */
+    async function preloadFrames() {
+      const totalBatches = Math.ceil(FRAME_COUNT / BATCH)
+      await loadBatch(0)
+      if (frames[0]) sampleBgColor(frames[0])
+      drawFrame(0)
+      for (let b = 1; b < totalBatches; b++) {
+        await loadBatch(b)
+      }
+      revealSite()
+    }
+
+    /* ── Keep batches around `index` warm (covers fast scrolling either way) ── */
+    function ensureLoaded(index: number) {
+      const b = Math.floor(index / BATCH)
+      loadBatch(b - 1)
+      loadBatch(b)
+      loadBatch(b + 1)
     }
 
     /* ── Lazy load GSAP + Lenis ── */
@@ -158,7 +224,7 @@ export default function X40Page() {
         },
       })
 
-      /* ── Frame scroll binding ── */
+      /* ── Frame scroll binding (direction-aware + lazy batch loading) ── */
       ScrollTrigger.create({
         trigger: scrollEl,
         start: 'top top',
@@ -169,6 +235,7 @@ export default function X40Page() {
           const idx = Math.min(Math.floor(accelerated * FRAME_COUNT), FRAME_COUNT - 1)
           if (idx !== currentFrame) {
             currentFrame = idx
+            ensureLoaded(idx)
             if (!rafPending) {
               rafPending = true
               requestAnimationFrame(() => {
@@ -279,8 +346,8 @@ export default function X40Page() {
           },
         })
 
-        const MENTER = 0.76
-        const MLEAVE = 0.88
+        const MENTER = 0.78
+        const MLEAVE = 0.89
         ScrollTrigger.create({
           trigger: scrollEl,
           start: 'top top',
@@ -317,16 +384,19 @@ export default function X40Page() {
   return (
     <div className="x40-page">
 
-      {/* ── Loader ── */}
+      {/* ── Loader (spinner + expanding see-through hole reveal) ── */}
       <div id="x40-loader" ref={loaderRef}>
-        <div className="x40-loader-brand">
-          <Image src="/logo.png" alt="JOMOO" width={120} height={36} style={{ objectFit: 'contain', opacity: 0.8 }} priority />
-          <span>X40</span>
+        <div className="x40-loader-content" ref={loaderContentRef}>
+          <div className="x40-loader-spinner" />
+          <div className="x40-loader-brand">
+            <Image src="/logo.png" alt="JOMOO" width={120} height={36} style={{ objectFit: 'contain', opacity: 0.8 }} priority />
+            <span>X40</span>
+          </div>
+          <div className="x40-loader-track">
+            <div className="x40-loader-bar" ref={loaderBarRef} />
+          </div>
+          <span className="x40-loader-pct" ref={loaderPctRef}>0%</span>
         </div>
-        <div className="x40-loader-track">
-          <div className="x40-loader-bar" ref={loaderBarRef} />
-        </div>
-        <span className="x40-loader-pct" ref={loaderPctRef}>0%</span>
       </div>
 
       {/* ── Fixed canvas wrap ── */}
@@ -366,66 +436,84 @@ export default function X40Page() {
       </div>
 
       {/* ══════════════════════════════════
-          SCROLL CONTAINER — 900vh
-          Canvas shows through beneath
+          SCROLL CONTAINER — 1500vh
+          (proportional to 10s video: 900vh × 10/6 = 1500vh)
+          FRAME_SPEED 1.0 → frame index maps 1:1 across scroll, so each
+          section is paced to what is happening on screen at that moment.
       ══════════════════════════════════ */}
-      <div id="x40-scroll" style={{ position: 'relative', height: '900vh', zIndex: 3 }}>
+      <div id="x40-scroll" style={{ position: 'relative', height: '1500vh', zIndex: 3 }}>
 
-        {/* 0–18%: pure video reveal, no text */}
+        {/* 0–10% (0–1s): pure reveal — the lid begins to rise */}
 
-        {/* Section 1 — Design (18–32%) */}
+        {/* Section 1 — Auto-open lid · 0–2s lid rising open (11–22%) */}
         <section
           className="scroll-section align-left"
-          data-enter="18" data-leave="32" data-animation="slide-left"
-          style={{ top: '25%', transform: 'translateY(-50%)' }}
+          data-enter="11" data-leave="22" data-animation="slide-left"
+          style={{ top: '16%', transform: 'translateY(-50%)' }}
         >
           <div className="section-inner">
-            <span className="section-label">002 / デザイン</span>
-            <h2 className="section-heading">640mm。<br />細部まで、<br />妥協なし。</h2>
+            <span className="section-label">002 / オートオープン</span>
+            <h2 className="section-heading">近づくと、ふたが、<br />静かに開く。</h2>
             <p className="section-body">
-              奥行きわずか640mmのX40は、従来のスマートトイレが設置できなかった空間にも対応します。
-              ナノグレーズ加工のセラミックは汚れと細菌を弾き、初日も、千日目も美しさを保ちます。
+              人感センサーがあなたを検知し、ふたと便座がなめらかに、自動で開きます。
+              触れることなく迎え入れる——X40の体験は、この一瞬から始まります。
             </p>
           </div>
         </section>
 
-        {/* Section 2 — Flush (30–44%) */}
+        {/* Section 2 — Heated seat · 2–5s warm amber glow (24–37%) */}
         <section
           className="scroll-section align-right"
-          data-enter="30" data-leave="47" data-animation="slide-right"
-          style={{ top: '37%', transform: 'translateY(-50%)' }}
+          data-enter="24" data-leave="37" data-animation="slide-right"
+          style={{ top: '30%', transform: 'translateY(-50%)' }}
         >
           <div className="section-inner">
-            <span className="section-label">003 / フラッシュ</span>
-            <h2 className="section-heading">38dB。<br />静音の、<br />極致。</h2>
+            <span className="section-label">003 / 温感シート</span>
+            <h2 className="section-heading">座る前から、<br />ぬくもりが灯っている。</h2>
             <p className="section-body">
-              サイクロン螺旋ジェットがわずか3.8Lで便器全体を洗浄——従来の洗浄水量より87%削減。
-              数値で証明された清潔さと、体感できる静けさを両立します。
+              便座のリムから広がる、ほのかな温かみ。四季に応じて温度を自動で整える温熱シートが、
+              どんな朝も、どんな夜も、心地よく迎えます。
             </p>
           </div>
         </section>
 
-        {/* Section 3 — Hygiene (42–56%) */}
+        {/* Section 3 — Bidet precision · 3–5s nozzle extends (39–49%) */}
         <section
           className="scroll-section align-left"
-          data-enter="42" data-leave="60" data-animation="scale-up"
-          style={{ top: '49%', transform: 'translateY(-50%)' }}
+          data-enter="39" data-leave="49" data-animation="scale-up"
+          style={{ top: '44%', transform: 'translateY(-50%)' }}
         >
           <div className="section-inner">
-            <span className="section-label">004 / 衛生</span>
-            <h2 className="section-heading">UV＋プラチナ。<br />除菌率99.9%。</h2>
+            <span className="section-label">004 / 精密洗浄</span>
+            <h2 className="section-heading">ノズルが伸び、<br />狙いを定める。</h2>
             <p className="section-body">
-              内蔵UVライトが使用前後に便器を自動除菌。プラチナ触媒が臭気分子を無害な水蒸気に変換——
-              薬品不要、スプレー不要、妥協なし。
+              クロム仕上げのビデノズルが、リムの奥から静かに前進。水圧・水温・位置はすべて個別に調整でき、
+              清潔さを思いのままにコントロールします。
             </p>
           </div>
         </section>
 
-        {/* Section 4 — Stats (54–67%, dark overlay) */}
+        {/* Section 4 — Cyclone flush · 5–7s vortex flush (51–67%) */}
+        <section
+          className="scroll-section align-right"
+          data-enter="51" data-leave="67" data-animation="clip-reveal"
+          style={{ top: '59%', transform: 'translateY(-50%)' }}
+        >
+          <div className="section-inner">
+            <span className="section-label">005 / サイクロン洗浄</span>
+            <h2 className="section-heading">澄んだ水が、<br />渦を巻き消えてゆく。</h2>
+            <p className="section-body">
+              クリスタルブルーの水流が螺旋を描き、わずか3.8Lで便器全体を洗い流します。
+              38dBの静けさのまま、汚れも、音も、残しません。
+            </p>
+          </div>
+        </section>
+
+        {/* Stats · 7–8s camera pulls back to the product (70–80%) — content unchanged */}
         <section
           className="scroll-section section-stats"
-          data-enter="54" data-leave="67" data-animation="stagger-up"
-          style={{ top: '60.5%', transform: 'translateY(-50%)' }}
+          data-enter="70" data-leave="80" data-animation="stagger-up"
+          style={{ top: '75%', transform: 'translateY(-50%)' }}
         >
           <div className="stats-grid">
             {[
@@ -445,43 +533,28 @@ export default function X40Page() {
           </div>
         </section>
 
-        {/* Section 5 — Comfort (65–78%) */}
-        <section
-          className="scroll-section align-right"
-          data-enter="65" data-leave="82" data-animation="clip-reveal"
-          style={{ top: '71.5%', transform: 'translateY(-50%)' }}
-        >
-          <div className="section-inner">
-            <span className="section-label">006 / コンフォート</span>
-            <h2 className="section-heading">6つのモード。<br />ひとつの習慣。</h2>
-            <p className="section-body">
-              後洗浄、ビデ、ワイド、マッサージ、やわらか——水圧・水温・位置はすべて個別調整可能。
-              温熱シートは四季に応答し、温水は常に瞬時に供給されます。
-            </p>
-          </div>
-        </section>
-
-        {/* Section 6 — Marquee (76–88%) */}
+        {/* Marquee · 8–9s (78–89%) */}
         <div
           className="marquee-wrap scroll-section"
-          style={{ top: '82%', transform: 'translateY(-50%)', width: '100%', opacity: 0 }}
+          style={{ top: '84%', transform: 'translateY(-50%)', width: '100%', opacity: 0 }}
         >
           <div className="marquee-text">
             インテリジェント&nbsp;·&nbsp;清潔&nbsp;·&nbsp;静音&nbsp;·&nbsp;精密&nbsp;·&nbsp;インテリジェント&nbsp;·&nbsp;清潔&nbsp;·&nbsp;静音&nbsp;·&nbsp;精密&nbsp;·&nbsp;インテリジェント&nbsp;·&nbsp;清潔&nbsp;·&nbsp;静音&nbsp;·&nbsp;
           </div>
         </div>
 
-        {/* Section 7 — CTA (86–100%, persists) */}
+        {/* CTA · 9–10s lid closes, the product sits immaculate (89–100%, persists) */}
         <section
           className="scroll-section section-cta"
-          data-enter="86" data-leave="100" data-animation="fade-up" data-persist="true"
-          style={{ top: '93%', transform: 'translateY(-50%)' }}
+          data-enter="89" data-leave="100" data-animation="fade-up" data-persist="true"
+          style={{ top: 'auto', bottom: 0, height: '100vh', width: '100%' }}
         >
           <div className="cta-inner">
-            <span className="section-label">008 / 体験</span>
-            <h2 className="section-heading cta-heading">X40を、<br />体験する。</h2>
+            <span className="section-label">006 / 体験</span>
+            <h2 className="section-heading cta-heading">ふたが閉じ、<br />すべてが整う。</h2>
             <p className="section-body section-note">
-              JOMOOショールームを訪れるか、専門スタッフにご相談ください。お客様に最適な構成をご提案いたします。
+              一連の動作を終え、X40は静かに佇む。この洗練された体験を、あなた自身の毎日へ。
+              JOMOOショールームで、最適な一台をご提案します。
             </p>
             <div className="cta-actions">
               <Link href="/products/smart-toilet" className="cta-btn cta-btn--white">全モデルを見る →</Link>

@@ -419,6 +419,9 @@ a { text-decoration: none; }
   min-height: 100vh;
   font-family: var(--font-geist-sans, system-ui, sans-serif);
   -webkit-font-smoothing: antialiased;
+  /* clip horizontal overflow from sections parked in their GSAP "from"
+     offset (e.g. slide-right x:60) so no horizontal scrollbar appears */
+  overflow-x: clip;
 }
 
 /* ── Loader ── */
@@ -428,12 +431,25 @@ a { text-decoration: none; }
   z-index: 1000;
   background: #000;
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 24px;
-  transition: opacity 0.5s ease;
 }
+.x40-loader-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 30px;
+  transition: opacity 0.35s ease;
+}
+.x40-loader-spinner {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  border: 2px solid rgba(255,255,255,0.12);
+  border-top-color: rgba(255,255,255,0.85);
+  animation: x40-spin 0.85s linear infinite;
+}
+@keyframes x40-spin { to { transform: rotate(360deg); } }
 .x40-loader-brand {
   display: flex;
   align-items: center;
@@ -593,11 +609,14 @@ a { text-decoration: none; }
 }
 
 /* ── Side alignment zones — text sits in the black margins beside the toilet ── */
-.align-left  { padding: 0 73vw 0 4vw; }
-.align-right { padding: 0 4vw 0 77vw; }
+.align-left  { padding: 0 65vw 0 4vw; }
+.align-right { padding: 0 4vw 0 68vw; }
 
-/* ── Section inner ── */
-.section-inner { padding: 0; }
+/* ── Section inner — faint see-through panel behind the text ── */
+.section-inner {
+  padding: 28px 32px;
+  background: rgba(0, 0, 0, 0.1);
+}
 
 /* ── Section typography ── */
 .section-label {
@@ -611,8 +630,8 @@ a { text-decoration: none; }
 }
 .section-heading {
   font-family: var(--font-bebas), var(--font-noto-sans-jp), sans-serif;
-  font-size: clamp(2.8rem, 4.5vw, 5.5rem);
-  line-height: 1.05;
+  font-size: clamp(1.7rem, 2.5vw, 2.8rem);
+  line-height: 1.14;
   letter-spacing: 0.02em;
   color: #fff;
   margin: 0 0 18px;
@@ -688,17 +707,21 @@ a { text-decoration: none; }
   will-change: transform;
 }
 
-/* ── CTA section ── */
+/* ── CTA section — fills the final viewport, footer pinned to the bottom ── */
 .section-cta {
-  padding: 0 5vw;
+  /* text block matches the align-left content width of the other rows */
+  padding: 0 65vw 0 4vw;
   display: flex;
   flex-direction: column;
+  justify-content: center;
 }
 .cta-inner {
-  max-width: 640px;
+  max-width: none;
+  padding: 28px 32px;
+  background: rgba(0, 0, 0, 0.1);
 }
 .cta-heading {
-  font-size: clamp(4rem, 8vw, 9rem) !important;
+  font-size: clamp(1.7rem, 2.5vw, 2.8rem) !important;
 }
 .cta-actions {
   display: flex;
@@ -726,10 +749,14 @@ a { text-decoration: none; }
 .cta-btn--ghost:hover { border-color: rgba(255,255,255,0.7); background: rgba(255,255,255,0.06); }
 
 .cta-footer-bar {
+  position: absolute;
+  left: 4vw;
+  right: 4vw;
+  bottom: 32px;
   display: flex;
   align-items: center;
   gap: 32px;
-  margin-top: 72px;
+  margin-top: 0;
   padding-top: 24px;
   border-top: 1px solid rgba(255,255,255,0.1);
   flex-wrap: wrap;
@@ -762,8 +789,8 @@ a { text-decoration: none; }
 /* ── Large desktop (1440px+) ── */
 @media (min-width: 1440px) {
   .x40-nav-inner { max-width: 1440px; padding: 24px 80px; }
-  .align-left  { padding: 0 74vw 0 4vw; }
-  .align-right { padding: 0 4vw 0 78vw; }
+  .align-left  { padding: 0 66vw 0 4vw; }
+  .align-right { padding: 0 4vw 0 69vw; }
   #x40-hero-text { padding-left: 80px; }
 }
 
@@ -778,7 +805,8 @@ a { text-decoration: none; }
   .align-left  { padding: 0 62vw 0 4vw; }
   .align-right { padding: 0 4vw 0 66vw; }
 
-  .section-heading { font-size: clamp(2.4rem, 5vw, 4rem); }
+  .section-heading,
+  .cta-heading     { font-size: clamp(1.9rem, 4vw, 2.8rem) !important; }
   .section-body    { font-size: 13px; }
 
   #x40-hero-text { padding-left: 32px; }
@@ -821,7 +849,8 @@ a { text-decoration: none; }
     display: inline-block;
   }
 
-  .section-heading { font-size: clamp(2.2rem, 9vw, 3.2rem); }
+  .section-heading,
+  .cta-heading     { font-size: clamp(1.9rem, 7.5vw, 2.6rem) !important; }
   .section-body    { font-size: 13px; line-height: 1.95; }
 
   /* Stats — 2×2, dark boxes, solid borders, full width */
@@ -835,12 +864,11 @@ a { text-decoration: none; }
   .marquee-text { font-size: 15vw; }
 
   /* CTA */
-  .section-cta    { padding: 0 16px; }
+  .section-cta    { padding: 14vh 16px 0; height: auto !important; min-height: 100vh; justify-content: flex-start; }
   .cta-inner      { max-width: 100%; }
-  .cta-heading    { font-size: clamp(2.8rem, 13vw, 4.5rem) !important; }
   .cta-actions    { flex-direction: column; gap: 10px; }
   .cta-btn        { width: 100%; justify-content: center; padding: 14px 20px; }
-  .cta-footer-bar { flex-direction: column; align-items: flex-start; gap: 14px; margin-top: 48px; }
+  .cta-footer-bar { position: static; left: auto; right: auto; bottom: auto; flex-direction: column; align-items: flex-start; gap: 14px; margin-top: 48px; }
   .cta-footer-bar > p { margin-left: 0; }
   .cta-footer-links { gap: 16px; flex-wrap: wrap; }
   .cta-footer-links a { font-size: 11px; }
@@ -851,6 +879,7 @@ a { text-decoration: none; }
 /* ── Very small (iPhone SE etc. 〜374px) ── */
 @media (max-width: 374px) {
   .x40-hero-title  { font-size: 5rem; }
-  .section-heading { font-size: 2rem; }
+  .section-heading,
+  .cta-heading     { font-size: 1.8rem !important; }
   .stat            { padding: 14px 10px; }
 }
