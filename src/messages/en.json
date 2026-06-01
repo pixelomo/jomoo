@@ -132,6 +132,9 @@
     "success": {
       "title": "Registration Submitted",
       "message": "Your product registration has been submitted. We will review it within 3–5 business days and notify you by email.",
+      "warrantyTitle": "Warranty Card Generated",
+      "warrantyMessage": "Serial number verified! Your electronic warranty card has been generated automatically.",
+      "viewWarranty": "View Warranty Card",
       "backToDashboard": "Back to Member Portal"
     }
   },
@@ -141,11 +144,27 @@
     "product": "Product Model",
     "registrationId": "Registration ID",
     "customerName": "Customer Name",
+    "serialNumber": "Serial Number",
+    "purchaseDate": "Purchase Date",
     "installationDate": "Installation Date",
-    "warrantyExpiry": "Warranty Expiry Date",
+    "warrantyExpiry": "Warranty Expiry",
+    "issuedOn": "Issued On",
     "print": "Print Warranty Card",
     "save": "Save as PDF",
     "notFound": "Warranty record not found"
+  },
+  "verify": {
+    "title": "Serial Number Verification",
+    "subtitle": "Enter your product serial number to verify its authenticity",
+    "inputLabel": "Product Serial Number",
+    "inputPlaceholder": "Enter the product serial number",
+    "button": "Verify",
+    "checking": "Checking...",
+    "validTitle": "Verified",
+    "validDesc": "This serial number belongs to a genuine JOMOO product.",
+    "invalidTitle": "Not Found",
+    "invalidDesc": "This serial number was not found in our database. Please double-check and try again, or contact customer support.",
+    "hint": "The serial number is printed on the product label or warranty card"
   },
   "footer": {
     "tagline": "Product Registration & Warranty",

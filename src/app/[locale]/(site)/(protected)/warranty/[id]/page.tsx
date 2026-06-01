@@ -47,8 +47,11 @@ export default async function WarrantyPage({ params }: Props) {
           product: t('product'),
           registrationId: t('registrationId'),
           customerName: t('customerName'),
+          serialNumber: t('serialNumber'),
+          purchaseDate: t('purchaseDate'),
           installationDate: t('installationDate'),
           warrantyExpiry: t('warrantyExpiry'),
+          issuedOn: t('issuedOn'),
           print: t('print'),
         }}
       />

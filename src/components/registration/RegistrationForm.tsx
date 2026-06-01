@@ -24,6 +24,8 @@ export default function RegistrationForm({ models }: Props) {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitError, setSubmitError] = useState<string>()
   const [done, setDone] = useState(false)
+  const [registrationId, setRegistrationId] = useState<string | null>(null)
+  const [autoApproved, setAutoApproved] = useState(false)
 
   const stepLabels = [t('steps.1'), t('steps.2'), t('steps.3')]
 
@@ -54,6 +56,9 @@ export default function RegistrationForm({ models }: Props) {
         throw new Error(error.error ?? 'Submission failed')
       }
 
+      const result: { id: string; status: string } = await res.json()
+      setRegistrationId(result.id)
+      setAutoApproved(result.status === 'REGISTERED_WITH_WARRANTY')
       setDone(true)
     } catch (err) {
       setSubmitError(err instanceof Error ? err.message : 'Unknown error')
@@ -70,14 +75,28 @@ export default function RegistrationForm({ models }: Props) {
             <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
           </svg>
         </div>
-        <h2 className="text-lg font-semibold text-green-800 mb-2">{t('success.title')}</h2>
-        <p className="text-sm text-green-700 mb-6">{t('success.message')}</p>
-        <button
-          onClick={() => router.push('/dashboard')}
-          className="inline-flex items-center rounded-lg bg-green-700 px-5 py-2.5 text-sm font-medium text-white hover:bg-green-800 transition-colors"
-        >
-          {t('success.backToDashboard')}
-        </button>
+        <h2 className="text-lg font-semibold text-green-800 mb-2">
+          {autoApproved ? t('success.warrantyTitle') : t('success.title')}
+        </h2>
+        <p className="text-sm text-green-700 mb-6">
+          {autoApproved ? t('success.warrantyMessage') : t('success.message')}
+        </p>
+        <div className="flex flex-col sm:flex-row gap-3 justify-center">
+          {autoApproved && registrationId && (
+            <button
+              onClick={() => router.push(`/warranty/${registrationId}`)}
+              className="inline-flex items-center justify-center rounded-lg bg-zinc-900 px-5 py-2.5 text-sm font-medium text-white hover:bg-zinc-700 transition-colors"
+            >
+              {t('success.viewWarranty')}
+            </button>
+          )}
+          <button
+            onClick={() => router.push('/dashboard')}
+            className="inline-flex items-center justify-center rounded-lg border border-green-300 bg-white px-5 py-2.5 text-sm font-medium text-green-800 hover:bg-green-50 transition-colors"
+          >
+            {t('success.backToDashboard')}
+          </button>
+        </div>
       </div>
     )
   }

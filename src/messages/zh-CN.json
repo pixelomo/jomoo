@@ -132,6 +132,9 @@
     "success": {
       "title": "登记提交成功",
       "message": "您的产品登记申请已提交，我们将在3-5个工作日内完成审核，审核结果将通过邮件通知您。",
+      "warrantyTitle": "电子保修卡已生成",
+      "warrantyMessage": "序列号验证通过！您的电子保修卡已自动生成，可在会员中心查看。",
+      "viewWarranty": "查看电子保修卡",
       "backToDashboard": "返回会员中心"
     }
   },
@@ -141,11 +144,27 @@
     "product": "产品型号",
     "registrationId": "登记编号",
     "customerName": "客户姓名",
+    "serialNumber": "产品序列号",
+    "purchaseDate": "购买日期",
     "installationDate": "安装日期",
     "warrantyExpiry": "保修到期日",
+    "issuedOn": "签发日期",
     "print": "打印保修卡",
     "save": "保存为PDF",
     "notFound": "未找到保修记录"
+  },
+  "verify": {
+    "title": "序列号验证",
+    "subtitle": "输入您产品的序列号，验证其真伪",
+    "inputLabel": "产品序列号",
+    "inputPlaceholder": "请输入产品序列号",
+    "button": "验证",
+    "checking": "验证中...",
+    "validTitle": "验证通过",
+    "validDesc": "此序列号为正品 JOMOO 产品，请放心使用。",
+    "invalidTitle": "验证失败",
+    "invalidDesc": "未找到此序列号，请检查后重试。如有疑问，请联系客服。",
+    "hint": "序列号印刷于产品铭牌或保修卡上"
   },
   "footer": {
     "tagline": "产品登记与保修服务",

@@ -85,6 +85,31 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'Failed to save registration' }, { status: 500 })
   }
 
+  // Auto-approve and generate warranty card when serial number is verified
+  let finalStatus: string = 'PENDING'
+  if (data.serialNumberValid === true) {
+    const baseDate = data.installationDate
+      ? new Date(data.installationDate)
+      : new Date()
+    const expiryDate = new Date(baseDate)
+    expiryDate.setFullYear(expiryDate.getFullYear() + 2)
+    const expiryStr = expiryDate.toISOString().split('T')[0]
+
+    const [updateResult, warrantyResult] = await Promise.all([
+      supabase
+        .from('product_registrations')
+        .update({ status: 'REGISTERED_WITH_WARRANTY', reviewed_at: new Date().toISOString() })
+        .eq('id', registration.id),
+      supabase
+        .from('warranty_records')
+        .insert({ registration_id: registration.id, expiry_date: expiryStr, card_generated: true }),
+    ])
+
+    if (!updateResult.error && !warrantyResult.error) {
+      finalStatus = 'REGISTERED_WITH_WARRANTY'
+    }
+  }
+
   // Send confirmation email (non-blocking)
   sendRegistrationConfirmation({
     to: user.email,
@@ -93,7 +118,7 @@ export async function POST(req: Request) {
     registrationId: registration.id,
   }).catch((err) => console.error('Email send error:', err))
 
-  return NextResponse.json({ id: registration.id }, { status: 201 })
+  return NextResponse.json({ id: registration.id, status: finalStatus }, { status: 201 })
 }
 
 export async function GET(req: Request) {
