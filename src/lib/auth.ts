@@ -23,6 +23,9 @@ export const auth = betterAuth({
   plugins: [
     twoFactor({
       issuer: 'JOMOO',
+      // Enable 2FA immediately when the user completes the setup flow,
+      // rather than requiring a separate TOTP verification round-trip.
+      skipVerificationOnEnable: true,
     }),
   ],
   user: {

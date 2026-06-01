@@ -77,7 +77,20 @@ export default function UserProfileSection({ user }: { user: UserProps }) {
     setTfaLoading(true)
     setTfaError(null)
     const { data, error } = await authClient.twoFactor.enable({ password: tfaPassword })
-    if (error || !data) { setTfaError(t('twoFactorPasswordError')); setTfaLoading(false); return }
+    if (error) {
+      console.error('[2FA enable error]', error)
+      const msg = error.code === 'INVALID_PASSWORD'
+        ? t('twoFactorPasswordError')
+        : `Error: ${error.message ?? error.code ?? 'Unknown error'}`
+      setTfaError(msg)
+      setTfaLoading(false)
+      return
+    }
+    if (!data) {
+      setTfaError('No data returned from server')
+      setTfaLoading(false)
+      return
+    }
     setTfaUri(data.totpURI)
     setTfaBackupCodes(data.backupCodes)
     setTfaStep('qr')
