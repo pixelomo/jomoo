@@ -10,7 +10,13 @@
       "Bash(git commit:*)",
       "Bash(gh repo:*)",
       "Bash(npx sanity@latest:*)",
-      "WebFetch(domain:jomoo-ashy.vercel.app)"
+      "WebFetch(domain:jomoo-ashy.vercel.app)",
+      "Bash(supabase status *)",
+      "Bash(curl -s 'https://ezgwjzilqpmmayzsyjau.supabase.co/rest/v1/__TRACKED_VAR__?select=*&limit=5' -H 'apikey: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV6Z3dqemlscXBtbWF5enN5amF1Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3ODQ1NTIxNiwiZXhwIjoyMDk0MDMxMjE2fQ.15wYKIE-BFFbnoKNuT09vlEW9mUllUeaukS3QLiH6dI' -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV6Z3dqemlscXBtbWF5enN5amF1Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3ODQ1NTIxNiwiZXhwIjoyMDk0MDMxMjE2fQ.15wYKIE-BFFbnoKNuT09vlEW9mUllUeaukS3QLiH6dI' -H 'Accept: application/json')",
+      "Bash(curl *)",
+      "Bash(npm run *)",
+      "Bash(echo \"PID: $!\")",
+      "Bash(python3 -m json.tool)"
     ]
   }
 }

@@ -1,0 +1,645 @@
+[
+  {
+    "fields": [
+      {
+        "validation": [
+          {
+            "level": "error",
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ]
+          }
+        ],
+        "description": "Unique identifier used in the registration form dropdown (e.g. XP40-BASIC)",
+        "name": "modelCode",
+        "type": "string"
+      },
+      {
+        "options": {
+          "list": [
+            {
+              "title": "Smart Toilet",
+              "value": "smart-toilet"
+            },
+            {
+              "title": "Washstand (Vanity)",
+              "value": "washstand"
+            },
+            {
+              "title": "Faucets & Fixtures",
+              "value": "faucets"
+            },
+            {
+              "title": "Shower Set",
+              "value": "shower-set"
+            }
+          ],
+          "layout": "radio"
+        },
+        "validation": [
+          {
+            "level": "error",
+            "rules": [
+              {
+                "flag": "valid",
+                "constraint": [
+                  "smart-toilet",
+                  "washstand",
+                  "faucets",
+                  "shower-set"
+                ]
+              },
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ]
+          }
+        ],
+        "name": "series",
+        "type": "string",
+        "title": "Product Series"
+      },
+      {
+        "fields": [
+          {
+            "validation": [
+              {
+                "level": "error",
+                "rules": [
+                  {
+                    "flag": "presence",
+                    "constraint": "required"
+                  }
+                ]
+              }
+            ],
+            "name": "zhCN",
+            "type": "string",
+            "title": "日本語 / 中文"
+          },
+          {
+            "validation": [
+              {
+                "level": "error",
+                "rules": [
+                  {
+                    "flag": "presence",
+                    "constraint": "required"
+                  }
+                ]
+              }
+            ],
+            "name": "en",
+            "type": "string",
+            "title": "English Name"
+          }
+        ],
+        "name": "name",
+        "type": "object",
+        "title": "Product Name"
+      },
+      {
+        "options": {
+          "source": "modelCode",
+          "maxLength": 96
+        },
+        "validation": [
+          {
+            "level": "error",
+            "rules": [
+              {
+                "flag": "custom"
+              },
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ]
+          }
+        ],
+        "name": "slug",
+        "type": "slug",
+        "title": "URL Slug"
+      },
+      {
+        "fields": [
+          {
+            "name": "zhCN",
+            "type": "string",
+            "title": "日本語 / 中文"
+          },
+          {
+            "name": "en",
+            "type": "string",
+            "title": "English"
+          }
+        ],
+        "name": "tagline",
+        "type": "object",
+        "title": "Tagline (short)"
+      },
+      {
+        "fields": [
+          {
+            "of": [
+              {
+                "lists": [
+                  {
+                    "value": "bullet",
+                    "title": "Bulleted list"
+                  },
+                  {
+                    "value": "number",
+                    "title": "Numbered list"
+                  }
+                ],
+                "marks": {
+                  "annotations": [
+                    {
+                      "i18nTitleKey": "inputs.portable-text.annotation.link",
+                      "options": {
+                        "modal": {
+                          "type": "popover"
+                        }
+                      },
+                      "fields": [
+                        {
+                          "validation": [
+                            {
+                              "level": "error",
+                              "rules": [
+                                {
+                                  "flag": "uri",
+                                  "constraint": {
+                                    "options": {
+                                      "scheme": [
+                                        "/^http$/",
+                                        "/^https$/",
+                                        "/^tel$/",
+                                        "/^mailto$/"
+                                      ],
+                                      "allowRelative": true,
+                                      "relativeOnly": false,
+                                      "allowCredentials": false
+                                    }
+                                  }
+                                }
+                              ]
+                            }
+                          ],
+                          "description": "A valid web, email, phone, or relative link.",
+                          "name": "href",
+                          "type": "url",
+                          "title": "Link"
+                        }
+                      ],
+                      "name": "link",
+                      "type": "object"
+                    }
+                  ],
+                  "decorators": [
+                    {
+                      "value": "strong",
+                      "title": "Strong"
+                    },
+                    {
+                      "value": "em",
+                      "title": "Italic"
+                    },
+                    {
+                      "value": "code",
+                      "title": "Code"
+                    },
+                    {
+                      "value": "underline",
+                      "title": "Underline"
+                    },
+                    {
+                      "value": "strike-through",
+                      "title": "Strike"
+                    }
+                  ]
+                },
+                "of": [],
+                "styles": [
+                  {
+                    "value": "normal",
+                    "title": "Normal"
+                  },
+                  {
+                    "value": "h1",
+                    "title": "Heading 1"
+                  },
+                  {
+                    "value": "h2",
+                    "title": "Heading 2"
+                  },
+                  {
+                    "value": "h3",
+                    "title": "Heading 3"
+                  },
+                  {
+                    "value": "h4",
+                    "title": "Heading 4"
+                  },
+                  {
+                    "value": "h5",
+                    "title": "Heading 5"
+                  },
+                  {
+                    "value": "h6",
+                    "title": "Heading 6"
+                  },
+                  {
+                    "value": "blockquote",
+                    "title": "Quote"
+                  }
+                ],
+                "type": "block"
+              }
+            ],
+            "name": "zhCN",
+            "type": "array",
+            "title": "日本語 / 中文"
+          },
+          {
+            "of": [
+              {
+                "lists": [
+                  {
+                    "value": "bullet",
+                    "title": "Bulleted list"
+                  },
+                  {
+                    "value": "number",
+                    "title": "Numbered list"
+                  }
+                ],
+                "marks": {
+                  "annotations": [
+                    {
+                      "i18nTitleKey": "inputs.portable-text.annotation.link",
+                      "options": {
+                        "modal": {
+                          "type": "popover"
+                        }
+                      },
+                      "fields": [
+                        {
+                          "validation": [
+                            {
+                              "level": "error",
+                              "rules": [
+                                {
+                                  "flag": "uri",
+                                  "constraint": {
+                                    "options": {
+                                      "scheme": [
+                                        "/^http$/",
+                                        "/^https$/",
+                                        "/^tel$/",
+                                        "/^mailto$/"
+                                      ],
+                                      "allowRelative": true,
+                                      "relativeOnly": false,
+                                      "allowCredentials": false
+                                    }
+                                  }
+                                }
+                              ]
+                            }
+                          ],
+                          "description": "A valid web, email, phone, or relative link.",
+                          "name": "href",
+                          "type": "url",
+                          "title": "Link"
+                        }
+                      ],
+                      "name": "link",
+                      "type": "object"
+                    }
+                  ],
+                  "decorators": [
+                    {
+                      "value": "strong",
+                      "title": "Strong"
+                    },
+                    {
+                      "value": "em",
+                      "title": "Italic"
+                    },
+                    {
+                      "value": "code",
+                      "title": "Code"
+                    },
+                    {
+                      "value": "underline",
+                      "title": "Underline"
+                    },
+                    {
+                      "value": "strike-through",
+                      "title": "Strike"
+                    }
+                  ]
+                },
+                "of": [],
+                "styles": [
+                  {
+                    "value": "normal",
+                    "title": "Normal"
+                  },
+                  {
+                    "value": "h1",
+                    "title": "Heading 1"
+                  },
+                  {
+                    "value": "h2",
+                    "title": "Heading 2"
+                  },
+                  {
+                    "value": "h3",
+                    "title": "Heading 3"
+                  },
+                  {
+                    "value": "h4",
+                    "title": "Heading 4"
+                  },
+                  {
+                    "value": "h5",
+                    "title": "Heading 5"
+                  },
+                  {
+                    "value": "h6",
+                    "title": "Heading 6"
+                  },
+                  {
+                    "value": "blockquote",
+                    "title": "Quote"
+                  }
+                ],
+                "type": "block"
+              }
+            ],
+            "name": "en",
+            "type": "array",
+            "title": "English"
+          }
+        ],
+        "name": "longDescription",
+        "type": "object",
+        "title": "Product Description"
+      },
+      {
+        "description": "Short bullet points shown in the features strip (3–6 items recommended)",
+        "of": [
+          {
+            "fields": [
+              {
+                "name": "icon",
+                "type": "string",
+                "title": "Icon (SVG name or short label, no emoji)"
+              },
+              {
+                "fields": [
+                  {
+                    "name": "zhCN",
+                    "type": "string",
+                    "title": "日本語 / 中文"
+                  },
+                  {
+                    "name": "en",
+                    "type": "string",
+                    "title": "English"
+                  }
+                ],
+                "name": "title",
+                "type": "object",
+                "title": "Feature Title"
+              },
+              {
+                "fields": [
+                  {
+                    "rows": 2,
+                    "name": "zhCN",
+                    "type": "text",
+                    "title": "日本語 / 中文"
+                  },
+                  {
+                    "rows": 2,
+                    "name": "en",
+                    "type": "text",
+                    "title": "English"
+                  }
+                ],
+                "name": "description",
+                "type": "object",
+                "title": "Feature Description"
+              }
+            ],
+            "type": "object"
+          }
+        ],
+        "name": "features",
+        "type": "array",
+        "title": "Feature Highlights"
+      },
+      {
+        "description": "Key technical parameters shown in the structured spec table",
+        "fields": [
+          {
+            "placeholder": "670×390×475 mm",
+            "name": "dimensions",
+            "type": "string",
+            "title": "Dimensions (W×D×H)"
+          },
+          {
+            "placeholder": "Vitreous China",
+            "name": "material",
+            "type": "string"
+          },
+          {
+            "placeholder": "AC100–240V, 50/60Hz, 60W",
+            "name": "power",
+            "type": "string",
+            "title": "Power Supply"
+          },
+          {
+            "placeholder": "Siphon Jet",
+            "name": "drainageMethod",
+            "type": "string"
+          },
+          {
+            "placeholder": "5.0 L / 3.5 L",
+            "name": "waterConsumption",
+            "type": "string"
+          },
+          {
+            "placeholder": "40 kg",
+            "name": "weight",
+            "type": "string"
+          },
+          {
+            "placeholder": "Cotton White",
+            "name": "color",
+            "type": "string",
+            "title": "Available Colors"
+          },
+          {
+            "placeholder": "JIS A 4422",
+            "name": "certification",
+            "type": "string",
+            "title": "Certifications"
+          }
+        ],
+        "name": "specTable",
+        "type": "object",
+        "title": "Specification Table"
+      },
+      {
+        "description": "Extra rows appended after the structured table",
+        "of": [
+          {
+            "fields": [
+              {
+                "fields": [
+                  {
+                    "name": "zhCN",
+                    "type": "string",
+                    "title": "日本語 / 中文"
+                  },
+                  {
+                    "name": "en",
+                    "type": "string",
+                    "title": "English"
+                  }
+                ],
+                "name": "label",
+                "type": "object"
+              },
+              {
+                "name": "value",
+                "type": "string"
+              }
+            ],
+            "type": "object"
+          }
+        ],
+        "name": "specs",
+        "type": "array",
+        "title": "Additional Specifications"
+      },
+      {
+        "description": "High-resolution images. First image is the hero/thumbnail.",
+        "of": [
+          {
+            "options": {
+              "hotspot": true
+            },
+            "fields": [
+              {
+                "name": "alt",
+                "type": "string",
+                "title": "Alt Text"
+              },
+              {
+                "name": "caption",
+                "type": "string"
+              }
+            ],
+            "type": "image"
+          }
+        ],
+        "name": "images",
+        "type": "array",
+        "title": "Product Images (carousel)"
+      },
+      {
+        "description": "YouTube or Vimeo embed URLs for product explainer videos",
+        "of": [
+          {
+            "fields": [
+              {
+                "validation": [
+                  {
+                    "level": "error",
+                    "rules": [
+                      {
+                        "flag": "uri",
+                        "constraint": {
+                          "options": {
+                            "scheme": [
+                              "/^http$/",
+                              "/^https$/"
+                            ],
+                            "allowRelative": false,
+                            "relativeOnly": false,
+                            "allowCredentials": false
+                          }
+                        }
+                      }
+                    ]
+                  }
+                ],
+                "name": "embedUrl",
+                "type": "url",
+                "title": "Embed URL (YouTube/Vimeo)"
+              },
+              {
+                "fields": [
+                  {
+                    "name": "zhCN",
+                    "type": "string",
+                    "title": "日本語 / 中文"
+                  },
+                  {
+                    "name": "en",
+                    "type": "string",
+                    "title": "English"
+                  }
+                ],
+                "name": "title",
+                "type": "object",
+                "title": "Video Title"
+              }
+            ],
+            "type": "object"
+          }
+        ],
+        "name": "featureVideos",
+        "type": "array"
+      },
+      {
+        "initialValue": true,
+        "name": "isActive",
+        "type": "boolean",
+        "title": "Active (show in registration dropdown)"
+      },
+      {
+        "fields": [
+          {
+            "rows": 2,
+            "name": "zhCN",
+            "type": "text",
+            "title": "日本語 / 中文"
+          },
+          {
+            "rows": 2,
+            "name": "en",
+            "type": "text",
+            "title": "English"
+          }
+        ],
+        "name": "description",
+        "type": "object",
+        "title": "Short Description (registration dropdown tooltip)"
+      }
+    ],
+    "name": "product",
+    "type": "document",
+    "title": "产品 / Product"
+  }
+]
