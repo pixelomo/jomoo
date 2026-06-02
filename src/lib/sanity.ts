@@ -126,3 +126,30 @@ export async function getProductSlugs(series: string): Promise<string[]> {
     return []
   }
 }
+
+export interface ProductSummary {
+  _id: string
+  slug: string
+  name: { zhCN: string; en: string }
+  tagline?: { zhCN: string; en: string }
+  modelCode: string
+  thumbnail?: { _ref: string; _type: string }
+}
+
+export async function getProductsInSeries(series: string): Promise<ProductSummary[]> {
+  try {
+    return await getSanityClient().fetch(
+      `*[_type == "product" && series == $series && defined(slug.current)] | order(modelCode asc) {
+        _id,
+        "slug": slug.current,
+        name,
+        tagline,
+        modelCode,
+        "thumbnail": images[0].asset
+      }`,
+      { series }
+    )
+  } catch {
+    return []
+  }
+}
