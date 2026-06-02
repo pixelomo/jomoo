@@ -1,3 +1,4 @@
 import { product } from './product'
+import { productSeries } from './productSeries'
 
-export const schemaTypes = [product]
+export const schemaTypes = [productSeries, product]

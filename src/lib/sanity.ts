@@ -127,6 +127,26 @@ export async function getProductSlugs(series: string): Promise<string[]> {
   }
 }
 
+export interface SeriesPageData {
+  _id: string
+  seriesId: string
+  name: { zhCN: string; en: string }
+  tagline?: { zhCN: string; en: string }
+  description?: { zhCN: string; en: string }
+}
+
+export async function getSeriesPage(seriesId: string): Promise<SeriesPageData | null> {
+  try {
+    const result = await getSanityClient().fetch(
+      `*[_type == "productSeries" && seriesId == $seriesId][0] { _id, seriesId, name, tagline, description }`,
+      { seriesId }
+    )
+    return result ?? null
+  } catch {
+    return null
+  }
+}
+
 export interface ProductSummary {
   _id: string
   slug: string

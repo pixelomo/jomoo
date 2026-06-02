@@ -1,19 +1,26 @@
-import { getTranslations, getLocale } from 'next-intl/server'
+import { getLocale } from 'next-intl/server'
 import Link from 'next/link'
-import { getProductsInSeries, imgUrl } from '@/lib/sanity'
+import { getSeriesPage, getProductsInSeries, imgUrl } from '@/lib/sanity'
 
 interface Props {
   series: string
-  title: string
-  description: string
 }
 
-export default async function SeriesPage({ series, title, description }: Props) {
-  const [t, locale, products] = await Promise.all([
-    getTranslations('home'),
+export default async function SeriesPage({ series }: Props) {
+  const [locale, seriesData, products] = await Promise.all([
     getLocale(),
+    getSeriesPage(series),
     getProductsInSeries(series),
   ])
+
+  const title = seriesData?.name
+    ? (locale === 'zh-CN' ? seriesData.name.zhCN : seriesData.name.en)
+    : series
+  const description = seriesData?.description
+    ? (locale === 'zh-CN' ? seriesData.description.zhCN : seriesData.description.en)
+    : null
+
+  const learnMore = locale === 'zh-CN' ? '詳細を見る' : 'Learn more'
 
   return (
     <main>
@@ -22,9 +29,11 @@ export default async function SeriesPage({ series, title, description }: Props) 
           <h1 style={{ fontSize: 40, fontWeight: 700, margin: '0 0 12px', letterSpacing: '0.02em', color: 'var(--ink)', borderBottom: '3px solid var(--accent)', display: 'inline-block', paddingBottom: 10 }}>
             {title}
           </h1>
-          <p style={{ fontSize: 16, color: 'var(--ink-2)', lineHeight: 1.8, marginTop: 24, maxWidth: 600 }}>
-            {description}
-          </p>
+          {description && (
+            <p style={{ fontSize: 16, color: 'var(--ink-2)', lineHeight: 1.8, marginTop: 24, maxWidth: 600 }}>
+              {description}
+            </p>
+          )}
         </div>
 
         {products.length === 0 ? (
@@ -71,7 +80,7 @@ export default async function SeriesPage({ series, title, description }: Props) 
                       </p>
                     )}
                     <span style={{ fontSize: 13, color: 'var(--accent)', fontWeight: 600, letterSpacing: '0.04em' }}>
-                      {t('learnMore')} →
+                      {learnMore} →
                     </span>
                   </div>
                 </Link>
