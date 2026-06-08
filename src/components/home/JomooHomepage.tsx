@@ -36,19 +36,7 @@ export default function JomooHomepage() {
       let cw = window.innerWidth
       let ch = window.innerHeight
 
-      const resizeCanvas = () => {
-        cw = window.innerWidth
-        ch = window.innerHeight
-        canvas.width = cw * dpr
-        canvas.height = ch * dpr
-        canvas.style.width = cw + 'px'
-        canvas.style.height = ch + 'px'
-        c2d.scale(dpr, dpr)
-        drawFrame(currentFrameIdx)
-      }
-      resizeCanvas()
-
-      // Frame images
+      // Declare these before resizeCanvas / drawFrame so no TDZ
       const frameImages: HTMLImageElement[] = []
       let loadedCount = 0
       let currentFrameIdx = 0
@@ -64,6 +52,18 @@ export default function JomooHomepage() {
         c2d.fillRect(0, 0, cw, ch)
         c2d.drawImage(img, dx, dy, dw, dh)
       }
+
+      const resizeCanvas = () => {
+        cw = window.innerWidth
+        ch = window.innerHeight
+        canvas.width = cw * dpr
+        canvas.height = ch * dpr
+        canvas.style.width = cw + 'px'
+        canvas.style.height = ch + 'px'
+        c2d.scale(dpr, dpr)
+        drawFrame(currentFrameIdx)
+      }
+      resizeCanvas()
 
       // Load all frames — draw first as soon as it's ready
       for (let i = 1; i <= FRAME_COUNT; i++) {
