@@ -3,38 +3,47 @@
 import { useLayoutEffect, useRef } from 'react'
 import Image from 'next/image'
 
+// Positions corrected per design:
+// toilet → center (original position is OK)
+// vanity → top left, offset right a little
+// faucet → top right, offset left a little
+// shower → bottom right
 const products = [
   {
-    src: '/images/product-x40b-toilet-white-bg.jpg',
+    src: '/images/product-x40b-toilet.png',
     alt: 'X40-B Smart Toilet',
-    style: { left: '8%', top: '30%', width: 260, height: 260 },
-    parallax: { from: 30, to: -20 },
-    rotate: -4,
+    pos: { left: '32%', top: '12%' },
+    size: { width: 300, height: 400 },
+    parallax: { from: 20, to: -15 },
+    rotate: 0,
     delay: 0,
   },
   {
-    src: '/images/product-faucet-chrome-black-bg.jpg',
-    alt: 'Chrome Faucet',
-    style: { left: '38%', top: '18%', width: 180, height: 280 },
-    parallax: { from: 15, to: -30 },
-    rotate: 6,
-    delay: 150,
-  },
-  {
-    src: '/images/product-shower-set-chrome-bg.jpg',
-    alt: 'Shower Set',
-    style: { right: '12%', top: '25%', width: 200, height: 340 },
-    parallax: { from: 40, to: -10 },
-    rotate: -8,
-    delay: 300,
-  },
-  {
-    src: '/images/product-vanity-unit-black-bg.jpg',
+    src: '/images/product-vanity-unit.png',
     alt: 'Vanity Unit',
-    style: { left: '62%', top: '55%', width: 200, height: 200 },
-    parallax: { from: 20, to: -40 },
-    rotate: 3,
-    delay: 450,
+    pos: { left: '6%', top: '8%' },
+    size: { width: 200, height: 260 },
+    parallax: { from: 30, to: -10 },
+    rotate: -3,
+    delay: 100,
+  },
+  {
+    src: '/images/product-faucet-chrome.png',
+    alt: 'Chrome Faucet',
+    pos: { right: '14%', top: '6%' },
+    size: { width: 120, height: 260 },
+    parallax: { from: 15, to: -25 },
+    rotate: 4,
+    delay: 200,
+  },
+  {
+    src: '/images/product-shower-set-chrome.png',
+    alt: 'Shower Set',
+    pos: { right: '6%', top: '52%' },
+    size: { width: 160, height: 300 },
+    parallax: { from: 40, to: -5 },
+    rotate: -5,
+    delay: 300,
   },
 ]
 
@@ -45,23 +54,21 @@ export default function AmazingExperienceSection() {
   useLayoutEffect(() => {
     let ctx: { revert: () => void } | null = null
 
-    // IntersectionObserver for fade-in
     const observers: IntersectionObserver[] = []
     productRefs.current.forEach((el, i) => {
       if (!el) return
       const obs = new IntersectionObserver(
         ([entry]) => {
-          if (entry.isIntersecting) {
-            setTimeout(() => {
-              if (el) {
-                el.style.opacity = '1'
-                el.style.transition = 'opacity 0.7s ease'
-              }
-            }, products[i].delay)
-            obs.disconnect()
-          }
+          if (!entry.isIntersecting) return
+          setTimeout(() => {
+            if (el) {
+              el.style.opacity = '1'
+              el.style.transition = 'opacity 0.7s ease'
+            }
+          }, products[i].delay)
+          obs.disconnect()
         },
-        { threshold: 0.1 }
+        { threshold: 0.05 }
       )
       obs.observe(el)
       observers.push(obs)
@@ -106,11 +113,11 @@ export default function AmazingExperienceSection() {
       ref={sectionRef}
       style={{
         position: 'relative',
-        minHeight: '140vh',
+        minHeight: '130vh',
         overflow: 'hidden',
       }}
     >
-      {/* Background image */}
+      {/* Background */}
       <Image
         src="/images/bg-gradient-blue-white.jpg"
         alt=""
@@ -119,49 +126,60 @@ export default function AmazingExperienceSection() {
         aria-hidden
       />
 
-      {/* Text */}
+      {/* Text block */}
       <div style={{
         position: 'relative',
         zIndex: 2,
         textAlign: 'center',
         paddingTop: 120,
+        paddingBottom: 32,
       }}>
         <span style={{
           display: 'block',
-          fontFamily: 'var(--font-cormorant, serif)',
-          fontWeight: 300,
+          fontFamily: 'var(--font-noto-sans-jp, sans-serif)',
+          fontWeight: 400,
           fontSize: 11,
-          letterSpacing: '0.4em',
-          color: 'var(--jomoo-grey)',
+          letterSpacing: '0.35em',
+          color: '#0c328c',
           textTransform: 'uppercase',
-          marginBottom: 20,
+          marginBottom: 16,
         }}>
           AMAZING EXPERIENCE
         </span>
         <h2 style={{
           fontFamily: 'var(--font-noto-sans-jp, sans-serif)',
           fontWeight: 300,
-          fontSize: 'clamp(32px, 4.5vw, 64px)',
+          fontSize: 'clamp(28px, 3.8vw, 52px)',
           color: 'var(--jomoo-black)',
-          margin: 0,
+          margin: '0 0 16px',
           lineHeight: 1.3,
         }}>
           「水まわり」に驚きを
         </h2>
+        <p style={{
+          fontFamily: 'var(--font-noto-sans-jp, sans-serif)',
+          fontWeight: 300,
+          fontSize: 13,
+          color: '#3A3A3A',
+          maxWidth: 400,
+          margin: '0 auto',
+          lineHeight: 1.9,
+        }}>
+          革新的なデザインと最先端技術が融合した、JOMOOのプレミアムバスルームコレクション。
+          日常を、特別な体験へ。
+        </p>
       </div>
 
-      {/* Floating product images */}
+      {/* Floating transparent product images */}
       {products.map((p, i) => (
         <div
           key={i}
           ref={el => { productRefs.current[i] = el }}
           style={{
             position: 'absolute',
-            ...(p.style.left !== undefined ? { left: p.style.left } : {}),
-            ...(p.style.right !== undefined ? { right: p.style.right } : {}),
-            top: p.style.top,
-            width: p.style.width,
-            height: p.style.height,
+            ...p.pos,
+            width: p.size.width,
+            height: p.size.height,
             rotate: `${p.rotate}deg`,
             pointerEvents: 'none',
             willChange: 'transform',
@@ -175,7 +193,7 @@ export default function AmazingExperienceSection() {
             fill
             style={{
               objectFit: 'contain',
-              filter: 'drop-shadow(0 20px 40px rgba(0,0,0,0.15))',
+              filter: 'drop-shadow(0 24px 48px rgba(0,0,0,0.12))',
             }}
           />
         </div>

@@ -29,17 +29,15 @@ export default function SmartToiletExpandSection() {
             },
           })
 
+          // Expand both width AND height
           tl.fromTo(
             imageWrapperRef.current,
-            { width: '960px', borderRadius: '12px' },
-            { width: '100vw', borderRadius: '0px', ease: 'none' }
+            { width: '880px', height: '520px', borderRadius: '10px' },
+            { width: '100vw', height: '100vh', borderRadius: '0px', ease: 'none' }
           )
 
-          tl.to(
-            labelRef.current,
-            { opacity: 0, ease: 'none' },
-            0
-          )
+          // Label fades out in first 20% of scroll
+          tl.to(labelRef.current, { opacity: 0, ease: 'none' }, 0)
         })
       }, sectionRef)
     })
@@ -50,10 +48,7 @@ export default function SmartToiletExpandSection() {
   return (
     <section
       ref={sectionRef}
-      style={{
-        height: '200vh',
-        background: 'var(--jomoo-warm-white)',
-      }}
+      style={{ height: '200vh', background: 'var(--jomoo-warm-white)' }}
     >
       <div
         ref={containerRef}
@@ -69,11 +64,11 @@ export default function SmartToiletExpandSection() {
         <p
           ref={labelRef}
           style={{
-            fontFamily: 'var(--font-cormorant, serif)',
-            fontWeight: 300,
+            fontFamily: 'var(--font-noto-sans-jp, sans-serif)',
+            fontWeight: 400,
             fontSize: 11,
             letterSpacing: '0.35em',
-            color: 'var(--jomoo-grey)',
+            color: '#0c328c',
             textTransform: 'uppercase',
             marginBottom: 24,
             textAlign: 'center',
@@ -85,20 +80,20 @@ export default function SmartToiletExpandSection() {
         <div
           ref={imageWrapperRef}
           style={{
-            width: '960px',
-            maxWidth: '100vw',
-            borderRadius: 12,
+            width: '880px',
+            height: '520px',
+            maxWidth: '96vw',
+            borderRadius: 10,
             overflow: 'hidden',
+            position: 'relative',
           }}
         >
-          <div style={{ position: 'relative', width: '100%', height: 560 }}>
-            <Image
-              src="/images/lifestyle-toilet-luxury-warmlit.jpg"
-              alt="Luxury warmly lit smart toilet bathroom"
-              fill
-              style={{ objectFit: 'cover' }}
-            />
-          </div>
+          <Image
+            src="/images/lifestyle-toilet-luxury-warmlit.jpg"
+            alt="Luxury warmly lit smart toilet bathroom"
+            fill
+            style={{ objectFit: 'cover' }}
+          />
         </div>
       </div>
     </section>

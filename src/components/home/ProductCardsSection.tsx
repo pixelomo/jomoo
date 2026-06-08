@@ -50,7 +50,7 @@ function ProductCard({
   }, [delay])
 
   return (
-    <div ref={cardRef} style={{ width: 'calc(50% - 24px)' }}>
+    <div ref={cardRef} style={{ flex: '1 1 calc(50% - 24px)', minWidth: 280 }}>
       <div
         ref={imgWrapRef}
         style={{
@@ -78,46 +78,42 @@ function ProductCard({
       </div>
       <div
         ref={textRef}
-        style={{
-          marginTop: 24,
-          transform: 'translateY(20px)',
-          opacity: 0,
-        }}
+        style={{ marginTop: 24, transform: 'translateY(20px)', opacity: 0 }}
       >
         <span style={{
           display: 'block',
-          fontFamily: 'var(--font-cormorant, serif)',
-          fontWeight: 300,
+          fontFamily: 'var(--font-noto-sans-jp, sans-serif)',
+          fontWeight: 400,
           fontSize: 10,
           letterSpacing: '0.3em',
-          color: 'var(--jomoo-grey)',
+          color: '#0c328c',
           textTransform: 'uppercase',
-          marginBottom: 16,
+          marginBottom: 12,
         }}>
           {label}
         </span>
         <h3 style={{
           fontFamily: 'var(--font-noto-sans-jp, sans-serif)',
           fontWeight: 300,
-          fontSize: 28,
+          fontSize: 26,
           color: 'var(--jomoo-black)',
-          margin: '0 0 12px',
+          margin: '0 0 10px',
         }}>
           {model}
         </h3>
         <p style={{
           fontFamily: 'var(--font-noto-sans-jp, sans-serif)',
           fontWeight: 300,
-          fontSize: 14,
+          fontSize: 13,
           color: 'var(--jomoo-grey)',
           lineHeight: 1.8,
-          margin: '0 0 20px',
+          margin: '0 0 18px',
         }}>
           {description}
         </p>
         <a href="#" style={{
           fontFamily: 'var(--font-noto-sans-jp, sans-serif)',
-          fontSize: 12,
+          fontSize: 11,
           letterSpacing: '0.2em',
           color: 'var(--jomoo-black)',
           borderBottom: '1px solid var(--jomoo-black)',
@@ -153,8 +149,8 @@ export default function ProductCardsSection() {
           delay={0}
         />
         <ProductCard
-          imageSrc="/images/lifestyle-toilet-ocean-dramatic.jpg"
-          imageAlt="JOMOO X40-C ocean view"
+          imageSrc="/images/lifestyle-toilet-dark-city-view.jpg"
+          imageAlt="JOMOO X40-C city view"
           label="SMART TOILET"
           model="X40-C"
           description="スマートトイレの説明スマートトイレの説明スマートトイレの説明"

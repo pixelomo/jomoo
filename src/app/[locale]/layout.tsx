@@ -1,17 +1,10 @@
 import { NextIntlClientProvider } from 'next-intl'
 import { getMessages } from 'next-intl/server'
 import { notFound } from 'next/navigation'
-import { Bebas_Neue, Cormorant_Garamond, Geist, Noto_Sans_JP } from 'next/font/google'
+import { Bebas_Neue, Geist, Noto_Sans_JP } from 'next/font/google'
 import { routing } from '@/i18n/routing'
 import type { Metadata } from 'next'
 import '../globals.css'
-
-const cormorantGaramond = Cormorant_Garamond({
-  variable: '--font-cormorant',
-  subsets: ['latin'],
-  weight: ['300', '400'],
-  display: 'swap',
-})
 
 const bebasNeue = Bebas_Neue({
   variable: '--font-bebas',
@@ -69,7 +62,7 @@ export default async function LocaleLayout({
   const messages = await getMessages()
 
   return (
-    <html lang={locale} className={`${bebasNeue.variable} ${geistSans.variable} ${notoSansJP.variable} ${cormorantGaramond.variable} h-full antialiased`}>
+    <html lang={locale} className={`${bebasNeue.variable} ${geistSans.variable} ${notoSansJP.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col bg-white text-zinc-900">
         <NextIntlClientProvider messages={messages}>
           {children}

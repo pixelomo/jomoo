@@ -10,9 +10,16 @@ const handleI18nRouting = createIntlMiddleware(routing)
 const PROTECTED = /^\/(zh-CN|en)\/(dashboard|register|warranty)/
 
 export default function proxy(req: NextRequest) {
+  const { pathname } = req.nextUrl
+
+  // Admin portal and its API routes are outside the locale tree
+  if (pathname.startsWith('/admin') || pathname.startsWith('/api/admin')) {
+    return NextResponse.next()
+  }
+
   // Skip API routes entirely — Better Auth handles auth for its own handler,
   // and our API routes validate sessions themselves.
-  if (req.nextUrl.pathname.startsWith('/api/')) return NextResponse.next()
+  if (pathname.startsWith('/api/')) return NextResponse.next()
 
   if (PROTECTED.test(req.nextUrl.pathname)) {
     const session = getSessionCookie(req)

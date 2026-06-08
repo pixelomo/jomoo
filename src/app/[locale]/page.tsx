@@ -2,7 +2,6 @@ import MarketingHeader from '@/components/home/MarketingHeader'
 import MarketingHeroSection from '@/components/home/MarketingHeroSection'
 import WorldOfJomooSection from '@/components/home/WorldOfJomooSection'
 import AmazingExperienceSection from '@/components/home/AmazingExperienceSection'
-import SmartToiletCinematicSection from '@/components/home/SmartToiletCinematicSection'
 import SmartToiletExpandSection from '@/components/home/SmartToiletExpandSection'
 import ProductCardsSection from '@/components/home/ProductCardsSection'
 import GlobalStatsSection from '@/components/home/GlobalStatsSection'
@@ -15,7 +14,6 @@ export default function HomePage() {
       <MarketingHeroSection />
       <WorldOfJomooSection />
       <AmazingExperienceSection />
-      <SmartToiletCinematicSection />
       <SmartToiletExpandSection />
       <ProductCardsSection />
       <GlobalStatsSection />
