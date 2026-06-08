@@ -31,6 +31,15 @@
   --accent-soft: #e8efff;
   --warn: #c8312c;
   --warn-soft: #fdecea;
+
+  /* JOMOO marketing homepage */
+  --jomoo-black: #0A0A0A;
+  --jomoo-dark: #111110;
+  --jomoo-mid: #3A3A3A;
+  --jomoo-grey: #8A8A8A;
+  --jomoo-warm-white: #F5F5F2;
+  --jomoo-white: #FFFFFF;
+  --jomoo-accent: #C8A882;
 }
 
 @theme inline {
@@ -46,7 +55,27 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+html { scroll-behavior: smooth; }
+
 a { text-decoration: none; }
+
+/* ─── JOMOO HOMEPAGE ANIMATIONS ─────────────────────────────────────── */
+
+@keyframes jm-hero-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes jm-scroll-line {
+  0%   { transform: scaleY(0); transform-origin: top; opacity: 0; }
+  40%  { transform: scaleY(1); transform-origin: top; opacity: 0.4; }
+  60%  { transform: scaleY(1); transform-origin: bottom; opacity: 0.4; }
+  100% { transform: scaleY(0); transform-origin: bottom; opacity: 0; }
+}
+
+.jm-scroll-indicator-line {
+  animation: jm-scroll-line 1.8s ease-in-out infinite;
+}
 
 /* ─── RESPONSIVE LAYOUT HELPERS ─────────────────────────────────────── */
 
