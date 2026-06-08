@@ -7,9 +7,7 @@ import './jomoo-homepage.css'
 export default function JomooHomepage() {
   const navRef = useRef<HTMLElement>(null)
   const videoRef = useRef<HTMLVideoElement>(null)
-  const worldTrackRef = useRef<HTMLDivElement>(null)
-  const worldProgressBarRef = useRef<HTMLSpanElement>(null)
-  const expandLabelRef = useRef<HTMLDivElement>(null)
+  const expandTextRef = useRef<HTMLDivElement>(null)
   const expandFrameRef = useRef<HTMLDivElement>(null)
   const statsGridRef = useRef<HTMLDivElement>(null)
 
@@ -20,6 +18,12 @@ export default function JomooHomepage() {
       const { default: gsap } = await import('gsap')
       const { ScrollTrigger } = await import('gsap/ScrollTrigger')
       gsap.registerPlugin(ScrollTrigger)
+
+      // Try to play the video
+      const video = videoRef.current
+      if (video) {
+        video.play().catch(() => {/* autoplay blocked, no action needed */})
+      }
 
       ctx = gsap.context(() => {
         // ── Nav scroll state ──────────────────────────────
@@ -35,10 +39,9 @@ export default function JomooHomepage() {
 
         gsap.matchMedia().add('(prefers-reduced-motion: no-preference)', () => {
           // ── Hero video scrub ───────────────────────────
-          const video = videoRef.current
           if (video) {
-            video.addEventListener('loadedmetadata', () => {
-              const dur = video.duration || 5
+            const scrubVideo = () => {
+              const dur = video.duration || 6
               gsap.to(video, {
                 currentTime: dur,
                 ease: 'none',
@@ -49,10 +52,15 @@ export default function JomooHomepage() {
                   scrub: true,
                 },
               })
-            })
-            // Also dim on scroll
+            }
+            if (video.readyState >= 1) {
+              scrubVideo()
+            } else {
+              video.addEventListener('loadedmetadata', scrubVideo, { once: true })
+            }
+            // Dim slightly on scroll
             gsap.to(video, {
-              opacity: 0.45,
+              opacity: 0.5,
               ease: 'none',
               scrollTrigger: {
                 trigger: '.hp-hero',
@@ -63,48 +71,19 @@ export default function JomooHomepage() {
             })
           }
 
-          // ── Hero headline fade out on scroll ──────────
-          gsap.fromTo('.hp-hero-headline',
-            { opacity: 1, y: 0 },
-            {
-              y: -40, opacity: 0, ease: 'none', immediateRender: false,
-              scrollTrigger: { trigger: '.hp-hero', start: 'top top', end: 'bottom top', scrub: true },
-            }
-          )
+          // ── Hero headline fades out ──────────────────
+          gsap.to('.hp-hero-headline', {
+            y: -50, opacity: 0, ease: 'none',
+            scrollTrigger: { trigger: '.hp-hero', start: 'top top', end: 'bottom top', scrub: true },
+          })
 
-          // ── World: horizontal slide ────────────────────
-          const track = worldTrackRef.current
-          const bar = worldProgressBarRef.current
-          if (track) {
-            const getShift = () => Math.max(0, track.scrollWidth - window.innerWidth + 56)
-            gsap.to(track, {
-              x: () => -getShift(),
-              ease: 'none',
-              scrollTrigger: {
-                trigger: '.hp-world',
-                start: 'top top',
-                end: 'bottom bottom',
-                scrub: 1,
-                invalidateOnRefresh: true,
-                onUpdate: (self) => {
-                  if (bar) bar.style.width = (self.progress * 100) + '%'
-                },
-              },
-            })
-            document.querySelectorAll('.hp-world-panel img').forEach((img) => {
-              gsap.fromTo(img, { scale: 1.08 }, {
-                scale: 1, ease: 'none',
-                scrollTrigger: {
-                  trigger: '.hp-world',
-                  start: 'top top',
-                  end: 'bottom bottom',
-                  scrub: 1,
-                },
-              })
-            })
-          }
+          // ── World: scattered images fade in ──────────
+          gsap.from('.hp-world-img', {
+            opacity: 0, y: 30, stagger: 0.18, duration: 0.9, ease: 'power2.out',
+            scrollTrigger: { trigger: '.hp-world', start: 'top 90%', once: true },
+          })
 
-          // ── Amazing: float parallax ────────────────────
+          // ── Amazing: float parallax (punchy range) ───
           document.querySelectorAll('.hp-float').forEach((el) => {
             const from = parseFloat((el as HTMLElement).dataset.from || '0')
             const to = parseFloat((el as HTMLElement).dataset.to || '0')
@@ -114,30 +93,19 @@ export default function JomooHomepage() {
                 trigger: '.hp-amazing',
                 start: 'top bottom',
                 end: 'bottom top',
-                scrub: 1.5,
+                scrub: 0.6,
               },
             })
           })
           gsap.to('.hp-float', {
-            opacity: 1, duration: 1, stagger: 0.15, ease: 'power2.out',
-            scrollTrigger: { trigger: '.hp-amazing', start: 'top 70%', once: true },
-          })
-
-          // ── Cine: parallax ─────────────────────────────
-          gsap.to('.hp-cine-media', {
-            yPercent: -10, ease: 'none',
-            scrollTrigger: {
-              trigger: '.hp-cine',
-              start: 'top bottom',
-              end: 'bottom top',
-              scrub: true,
-            },
+            opacity: 1, duration: 0.8, stagger: 0.12, ease: 'power2.out',
+            scrollTrigger: { trigger: '.hp-amazing', start: 'top 65%', once: true },
           })
 
           // ── Expand: CSS sticky + GSAP dimensions ──────
-          const expandLabel = expandLabelRef.current
+          const expandText = expandTextRef.current
           const expandFrame = expandFrameRef.current
-          if (expandLabel && expandFrame) {
+          if (expandText && expandFrame) {
             const expandTl = gsap.timeline({
               scrollTrigger: {
                 trigger: '.hp-expand',
@@ -147,7 +115,7 @@ export default function JomooHomepage() {
               },
             })
             expandTl
-              .to(expandLabel, { opacity: 0, y: -16, duration: 0.2, ease: 'none' }, 0)
+              .to(expandText, { opacity: 0, y: -20, duration: 0.25, ease: 'none' }, 0)
               .fromTo(expandFrame,
                 { width: 960, height: 540, borderRadius: 14 },
                 { width: () => window.innerWidth, height: () => window.innerHeight, borderRadius: 0, ease: 'none', duration: 1 },
@@ -240,75 +208,77 @@ export default function JomooHomepage() {
         </div>
       </header>
 
-      {/* ── HERO ────────────────────────────────────────── */}
-      <section className="hp-hero" id="hp-top">
-        <div className="hp-hero-media" id="hp-heroMedia">
-          <video
-            ref={videoRef}
-            muted
-            playsInline
-            preload="auto"
-            style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.85 }}
-          >
-            <source src="/videos/hero.webm" type="video/webm" />
-            <source src="/videos/hero.mp4" type="video/mp4" />
-          </video>
-        </div>
-        <h1 className="hp-hero-headline">美しい水まわりが、暮らしを変える。</h1>
-        <div className="hp-scroll-cue" />
-      </section>
+      {/* ── HERO + WORLD wrapper (video stays sticky) ─── */}
+      <div className="hp-hero-world-wrapper">
+        {/* ── HERO ──────────────────────────────────────── */}
+        <section className="hp-hero" id="hp-top">
+          <div className="hp-hero-media">
+            <video
+              ref={videoRef}
+              autoPlay
+              muted
+              loop
+              playsInline
+              preload="auto"
+            >
+              <source src="/videos/hero.webm" type="video/webm" />
+              <source src="/videos/hero.mp4" type="video/mp4" />
+            </video>
+          </div>
+          <h1 className="hp-hero-headline">美しい水まわりが、暮らしを変える。</h1>
+          <div className="hp-scroll-cue" />
+        </section>
 
-      {/* ── WORLD OF JOMOO ──────────────────────────────── */}
-      <section className="hp-world" id="hp-inspiration">
-        <div className="hp-world-sticky">
-          <div className="hp-world-track" ref={worldTrackRef}>
-            <div className="hp-world-panel" style={{ aspectRatio: '0.8' }}>
+        {/* ── WORLD OF JOMOO ──────────────────────────── */}
+        <section className="hp-world" id="hp-inspiration">
+          <div className="hp-world-sticky">
+            {/* Scattered images — fade in over hero video */}
+            <div className="hp-world-img hp-world-img-1">
               <img src="/images/product-x40c-toilet-lid-screen.jpg" alt="X40-C smart toilet" />
             </div>
-            <div className="hp-world-panel" style={{ aspectRatio: '1.5' }}>
-              <img src="/images/lifestyle-bathroom-luxury-collection.jpg" alt="Luxury bathroom collection" />
+            <div className="hp-world-img hp-world-img-2">
+              <img src="/images/lifestyle-bathroom-luxury-collection.jpg" alt="Luxury bathroom" />
             </div>
-            <div className="hp-world-panel" style={{ aspectRatio: '1.78' }}>
-              <img src="/images/lifestyle-bathroom-marble-wide.jpg" alt="Marble bathroom" />
-            </div>
-            <div className="hp-world-panel" style={{ aspectRatio: '0.82' }}>
+            <div className="hp-world-img hp-world-img-3">
               <img src="/images/lifestyle-shower-dark-dramatic.jpg" alt="Dramatic shower" />
             </div>
-          </div>
-          <div className="hp-world-overlay">
-            <span className="hp-eyebrow">THE WORLD OF JOMOO</span>
-            <h2>美しさと<br />快適さの世界を<br />あなたに</h2>
-            <p>私たちJOMOOは、水まわり空間の可能性を追求し続けています。</p>
-          </div>
-          <div className="hp-world-progress">
-            <span ref={worldProgressBarRef} />
-          </div>
-        </div>
-      </section>
+            <div className="hp-world-img hp-world-img-4">
+              <img src="/images/lifestyle-bathroom-marble-wide.jpg" alt="Marble bathroom" />
+            </div>
 
-      {/* ── WORLD STATEMENT ─────────────────────────────── */}
-      <div className="hp-world-statement">
-        <p>先進技術と洗練されたデザインを融合させ、一人ひとりの暮らしに新しい快適さと心地よさを届けること。それがJOMOOの考えるものづくりです。</p>
-        <p>その想いは、製品単体ではなく、空間全体の心地よさへとつながっています。毎日使う場所だからこそ、より美しく、より快適に。JOMOOは新しい暮らしの価値を提案します。</p>
+            {/* Text overlay — bottom left */}
+            <div className="hp-world-overlay">
+              <span className="hp-eyebrow">THE WORLD OF JOMOO</span>
+              <h2>美しさと<br />快適さの世界を<br />あなたに</h2>
+              <p>私たちJOMOOは、水まわり空間の可能性を追求し続けています。先進技術と洗練されたデザインを融合させ、一人ひとりの暮らしに新しい快適さと心地よさを届けること。それがJOMOOの考えるものづくりです。</p>
+              <p>その想いは、製品単体ではなく、空間全体の心地よさへとつながっています。毎日使う場所だからこそ、より美しく、より快適に。JOMOOは新しい暮らしの価値を提案します。</p>
+            </div>
+          </div>
+        </section>
       </div>
 
       {/* ── AMAZING EXPERIENCE ──────────────────────────── */}
       <section className="hp-amazing" id="hp-products">
-        {/* Floating product cut-outs */}
-        <div className="hp-float" data-from="20" data-to="-40"
-          style={{ left: '13%', top: '6%', width: 210, height: 210, transform: 'rotate(3deg)' }}>
+        {/* Floating transparent PNG cut-outs
+            vanity:  top-left, above toilet, offset right
+            toilet:  left side, primary product
+            faucet:  top-right, offset left from edge
+            shower:  bottom-right
+        */}
+        <div className="hp-float" data-from="30" data-to="-55"
+          style={{ left: '18%', top: '5%', width: 190, height: 190, transform: 'rotate(3deg)' }}>
           <img src="/images/product-vanity-unit.png" alt="Vanity unit" />
         </div>
-        <div className="hp-float" data-from="30" data-to="-20"
-          style={{ left: '7%', top: '35%', width: 260, height: 260, transform: 'rotate(-4deg)' }}>
+        <div className="hp-float" data-from="40" data-to="-25"
+          style={{ left: '6%', top: '35%', width: 270, height: 270, transform: 'rotate(-4deg)' }}>
           <img src="/images/product-x40b-toilet.png" alt="X40-B toilet" />
         </div>
-        <div className="hp-float" data-from="15" data-to="-30"
-          style={{ right: '13%', top: '6%', width: 172, height: 270, transform: 'rotate(6deg)' }}>
+        <div className="hp-float" data-from="20" data-to="-55"
+          style={{ right: '16%', top: '4%', width: 165, height: 265, transform: 'rotate(6deg)' }}>
           <img src="/images/product-faucet-chrome.png" alt="Chrome faucet" />
         </div>
-        <div className="hp-float" data-from="40" data-to="-10"
-          style={{ right: '8%', top: '54%', width: 200, height: 340, transform: 'rotate(-8deg)' }}>
+        <div className="hp-float" data-from="50" data-to="-10"
+          style={{ right: '6%', top: '52%', width: 210, height: 350, transform: 'rotate(-8deg)' }}>
           <img src="/images/product-shower-set-chrome.png" alt="Shower set" />
         </div>
 
@@ -321,25 +291,21 @@ export default function JomooHomepage() {
         </div>
       </section>
 
-      {/* ── SMART TOILET — cinematic strip ──────────────── */}
-      <section className="hp-cine">
-        <div className="hp-cine-media">
-          <img src="/images/lifestyle-toilet-dark-city-view.jpg" alt="Smart toilet city view at night" />
-        </div>
-      </section>
-
       {/* ── SMART TOILET — expand on scroll ─────────────── */}
       <section className="hp-expand">
         <div className="hp-expand-sticky">
-          <div className="hp-expand-label" ref={expandLabelRef}>SMART TOILET</div>
           <div className="hp-expand-frame" ref={expandFrameRef}>
             <img src="/images/lifestyle-toilet-luxury-warmlit.jpg" alt="Luxury warm-lit bathroom" />
+            <div className="hp-expand-text" ref={expandTextRef}>
+              <span>SMART</span>
+              <span>TOILET</span>
+            </div>
           </div>
         </div>
       </section>
 
       {/* ── PRODUCT CARDS ───────────────────────────────── */}
-      <section className="hp-products" id="hp-products-section">
+      <section className="hp-products">
         <div className="hp-products-inner">
           <div className="hp-products-head">
             <div>
