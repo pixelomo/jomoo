@@ -134,7 +134,7 @@ export default function HeroSection({ slides }: Props) {
                 />
               ))}
             </div>
-            <span style={{ fontFamily: 'ui-monospace,monospace', fontSize: 11, letterSpacing: '0.08em', opacity: 0.85 }}>
+            <span style={{ fontFamily: 'var(--font-poppins), sans-serif', fontSize: 11, letterSpacing: '0.08em', opacity: 0.85 }}>
               <b style={{ fontWeight: 700 }}>{String(idx + 1).padStart(2, '0')}</b> / {String(slides.length).padStart(2, '0')}
             </span>
           </div>

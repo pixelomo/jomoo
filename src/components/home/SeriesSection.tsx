@@ -34,7 +34,7 @@ export default function SeriesSection({ sectionNum, sectionTitle, moreLabel, mor
         {/* Section head */}
         <div className="jm-sec-head">
           <div>
-            <div style={{ fontFamily: 'ui-monospace,monospace', fontSize: 12, letterSpacing: '0.1em', color: 'var(--ink-3)', fontWeight: 600, marginBottom: 14 }}>
+            <div style={{ fontFamily: 'var(--font-poppins), sans-serif', fontSize: 12, letterSpacing: '0.1em', color: 'var(--ink-3)', fontWeight: 600, marginBottom: 14 }}>
               {sectionNum}
             </div>
             <h2 style={{ fontSize: 28, fontWeight: 700, lineHeight: 1.4, letterSpacing: '0.01em', paddingBottom: 14, borderBottom: '4px solid var(--accent)', display: 'inline-block' }}>
@@ -79,7 +79,7 @@ export default function SeriesSection({ sectionNum, sectionTitle, moreLabel, mor
                     : 'repeating-linear-gradient(45deg,rgba(0,0,0,0.03) 0 1px,transparent 1px 16px),linear-gradient(180deg,#efece4 0%,#d6d1c5 100%)',
                   display: 'flex', alignItems: 'flex-end', padding: 12,
                 }}>
-                  <span style={{ fontFamily: 'ui-monospace,monospace', fontSize: 10, letterSpacing: '0.08em', opacity: 0.7, color: i % 2 === 0 ? '#cfd3d8' : '#4a4a4a' }}>
+                  <span style={{ fontFamily: 'var(--font-poppins), sans-serif', fontSize: 10, letterSpacing: '0.08em', opacity: 0.7, color: i % 2 === 0 ? '#cfd3d8' : '#4a4a4a' }}>
                     {card.img}
                   </span>
                 </div>
@@ -89,7 +89,7 @@ export default function SeriesSection({ sectionNum, sectionTitle, moreLabel, mor
                   <span style={{ fontSize: 10, letterSpacing: '0.05em', color: 'var(--accent)', padding: '3px 8px', background: 'var(--accent-soft)', fontWeight: 600 }}>
                     {card.catPill}
                   </span>
-                  <span style={{ fontFamily: 'ui-monospace,monospace', fontSize: 11, color: 'var(--ink-3)', letterSpacing: '0.04em' }}>
+                  <span style={{ fontFamily: 'var(--font-poppins), sans-serif', fontSize: 11, color: 'var(--ink-3)', letterSpacing: '0.04em' }}>
                     {card.code}
                   </span>
                 </div>

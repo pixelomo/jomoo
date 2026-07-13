@@ -6,7 +6,7 @@ export default function RootNotFound() {
       <body style={{ margin: 0, fontFamily: 'system-ui, -apple-system, sans-serif', background: '#fff', color: '#0a0a0a' }}>
         <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '80px 40px' }}>
           <div style={{ maxWidth: 560 }}>
-            <span style={{ fontFamily: 'ui-monospace,monospace', fontSize: 11, letterSpacing: '0.14em', textTransform: 'uppercase', color: '#a8a8a8', display: 'block', marginBottom: 24 }}>
+            <span style={{ fontFamily: 'var(--font-poppins), sans-serif', fontSize: 11, letterSpacing: '0.14em', textTransform: 'uppercase', color: '#a8a8a8', display: 'block', marginBottom: 24 }}>
               [ ERROR · 404 ]
             </span>
             <h1 style={{ fontSize: 'clamp(40px, 6vw, 72px)', fontWeight: 700, lineHeight: 1.05, letterSpacing: '-0.02em', margin: '0 0 24px' }}>

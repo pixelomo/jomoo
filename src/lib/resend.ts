@@ -1,5 +1,16 @@
 import { Resend } from 'resend'
 
+function isResendConfigured() {
+  return Boolean(process.env.RESEND_API_KEY?.trim() && process.env.RESEND_FROM_EMAIL?.trim())
+}
+
+function useContactDevFallback() {
+  return (
+    process.env.NODE_ENV === 'development' &&
+    process.env.CONTACT_DEV_FALLBACK !== 'false'
+  )
+}
+
 function getResend() {
   const key = process.env.RESEND_API_KEY
   if (!key) throw new Error('RESEND_API_KEY is not set')
@@ -14,6 +25,143 @@ function from() {
 
 function appUrl() {
   return (process.env.NEXT_PUBLIC_APP_URL ?? '').replace(/\/$/, '')
+}
+
+function contactTo() {
+  if (process.env.NODE_ENV === 'development' && process.env.CONTACT_DEV_TO_EMAIL?.trim()) {
+    return process.env.CONTACT_DEV_TO_EMAIL.trim()
+  }
+  return process.env.CONTACT_TO_EMAIL?.trim() ?? 'alan.s@uralaverse.com'
+}
+
+async function deliverEmail({
+  to,
+  subject,
+  html,
+  replyTo,
+  devLabel,
+  devSummary,
+}: {
+  to: string | string[]
+  subject: string
+  html: string
+  replyTo?: string
+  devLabel: string
+  devSummary: Record<string, unknown>
+}) {
+  if (!isResendConfigured()) {
+    if (useContactDevFallback()) {
+      console.info(`[email:dev-fallback] ${devLabel}`, { to, replyTo, ...devSummary })
+      return { devFallback: true as const }
+    }
+    throw new Error('EMAIL_SEND_FAILED')
+  }
+
+  const { data, error } = await getResend().emails.send({
+    from: from(),
+    to,
+    replyTo,
+    subject,
+    html,
+  })
+
+  if (error) {
+    if (useContactDevFallback()) {
+      console.error(`[email:dev-fallback] Resend error for ${devLabel}:`, error)
+      console.info(`[email:dev-fallback] Payload`, { to, replyTo, ...devSummary })
+      return { devFallback: true as const }
+    }
+    throw new Error('EMAIL_SEND_FAILED')
+  }
+
+  if (process.env.NODE_ENV === 'development') {
+    console.info(`[email] sent ${devLabel}`, { id: data?.id, to, from: from() })
+  }
+
+  return { id: data?.id }
+}
+
+// ─────────────────────────────────────────────
+// Contact form inquiry
+// ─────────────────────────────────────────────
+export async function sendContactInquiry({
+  lastName,
+  firstName,
+  companyName,
+  email,
+  countryCode,
+  phoneNumber,
+  message,
+  showroomReservation,
+  preferredDateTime,
+}: {
+  lastName: string
+  firstName: string
+  companyName?: string
+  email: string
+  countryCode?: string
+  phoneNumber?: string
+  message: string
+  showroomReservation: boolean
+  preferredDateTime?: string
+}) {
+  const fullName = `${lastName} ${firstName}`
+  const phone =
+    countryCode && phoneNumber ? `${countryCode} ${phoneNumber}` : phoneNumber || '—'
+  const showroom = showroomReservation
+    ? preferredDateTime
+      ? `はい（${preferredDateTime}）`
+      : 'はい'
+    : 'いいえ'
+
+  const rows = [
+    ['お名前', fullName],
+    ['会社名', companyName || '—'],
+    ['メールアドレス', email],
+    ['会社電話番号', phone],
+    ['ショールーム予約', showroom],
+    ['お問い合わせ内容', message],
+  ]
+
+  const bodyHtml = rows
+    .map(
+      ([label, value]) => `
+        <tr>
+          <td style="padding:10px 12px;border-bottom:1px solid #f4f4f5;font-size:13px;color:#71717a;vertical-align:top;width:140px">${label}</td>
+          <td style="padding:10px 12px;border-bottom:1px solid #f4f4f5;font-size:14px;color:#18181b;white-space:pre-wrap">${value}</td>
+        </tr>`
+    )
+    .join('')
+
+  await deliverEmail({
+    to: contactTo(),
+    replyTo: email,
+    subject: `【JOMOO】お問い合わせ: ${fullName}`,
+    devLabel: 'contact inquiry',
+    devSummary: {
+      fullName,
+      companyName,
+      email,
+      phone,
+      showroom,
+      message,
+    },
+    html: `
+<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8" /></head>
+<body style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f4f4f5;margin:0;padding:32px 16px">
+  <div style="max-width:640px;margin:0 auto;background:#fff;border-radius:8px;overflow:hidden;border:1px solid #e4e4e7">
+    <div style="background:#18181b;padding:20px 28px">
+      <p style="margin:0;color:#fff;font-size:18px;font-weight:700;letter-spacing:0.05em">JOMOO お問い合わせ</p>
+    </div>
+    <div style="padding:24px 28px 8px">
+      <table style="width:100%;border-collapse:collapse">${bodyHtml}</table>
+    </div>
+  </div>
+</body>
+</html>`,
+  })
 }
 
 // ─────────────────────────────────────────────

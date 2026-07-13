@@ -51,7 +51,7 @@ function VideoPlaceholder({ title, embedUrl }: { title: string; embedUrl?: strin
     <div style={{ position: 'relative', width: '100%', paddingTop: '56.25%', background: '#0a0a0a' }}>
       <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 16, color: 'rgba(255,255,255,0.35)' }}>
         <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1"><circle cx="12" cy="12" r="10" /><path d="M10 8l6 4-6 4V8z" fill="currentColor" /></svg>
-        <span style={{ fontFamily: 'ui-monospace,monospace', fontSize: 11, letterSpacing: '0.12em', textTransform: 'uppercase' }}>[ feature video · coming soon ]</span>
+        <span style={{ fontFamily: 'var(--font-poppins), sans-serif', fontSize: 11, letterSpacing: '0.12em', textTransform: 'uppercase' }}>[ feature video · coming soon ]</span>
         <span style={{ fontSize: 13, marginTop: -8 }}>{title}</span>
       </div>
     </div>
@@ -118,7 +118,7 @@ export default async function ProductDetailPage({ params }: { params: Params }) 
         </div>
 
         <div>
-          <p style={{ fontFamily: 'ui-monospace,monospace', fontSize: 12, letterSpacing: '0.2em', textTransform: 'uppercase', color: 'var(--accent)', margin: '0 0 10px' }}>
+          <p style={{ fontFamily: 'var(--font-poppins), sans-serif', fontSize: 12, letterSpacing: '0.2em', textTransform: 'uppercase', color: 'var(--accent)', margin: '0 0 10px' }}>
             {product.modelCode}
           </p>
           <h1 style={{ fontSize: 34, fontWeight: 700, letterSpacing: '0.02em', margin: '0 0 12px', lineHeight: 1.25, color: 'var(--ink)' }}>
@@ -204,7 +204,7 @@ export default async function ProductDetailPage({ params }: { params: Params }) 
           </tbody>
         </table>
         {(!product.specTable && !product.specs?.length) && (
-          <div style={{ padding: 40, background: 'var(--bg-soft)', textAlign: 'center', color: 'var(--ink-3)', fontSize: 14, fontFamily: 'ui-monospace,monospace', letterSpacing: '0.08em', border: '1px solid var(--line)' }}>
+          <div style={{ padding: 40, background: 'var(--bg-soft)', textAlign: 'center', color: 'var(--ink-3)', fontSize: 14, fontFamily: 'var(--font-poppins), sans-serif', letterSpacing: '0.08em', border: '1px solid var(--line)' }}>
             [ specifications · add in Sanity Studio ]
           </div>
         )}

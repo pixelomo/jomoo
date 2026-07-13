@@ -54,7 +54,7 @@ export default function MarketingHeader() {
           align-items: center;
         }
         .jmh-logo {
-          font-family: var(--font-noto-sans-jp, sans-serif);
+          font-family: var(--font-poppins, sans-serif);
           font-size: 20px;
           font-weight: 400;
           letter-spacing: 0.15em;
@@ -70,7 +70,7 @@ export default function MarketingHeader() {
         }
         .jmh-nav-link {
           position: relative;
-          font-family: var(--font-noto-sans-jp, sans-serif);
+          font-family: var(--font-poppins, sans-serif);
           font-size: 13px;
           font-weight: 400;
           letter-spacing: 0.1em;

@@ -69,7 +69,7 @@ export default function MarketingHeroSection() {
         zIndex: 2,
       }}>
         <p style={{
-          fontFamily: 'var(--font-noto-sans-jp, sans-serif)',
+          fontFamily: 'var(--font-poppins, sans-serif)',
           fontWeight: 300,
           fontSize: 'clamp(24px, 3.5vw, 52px)',
           color: '#fff',

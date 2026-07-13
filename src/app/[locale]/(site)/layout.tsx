@@ -1,14 +1,19 @@
-import Header from '@/components/layout/Header'
-import Footer from '@/components/layout/Footer'
+import { headers } from 'next/headers'
+import JomooNav from '@/components/layout/JomooNav'
+import JomooFooter from '@/components/layout/JomooFooter'
+import { auth } from '@/lib/auth'
+import '@/components/layout/jomoo-chrome.css'
 
-export default function SiteLayout({ children }: { children: React.ReactNode }) {
+export default async function SiteLayout({ children }: { children: React.ReactNode }) {
+  const session = await auth.api.getSession({ headers: await headers() })
+
   return (
     <>
-      <Header />
-      <div className="flex flex-col flex-1">
+      <JomooNav isSignedIn={Boolean(session?.user)} />
+      <div className="site-main">
         {children}
       </div>
-      <Footer />
+      <JomooFooter />
     </>
   )
 }

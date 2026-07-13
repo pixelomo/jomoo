@@ -3,14 +3,15 @@ import { test, expect } from '@playwright/test'
 test.describe('Navigation', () => {
   test('homepage loads and shows JOMOO brand', async ({ page }) => {
     await page.goto('/zh-CN')
-    await expect(page.locator('text=JOMOO')).toBeVisible()
+    await expect(page.locator('text=JOMOO').first()).toBeVisible()
   })
 
-  test('locale switcher changes to English', async ({ page }) => {
-    await page.goto('/zh-CN')
-    // find the EN locale link and click it
-    await page.getByRole('link', { name: /en/i }).first().click()
-    await expect(page).toHaveURL(/\/en/)
+  test('locale switcher changes to English', async ({ page, isMobile }) => {
+    // LocaleSwitcher is in the utility bar (hidden on mobile)
+    if (isMobile) test.skip(true, 'Locale switcher is in utility bar, hidden on mobile')
+    await page.goto('/zh-CN/products/smart-toilet')
+    await page.getByRole('button', { name: 'EN' }).first().click()
+    await expect(page).toHaveURL(/\/en/, { timeout: 10000 })
   })
 
   test('header has product registration CTA', async ({ page }) => {

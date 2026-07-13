@@ -49,7 +49,7 @@ export default function WorldOfJomooSection() {
       <div style={{ maxWidth: 1320, margin: '0 auto 56px' }}>
         <span style={{
           display: 'block',
-          fontFamily: 'var(--font-noto-sans-jp, sans-serif)',
+          fontFamily: 'var(--font-poppins, sans-serif)',
           fontWeight: 400,
           fontSize: 11,
           letterSpacing: '0.35em',
@@ -60,7 +60,7 @@ export default function WorldOfJomooSection() {
           THE WORLD OF JOMOO
         </span>
         <h2 style={{
-          fontFamily: 'var(--font-noto-sans-jp, sans-serif)',
+          fontFamily: 'var(--font-poppins, sans-serif)',
           fontWeight: 300,
           fontSize: 'clamp(28px, 3.5vw, 48px)',
           color: '#fff',
@@ -70,7 +70,7 @@ export default function WorldOfJomooSection() {
           美しさと快適さの世界を<br />あなたに
         </h2>
         <p style={{
-          fontFamily: 'var(--font-noto-sans-jp, sans-serif)',
+          fontFamily: 'var(--font-poppins, sans-serif)',
           fontWeight: 300,
           fontSize: 13,
           color: 'var(--jomoo-grey)',

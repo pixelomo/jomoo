@@ -11,7 +11,7 @@ export default async function AdminPortalLayout({ children }: { children: ReactN
     <div style={{
       display: 'flex',
       minHeight: '100vh',
-      fontFamily: 'var(--font-geist-sans, system-ui, sans-serif)',
+      fontFamily: 'var(--font-poppins, sans-serif)',
       background: 'var(--bg-soft)',
     }}>
       <AdminSidebar />

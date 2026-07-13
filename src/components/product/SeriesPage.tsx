@@ -37,7 +37,7 @@ export default async function SeriesPage({ series }: Props) {
         </div>
 
         {products.length === 0 ? (
-          <div style={{ padding: '60px 0', textAlign: 'center', color: 'var(--ink-4)', fontFamily: 'ui-monospace,monospace', fontSize: 12, letterSpacing: '0.1em' }}>
+          <div style={{ padding: '60px 0', textAlign: 'center', color: 'var(--ink-4)', fontFamily: 'var(--font-poppins), sans-serif', fontSize: 12, letterSpacing: '0.1em' }}>
             [ no products published in Sanity for this series ]
           </div>
         ) : (
@@ -64,7 +64,7 @@ export default async function SeriesPage({ series }: Props) {
                     ) : (
                       <>
                         <div style={{ position: 'absolute', inset: 0, background: 'repeating-linear-gradient(45deg,#dce4f5 0px,#dce4f5 18px,#c8d6f0 18px,#c8d6f0 36px)' }} />
-                        <span style={{ position: 'absolute', bottom: 10, left: 14, fontFamily: 'ui-monospace,monospace', fontSize: 10, color: 'rgba(255,255,255,0.85)', letterSpacing: '0.1em' }}>
+                        <span style={{ position: 'absolute', bottom: 10, left: 14, fontFamily: 'var(--font-poppins), sans-serif', fontSize: 10, color: 'rgba(255,255,255,0.85)', letterSpacing: '0.1em' }}>
                           [ {p.modelCode} ]
                         </span>
                       </>

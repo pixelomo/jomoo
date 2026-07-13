@@ -40,7 +40,7 @@ export default function AdminLoginPage() {
       alignItems: 'center',
       justifyContent: 'center',
       background: 'var(--bg-soft)',
-      fontFamily: 'var(--font-geist-sans, system-ui, sans-serif)',
+      fontFamily: 'var(--font-poppins, sans-serif)',
     }}>
       <div style={{
         background: 'var(--paper)',

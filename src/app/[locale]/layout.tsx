@@ -1,35 +1,15 @@
 import { NextIntlClientProvider } from 'next-intl'
 import { getMessages } from 'next-intl/server'
 import { notFound } from 'next/navigation'
-import { Bebas_Neue, Geist, Noto_Sans_JP, Zen_Kaku_Gothic_Antique } from 'next/font/google'
+import { Poppins } from 'next/font/google'
 import { routing } from '@/i18n/routing'
 import type { Metadata } from 'next'
 import '../globals.css'
 
-const bebasNeue = Bebas_Neue({
-  variable: '--font-bebas',
-  subsets: ['latin'],
-  weight: '400',
-  display: 'swap',
-})
-
-const geistSans = Geist({
-  variable: '--font-geist-sans',
-  subsets: ['latin'],
-})
-
-const zenKaku = Zen_Kaku_Gothic_Antique({
-  variable: '--font-zen-kaku',
-  subsets: ['latin'],
-  weight: ['300', '400', '500', '700', '900'],
-  display: 'swap',
-  preload: false,
-})
-
-const notoSansJP = Noto_Sans_JP({
-  variable: '--font-noto-sans-jp',
-  subsets: ['latin'],
-  weight: ['300', '400', '500', '600', '700', '900'],
+const poppins = Poppins({
+  variable: '--font-poppins',
+  subsets: ['latin', 'latin-ext'],
+  weight: ['300', '400', '500', '600', '700'],
   display: 'swap',
 })
 
@@ -70,8 +50,8 @@ export default async function LocaleLayout({
   const messages = await getMessages()
 
   return (
-    <html lang={locale} className={`${bebasNeue.variable} ${geistSans.variable} ${notoSansJP.variable} ${zenKaku.variable} h-full antialiased`}>
-      <body className="min-h-full flex flex-col bg-white text-zinc-900">
+    <html lang={locale} className={`${poppins.variable} h-full antialiased`}>
+      <body className={`${poppins.className} min-h-full flex flex-col bg-white text-zinc-900`}>
         <NextIntlClientProvider messages={messages}>
           {children}
         </NextIntlClientProvider>

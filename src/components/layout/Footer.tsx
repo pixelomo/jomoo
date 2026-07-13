@@ -10,7 +10,7 @@ export default async function Footer() {
       <div className="jm-footer-top-new">
         {/* Brand column */}
         <div>
-          <div style={{ fontFamily: 'ui-monospace,monospace', fontWeight: 800, fontSize: 28, letterSpacing: '0.02em', color: 'var(--ink)' }}>
+          <div style={{ fontFamily: 'var(--font-poppins), sans-serif', fontWeight: 800, fontSize: 28, letterSpacing: '0.02em', color: 'var(--ink)' }}>
             JOMOO<span style={{ color: 'var(--accent)' }}>.</span>
           </div>
           <div style={{ fontSize: 12, lineHeight: 1.9, color: 'var(--ink-2)', marginTop: 16 }}>

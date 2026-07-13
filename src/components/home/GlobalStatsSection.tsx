@@ -75,7 +75,7 @@ function StatCell({ stat, index, gridRef }: {
         <span
           ref={numRef}
           style={{
-            fontFamily: 'var(--font-noto-sans-jp, sans-serif)',
+            fontFamily: 'var(--font-poppins, sans-serif)',
             fontWeight: 300,
             fontSize: 'clamp(44px, 5.5vw, 72px)',
             color: '#fff',
@@ -88,7 +88,7 @@ function StatCell({ stat, index, gridRef }: {
           <span
             ref={suffixRef}
             style={{
-              fontFamily: 'var(--font-noto-sans-jp, sans-serif)',
+              fontFamily: 'var(--font-poppins, sans-serif)',
               fontWeight: 300,
               fontSize: 'clamp(28px, 3.5vw, 48px)',
               color: 'var(--jomoo-accent)',
@@ -102,7 +102,7 @@ function StatCell({ stat, index, gridRef }: {
         )}
       </div>
       <p style={{
-        fontFamily: 'var(--font-noto-sans-jp, sans-serif)',
+        fontFamily: 'var(--font-poppins, sans-serif)',
         fontWeight: 300,
         fontSize: 12,
         color: 'rgba(255,255,255,0.55)',
@@ -151,7 +151,7 @@ export default function GlobalStatsSection() {
         <div style={{ textAlign: 'center', marginBottom: 80 }}>
           <span style={{
             display: 'block',
-            fontFamily: 'var(--font-noto-sans-jp, sans-serif)',
+            fontFamily: 'var(--font-poppins, sans-serif)',
             fontWeight: 400,
             fontSize: 11,
             letterSpacing: '0.35em',
@@ -162,7 +162,7 @@ export default function GlobalStatsSection() {
             GLOBAL PRESENCE
           </span>
           <h2 style={{
-            fontFamily: 'var(--font-noto-sans-jp, sans-serif)',
+            fontFamily: 'var(--font-poppins, sans-serif)',
             fontWeight: 300,
             fontSize: 'clamp(26px, 3.2vw, 44px)',
             color: '#fff',
@@ -171,7 +171,7 @@ export default function GlobalStatsSection() {
             世界が認める品質
           </h2>
           <p style={{
-            fontFamily: 'var(--font-noto-sans-jp, sans-serif)',
+            fontFamily: 'var(--font-poppins, sans-serif)',
             fontWeight: 300,
             fontSize: 13,
             color: 'rgba(255,255,255,0.55)',

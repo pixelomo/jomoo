@@ -90,7 +90,7 @@ export default function ImageCarousel({ slides }: Props) {
               <circle cx="8.5" cy="8.5" r="1.5" />
               <path d="M21 15l-5-5L5 21" />
             </svg>
-            <span style={{ fontFamily: 'ui-monospace,monospace', fontSize: 11, letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+            <span style={{ fontFamily: 'var(--font-poppins), sans-serif', fontSize: 11, letterSpacing: '0.1em', textTransform: 'uppercase' }}>
               [ product image · add in Sanity Studio ]
             </span>
           </div>

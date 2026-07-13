@@ -3,19 +3,21 @@ import { test, expect } from '@playwright/test'
 test.describe('Auth — Sign In / Sign Up', () => {
   test('sign-in page loads', async ({ page }) => {
     await page.goto('/zh-CN/sign-in')
-    await expect(page.locator('input[type="email"], input[name="email"]')).toBeVisible()
-    await expect(page.locator('input[type="password"], input[name="password"]')).toBeVisible()
+    await expect(page.locator('main input[type="email"]').first()).toBeVisible()
+    await expect(page.locator('main input[type="password"]').first()).toBeVisible()
   })
 
   test('sign-up page loads', async ({ page }) => {
     await page.goto('/zh-CN/sign-up')
-    await expect(page.locator('input[type="email"], input[name="email"]')).toBeVisible()
+    await expect(page.getByRole('heading', { name: 'JOMOOクラブ会員' })).toBeVisible()
+    await expect(page.getByRole('button', { name: '法人' })).toBeVisible()
+    await expect(page.getByRole('button', { name: '個人' })).toBeVisible()
   })
 
   test('sign-in shows error for invalid credentials', async ({ page }) => {
     await page.goto('/zh-CN/sign-in')
-    await page.fill('input[type="email"], input[name="email"]', 'notreal@example.com')
-    await page.fill('input[type="password"], input[name="password"]', 'wrongpassword')
+    await page.locator('main input[type="email"]').first().fill('notreal@example.com')
+    await page.locator('main input[type="password"]').first().fill('wrongpassword')
     await page.locator('button[type="submit"]').click()
     // Should stay on sign-in and show an error, not redirect to dashboard
     await expect(page).not.toHaveURL(/dashboard/)
@@ -23,7 +25,7 @@ test.describe('Auth — Sign In / Sign Up', () => {
 
   test('sign-in page has link to sign-up', async ({ page }) => {
     await page.goto('/zh-CN/sign-in')
-    await expect(page.locator('a[href*="sign-up"]')).toBeVisible()
+    await expect(page.locator('main a[href*="sign-up"]').first()).toBeVisible()
   })
 })
 

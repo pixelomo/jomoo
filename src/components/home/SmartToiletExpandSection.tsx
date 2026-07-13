@@ -64,7 +64,7 @@ export default function SmartToiletExpandSection() {
         <p
           ref={labelRef}
           style={{
-            fontFamily: 'var(--font-noto-sans-jp, sans-serif)',
+            fontFamily: 'var(--font-poppins, sans-serif)',
             fontWeight: 400,
             fontSize: 11,
             letterSpacing: '0.35em',

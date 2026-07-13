@@ -3,6 +3,7 @@ import { type ReactNode } from 'react'
 interface FormFieldProps {
   label: string
   required?: boolean
+  requiredBadge?: boolean
   error?: string
   hint?: string
   children: ReactNode
@@ -12,6 +13,7 @@ interface FormFieldProps {
 export default function FormField({
   label,
   required,
+  requiredBadge,
   error,
   hint,
   children,
@@ -19,13 +21,20 @@ export default function FormField({
 }: FormFieldProps) {
   return (
     <div className="space-y-1.5">
-      <label
-        htmlFor={htmlFor}
-        className="block text-sm font-medium text-zinc-700"
-      >
-        {label}
-        {required && <span className="text-red-500 ml-0.5">*</span>}
-      </label>
+      <div className="flex items-center justify-between gap-3">
+        <label
+          htmlFor={htmlFor}
+          className="block text-sm font-medium text-zinc-700"
+        >
+          {label}
+          {required && !requiredBadge && <span className="text-red-500 ml-0.5">*</span>}
+        </label>
+        {requiredBadge && (
+          <span className="shrink-0 rounded px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-[#73a4c7] bg-[#73a4c7]/12">
+            必須
+          </span>
+        )}
+      </div>
       {children}
       {hint && !error && (
         <p className="text-xs text-zinc-400">{hint}</p>

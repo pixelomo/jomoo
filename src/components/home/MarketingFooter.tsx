@@ -36,7 +36,7 @@ export default function MarketingFooter() {
         {columns.map(col => (
           <div key={col.heading}>
             <p style={{
-              fontFamily: 'var(--font-noto-sans-jp, sans-serif)',
+              fontFamily: 'var(--font-poppins, sans-serif)',
               fontWeight: 500,
               fontSize: 13,
               color: '#fff',
@@ -51,7 +51,7 @@ export default function MarketingFooter() {
                   <a
                     href="#"
                     style={{
-                      fontFamily: 'var(--font-noto-sans-jp, sans-serif)',
+                      fontFamily: 'var(--font-poppins, sans-serif)',
                       fontWeight: 300,
                       fontSize: 13,
                       color: 'var(--jomoo-grey)',
@@ -86,7 +86,7 @@ export default function MarketingFooter() {
       }}>
         <Image src="/logo.png" alt="JOMOO" width={90} height={18} style={{ objectFit: 'contain', filter: 'brightness(0) invert(1)' }} />
         <p style={{
-          fontFamily: 'var(--font-noto-sans-jp, sans-serif)',
+          fontFamily: 'var(--font-poppins, sans-serif)',
           fontWeight: 300,
           fontSize: 11,
           color: 'var(--jomoo-grey)',
@@ -101,7 +101,7 @@ export default function MarketingFooter() {
               <a
                 href="#"
                 style={{
-                  fontFamily: 'var(--font-noto-sans-jp, sans-serif)',
+                  fontFamily: 'var(--font-poppins, sans-serif)',
                   fontWeight: 300,
                   fontSize: 11,
                   color: 'var(--jomoo-grey)',

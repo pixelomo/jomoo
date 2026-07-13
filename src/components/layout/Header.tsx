@@ -69,7 +69,7 @@ export default async function Header() {
       <header className="jm-site-header">
         <div className="jm-header-inner">
           <Link href="/" style={{ display: 'flex', alignItems: 'baseline', gap: 10, flexShrink: 0, textDecoration: 'none' }}>
-            <span style={{ fontFamily: 'ui-monospace,monospace', fontWeight: 800, fontSize: 24, letterSpacing: '0.02em', lineHeight: 1, color: 'var(--ink)' }}>
+            <span style={{ fontFamily: 'var(--font-poppins), sans-serif', fontWeight: 800, fontSize: 24, letterSpacing: '0.02em', lineHeight: 1, color: 'var(--ink)' }}>
               JOMOO<span style={{ color: 'var(--accent)' }}>.</span>
             </span>
           </Link>

@@ -82,7 +82,7 @@ function ProductCard({
       >
         <span style={{
           display: 'block',
-          fontFamily: 'var(--font-noto-sans-jp, sans-serif)',
+          fontFamily: 'var(--font-poppins, sans-serif)',
           fontWeight: 400,
           fontSize: 10,
           letterSpacing: '0.3em',
@@ -93,7 +93,7 @@ function ProductCard({
           {label}
         </span>
         <h3 style={{
-          fontFamily: 'var(--font-noto-sans-jp, sans-serif)',
+          fontFamily: 'var(--font-poppins, sans-serif)',
           fontWeight: 300,
           fontSize: 26,
           color: 'var(--jomoo-black)',
@@ -102,7 +102,7 @@ function ProductCard({
           {model}
         </h3>
         <p style={{
-          fontFamily: 'var(--font-noto-sans-jp, sans-serif)',
+          fontFamily: 'var(--font-poppins, sans-serif)',
           fontWeight: 300,
           fontSize: 13,
           color: 'var(--jomoo-grey)',
@@ -112,7 +112,7 @@ function ProductCard({
           {description}
         </p>
         <a href="#" style={{
-          fontFamily: 'var(--font-noto-sans-jp, sans-serif)',
+          fontFamily: 'var(--font-poppins, sans-serif)',
           fontSize: 11,
           letterSpacing: '0.2em',
           color: 'var(--jomoo-black)',

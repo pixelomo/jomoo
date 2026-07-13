@@ -136,7 +136,7 @@ export default function AmazingExperienceSection() {
       }}>
         <span style={{
           display: 'block',
-          fontFamily: 'var(--font-noto-sans-jp, sans-serif)',
+          fontFamily: 'var(--font-poppins, sans-serif)',
           fontWeight: 400,
           fontSize: 11,
           letterSpacing: '0.35em',
@@ -147,7 +147,7 @@ export default function AmazingExperienceSection() {
           AMAZING EXPERIENCE
         </span>
         <h2 style={{
-          fontFamily: 'var(--font-noto-sans-jp, sans-serif)',
+          fontFamily: 'var(--font-poppins, sans-serif)',
           fontWeight: 300,
           fontSize: 'clamp(28px, 3.8vw, 52px)',
           color: 'var(--jomoo-black)',
@@ -157,7 +157,7 @@ export default function AmazingExperienceSection() {
           「水まわり」に驚きを
         </h2>
         <p style={{
-          fontFamily: 'var(--font-noto-sans-jp, sans-serif)',
+          fontFamily: 'var(--font-poppins, sans-serif)',
           fontWeight: 300,
           fontSize: 13,
           color: '#3A3A3A',
