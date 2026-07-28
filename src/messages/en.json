@@ -119,7 +119,11 @@
         "passwordMismatch": "パスワードが一致しません",
         "phoneDigitsOnly": "半角数字ハイフンなしで入力ください"
       }
-    }
+    },
+    "emailNotVerified": "メールアドレスの確認が完了していません。確認メール内のリンクからお手続きください。",
+    "resendVerification": "確認メールを再送する",
+    "verificationResent": "確認メールを再送しました。メールボックスをご確認ください。",
+    "verificationResendFailed": "確認メールの再送に失敗しました。しばらくしてから再度お試しください。"
   },
   "dashboard": {
     "title": "Member Portal",

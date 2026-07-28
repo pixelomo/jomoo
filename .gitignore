@@ -37,6 +37,8 @@ yarn-error.log*
 .env.development
 .env.production
 .env.test
+# any other env dump (e.g. `vercel env pull` output)
+.env.vercel*
 
 # sanity
 .sanity/

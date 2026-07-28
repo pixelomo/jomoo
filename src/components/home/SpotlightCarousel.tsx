@@ -2,10 +2,12 @@
 'use client'
 
 import { useCallback, useEffect, useRef, useState } from 'react'
+import SpotlightModelViewer from './SpotlightModelViewer'
 
 type SlideMedia =
   | { type: 'video'; src: string; background?: string }
   | { type: 'image'; src: string; background?: string }
+  | { type: 'model'; src: string; background?: string; activeBackground?: string }
 
 type SpotlightSlide = {
   index: string
@@ -28,9 +30,10 @@ const SLIDES: SpotlightSlide[] = [
       '心地よく穏やかな毎日を支えます。',
     ],
     media: {
-      type: 'video',
-      src: '/images/x40.mov',
-      background: '/images/blue-gradient.png',
+      type: 'model',
+      src: '/glb/x40.glb',
+      background: '/images/3Dplaceholder.jpg',
+      activeBackground: '/images/blue-gradient.png',
     },
     playLabel: '3D VIEW',
     playTheme: 'light',
@@ -196,6 +199,24 @@ export default function SpotlightCarousel() {
     void video.play().catch(() => {})
   }
 
+  function toggleMedia(index: number) {
+    const slide = SLIDES[index]
+    if (slide.media.type === 'video') {
+      toggleVideo(index)
+      return
+    }
+
+    if (slide.media.type === 'model') {
+      if (playingIndex === index) {
+        setPlayingIndex(null)
+        return
+      }
+
+      setActiveIndex(index)
+      setPlayingIndex(index)
+    }
+  }
+
   const step = stepRef.current || 1
   const translateX = centerOffsetRef.current - activeIndex * step + dragOffset
   void layoutVersion
@@ -239,12 +260,27 @@ export default function SpotlightCarousel() {
                   {slide.media.background && (
                     <img
                       className="spotlight__media-bg"
-                      src={slide.media.background}
+                      src={
+                        slide.media.type === 'model' &&
+                        playingIndex === index &&
+                        slide.media.activeBackground
+                          ? slide.media.activeBackground
+                          : slide.media.background
+                      }
                       alt=""
                     />
                   )}
 
-                  {slide.media.type === 'video' ? (
+                  {slide.media.type === 'model' ? (
+                    <SpotlightModelViewer
+                      src={slide.media.src}
+                      active={playingIndex === index}
+                      playLabel={slide.playLabel ?? '3D VIEW'}
+                      playTheme={slide.playTheme}
+                      onActivate={() => toggleMedia(index)}
+                      onDeactivate={() => setPlayingIndex(null)}
+                    />
+                  ) : slide.media.type === 'video' ? (
                     <video
                       ref={(el) => {
                         videoRefs.current[index] = el
@@ -275,7 +311,7 @@ export default function SpotlightCarousel() {
                         .filter(Boolean)
                         .join(' ')}
                       onPointerDown={(event) => event.stopPropagation()}
-                      onClick={() => toggleVideo(index)}
+                      onClick={() => toggleMedia(index)}
                       aria-label={
                         playingIndex === index ? 'Pause video' : 'Play video'
                       }

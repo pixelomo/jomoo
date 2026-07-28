@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useTranslations } from 'next-intl'
 import { authClient } from '@/lib/auth-client'
@@ -21,9 +20,9 @@ type FormData = Partial<CorporateSignupData & IndividualSignupData>
 export default function SignUpForm() {
   const t = useTranslations('auth')
   const tm = useTranslations('auth.membership')
-  const router = useRouter()
 
   const [step, setStep] = useState(1)
+  const [verificationSent, setVerificationSent] = useState(false)
   const [membershipType, setMembershipType] = useState<MembershipType | undefined>()
   const [formData, setFormData] = useState<FormData>({})
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -76,8 +75,10 @@ export default function SignUpForm() {
       const { error: err } = await authClient.signUp.email(payload)
 
       if (!err) {
-        router.push('/dashboard')
-        router.refresh()
+        // requireEmailVerification is on, so no session exists yet — the member
+        // has to click the link in the verification email before signing in.
+        setVerificationSent(true)
+        setIsSubmitting(false)
         return
       }
 
@@ -107,6 +108,37 @@ export default function SignUpForm() {
         </div>
       )}
 
+      {verificationSent ? (
+        <div className="rounded-xl border border-[#73a4c7]/25 bg-[#73a4c7]/5 px-6 py-12 text-center">
+          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-[#73a4c7]/15">
+            <svg
+              className="h-6 w-6 text-[#73a4c7]"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2}
+              aria-hidden="true"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+              />
+            </svg>
+          </div>
+          <h2 className="text-lg font-semibold text-zinc-900">確認メールを送信しました</h2>
+          <p className="mt-2 text-sm text-zinc-600">
+            <span className="font-medium text-zinc-900">{formData.email}</span>{' '}
+            宛にメールをお送りしました。
+            <br />
+            メール内のボタンからメールアドレスをご確認ください。
+          </p>
+          <p className="mt-4 text-xs text-zinc-500">
+            メールが届かない場合は、迷惑メールフォルダをご確認ください。
+          </p>
+        </div>
+      ) : (
+        <>
       {step === 1 && <SignUpStep1 value={membershipType} onSelect={handleTypeSelect} />}
 
       {step === 2 && membershipType && (
@@ -142,6 +174,8 @@ export default function SignUpForm() {
             {t('signInLink')}
           </Link>
         </p>
+      )}
+        </>
       )}
     </div>
   )

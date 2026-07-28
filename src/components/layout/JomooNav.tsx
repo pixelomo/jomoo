@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 'use client'
 
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useLocale } from 'next-intl'
 import { useRouter } from 'next/navigation'
 import { authClient } from '@/lib/auth-client'
@@ -10,10 +10,17 @@ interface Props {
   isSignedIn: boolean
 }
 
+const NAV_LINKS = [
+  { href: 'products/smart-toilet', label: '商品情報' },
+  { href: 'inspiration', label: 'インスピレーション' },
+  { href: 'company-information', label: '会社情報' },
+] as const
+
 export default function JomooNav({ isSignedIn }: Props) {
   const locale = useLocale()
   const router = useRouter()
   const navRef = useRef<HTMLElement>(null)
+  const [menuOpen, setMenuOpen] = useState(false)
 
   useEffect(() => {
     const nav = navRef.current
@@ -42,53 +49,160 @@ export default function JomooNav({ isSignedIn }: Props) {
     }
   }, [])
 
+  useEffect(() => {
+    if (!menuOpen) return
+
+    function onKeyDown(event: KeyboardEvent) {
+      if (event.key === 'Escape') setMenuOpen(false)
+    }
+
+    function onResize() {
+      if (window.innerWidth >= 1300) setMenuOpen(false)
+    }
+
+    document.addEventListener('keydown', onKeyDown)
+    window.addEventListener('resize', onResize)
+
+    return () => {
+      document.removeEventListener('keydown', onKeyDown)
+      window.removeEventListener('resize', onResize)
+    }
+  }, [menuOpen])
+
+  function closeMenu() {
+    setMenuOpen(false)
+  }
+
   return (
-    <nav className="nav" ref={navRef}>
+    <nav
+      className={`nav${menuOpen ? ' is-menu-open' : ''}`}
+      ref={navRef}
+    >
       <a href={`/${locale}`} className="nav__logo">
         <img src="/logo.svg" alt="JOMOO" />
       </a>
+
       <ul className="nav__menu">
-        <li><a href={`/${locale}/products/smart-toilet`}>商品情報</a></li>
-        <li><a href={`/${locale}/inspiration`}>インスピレーション</a></li>
-        <li><a href={`/${locale}/company-information`}>会社情報</a></li>
+        {NAV_LINKS.map((item) => (
+          <li key={item.href}>
+            <a href={`/${locale}/${item.href}`}>{item.label}</a>
+          </li>
+        ))}
       </ul>
-      <div className="nav__actions">
-        <button type="button" className="nav__search" aria-label="検索">
-          <img src="/images/search.svg" alt="" />
+
+      <div className="nav__end">
+        <div className="nav__actions">
+          <button type="button" className="nav__search" aria-label="検索">
+            <img src="/images/search.svg" alt="" />
+          </button>
+          <a
+            href={`/${locale}/contact-us`}
+            className="nav__btn nav__btn--white nav__btn--contact"
+          >
+            お問い合わせ
+          </a>
+          {isSignedIn ? (
+            <>
+              <a
+                href={`/${locale}/dashboard`}
+                className="nav__btn nav__btn--black nav__btn--dashboard"
+              >
+                マイページ
+              </a>
+              <button
+                type="button"
+                className="nav__auth-icon nav__auth-icon--signout"
+                aria-label="ログアウト"
+                onClick={async () => {
+                  await authClient.signOut()
+                  router.push(`/${locale}`)
+                  router.refresh()
+                }}
+              >
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                  <path d="M16 17l5-5-5-5" />
+                  <path d="M21 12H9" />
+                </svg>
+              </button>
+            </>
+          ) : (
+            <>
+              <a
+                href={`/${locale}/sign-up`}
+                className="nav__btn nav__btn--black nav__btn--signup"
+              >
+                パートナー登録
+              </a>
+              <a
+                href={`/${locale}/sign-in`}
+                className="nav__auth-icon nav__auth-icon--signin"
+                aria-label="ログイン"
+              >
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
+                  <path d="M10 17l-5-5 5-5" />
+                  <path d="M3 12h12" />
+                </svg>
+              </a>
+            </>
+          )}
+        </div>
+
+        <button
+          type="button"
+          className="nav__toggle"
+          aria-label={menuOpen ? 'メニューを閉じる' : 'メニューを開く'}
+          aria-expanded={menuOpen}
+          aria-controls="nav-drawer"
+          onClick={() => setMenuOpen((open) => !open)}
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            {menuOpen ? (
+              <path d="M18 6L6 18M6 6l12 12" />
+            ) : (
+              <path d="M3 12h18M3 6h18M3 18h18" />
+            )}
+          </svg>
         </button>
-        <a href={`/${locale}/contact-us`} className="nav__btn nav__btn--white">お問い合わせ</a>
-        {isSignedIn ? (
-          <>
-            <a href={`/${locale}/dashboard`} className="nav__btn nav__btn--black">マイページ</a>
-            <button
-              type="button"
-              className="nav__auth-icon"
-              aria-label="ログアウト"
-              onClick={async () => {
-                await authClient.signOut()
-                router.push(`/${locale}`)
-                router.refresh()
-              }}
+      </div>
+
+      <div className="nav__drawer" id="nav-drawer">
+        <ul className="nav__drawer-menu">
+          {NAV_LINKS.map((item) => (
+            <li key={item.href}>
+              <a href={`/${locale}/${item.href}`} onClick={closeMenu}>
+                {item.label}
+              </a>
+            </li>
+          ))}
+        </ul>
+        <div className="nav__drawer-actions">
+          <a
+            href={`/${locale}/contact-us`}
+            className="nav__drawer-btn nav__drawer-btn--contact"
+            onClick={closeMenu}
+          >
+            お問い合わせ
+          </a>
+          {!isSignedIn ? (
+            <a
+              href={`/${locale}/sign-up`}
+              className="nav__drawer-btn nav__drawer-btn--signup"
+              onClick={closeMenu}
             >
-              <svg viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-                <path d="M16 17l5-5-5-5" />
-                <path d="M21 12H9" />
-              </svg>
-            </button>
-          </>
-        ) : (
-          <>
-            <a href={`/${locale}/sign-up`} className="nav__btn nav__btn--black">パートナー登録</a>
-            <a href={`/${locale}/sign-in`} className="nav__auth-icon" aria-label="ログイン">
-              <svg viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
-                <path d="M10 17l-5-5 5-5" />
-                <path d="M3 12h12" />
-              </svg>
+              パートナー登録
             </a>
-          </>
-        )}
+          ) : (
+            <a
+              href={`/${locale}/dashboard`}
+              className="nav__drawer-btn"
+              onClick={closeMenu}
+            >
+              マイページ
+            </a>
+          )}
+        </div>
       </div>
     </nav>
   )

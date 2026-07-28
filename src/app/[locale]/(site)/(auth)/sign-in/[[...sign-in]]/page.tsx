@@ -19,11 +19,15 @@ export default function SignInPage() {
   const [totp, setTotp] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [needsVerification, setNeedsVerification] = useState(false)
+  const [resendNotice, setResendNotice] = useState<string | null>(null)
 
   const handleCredentials = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
     setError(null)
+    setNeedsVerification(false)
+    setResendNotice(null)
 
     const { data, error: err } = await authClient.signIn.email({ email, password })
 
@@ -45,7 +49,28 @@ export default function SignInPage() {
       return
     }
 
+    // Distinct from a bad password — the account exists but is unconfirmed
+    if (err.code === 'EMAIL_NOT_VERIFIED' || err.status === 403) {
+      setNeedsVerification(true)
+      setError(t('emailNotVerified'))
+      setLoading(false)
+      return
+    }
+
     setError(t('invalidCredentials'))
+    setLoading(false)
+  }
+
+  const handleResendVerification = async () => {
+    setLoading(true)
+    setResendNotice(null)
+
+    const { error: err } = await authClient.sendVerificationEmail({
+      email,
+      callbackURL: '/dashboard',
+    })
+
+    setResendNotice(err ? t('verificationResendFailed') : t('verificationResent'))
     setLoading(false)
   }
 
@@ -87,6 +112,19 @@ export default function SignInPage() {
               <input type="password" value={password} onChange={e => setPassword(e.target.value)} required className={inputClass} />
             </div>
             {error && <p className="text-sm text-red-600">{error}</p>}
+            {needsVerification && (
+              <div className="rounded-md border border-amber-200 bg-amber-50 px-3 py-2.5">
+                <button
+                  type="button"
+                  onClick={handleResendVerification}
+                  disabled={loading}
+                  className="text-sm font-medium text-amber-900 underline underline-offset-2 disabled:opacity-50"
+                >
+                  {t('resendVerification')}
+                </button>
+                {resendNotice && <p className="mt-1.5 text-xs text-amber-800">{resendNotice}</p>}
+              </div>
+            )}
             <button type="submit" disabled={loading} className="w-full rounded-lg bg-zinc-900 px-4 py-3 text-sm font-medium text-white hover:bg-zinc-700 disabled:opacity-50 transition-colors">
               {loading ? tc('loading') : t('signInBtn')}
             </button>

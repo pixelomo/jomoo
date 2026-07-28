@@ -159,7 +159,7 @@ export interface ProductSummary {
 export async function getProductsInSeries(series: string): Promise<ProductSummary[]> {
   try {
     return await getSanityClient().fetch(
-      `*[_type == "product" && series == $series && defined(slug.current)] | order(modelCode asc) {
+      `*[_type == "product" && series == $series && defined(slug.current)] | order(slug.current asc) {
         _id,
         "slug": slug.current,
         name,

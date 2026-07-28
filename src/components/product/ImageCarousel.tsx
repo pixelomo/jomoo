@@ -90,7 +90,7 @@ export default function ImageCarousel({ slides }: Props) {
               <circle cx="8.5" cy="8.5" r="1.5" />
               <path d="M21 15l-5-5L5 21" />
             </svg>
-            <span style={{ fontFamily: 'var(--font-poppins), sans-serif', fontSize: 11, letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+            <span style={{ fontFamily: 'var(--font-poppins), sans-serif', fontSize: 11, textTransform: 'uppercase' }}>
               [ product image · add in Sanity Studio ]
             </span>
           </div>
@@ -98,7 +98,7 @@ export default function ImageCarousel({ slides }: Props) {
 
         {/* Caption overlay */}
         {current.caption && (
-          <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, background: 'linear-gradient(transparent,rgba(0,0,0,0.5))', padding: '28px 20px 14px', color: '#fff', fontSize: 13, letterSpacing: '0.02em', pointerEvents: 'none' }}>
+          <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, background: 'linear-gradient(transparent,rgba(0,0,0,0.5))', padding: '28px 20px 14px', color: '#fff', fontSize: 13, pointerEvents: 'none' }}>
             {current.caption}
           </div>
         )}

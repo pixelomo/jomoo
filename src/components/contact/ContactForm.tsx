@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import FormField, { inputClass } from '@/components/ui/FormField'
 import { COUNTRY_CODES } from '@/data/jp-prefectures'
-import { ContactSchema, type ContactData } from '@/types/contact'
+import { CONTACT_CATEGORIES, ContactSchema, type ContactData } from '@/types/contact'
 import ContactStepIndicator from './ContactStepIndicator'
 
 const SUBMIT_ERROR_MESSAGE =
@@ -84,6 +84,26 @@ export default function ContactForm() {
 
       {step === 1 && (
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+          <FormField
+            label="お問い合わせ種別"
+            required
+            requiredBadge
+            htmlFor="category"
+            hint="内容に応じた担当部署へお繋ぎします。"
+            error={resolveError(errors.category?.message)}
+          >
+            <select id="category" className={inputClass} defaultValue="" {...register('category')}>
+              <option value="" disabled>
+                選択してください
+              </option>
+              {CONTACT_CATEGORIES.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.label}
+                </option>
+              ))}
+            </select>
+          </FormField>
+
           <div>
             <div className="mb-4 flex items-center justify-between gap-3">
               <h2 className="text-sm font-semibold text-zinc-900">名前</h2>

@@ -1,10 +1,11 @@
 import { Resend } from 'resend'
+import { categoryLabel, type ContactCategory } from '@/types/contact'
 
 function isResendConfigured() {
   return Boolean(process.env.RESEND_API_KEY?.trim() && process.env.RESEND_FROM_EMAIL?.trim())
 }
 
-function useContactDevFallback() {
+function contactDevFallbackEnabled() {
   return (
     process.env.NODE_ENV === 'development' &&
     process.env.CONTACT_DEV_FALLBACK !== 'false'
@@ -27,11 +28,27 @@ function appUrl() {
   return (process.env.NEXT_PUBLIC_APP_URL ?? '').replace(/\/$/, '')
 }
 
-function contactTo() {
+/** Inquiry category → env var holding that department's address. */
+const CATEGORY_ENV: Record<ContactCategory, string> = {
+  product:      'CONTACT_TO_PRODUCT',
+  purchase:     'CONTACT_TO_PURCHASE',
+  support:      'CONTACT_TO_SUPPORT',
+  installation: 'CONTACT_TO_INSTALLATION',
+  partnership:  'CONTACT_TO_PARTNERSHIP',
+  other:        'CONTACT_TO_OTHER',
+}
+
+/**
+ * Routes to the department that owns the selected category, falling back to
+ * CONTACT_TO_EMAIL whenever a department address is not configured — an
+ * unrouted inquiry still lands somewhere a human reads.
+ */
+function contactTo(category: ContactCategory) {
   if (process.env.NODE_ENV === 'development' && process.env.CONTACT_DEV_TO_EMAIL?.trim()) {
     return process.env.CONTACT_DEV_TO_EMAIL.trim()
   }
-  return process.env.CONTACT_TO_EMAIL?.trim() ?? 'alan.s@uralaverse.com'
+  const departmentAddress = process.env[CATEGORY_ENV[category]]?.trim()
+  return departmentAddress || process.env.CONTACT_TO_EMAIL?.trim() || 'alan.s@uralaverse.com'
 }
 
 async function deliverEmail({
@@ -50,7 +67,7 @@ async function deliverEmail({
   devSummary: Record<string, unknown>
 }) {
   if (!isResendConfigured()) {
-    if (useContactDevFallback()) {
+    if (contactDevFallbackEnabled()) {
       console.info(`[email:dev-fallback] ${devLabel}`, { to, replyTo, ...devSummary })
       return { devFallback: true as const }
     }
@@ -66,7 +83,7 @@ async function deliverEmail({
   })
 
   if (error) {
-    if (useContactDevFallback()) {
+    if (contactDevFallbackEnabled()) {
       console.error(`[email:dev-fallback] Resend error for ${devLabel}:`, error)
       console.info(`[email:dev-fallback] Payload`, { to, replyTo, ...devSummary })
       return { devFallback: true as const }
@@ -85,6 +102,7 @@ async function deliverEmail({
 // Contact form inquiry
 // ─────────────────────────────────────────────
 export async function sendContactInquiry({
+  category,
   lastName,
   firstName,
   companyName,
@@ -95,6 +113,7 @@ export async function sendContactInquiry({
   showroomReservation,
   preferredDateTime,
 }: {
+  category: ContactCategory
   lastName: string
   firstName: string
   companyName?: string
@@ -114,7 +133,10 @@ export async function sendContactInquiry({
       : 'はい'
     : 'いいえ'
 
+  const label = categoryLabel(category)
+
   const rows = [
+    ['お問い合わせ種別', label],
     ['お名前', fullName],
     ['会社名', companyName || '—'],
     ['メールアドレス', email],
@@ -134,11 +156,12 @@ export async function sendContactInquiry({
     .join('')
 
   await deliverEmail({
-    to: contactTo(),
+    to: contactTo(category),
     replyTo: email,
-    subject: `【JOMOO】お問い合わせ: ${fullName}`,
-    devLabel: 'contact inquiry',
+    subject: `【JOMOO】${label}: ${fullName}`,
+    devLabel: `contact inquiry (${category})`,
     devSummary: {
+      category,
       fullName,
       companyName,
       email,
@@ -161,6 +184,64 @@ export async function sendContactInquiry({
   </div>
 </body>
 </html>`,
+  })
+}
+
+// ─────────────────────────────────────────────
+// Email verification (click-to-verify, required before first sign-in)
+// ─────────────────────────────────────────────
+export async function sendVerificationEmail({
+  to,
+  name,
+  url,
+}: {
+  to: string
+  name: string
+  url: string
+}) {
+  await deliverEmail({
+    to,
+    subject: '【JOMOO】メールアドレスのご確認',
+    devLabel: 'email verification',
+    devSummary: { name, url },
+    html: buildHtml(`${name} 様`, [
+      'JOMOO の会員登録ありがとうございます。',
+      '下記のボタンからメールアドレスのご確認をお願いいたします。確認完了後、マイページをご利用いただけます。',
+      `<a href="${url}" style="display:inline-block;margin-top:8px;padding:10px 20px;background:#18181b;color:#fff;border-radius:6px;text-decoration:none;font-weight:600">メールアドレスを確認する</a>`,
+      `<span style="font-size:13px;color:#71717a">ボタンが開かない場合は、次のURLをブラウザに貼り付けてください:<br /><span style="word-break:break-all">${url}</span></span>`,
+      '<span style="font-size:13px;color:#71717a">お心当たりのない場合は、お手数ですがこのメールを破棄してください。</span>',
+    ]),
+  })
+}
+
+// ─────────────────────────────────────────────
+// Member sign-up confirmation (fires once, on account creation)
+// ─────────────────────────────────────────────
+export async function sendMemberWelcome({
+  to,
+  name,
+  // Must be one of routing.locales — 'ja' would 404
+  locale = 'en',
+}: {
+  to: string
+  name: string
+  locale?: string
+}) {
+  const signInUrl = `${appUrl()}/${locale}/sign-in`
+  const dashboardUrl = `${appUrl()}/${locale}/dashboard`
+
+  await deliverEmail({
+    to,
+    subject: '【JOMOO】会員登録が完了しました',
+    devLabel: 'member welcome',
+    devSummary: { name },
+    html: buildHtml(`${name} 様`, [
+      'この度は JOMOO の会員登録をいただき、誠にありがとうございます。',
+      '会員登録が完了しました。マイページより製品登録や保証書の確認、各種お手続きがご利用いただけます。',
+      `<a href="${dashboardUrl}" style="display:inline-block;margin-top:8px;padding:10px 20px;background:#18181b;color:#fff;border-radius:6px;text-decoration:none;font-weight:600">マイページへ</a>`,
+      `<span style="font-size:13px;color:#71717a">ログインは <a href="${signInUrl}" style="color:#18181b">こちら</a> から行えます。</span>`,
+      '<span style="font-size:13px;color:#71717a">お心当たりのない場合は、お手数ですがこのメールを破棄してください。</span>',
+    ]),
   })
 }
 

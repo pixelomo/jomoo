@@ -1,0 +1,997 @@
+/* ============================================
+   PRODUCT DETAIL — shared template
+   Type scale / tokens mirror jomoo-homepage.css
+   ============================================ */
+
+.pdp {
+  --pdp-primary: #73a4c7;
+  --pdp-ink: #0a0a0a;
+  --pdp-ink-soft: #3a3a3a;
+  --pdp-ink-mute: #6e6e73;
+  --pdp-card-radius: 20px;
+  --pdp-card-shadow: 0 6px 30px rgba(20, 30, 50, 0.06);
+  --pdp-card-border: 1px solid rgba(0, 0, 0, 0.06);
+  --pdp-hero-height: min(calc(100vh - var(--nav-height)), 52rem);
+
+  background: #f4f4f7;
+  color: var(--pdp-ink);
+  font-family: var(--font-jp);
+}
+
+/* ============================================
+   HERO — full-bleed lifestyle image, right text
+   ============================================ */
+.pdp-hero {
+  position: relative;
+  width: 100%;
+  height: var(--pdp-hero-height);
+  overflow: hidden;
+  background: #ffffff;
+}
+
+.pdp-hero__media {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+}
+
+.pdp-hero__scrim {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.55) 45%,
+    rgba(255, 255, 255, 0.85) 100%
+  );
+}
+
+.pdp-hero__inner {
+  position: relative;
+  z-index: 2;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.pdp-hero__content {
+  width: 44%;
+  min-width: 20rem;
+  text-align: left;
+  color: var(--pdp-ink);
+}
+
+.pdp-hero__eyebrow {
+  font-family: var(--font-en);
+  font-size: 2rem;
+  font-weight: 500;
+  line-height: 1.2;
+  text-transform: uppercase;
+  margin: 0 0 0.75rem;
+}
+
+.pdp-hero__title {
+  font-family: var(--font-en);
+  font-size: clamp(56px, 10vw, 180px);
+  font-weight: 600;
+  line-height: 0.95;
+  margin: 0 0 1.5rem;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+}
+
+.pdp-hero__catch {
+  font-family: var(--font-jp);
+  font-size: 3rem;
+  font-weight: 600;
+  line-height: 1.35;
+  margin: 0;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+}
+
+/* ============================================
+   BREADCRUMB
+   ============================================ */
+/* Parked, not retired — flip back to `flex` to bring the trail back. */
+.pdp-crumbs {
+  display: none;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 2rem 0 0;
+  font-size: 1.05rem;
+  color: var(--pdp-ink-mute);
+}
+
+.pdp-crumbs a {
+  color: var(--pdp-ink-mute);
+  text-decoration: none;
+  transition: color 0.25s ease;
+}
+
+.pdp-crumbs a:hover,
+.pdp-crumbs a:focus-visible {
+  color: var(--pdp-primary);
+}
+
+.pdp-crumbs__current {
+  color: var(--pdp-ink);
+  font-weight: 600;
+}
+
+/* ============================================
+   SHARED SECTION FURNITURE
+   ============================================ */
+.pdp-section {
+  padding: 5.5rem 0 0;
+}
+
+.pdp > section:last-of-type:not(.footer-cta) {
+  padding-bottom: 8rem;
+}
+
+/* The CTA brings no top padding of its own */
+.pdp .footer-cta {
+  padding-top: 8rem;
+}
+
+.pdp-eyebrow {
+  font-family: var(--font-en);
+  font-size: 28px;
+  font-weight: 400;
+  text-transform: uppercase;
+  color: var(--pdp-primary);
+  margin: 0 0 1.75rem;
+}
+
+.pdp-title {
+  font-weight: 700;
+  font-size: clamp(2.6rem, 4.55vw, 3.9rem);
+  line-height: 1.4;
+  margin: 0 0 2rem;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+}
+
+.pdp-title--center {
+  text-align: center;
+}
+
+.pdp-rule {
+  width: 3rem;
+  height: 2px;
+  background: var(--pdp-primary);
+  margin: 0 0 2.5rem;
+}
+
+.pdp-rule--center {
+  margin-inline: auto;
+}
+
+.pdp-body {
+  font-size: 1.5rem;
+  line-height: 2;
+  color: var(--pdp-ink-soft);
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+}
+
+.pdp-body p {
+  margin: 0 0 1.5rem;
+}
+
+.pdp-body p:last-child {
+  margin-bottom: 0;
+}
+
+.pdp-card {
+  background: #ffffff;
+  border-radius: var(--pdp-card-radius);
+  border: var(--pdp-card-border);
+  box-shadow: var(--pdp-card-shadow);
+  overflow: hidden;
+}
+
+/* ============================================
+   TABS — おすすめ機能 / 仕様 / タイプ・価格
+   ============================================ */
+.pdp-tabs {
+  background: #ffffff;
+}
+
+.pdp-tabs__nav {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  border-bottom: 1px solid #d3d3d3;
+  /* Sticks under the fixed site nav so the jump links stay reachable and the
+     current-section highlight stays visible while reading. */
+  position: sticky;
+  top: calc(var(--nav-height) + 1rem);
+  z-index: 20;
+  background: #ffffff;
+}
+
+.pdp-tabs__tab {
+  display: block;
+  padding: 1.5rem 1rem;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  background: none;
+  font-family: var(--font-jp);
+  font-size: 1.75rem;
+  font-weight: 500;
+  line-height: 1.4;
+  color: var(--pdp-ink);
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  transition: color 0.25s ease, border-color 0.25s ease;
+}
+
+.pdp-tabs__tab:hover,
+.pdp-tabs__tab:focus-visible {
+  color: var(--pdp-primary);
+}
+
+.pdp-tabs__tab.is-active {
+  border-bottom-color: var(--pdp-primary);
+}
+
+.pdp-tabs__panel {
+  /* padding-block only — .site-container owns the horizontal gutter */
+  padding-block: 5rem;
+  /* Clears the fixed site nav plus the sticky bar when jumped to */
+  scroll-margin-top: calc(var(--nav-height) + 6.5rem);
+}
+
+.pdp-tabs__panel:first-of-type {
+  padding-top: 7rem;
+}
+
+.pdp-tabs__panel:last-of-type {
+  padding-bottom: 8rem;
+}
+
+.pdp-tabs__empty {
+  padding: 4rem 2rem;
+  text-align: center;
+  font-family: var(--font-en);
+  font-size: 1rem;
+  text-transform: uppercase;
+  color: var(--pdp-ink-mute);
+}
+
+/* Feature cards — homepage spotlight card, flattened */
+.pdp-fcard {
+  display: grid;
+  grid-template-columns: minmax(0, 33%) minmax(0, 67%);
+  align-items: center;
+  padding: 4rem 0;
+  border-bottom: 1px solid #d3d3d3;
+}
+
+.pdp-fcard:last-child {
+  border-bottom: 0;
+  padding-bottom: 0;
+}
+
+.pdp-fcard:first-child {
+  padding-top: 0;
+}
+
+.pdp-fcard__media {
+  aspect-ratio: 4 / 3;
+  border-radius: 2rem;
+  overflow: hidden;
+  background: #f4f4f7;
+}
+
+.pdp-fcard__media img,
+.pdp-fcard__media-empty {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.pdp-fcard__content {
+  padding: 0 3rem;
+}
+
+.pdp-fcard__index {
+  font-family: var(--font-en);
+  font-size: 2.7rem;
+  font-weight: 500;
+  line-height: 1;
+  color: var(--pdp-primary);
+  margin: 0 0 1.5rem;
+}
+
+.pdp-fcard__title {
+  font-size: 2.7rem;
+  font-weight: 700;
+  line-height: 1.35;
+  margin: 0 0 1.5rem;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+}
+
+.pdp-fcard__rule {
+  width: 2.75rem;
+  height: 2px;
+  background: var(--pdp-primary);
+  margin-bottom: 1.75rem;
+}
+
+.pdp-fcard__body {
+  font-size: 1.5rem;
+  line-height: 2;
+  color: #4a4a4a;
+  margin: 0;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+}
+
+/* 標準機能 — grouped capability tiles */
+.pdp-std {
+  margin-top: 7rem;
+}
+
+.pdp-std__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.5rem;
+}
+
+.pdp-std__card {
+  background: #f4f4f7;
+  border-radius: var(--pdp-card-radius);
+  padding: 2.5rem 3rem;
+}
+
+.pdp-std__title {
+  font-size: 1.8rem;
+  font-weight: 700;
+  line-height: 1.5;
+  margin: 0 0 1.25rem;
+  color: var(--pdp-ink);
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+}
+
+.pdp-std__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  font-size: 1.25rem;
+  line-height: 2;
+  color: var(--pdp-ink-soft);
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+}
+
+/* ============================================
+   TYPE & PRICE — 3D card, homepage spotlight geometry
+   ============================================ */
+.pdp-type {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  align-items: stretch;
+  margin-top: 5rem;
+  background: #ffffff;
+  border-radius: 2rem;
+  overflow: hidden;
+  box-shadow:
+    0 6px 14px -4px rgba(15, 23, 42, 0.08),
+    0 14px 28px -8px rgba(15, 23, 42, 0.1);
+}
+
+.pdp-type__media {
+  position: relative;
+  height: 520px;
+  overflow: hidden;
+  isolation: isolate;
+  /* Replaces the homepage card's blue backdrop. Kept a shade off white at the
+     top-left so the white model still reads against it. */
+  background: linear-gradient(160deg, #e4e7ea 0%, #f3f4f6 50%, #ffffff 100%);
+}
+
+/*
+  SpotlightModelViewer emits the homepage's `spotlight__*` class names. Those
+  styles live in jomoo-homepage.css, which this route does not load, so the
+  viewer plumbing is restated here — scoped, so it can never collide with the
+  homepage's own rules when both stylesheets are in the document.
+*/
+.pdp-type__still {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center;
+}
+
+.pdp-type__media .spotlight__model-wrap {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  overflow: hidden;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.35s ease, visibility 0.35s ease;
+  pointer-events: none;
+}
+
+.pdp-type__media .spotlight__model-wrap.is-ready {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.pdp-type__media .spotlight__media-el--model {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  background: transparent;
+  cursor: grab;
+  overflow: hidden;
+  --poster-color: transparent;
+  --progress-bar-height: 0px;
+  --progress-bar-color: transparent;
+  --progress-mask: transparent;
+}
+
+.pdp-type__media .spotlight__media-el--model:active {
+  cursor: grabbing;
+}
+
+.pdp-type__media .spotlight__media-el--model::part(default-progress-bar),
+.pdp-type__media .spotlight__media-el--model::part(default-progress-mask) {
+  display: none;
+}
+
+/* The viewer's hardcoded poster is the homepage's blue still — let the
+   gradient show through while the model loads instead. */
+.pdp-type__media .spotlight__media-el--model::part(default-poster) {
+  display: none;
+}
+
+.pdp-type__media .spotlight__play {
+  position: absolute;
+  left: 1.75rem;
+  bottom: 1.75rem;
+  z-index: 3;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  font-family: var(--font-en);
+  font-size: 0.9rem;
+  font-weight: 500;
+  letter-spacing: 0;
+  text-transform: uppercase;
+  color: #000000;
+  cursor: pointer;
+}
+
+.pdp-type__media .spotlight__play-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border: 1px solid var(--pdp-primary);
+  border-radius: 50%;
+  background: transparent;
+  color: #302d2c;
+}
+
+.pdp-type__media .spotlight__play-icon svg {
+  width: 1.035rem;
+  height: 1.035rem;
+  fill: currentColor;
+}
+
+/* Text side — homepage feature__content */
+.pdp-type__content {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  text-align: left;
+  padding: 3.5rem 3rem;
+}
+
+.pdp-type__pill {
+  display: inline-block;
+  background: #ececee;
+  color: var(--pdp-ink);
+  font-family: var(--font-en);
+  font-size: 1.2rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  padding: 0.25rem 1.2rem;
+  border-radius: 999px;
+  margin-bottom: 1rem;
+}
+
+.pdp-type__name {
+  font-family: var(--font-en);
+  font-size: 4rem;
+  font-weight: 600;
+  line-height: 1.2;
+  margin: 0 0 0.75rem;
+}
+
+.pdp-type__model {
+  font-family: var(--font-en);
+  font-size: 1.5rem;
+  font-weight: 400;
+  line-height: 1.9;
+  color: var(--pdp-ink-soft);
+  margin: 0 0 1.5rem;
+}
+
+.pdp-type__price {
+  font-size: 1.5rem;
+  font-weight: 400;
+  line-height: 1.6;
+  color: var(--pdp-ink);
+  margin: 0;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+}
+
+/* ============================================
+   RELATED PRODUCTS — homepage feature card, one-up
+   ============================================ */
+.pdp-related .feature__grid {
+  padding-top: 1rem;
+}
+
+/* A lone card keeps the half-column width of the homepage grid, centred */
+.pdp-related__grid--single {
+  grid-template-columns: minmax(0, calc(50% - 1.875rem));
+  justify-content: center;
+}
+
+.pdp-related .feature__pill,
+.pdp-related .feature__name,
+.pdp-related .feature__desc,
+.pdp-related .feature__more {
+  letter-spacing: 0;
+}
+
+/* ============================================
+   ABOUT — long description
+   ============================================ */
+.pdp-about__card {
+  padding: clamp(2.5rem, 4vw, 4rem);
+}
+
+/* ============================================
+   FEATURE VIDEOS
+   ============================================ */
+.pdp-videos__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.5rem;
+}
+
+.pdp-videos__grid--single {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.pdp-video__frame {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: #0a0a0a;
+}
+
+.pdp-video__frame iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+.pdp-video__empty {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  color: rgba(255, 255, 255, 0.4);
+  font-family: var(--font-en);
+  font-size: 1rem;
+  text-transform: uppercase;
+}
+
+.pdp-video__caption {
+  padding: 1.5rem 2rem 1.75rem;
+  font-size: 1.5rem;
+  font-weight: 600;
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* ============================================
+   SPEC TABLE
+   ============================================ */
+.pdp-specs__diagram {
+  width: 100%;
+  height: auto;
+  display: block;
+  margin-bottom: 3rem;
+}
+
+.pdp-specs__table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.pdp-specs__table th,
+.pdp-specs__table td {
+  text-align: left;
+  vertical-align: top;
+  padding: 1rem 2rem;
+  border-bottom: 1px solid #000000;
+}
+
+.pdp-specs__table tr:first-child th,
+.pdp-specs__table tr:first-child td {
+  border-top: 1px solid #000000;
+}
+
+.pdp-specs__label {
+  width: 34%;
+  font-size: 1.25rem;
+  font-weight: 600;
+  line-height: 1.7;
+  color: var(--pdp-ink);
+  background: #f2f3f5;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+}
+
+.pdp-specs__value {
+  font-size: 1.25rem;
+  font-weight: 400;
+  line-height: 1.9;
+  color: var(--pdp-ink-soft);
+}
+
+.pdp-specs__empty {
+  padding: 3rem 2rem;
+  text-align: center;
+  font-family: var(--font-en);
+  font-size: 1rem;
+  text-transform: uppercase;
+  color: var(--pdp-ink-mute);
+}
+
+/* ============================================
+   RESPONSIVE — mirrors homepage breakpoints
+   ============================================ */
+/* Spotlight-card scale-down, matching the homepage carousel */
+@media (max-width: 1439px) {
+  .pdp-fcard__index,
+  .pdp-fcard__title {
+    font-size: 2.2rem;
+  }
+
+  .pdp-fcard__body {
+    font-size: 1.2rem;
+  }
+}
+
+@media (max-width: 1299px) and (min-width: 1024px) {
+  .pdp-hero__eyebrow {
+    font-size: 1.75rem;
+  }
+
+  .pdp-eyebrow {
+    font-size: 24px;
+  }
+
+  .pdp-hero__catch {
+    font-size: 2.5rem;
+  }
+
+  .pdp-body,
+  .pdp-video__caption {
+    font-size: 1.35rem;
+  }
+
+  .pdp-tabs__tab {
+    font-size: 1.5rem;
+  }
+}
+
+@media (max-width: 1023px) {
+  .pdp {
+    --pdp-hero-height: min(calc(100vh - var(--nav-height)), 44rem);
+  }
+
+  .pdp-hero__content {
+    width: 56%;
+  }
+
+  .pdp-hero__eyebrow {
+    font-size: 1.5rem;
+  }
+
+  .pdp-hero__title {
+    font-size: clamp(48px, 9vw, 104px);
+    margin-bottom: 1.25rem;
+  }
+
+  .pdp-hero__catch {
+    font-size: clamp(1.75rem, 5vw, 2.25rem);
+  }
+
+  .pdp-section {
+    padding-top: 4rem;
+  }
+
+  .pdp > section:last-of-type:not(.footer-cta) {
+    padding-bottom: 5rem;
+  }
+
+  .pdp .footer-cta {
+    padding-top: 5rem;
+  }
+
+  .pdp-title {
+    font-size: clamp(2.2rem, 6vw, 3.2rem);
+  }
+
+  .pdp-tabs__tab {
+    padding: 1.25rem 0.75rem;
+    font-size: 1.35rem;
+  }
+
+  .pdp-tabs__panel {
+    padding-block: 3.5rem;
+    scroll-margin-top: calc(var(--nav-height) + 5.5rem);
+  }
+
+  .pdp-tabs__panel:first-of-type {
+    padding-top: 4rem;
+  }
+
+  .pdp-tabs__panel:last-of-type {
+    padding-bottom: 5rem;
+  }
+
+  /* Rows stay inline down to 768px; the type steps down to suit the
+     narrower text column. */
+  .pdp-fcard {
+    padding: 3rem 0;
+  }
+
+  .pdp-fcard__content {
+    padding: 0 0 0 2rem;
+  }
+
+  .pdp-fcard__index,
+  .pdp-fcard__title {
+    font-size: 1.75rem;
+  }
+
+  .pdp-fcard__index,
+  .pdp-fcard__title {
+    margin-bottom: 1rem;
+  }
+
+  .pdp-fcard__rule {
+    margin-bottom: 1.25rem;
+  }
+
+  .pdp-fcard__body {
+    font-size: 1.05rem;
+    line-height: 1.9;
+  }
+
+  .pdp-std {
+    margin-top: 4rem;
+  }
+
+  .pdp-std__card {
+    padding: 2rem;
+  }
+
+  .pdp-std__title {
+    font-size: 1.5rem;
+  }
+
+  .pdp-eyebrow {
+    font-size: 22px;
+  }
+
+  .pdp-related__grid--single {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .pdp-type {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .pdp-type__media {
+    height: 22rem;
+  }
+
+  .pdp-type__content {
+    padding: 2.5rem 2rem 3rem;
+  }
+
+  .pdp-body {
+    font-size: 1.25rem;
+    line-height: 1.85;
+  }
+
+  .pdp-videos__grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .pdp-type__name {
+    font-size: 3rem;
+  }
+
+  .pdp-type__model,
+  .pdp-type__price {
+    font-size: 1.25rem;
+  }
+}
+
+/* The site nav loses its button row below 980px and gets shorter, so the bar
+   sits flush against it again. */
+@media (max-width: 979px) {
+  .pdp-tabs__nav {
+    top: var(--nav-height);
+  }
+
+  .pdp-tabs__panel {
+    scroll-margin-top: calc(var(--nav-height) + 4.5rem);
+  }
+}
+
+@media (max-width: 767px) {
+  .pdp {
+    --pdp-hero-height: min(calc(100svh - var(--nav-height)), 38rem);
+  }
+
+  .pdp-hero__scrim {
+    opacity: 1;
+    background: linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.9) 0%,
+      rgba(255, 255, 255, 0.7) 42%,
+      rgba(255, 255, 255, 0) 78%
+    );
+  }
+
+  .pdp-hero__inner {
+    align-items: flex-start;
+    padding-top: 2.5rem;
+  }
+
+  .pdp-hero__content {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .pdp-hero__eyebrow {
+    font-size: 1.25rem;
+  }
+
+  .pdp-hero__title {
+    font-size: clamp(44px, 14vw, 72px);
+  }
+
+  .pdp-hero__catch {
+    font-size: clamp(1.4rem, 5.5vw, 1.9rem);
+  }
+
+  .pdp-crumbs {
+    font-size: 0.95rem;
+  }
+
+  .pdp-title {
+    font-size: clamp(1.85rem, 7.5vw, 2.4rem);
+  }
+
+  .pdp-eyebrow {
+    font-size: 18px;
+  }
+
+  /* Below 768px the row stacks: image over text, both full width. */
+  .pdp-fcard {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1.5rem;
+    padding: 2.5rem 0;
+  }
+
+  .pdp-fcard__content {
+    padding: 0;
+  }
+
+  .pdp-tabs__tab {
+    padding: 1rem 0.5rem;
+    font-size: 1.05rem;
+  }
+
+  .pdp-tabs__panel {
+    scroll-margin-top: calc(var(--nav-height) + 3.75rem);
+  }
+
+  .pdp-std__grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .pdp-std__card {
+    padding: 1.5rem 1.5rem 1.75rem;
+  }
+
+  .pdp-std__title {
+    font-size: 1.25rem;
+  }
+
+  .pdp-std__list {
+    font-size: 1rem;
+    line-height: 1.9;
+  }
+
+  .pdp-body,
+  .pdp-video__caption {
+    font-size: 1.05rem;
+    line-height: 1.75;
+  }
+
+  .pdp-type__media {
+    height: 18rem;
+  }
+
+  .pdp-type__content {
+    padding: 2rem 1.5rem 2.5rem;
+  }
+
+  .pdp-type__name {
+    font-size: 2.25rem;
+  }
+
+  .pdp-type__model,
+  .pdp-type__price {
+    font-size: 1.05rem;
+  }
+
+  .pdp-specs__label,
+  .pdp-specs__value {
+    font-size: 1rem;
+  }
+
+  .pdp-specs__table th,
+  .pdp-specs__table td {
+    padding: 1rem 1.1rem;
+  }
+
+}

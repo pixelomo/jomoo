@@ -3,6 +3,9 @@
 
 import { useEffect, useRef, useState } from 'react'
 import SpotlightCarousel from './SpotlightCarousel'
+import GlobalProjectsSection from './GlobalProjectsSection'
+import DesignExcellenceSection from './DesignExcellenceSection'
+import FooterCtaSection from './FooterCtaSection'
 import './jomoo-homepage.css'
 
 const HERO_SLIDES = [
@@ -12,23 +15,55 @@ const HERO_SLIDES = [
 ]
 
 const HERO_SLIDE_MS = 6000
+const HERO_NARROW_MAX_WIDTH = 700
+
+function getHeroSlideCount(viewportWidth: number) {
+  return viewportWidth <= HERO_NARROW_MAX_WIDTH ? 2 : HERO_SLIDES.length
+}
+
+function getStatStep(target: number) {
+  if (target === 300000) return 10000
+  if (target === 20000) return 1000
+  if (target === 15 || target === 16) return 1
+  if (target === 120 || target === 350) return 10
+  return 1
+}
+
+const DESIGN_LOGOS = Array.from({ length: 7 }, (_, i) =>
+  `/images/icon/jomoo_design_logo_${String(i + 1).padStart(5, '0')}.png`
+)
 
 export default function JomooHomepage() {
   const expandRef = useRef<HTMLElement>(null)
   const statsGridRef = useRef<HTMLDivElement>(null)
   const heroVideoRefs = useRef<(HTMLVideoElement | null)[]>([])
   const [heroSlide, setHeroSlide] = useState(0)
+  const [heroSlideCount, setHeroSlideCount] = useState(HERO_SLIDES.length)
+
+  useEffect(() => {
+    function updateHeroSlideCount() {
+      setHeroSlideCount(getHeroSlideCount(window.innerWidth))
+    }
+
+    updateHeroSlideCount()
+    window.addEventListener('resize', updateHeroSlideCount)
+    return () => window.removeEventListener('resize', updateHeroSlideCount)
+  }, [])
+
+  useEffect(() => {
+    setHeroSlide((index) => (index >= heroSlideCount ? 0 : index))
+  }, [heroSlideCount])
 
   useEffect(() => {
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     if (prefersReducedMotion) return
 
     const interval = window.setInterval(() => {
-      setHeroSlide((index) => (index + 1) % HERO_SLIDES.length)
+      setHeroSlide((index) => (index + 1) % heroSlideCount)
     }, HERO_SLIDE_MS)
 
     return () => window.clearInterval(interval)
-  }, [])
+  }, [heroSlideCount])
 
   useEffect(() => {
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
@@ -118,13 +153,12 @@ export default function JomooHomepage() {
 
     function setStatFinalValues() {
       document.querySelectorAll('.stat[data-target]').forEach((stat) => {
-        const numEl = stat.querySelector('.stat__val') as HTMLElement | null
+        const numEl = stat.querySelector('.stat__val-num') as HTMLElement | null
         const sufEl = stat.querySelector('.stat__suf') as HTMLElement | null
         const target = parseFloat((stat as HTMLElement).dataset.target || '0')
         if (numEl) numEl.textContent = Math.round(target).toLocaleString('ja-JP')
         if (sufEl) {
           sufEl.style.opacity = '1'
-          sufEl.style.transform = 'scale(1)'
         }
       })
     }
@@ -145,6 +179,56 @@ export default function JomooHomepage() {
           )
 
           worldImages.forEach((el) => {
+            const tween = gsap.fromTo(
+              el,
+              { opacity: 0, y: 48 },
+              {
+                opacity: 1,
+                y: 0,
+                ease: 'power1.out',
+                scrollTrigger: {
+                  trigger: el,
+                  start: 'top 92%',
+                  end: 'top 58%',
+                  scrub: 0.8,
+                },
+              }
+            )
+
+            gsapCleanups.push(() => {
+              tween.scrollTrigger?.kill()
+              tween.kill()
+            })
+          })
+
+          const featureCards = gsap.utils.toArray<HTMLElement>('.feature__card')
+
+          featureCards.forEach((el) => {
+            const tween = gsap.fromTo(
+              el,
+              { opacity: 0, y: 48 },
+              {
+                opacity: 1,
+                y: 0,
+                ease: 'power1.out',
+                scrollTrigger: {
+                  trigger: el,
+                  start: 'top 92%',
+                  end: 'top 58%',
+                  scrub: 0.8,
+                },
+              }
+            )
+
+            gsapCleanups.push(() => {
+              tween.scrollTrigger?.kill()
+              tween.kill()
+            })
+          })
+
+          const statCards = gsap.utils.toArray<HTMLElement>('.stat')
+
+          statCards.forEach((el) => {
             const tween = gsap.fromTo(
               el,
               { opacity: 0, y: 48 },
@@ -195,37 +279,83 @@ export default function JomooHomepage() {
           }
 
           if (statsGrid) {
-            document.querySelectorAll('.stat[data-target]').forEach((stat, i) => {
-              const numEl = stat.querySelector('.stat__val') as HTMLElement | null
-              const sufEl = stat.querySelector('.stat__suf') as HTMLElement | null
-              const target = parseFloat((stat as HTMLElement).dataset.target || '0')
-              const obj = { v: 0 }
-              const trigger = ScrollTrigger.create({
-                trigger: statsGrid,
-                start: 'top 88%',
-                once: true,
-                onEnter: () => {
-                  gsap.to(obj, {
-                    v: target,
-                    duration: 2,
-                    delay: i * 0.07,
-                    ease: 'power2.out',
-                    onUpdate: () => {
-                      if (numEl) numEl.textContent = Math.round(obj.v).toLocaleString('ja-JP')
-                    },
-                    onComplete: () => {
-                      if (sufEl) {
-                        gsap.fromTo(
-                          sufEl,
-                          { opacity: 0, scale: 0.4 },
-                          { opacity: 1, scale: 1, duration: 0.35, ease: 'back.out(2)' }
-                        )
-                      }
-                    },
-                  })
-                },
+            const stats = Array.from(
+              document.querySelectorAll<HTMLElement>('.stat[data-target]')
+            )
+            const statAnimations = stats.map(() => ({
+              obj: { n: 0 },
+              tween: null as gsap.core.Tween | null,
+            }))
+
+            function resetStats() {
+              stats.forEach((stat, i) => {
+                const numEl = stat.querySelector('.stat__val-num') as HTMLElement | null
+                const sufEl = stat.querySelector('.stat__suf') as HTMLElement | null
+                const anim = statAnimations[i]
+
+                anim.tween?.kill()
+                anim.tween = null
+                anim.obj.n = 0
+
+                if (numEl) numEl.textContent = '0'
+                if (sufEl) {
+                  gsap.killTweensOf(sufEl)
+                  gsap.set(sufEl, { opacity: 0 })
+                }
               })
-              gsapCleanups.push(() => trigger.kill())
+            }
+
+            function playStats() {
+              stats.forEach((stat, i) => {
+                const numEl = stat.querySelector('.stat__val-num') as HTMLElement | null
+                const sufEl = stat.querySelector('.stat__suf') as HTMLElement | null
+                const target = parseFloat(stat.dataset.target || '0')
+                const step = getStatStep(target)
+                const totalSteps = target / step
+                const anim = statAnimations[i]
+
+                anim.tween?.kill()
+                anim.obj.n = 0
+                if (numEl) numEl.textContent = '0'
+                if (sufEl) {
+                  gsap.killTweensOf(sufEl)
+                  gsap.set(sufEl, { opacity: 0 })
+                }
+
+                anim.tween = gsap.to(anim.obj, {
+                  n: totalSteps,
+                  duration: 3.5,
+                  delay: i * 0.1,
+                  ease: 'power1.inOut',
+                  onUpdate: () => {
+                    if (!numEl) return
+                    const value = Math.min(target, Math.round(anim.obj.n) * step)
+                    numEl.textContent = value.toLocaleString('ja-JP')
+                  },
+                  onComplete: () => {
+                    if (numEl) numEl.textContent = target.toLocaleString('ja-JP')
+                    if (sufEl) {
+                      gsap.fromTo(
+                        sufEl,
+                        { opacity: 0 },
+                        { opacity: 1, duration: 0.35, ease: 'power2.out' }
+                      )
+                    }
+                  },
+                })
+              })
+            }
+
+            const trigger = ScrollTrigger.create({
+              trigger: statsGrid,
+              start: 'top 88%',
+              onEnter: playStats,
+              onLeaveBack: resetStats,
+            })
+
+            gsapCleanups.push(() => {
+              trigger.kill()
+              statAnimations.forEach((anim) => anim.tween?.kill())
             })
           }
         })
@@ -252,13 +382,17 @@ export default function JomooHomepage() {
         <div className="hero__carousel" aria-hidden="true">
           {HERO_SLIDES.map((slide, index) => {
             const isActive = index === heroSlide
+            const slideClassName = [
+              'hero__slide',
+              isActive && 'is-active',
+              index === 2 && 'hero__slide--wide-only',
+            ]
+              .filter(Boolean)
+              .join(' ')
 
             if (slide.type === 'video') {
               return (
-                <div
-                  key={slide.src}
-                  className={`hero__slide${isActive ? ' is-active' : ''}`}
-                >
+                <div key={slide.src} className={slideClassName}>
                   <video
                     ref={(el) => {
                       heroVideoRefs.current[index] = el
@@ -277,10 +411,7 @@ export default function JomooHomepage() {
             }
 
             return (
-              <div
-                key={slide.src}
-                className={`hero__slide${isActive ? ' is-active' : ''}`}
-              >
+              <div key={slide.src} className={slideClassName}>
                 <img src={slide.src} alt="" />
               </div>
             )
@@ -348,21 +479,23 @@ export default function JomooHomepage() {
               <div className="world__intro">
                 <div className="world__eyebrow">THE WORLD OF JOMOO</div>
                 <h2 className="world__title">
-                  使うたび、<br />
-                  優しさに包まれる<br />
-                  極上の体験を
+                  日常の、<br />
+                  その先へ。
                 </h2>
                 <div className="world__rule" aria-hidden="true" />
                 <div className="world__body">
                   <p>
-                    JOMOOは創業以来、<br />
-                    グローバル展開を続け<br />
-                    スマートバスブランドの<br />
-                    トップメーカーとして<br />
-                    世界中のユーザーに<br />
-                    &ldquo;快適な暮らし&rdquo;を届けています。
+                    JOMOOは、世界で培った<br />
+                    テクノロジーとデザインで、<br />
+                    心地よいバスルーム空間を<br />
+                    創造します。
                   </p>
                 </div>
+                <p className="world__body world__body--secondary world__body--secondary-intro">
+                  スマートトイレから広がる、<br />
+                  新しい暮らしの体験を<br />
+                  お届けします。
+                </p>
               </div>
 
               <div className="world__photos">
@@ -382,12 +515,10 @@ export default function JomooHomepage() {
               <figure className="world__figure world__figure--bathroom">
                 <img src="/images/world4.jpg" alt="" />
               </figure>
-              <p className="world__body world__body--secondary">
-                欧州の名門デザインスタジオや<br />
-                世界有数のテクノロジー企業との<br />
-                連携による技術革新で<br />
-                「スマートな暮らしの実現」を<br />
-                目指しています。
+              <p className="world__body world__body--secondary world__body--secondary-lower">
+                スマートトイレから広がる、<br />
+                新しい暮らしの体験を<br />
+                お届けします。
               </p>
             </div>
           </div>
@@ -406,135 +537,199 @@ export default function JomooHomepage() {
       <SpotlightCarousel />
 
       {/* FEATURE ROW */}
-      <section className="feature" data-nav="light" id="feature">
+      <section className="feature feature--animate" data-nav="light" id="feature">
         <div className="feature__inner">
-          <div className="feature__head">
-            <div className="reveal reveal--left">
-              <div className="feature__eyebrow">SMART TOILET</div>
-              <h2 className="feature__title">
-                スマートトイレの<br />
-                キャッチコピー<br />
-                キャッチコピー
-              </h2>
-            </div>
-            <div className="feature__body reveal reveal--right">
-              <p>
-                スマートトイレの説明スマートトイレの説明スマートトイレの説明スマートトイレの説明
-                スマートトイレの説明スマートトイレの説明スマートトイレの説明スマートトイレの
-              </p>
-              <p style={{ marginTop: '16px' }}>
-                スマートトイレの説明スマートトイレの説明スマートトイレの説明
-                スマートトイレの説明スマートトイレの説明スマートトイレの説明スマートトイレの
-              </p>
-            </div>
+          <div className="feature__head reveal">
+            <div className="feature__eyebrow">SMART TOILET LINEUP</div>
+            <h2 className="feature__title">あなたの空間に、最適な一台を。</h2>
+            <div className="feature__rule" aria-hidden="true" />
+            <p className="feature__subtitle">
+              ライフスタイルや空間に合わせて選べる、
+              <br />
+              JOMOOのスマートトイレラインナップ。
+            </p>
           </div>
 
           <div className="feature__grid">
-            <div className="feature__card reveal">
-              <img className="feature__img" src="/images/world-col2.jpg" alt="Smart toilet by city view" />
-              <div className="feature__sku">SMART TOILET</div>
-              <div className="feature__name">X40-C</div>
-              <p className="feature__desc">
-                設置しているセンサーに反応して、
-                自動で蓋が開閉したり、洗浄します。
-              </p>
-              <a href="#" className="feature__more">View More</a>
-            </div>
-            <div className="feature__card reveal">
-              <img className="feature__img" src="/images/world-col3.jpg" alt="Smart toilet ocean view" />
-              <div className="feature__sku">SMART TOILET</div>
-              <div className="feature__name">X40-B</div>
-              <p className="feature__desc">
-                設置しているセンサーに反応して、
-                自動で蓋が開閉したり、洗浄します。
-              </p>
-              <a href="#" className="feature__more">View More</a>
-            </div>
+            <a
+              href="/products/smart-toilet/x40-b"
+              className="feature__card"
+              aria-label="X40-B の詳細を見る"
+            >
+              <div className="feature__media">
+                <img
+                  className="feature__img feature__img--default"
+                  src="/images/X-40-B.jpeg"
+                  alt="JOMOO X40-B smart toilet"
+                />
+                <img
+                  className="feature__img feature__img--hover"
+                  src="/images/X40-hover.jpeg"
+                  alt=""
+                  aria-hidden="true"
+                />
+              </div>
+              <div className="feature__content">
+                <span className="feature__pill">SMART TOILET</span>
+                <h3 className="feature__name">X40-B</h3>
+                <p className="feature__desc">
+                  設置しているセンサーに反応して、
+                  自動で蓋が開閉したり、洗浄します。
+                </p>
+                <span className="feature__more">詳しく見る&gt;</span>
+              </div>
+            </a>
+            <a
+              href="/products/smart-toilet/x40-c"
+              className="feature__card"
+              aria-label="X40-C の詳細を見る"
+            >
+              <div className="feature__media">
+                <img
+                  className="feature__img feature__img--default"
+                  src="/images/X-40-C.jpeg"
+                  alt="JOMOO X40-C smart toilet"
+                />
+                <img
+                  className="feature__img feature__img--hover"
+                  src="/images/X40-hover.jpeg"
+                  alt=""
+                  aria-hidden="true"
+                />
+              </div>
+              <div className="feature__content">
+                <span className="feature__pill">SMART TOILET</span>
+                <h3 className="feature__name">X40-C</h3>
+                <p className="feature__desc">
+                  世界で多くの賞を獲得したデザインチームによる革新的なデザインです。
+                </p>
+                <span className="feature__more">詳しく見る&gt;</span>
+              </div>
+            </a>
           </div>
         </div>
       </section>
+
+      <GlobalProjectsSection />
 
       {/* STATS */}
-      <section className="stats" data-nav="light">
+      <section className="stats stats--animate" data-nav="light">
         <div className="stats__inner">
-          <div className="stats__head">
-            <div className="reveal reveal--left">
-              <div className="feature__eyebrow">GLOBAL PRESENCE</div>
-              <h2 className="stats__title">世界が認める品質</h2>
-            </div>
-            <div className="stats__body reveal reveal--right">
-              <p>
-                JOMOOは世界120以上の国と地域で展開し、
-                数々の国際的なデザイン賞を受賞しています。
-                積み重ねてきた技術と品質が、
-                世界中の暮らしに選ばれています。
-              </p>
-            </div>
-          </div>
-
           <div className="stats__grid" ref={statsGridRef}>
-            <div className="stat reveal" data-target="120">
-              <div className="stat__icon">
-                <svg viewBox="0 0 24 24"><path d="M3 21V9l9-6 9 6v12" /><path d="M9 21v-7h6v7" /></svg>
+            <div className="stat" data-target="120">
+              <div className="stat__top">
+                <div className="stat__icon">
+                  <img src="/images/icon/icon_00001.png" alt="" />
+                </div>
+                <div className="stat__label">展開国・地域数</div>
               </div>
               <div className="stat__num">
-                <span className="stat__val">0</span>
-                <span className="stat__suf">+</span>
+                <span className="stat__val">
+                  <span className="stat__val-num">0</span>
+                  <span className="stat__suf">+</span>
+                </span>
               </div>
-              <div className="stat__label">展開国・地域数</div>
             </div>
-            <div className="stat reveal" data-target="300000">
-              <div className="stat__icon">
-                <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4" /><path d="M4 21a8 8 0 0 1 16 0" /></svg>
+            <div className="stat" data-target="300000">
+              <div className="stat__top">
+                <div className="stat__icon">
+                  <img src="/images/icon/icon_00002.png" alt="" />
+                </div>
+                <div className="stat__label">販売拠点数</div>
               </div>
               <div className="stat__num">
-                <span className="stat__val">0</span>
-                <span className="stat__suf">+</span>
+                <span className="stat__val">
+                  <span className="stat__val-num">0</span>
+                  <span className="stat__suf">+</span>
+                </span>
               </div>
-              <div className="stat__label">販売拠点数</div>
             </div>
-            <div className="stat reveal" data-target="16">
-              <div className="stat__icon">
-                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" /><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18" /></svg>
+            <div className="stat" data-target="350">
+              <div className="stat__top">
+                <div className="stat__icon">
+                  <img src="/images/icon/icon_00003.png" alt="" />
+                </div>
+                <div className="stat__label">
+                  国際デザイン賞
+                  <br />
+                  受賞数
+                </div>
               </div>
               <div className="stat__num">
-                <span className="stat__val">0</span>
+                <span className="stat__val">
+                  <span className="stat__val-num">0</span>
+                  <span className="stat__suf">+</span>
+                </span>
               </div>
-              <div className="stat__label">グローバル研究開発センター</div>
             </div>
-            <div className="stat reveal" data-target="15">
-              <div className="stat__icon">
-                <svg viewBox="0 0 24 24"><path d="M12 3 4 7v7a8 8 0 0 0 16 0V7Z" /></svg>
+            <div className="stat" data-target="16">
+              <div className="stat__top">
+                <div className="stat__icon">
+                  <img src="/images/icon/icon_00004.png" alt="" />
+                </div>
+                <div className="stat__label">
+                  グローバル研究
+                  <br />
+                  開発センター
+                </div>
               </div>
               <div className="stat__num">
-                <span className="stat__val">0</span>
-                <span className="stat__suf">+</span>
+                <span className="stat__val">
+                  <span className="stat__val-num">0</span>
+                </span>
               </div>
-              <div className="stat__label">ハイエンドスマートファクトリー</div>
             </div>
-            <div className="stat reveal" data-target="350">
-              <div className="stat__icon">
-                <svg viewBox="0 0 24 24"><path d="M3 12h4l3-9 4 18 3-9h4" /></svg>
+            <div className="stat" data-target="15">
+              <div className="stat__top">
+                <div className="stat__icon">
+                  <img src="/images/icon/icon_00005.png" alt="" />
+                </div>
+                <div className="stat__label">ハイエンドスマートファクトリー</div>
               </div>
               <div className="stat__num">
-                <span className="stat__val">0</span>
-                <span className="stat__suf">+</span>
+                <span className="stat__val">
+                  <span className="stat__val-num">0</span>
+                </span>
               </div>
-              <div className="stat__label">国際デザイン賞受賞数</div>
             </div>
-            <div className="stat reveal" data-target="20000">
-              <div className="stat__icon">
-                <svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="13" rx="2" /><path d="M8 6V4h8v2" /></svg>
+            <div className="stat" data-target="20000">
+              <div className="stat__top">
+                <div className="stat__icon">
+                  <img src="/images/icon/icon_00006.png" alt="" />
+                </div>
+                <div className="stat__label">特許取得数</div>
               </div>
               <div className="stat__num">
-                <span className="stat__val">0</span>
-                <span className="stat__suf">+</span>
+                <span className="stat__val">
+                  <span className="stat__val-num">0</span>
+                  <span className="stat__suf">+</span>
+                </span>
               </div>
-              <div className="stat__label">特許取得数</div>
             </div>
           </div>
         </div>
       </section>
+
+      <section className="design-logos" data-nav="light" aria-label="Design awards">
+        <div className="design-logos__inner">
+          <div className="design-logos__card">
+            {DESIGN_LOGOS.map((src, index) => (
+              <div key={src} className="design-logos__segment">
+                <div className="design-logos__item">
+                  <img src={src} alt="" />
+                </div>
+                {index < DESIGN_LOGOS.length - 1 ? (
+                  <span className="design-logos__divider" aria-hidden="true" />
+                ) : null}
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <DesignExcellenceSection />
+
+      <FooterCtaSection />
 
     </div>
   )

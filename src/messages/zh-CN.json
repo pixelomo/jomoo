@@ -119,7 +119,11 @@
         "passwordMismatch": "パスワードが一致しません",
         "phoneDigitsOnly": "半角数字ハイフンなしで入力ください"
       }
-    }
+    },
+    "emailNotVerified": "邮箱尚未验证，请点击验证邮件中的链接完成验证。",
+    "resendVerification": "重新发送验证邮件",
+    "verificationResent": "验证邮件已重新发送，请查收。",
+    "verificationResendFailed": "验证邮件重发失败，请稍后再试。"
   },
   "dashboard": {
     "title": "会员中心",
