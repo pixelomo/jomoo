@@ -82,11 +82,16 @@ export default function SignUpForm() {
         return
       }
 
-      if (err.code === 'USER_ALREADY_EXISTS') {
-        setError(t('emailTaken'))
-      } else {
-        setError(t('signUpFailed'))
-      }
+      // better-auth reports a duplicate address under a few different shapes
+      // depending on where it is caught, so match on the message too rather
+      // than falling through to the generic failure text.
+      const alreadyExists =
+        err.code === 'USER_ALREADY_EXISTS' ||
+        err.status === 422 ||
+        /already exists|already registered/i.test(err.message ?? '')
+
+      setError(alreadyExists ? t('emailTaken') : t('signUpFailed'))
+      console.error('[sign-up] failed', { code: err.code, status: err.status, message: err.message })
     } catch {
       setError(t('signUpFailed'))
     }
