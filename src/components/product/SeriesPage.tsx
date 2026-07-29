@@ -1,6 +1,5 @@
 /* eslint-disable @next/next/no-img-element */
-import { getSeriesPage, getProductsInSeries, imgUrl } from '@/lib/sanity'
-import { getCardArt, getHeroContent, getSeriesLineup } from '@/lib/product-content'
+import { getSeriesPage, getProductsInSeries, imgUrl, type AssetRef } from '@/lib/sanity'
 import FooterCtaSection from '@/components/home/FooterCtaSection'
 // Reuses the homepage feature grid and footer CTA, so this route needs that
 // stylesheet.
@@ -10,28 +9,35 @@ interface Props {
   series: string
 }
 
+const url = (asset?: AssetRef, width = 900) => (asset ? imgUrl(asset, width) : undefined)
+
 export default async function SeriesPage({ series }: Props) {
   const [seriesData, products] = await Promise.all([
     getSeriesPage(series),
     getProductsInSeries(series),
   ])
 
-  const seriesName = seriesData?.name ?? series
-  const seriesDesc = seriesData?.description
+  const fallbackEyebrow =
+    seriesData?.productDefaults?.heroEyebrow ?? series.replace(/-/g, ' ').toUpperCase()
 
-  const lineup = getSeriesLineup(series, seriesName, seriesDesc)
+  const lineup = {
+    eyebrow: seriesData?.lineup?.eyebrow || `${fallbackEyebrow} LINEUP`,
+    title: seriesData?.lineup?.title || seriesData?.name || series,
+    subtitle: (seriesData?.lineup?.subtitle || seriesData?.description || '')
+      .split('\n')
+      .filter(Boolean),
+  }
 
   const cards = products.flatMap(p => {
-    const art = getCardArt(p.slug, p.thumbnail ? imgUrl(p.thumbnail, 900) : undefined)
-    if (!art) return []
-    const summary = getHeroContent(series, p.slug, p.name)
+    const image = url(p.card?.image?.asset) ?? url(p.thumbnail)
+    if (!image) return []
     return [{
       slug: p.slug,
       href: `/products/${series}/${p.slug}`,
-      eyebrow: summary.eyebrow,
-      name: summary.title,
-      desc: art.desc ?? p.tagline ?? '',
-      art,
+      eyebrow: p.heroEyebrow || fallbackEyebrow,
+      name: p.heroTitle || p.name,
+      desc: p.card?.description ?? p.tagline ?? '',
+      art: { image, hover: url(p.card?.hoverImage?.asset) },
     }]
   })
 

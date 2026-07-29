@@ -680,6 +680,28 @@
   color: var(--pdp-ink-soft);
 }
 
+.pdp-specs__group {
+  background: var(--pdp-ink);
+  color: #ffffff;
+  font-size: 1.125rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.pdp-specs__subgroup {
+  background: #e4e6ea;
+  font-size: 1.0625rem;
+  font-weight: 600;
+  color: var(--pdp-ink);
+}
+
+.pdp-specs__note {
+  margin: 1.5rem 0 0;
+  font-size: 1rem;
+  line-height: 1.9;
+  color: var(--pdp-ink-mute);
+}
+
 .pdp-specs__empty {
   padding: 3rem 2rem;
   text-align: center;
@@ -992,6 +1014,15 @@
   .pdp-specs__table th,
   .pdp-specs__table td {
     padding: 1rem 1.1rem;
+  }
+
+  .pdp-specs__group,
+  .pdp-specs__subgroup {
+    font-size: 1rem;
+  }
+
+  .pdp-specs__note {
+    font-size: 0.9375rem;
   }
 
 }

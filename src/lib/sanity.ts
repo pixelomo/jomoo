@@ -50,15 +50,10 @@ export async function getProductModels(): Promise<{ _id: string; name: string; m
   }
 }
 
-export interface ProductSpec {
-  label: string
-  value: string
-}
-
-export interface ProductFeature {
-  icon: string
-  title: string
-  description: string
+/** A Sanity image/file reference resolved to a URL by the query. */
+export interface AssetRef {
+  _ref: string
+  _type: string
 }
 
 export interface ProductVideo {
@@ -66,15 +61,42 @@ export interface ProductVideo {
   title: string
 }
 
-export interface ProductSpecTable {
-  dimensions?: string
-  material?: string
-  power?: string
-  drainageMethod?: string
-  waterConsumption?: string
-  weight?: string
-  color?: string
-  certification?: string
+export interface SpecRow {
+  /** Groups consecutive rows under a shared sub-heading. */
+  subgroup?: string
+  label: string
+  value: string
+}
+
+export interface SpecGroup {
+  /** Optional — an untitled group renders as plain rows at the top of the table. */
+  title?: string
+  rows: SpecRow[]
+}
+
+export interface FeatureCard {
+  /** Newline-separated in Sanity; split into rendered lines. */
+  title: string
+  body?: string
+  image?: { asset?: AssetRef }
+}
+
+export interface StandardGroup {
+  title: string
+  items: string[]
+}
+
+export interface ProductHero {
+  eyebrow?: string
+  title?: string
+  catchphrase?: string
+  image?: { asset?: AssetRef }
+}
+
+export interface ProductCard {
+  image?: { asset?: AssetRef }
+  hoverImage?: { asset?: AssetRef }
+  description?: string
 }
 
 export interface ProductDetail {
@@ -84,29 +106,41 @@ export interface ProductDetail {
   name: string
   slug: { current: string }
   tagline?: string
+  hero?: ProductHero
   longDescription?: unknown[]
-  features?: ProductFeature[]
-  specTable?: ProductSpecTable
-  specs?: ProductSpec[]
-  images?: Array<{ _key: string; asset: { _ref: string }; alt?: string; caption?: string }>
-  featureImages?: Array<{ _key: string; asset: { _ref: string }; caption?: string }>
+  featureCards?: FeatureCard[]
+  standardGroups?: StandardGroup[]
+  specGroups?: SpecGroup[]
+  specNote?: string
+  specImage?: { asset?: AssetRef }
+  images?: Array<{ _key: string; asset: AssetRef; alt?: string; caption?: string }>
+  model3dUrl?: string
+  price?: string
+  card?: ProductCard
   featureVideos?: ProductVideo[]
 }
+
+const PRODUCT_DETAIL_PROJECTION = `
+  _id, modelCode, series,
+  name, slug, tagline,
+  hero { eyebrow, title, catchphrase, image },
+  longDescription,
+  featureCards[] { title, body, image },
+  standardGroups[] { title, items },
+  specGroups[] { title, rows[] { subgroup, label, value } },
+  specNote,
+  specImage,
+  images[] { _key, asset, alt, caption },
+  "model3dUrl": model3d.asset->url,
+  price,
+  card { image, hoverImage, description },
+  featureVideos[] { embedUrl, title }
+`
 
 export async function getProductDetail(series: string, slug: string): Promise<ProductDetail | null> {
   try {
     const result = await getSanityClient().fetch(
-      `*[_type == "product" && series == $series && slug.current == $slug][0] {
-        _id, modelCode, series,
-        name, slug, tagline,
-        longDescription,
-        features[] { icon, title, description },
-        specTable,
-        specs[] { label, value },
-        images[] { _key, asset, alt, caption },
-        featureImages[] { _key, asset, caption },
-        featureVideos[] { embedUrl, title }
-      }`,
+      `*[_type == "product" && series == $series && slug.current == $slug][0] {${PRODUCT_DETAIL_PROJECTION}}`,
       { series, slug }
     )
     return result ?? null
@@ -127,18 +161,41 @@ export async function getProductSlugs(series: string): Promise<string[]> {
   }
 }
 
+export interface SeriesLineup {
+  eyebrow?: string
+  title?: string
+  /** Newline-separated in Sanity; split into rendered lines. */
+  subtitle?: string
+}
+
+export interface SeriesProductDefaults {
+  heroEyebrow?: string
+  heroCatchphrase?: string
+  heroImage?: { asset?: AssetRef }
+  /** Trailing words stripped off the product name to get the bare model name. */
+  nameSuffix?: string
+}
+
 export interface SeriesPageData {
   _id: string
   seriesId: string
   name: string
   tagline?: string
   description?: string
+  lineup?: SeriesLineup
+  productDefaults?: SeriesProductDefaults
 }
+
+const SERIES_PROJECTION = `
+  _id, seriesId, name, tagline, description,
+  lineup { eyebrow, title, subtitle },
+  productDefaults { heroEyebrow, heroCatchphrase, heroImage, nameSuffix }
+`
 
 export async function getSeriesPage(seriesId: string): Promise<SeriesPageData | null> {
   try {
     const result = await getSanityClient().fetch(
-      `*[_type == "productSeries" && seriesId == $seriesId][0] { _id, seriesId, name, tagline, description }`,
+      `*[_type == "productSeries" && seriesId == $seriesId][0] {${SERIES_PROJECTION}}`,
       { seriesId }
     )
     return result ?? null
@@ -153,7 +210,10 @@ export interface ProductSummary {
   name: string
   tagline?: string
   modelCode: string
-  thumbnail?: { _ref: string; _type: string }
+  thumbnail?: AssetRef
+  heroTitle?: string
+  heroEyebrow?: string
+  card?: ProductCard
 }
 
 export async function getProductsInSeries(series: string): Promise<ProductSummary[]> {
@@ -165,7 +225,10 @@ export async function getProductsInSeries(series: string): Promise<ProductSummar
         name,
         tagline,
         modelCode,
-        "thumbnail": images[0].asset
+        "thumbnail": images[0].asset,
+        "heroTitle": hero.title,
+        "heroEyebrow": hero.eyebrow,
+        card { image, hoverImage, description }
       }`,
       { series }
     )

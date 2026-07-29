@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 'use client'
 
-import { useEffect, useState } from 'react'
+import { Fragment, useEffect, useState } from 'react'
 import SpotlightModelViewer from '@/components/home/SpotlightModelViewer'
 
 export interface FeatureCardView {
@@ -20,8 +20,31 @@ export interface StandardGroupView {
 }
 
 export interface SpecRowView {
+  /** Consecutive rows sharing a subgroup render under one sub-heading. */
+  subgroup?: string
   label: string
   value: string
+}
+
+export interface SpecGroupView {
+  /** Optional — an untitled group renders as plain rows with no heading. */
+  title?: string
+  rows: SpecRowView[]
+}
+
+/** Renders a value's newlines as line breaks. */
+function Lines({ text }: { text: string }) {
+  const lines = text.split('\n')
+  return (
+    <>
+      {lines.map((line, i) => (
+        <Fragment key={i}>
+          {i > 0 && <br />}
+          {line}
+        </Fragment>
+      ))}
+    </>
+  )
 }
 
 export interface TypeCardView {
@@ -41,7 +64,9 @@ export interface TypeCardView {
 interface Props {
   features: FeatureCardView[]
   standard: StandardGroupView[]
-  specs: SpecRowView[]
+  specs: SpecGroupView[]
+  /** Footnote printed under the spec table. */
+  specNote?: string
   /** Dimension drawing shown above the spec table. */
   specImage?: string
   type: TypeCardView
@@ -55,7 +80,14 @@ const SECTIONS = [
 
 type SectionId = (typeof SECTIONS)[number]['id']
 
-export default function ProductTabs({ features, standard, specs, specImage, type }: Props) {
+export default function ProductTabs({
+  features,
+  standard,
+  specs,
+  specNote,
+  specImage,
+  type,
+}: Props) {
   const [active, setActive] = useState<SectionId>('features')
   const [modelOn, setModelOn] = useState(false)
 
@@ -171,16 +203,39 @@ export default function ProductTabs({ features, standard, specs, specImage, type
             <img className="pdp-specs__diagram" src={specImage} alt="寸法図" />
           )}
           {specs.length > 0 ? (
-            <table className="pdp-specs__table">
-              <tbody>
-                {specs.map((spec, i) => (
-                  <tr key={i}>
-                    <th scope="row" className="pdp-specs__label">{spec.label}</th>
-                    <td className="pdp-specs__value">{spec.value}</td>
-                  </tr>
+            <>
+              <table className="pdp-specs__table">
+                {specs.map((group, gi) => (
+                  <tbody key={gi}>
+                    {group.title && (
+                      <tr className="pdp-specs__grouprow">
+                        <th colSpan={2} scope="colgroup" className="pdp-specs__group">
+                          {group.title}
+                        </th>
+                      </tr>
+                    )}
+                    {group.rows.map((row, ri) => (
+                      <Fragment key={ri}>
+                        {row.subgroup && row.subgroup !== group.rows[ri - 1]?.subgroup && (
+                          <tr className="pdp-specs__subrow">
+                            <th colSpan={2} scope="rowgroup" className="pdp-specs__subgroup">
+                              {row.subgroup}
+                            </th>
+                          </tr>
+                        )}
+                        <tr>
+                          <th scope="row" className="pdp-specs__label">{row.label}</th>
+                          <td className="pdp-specs__value"><Lines text={row.value} /></td>
+                        </tr>
+                      </Fragment>
+                    ))}
+                  </tbody>
                 ))}
-              </tbody>
-            </table>
+              </table>
+              {specNote && (
+                <p className="pdp-specs__note"><Lines text={specNote} /></p>
+              )}
+            </>
           ) : (
             <p className="pdp-tabs__empty">[ specifications · add in Sanity Studio ]</p>
           )}

@@ -1,19 +1,19 @@
 /* eslint-disable @next/next/no-img-element */
 import Link from 'next/link'
 import { PortableText } from '@portabletext/react'
-import { getProductsInSeries, imgUrl, type ProductDetail } from '@/lib/sanity'
 import {
-  getCardArt,
-  getFeatureCopy,
-  getHeroContent,
-  getModelSrc,
-  getPrice,
-  getSpecImage,
-  getStandardGroups,
-  getStillAlias,
-} from '@/lib/product-content'
+  getProductsInSeries,
+  getSeriesPage,
+  imgUrl,
+  type AssetRef,
+  type ProductDetail,
+  type SeriesPageData,
+} from '@/lib/sanity'
 import FooterCtaSection from '@/components/home/FooterCtaSection'
-import ProductTabs, { type FeatureCardView, type SpecRowView } from './ProductTabs'
+import ProductTabs, {
+  type FeatureCardView,
+  type SpecGroupView,
+} from './ProductTabs'
 // The related grid and footer CTA reuse the homepage's feature__*/footer-cta__*
 // rules, so this route needs that stylesheet. Imported first, so anything below
 // can override it.
@@ -22,99 +22,88 @@ import './product-detail.css'
 
 interface Props {
   product: ProductDetail
-  /** Label for the series step of the breadcrumb, e.g. スマートトイレ. */
-  seriesLabel: string
-  /** Series listing route, e.g. /products/smart-toilet. */
-  seriesHref: string
 }
 
-const SPEC_LABELS: Record<string, string> = {
-  dimensions:       '外形寸法 (W×D×H)',
-  material:         '素材',
-  power:            '電源',
-  drainageMethod:   '排水方式',
-  waterConsumption: '洗浄水量',
-  weight:           '重量',
-  color:            'カラー',
-  certification:    '認証',
+const FALLBACK_HERO = '/images/placeholder-hero-scene.jpg'
+
+function url(asset?: AssetRef, width = 900): string | undefined {
+  return asset ? imgUrl(asset, width) : undefined
 }
 
-function imgUrlOrUndefined(asset?: { _ref: string }): string | undefined {
-  return asset ? imgUrl(asset, 900) : undefined
+/** Sanity stores multi-line copy as one string; the template renders per line. */
+function lines(text?: string): string[] {
+  return text ? text.split('\n').filter(Boolean) : []
 }
 
-export default async function ProductDetailTemplate({
-  product,
-  seriesLabel,
-  seriesHref,
-}: Props) {
-  const name        = product.name
+/**
+ * Falls back to the series defaults, then to the product name, so a product that
+ * has not had its hero filled in still renders something sensible.
+ */
+function resolveHero(product: ProductDetail, series: SeriesPageData | null) {
+  const defaults = series?.productDefaults
+  const suffix = defaults?.nameSuffix
+
+  const strippedName =
+    suffix && product.name.endsWith(suffix)
+      ? product.name.slice(0, -suffix.length).trim() || product.name
+      : product.name
+
+  return {
+    eyebrow: product.hero?.eyebrow || defaults?.heroEyebrow || product.series.replace(/-/g, ' ').toUpperCase(),
+    title: product.hero?.title || strippedName,
+    catch: lines(product.hero?.catchphrase || defaults?.heroCatchphrase),
+    image:
+      url(product.hero?.image?.asset, 1800) ??
+      url(defaults?.heroImage?.asset, 1800) ??
+      url(product.images?.[0]?.asset, 1800) ??
+      FALLBACK_HERO,
+  }
+}
+
+export default async function ProductDetailTemplate({ product }: Props) {
+  const [series, siblingsAll] = await Promise.all([
+    getSeriesPage(product.series),
+    getProductsInSeries(product.series),
+  ])
+
+  const seriesHref = `/products/${product.series}`
+  const seriesLabel = series?.name ?? product.series
+
+  const hero = resolveHero(product, series)
   const description = product.longDescription
 
-  // Exclude GIFs — no animation survives the Sanity CDN WebP pipeline
-  const featureImgs = (product.featureImages ?? []).filter(fi => !fi.asset?._ref?.endsWith('-gif'))
-
-  const hero = getHeroContent(
-    product.series,
-    product.slug.current,
-    product.name,
-    imgUrlOrUndefined(product.images?.[0]?.asset)
-  )
-
-  // Hand-written copy is the whole list when it exists; Sanity covers the rest.
-  const featureCopy = getFeatureCopy(product.slug.current)
-  const featureCards: FeatureCardView[] = featureCopy.length
-    ? featureCopy.map((copy, i) => ({
-        title: copy.title,
-        body: copy.body,
-        image: copy.image ?? imgUrlOrUndefined(featureImgs[i]?.asset),
-        alt: copy.title.join(''),
-      }))
-    : (product.features ?? []).map((f, i) => {
-        const title = f.title
-        return {
-          title: [title],
-          body: [f.description],
-          image: imgUrlOrUndefined(featureImgs[i]?.asset),
-          alt: title || name,
-        }
-      })
+  const featureCards: FeatureCardView[] = (product.featureCards ?? []).map(card => {
+    const title = lines(card.title)
+    return {
+      title,
+      body: lines(card.body),
+      image: url(card.image?.asset),
+      alt: title.join('') || product.name,
+    }
+  })
 
   // Everything else in the series, as homepage-style lineup cards
-  const siblings = (await getProductsInSeries(product.series)).filter(
-    p => p.slug !== product.slug.current
-  )
+  const siblings = siblingsAll.filter(p => p.slug !== product.slug.current)
   const related = siblings.flatMap(p => {
-    const art = getCardArt(p.slug, imgUrlOrUndefined(p.thumbnail))
-    if (!art) return []
-    const summary = getHeroContent(product.series, p.slug, p.name)
+    const image = url(p.card?.image?.asset) ?? url(p.thumbnail)
+    if (!image) return []
     return [{
       slug: p.slug,
       href: `${seriesHref}/${p.slug}`,
-      eyebrow: summary.eyebrow,
-      name: summary.title,
-      desc: p.tagline ?? '',
-      art,
+      eyebrow: p.heroEyebrow || hero.eyebrow,
+      name: p.heroTitle || p.name,
+      desc: p.card?.description ?? p.tagline ?? '',
+      art: { image, hover: url(p.card?.hoverImage?.asset) },
     }]
   })
 
-  // The 3D card's resting still, optionally borrowed from a sibling
-  const stillAlias = getStillAlias(product.slug.current)
-  const still = imgUrlOrUndefined(
-    (stillAlias && siblings.find(p => p.slug === stillAlias)?.thumbnail) ||
-      product.images?.[0]?.asset
-  )
+  // Resting still behind the 3D viewer
+  const still = url(product.card?.image?.asset) ?? url(product.images?.[0]?.asset)
 
-  const specRows: SpecRowView[] = [
-    ...Object.entries(product.specTable ?? {}).flatMap(([key, value]) =>
-      SPEC_LABELS[key] && value
-        ? [{ label: SPEC_LABELS[key], value }]
-        : []
-    ),
-    ...(product.specs ?? []).flatMap(spec =>
-      spec.value ? [{ label: spec.label, value: spec.value }] : []
-    ),
-  ]
+  const specGroups: SpecGroupView[] = (product.specGroups ?? []).flatMap(group => {
+    const rows = (group.rows ?? []).filter(row => row.label && row.value)
+    return rows.length ? [{ title: group.title, rows }] : []
+  })
 
   return (
     <main className="pdp">
@@ -152,15 +141,16 @@ export default async function ProductDetailTemplate({
 
       <ProductTabs
         features={featureCards}
-        standard={getStandardGroups(product.slug.current)}
-        specs={specRows}
-        specImage={getSpecImage(product.slug.current)}
+        standard={product.standardGroups ?? []}
+        specs={specGroups}
+        specNote={product.specNote}
+        specImage={url(product.specImage?.asset, 1400)}
         type={{
           eyebrow: hero.eyebrow,
           name: hero.title,
           modelCode: product.modelCode,
-          price: getPrice(product.slug.current),
-          model: getModelSrc(product.slug.current),
+          price: product.price ?? '',
+          model: product.model3dUrl,
           still,
         }}
       />
@@ -193,32 +183,29 @@ export default async function ProductDetailTemplate({
                 product.featureVideos.length === 1 ? ' pdp-videos__grid--single' : ''
               }`}
             >
-              {product.featureVideos.map((v, i) => {
-                const title = v.title
-                return (
-                  <div key={i} className="pdp-card">
-                    <div className="pdp-video__frame">
-                      {v.embedUrl ? (
-                        <iframe
-                          src={v.embedUrl}
-                          title={title}
-                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                          allowFullScreen
-                        />
-                      ) : (
-                        <div className="pdp-video__empty">
-                          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" aria-hidden="true">
-                            <circle cx="12" cy="12" r="10" />
-                            <path d="M10 8l6 4-6 4V8z" fill="currentColor" />
-                          </svg>
-                          <span>[ feature video · coming soon ]</span>
-                        </div>
-                      )}
-                    </div>
-                    <p className="pdp-video__caption">{title}</p>
+              {product.featureVideos.map((v, i) => (
+                <div key={i} className="pdp-card">
+                  <div className="pdp-video__frame">
+                    {v.embedUrl ? (
+                      <iframe
+                        src={v.embedUrl}
+                        title={v.title}
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                      />
+                    ) : (
+                      <div className="pdp-video__empty">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" aria-hidden="true">
+                          <circle cx="12" cy="12" r="10" />
+                          <path d="M10 8l6 4-6 4V8z" fill="currentColor" />
+                        </svg>
+                        <span>[ feature video · coming soon ]</span>
+                      </div>
+                    )}
                   </div>
-                )
-              })}
+                  <p className="pdp-video__caption">{v.title}</p>
+                </div>
+              ))}
             </div>
           </div>
         </section>
