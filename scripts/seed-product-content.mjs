@@ -65,6 +65,10 @@ async function upload(publicPath, kind = 'image') {
 }
 
 const imageRef = (id) => (id ? { _type: 'image', asset: { _type: 'reference', _ref: id } } : undefined)
+
+/** A card's art is either a file under public/ or an asset already in Sanity. */
+const cardImageRef = async (card) =>
+  card.assetId ? imageRef(card.assetId) : imageRef(await upload(card.image))
 const fileRef = (id) => (id ? { _type: 'file', asset: { _type: 'reference', _ref: id } } : undefined)
 
 /* ── the content, lifted verbatim from product-content.ts ───── */
@@ -119,6 +123,47 @@ const X40_FEATURE_CARDS = [
       'リモコン式の機能も備えています。',
     ].join('\n'),
     image: '/images/feature-5.jpg',
+  },
+]
+
+/**
+ * X40-C's own features. The client's comparison sheet marks every one of the
+ * X40-B 独自の機能 (self-cleaning arm, UV nozzle, foot-sensor lid, seasonal
+ * temperature, remote lid) as not applicable to the C model, so it must not
+ * advertise them. These six are the ones the sheet marks ● for X40-C, and match
+ * the copy that was already on the product in Sanity before the migration.
+ * Images reuse the assets uploaded with the original product photography.
+ */
+const X40C_FEATURE_CARDS = [
+  {
+    title: '白金脱臭',
+    body: '白金触媒脱臭剤が使用中の空気を継続的に浄化します。',
+    assetId: 'image-2ebb1155bf469ac6ead1965b8cbd6581876620af-1920x1080-png',
+  },
+  {
+    title: '気泡ミックス洗浄',
+    body: '水と空気が混合して細かい泡を形成し、やさしくしっかりと洗浄します。',
+    assetId: 'image-bb9e82bfca33216edb96254fdcc9dd274d391d71-2480x3508-jpg',
+  },
+  {
+    title: '抗菌釉薬',
+    body: '陶磁器釉薬に抗菌成分を配合し、細菌の繁殖を抑えてお手入れを簡単にします。',
+    assetId: 'image-b39ad39b0c8f50a0aa25a6bc3d00f22d50206223-5430x4032-jpg',
+  },
+  {
+    title: '超静音旋風フラッシュ',
+    body: '38dBの超低騒音フラッシュ—いつでも周りへの配慮を忘れません。',
+    assetId: 'image-7476421009f254a3ce43259c3918f3eec2c1cff3-739x868-jpg',
+  },
+  {
+    title: '離席自動フラッシュ',
+    body: '離席時に大・小フラッシュを自動選択—楽に節水できます。',
+    assetId: 'image-6371b6e8ec4259d8ba52742d6e60f409d23bdd7d-738x893-jpg',
+  },
+  {
+    title: 'フットセンサーフラッシュ',
+    body: '本体底部のセンサーに足で触れるだけでフラッシュ—完全ハンズフリーです。',
+    assetId: 'image-35f8045432b2b62c46e7f16ed153463314ee9574-737x563-png',
   },
 ]
 
@@ -178,11 +223,7 @@ const PRODUCTS = {
     slug: 'x40-c',
     seriesDoc: 'series-smart-toilet',
     heroTitle: 'X40-C',
-    // Seeded with the same cards the live site already shows. Note the client's
-    // own comparison sheet marks every one of these 独自の機能 as "/" for X40-C,
-    // so this list is likely wrong — but that is a content call for them to make
-    // in Studio, not something to silently change during a migration.
-    featureCards: X40_FEATURE_CARDS,
+    featureCards: X40C_FEATURE_CARDS,
     standardGroups: X40_STANDARD_GROUPS,
     specImage: '/images/x40-diagram.jpg',
     model3d: '/glb/x40.glb',
@@ -279,7 +320,7 @@ async function main() {
           cfg.featureCards.map(async (c) => ({
             title: c.title,
             body: c.body,
-            image: imageRef(await upload(c.image)),
+            image: await cardImageRef(c),
           }))
         ),
         'fc'
