@@ -1,15 +1,12 @@
 import { getRequestConfig } from 'next-intl/server'
-import { routing } from './routing'
 
-export default getRequestConfig(async ({ requestLocale }) => {
-  let locale = await requestLocale
+// The site ships in Japanese only and has no locale segment in its URLs, so
+// next-intl runs without routing: one fixed locale, one message catalogue.
+// Re-introducing a second language means adding routing back here and wrapping
+// the app tree in a [locale] segment again.
+export const LOCALE = 'ja'
 
-  if (!locale || !routing.locales.includes(locale as (typeof routing.locales)[number])) {
-    locale = routing.defaultLocale
-  }
-
-  return {
-    locale,
-    messages: (await import(`../messages/${locale}.json`)).default,
-  }
-})
+export default getRequestConfig(async () => ({
+  locale: LOCALE,
+  messages: (await import(`../messages/${LOCALE}.json`)).default,
+}))

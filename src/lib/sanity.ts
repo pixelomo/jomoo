@@ -39,9 +39,9 @@ export function imgUrl(source: any, width: number, quality = 82): string {
 export async function getProductModels(): Promise<{ _id: string; name: string; modelCode: string }[]> {
   try {
     return await getSanityClient().fetch(
-      `*[_type == "product" && isActive == true && defined(modelCode)] | order(name.zhCN asc) {
+      `*[_type == "product" && isActive == true && defined(modelCode)] | order(name asc) {
         _id,
-        "name": coalesce(name.zhCN, name.en, "Unknown"),
+        "name": coalesce(name, "Unknown"),
         modelCode
       }`
     )
@@ -51,19 +51,19 @@ export async function getProductModels(): Promise<{ _id: string; name: string; m
 }
 
 export interface ProductSpec {
-  label: { zhCN: string; en: string }
+  label: string
   value: string
 }
 
 export interface ProductFeature {
   icon: string
-  title: { zhCN: string; en: string }
-  description: { zhCN: string; en: string }
+  title: string
+  description: string
 }
 
 export interface ProductVideo {
   embedUrl: string
-  title: { zhCN: string; en: string }
+  title: string
 }
 
 export interface ProductSpecTable {
@@ -81,15 +81,15 @@ export interface ProductDetail {
   _id: string
   modelCode: string
   series: string
-  name: { zhCN: string; en: string }
+  name: string
   slug: { current: string }
-  tagline?: { zhCN: string; en: string }
-  longDescription?: { zhCN: unknown[]; en: unknown[] }
+  tagline?: string
+  longDescription?: unknown[]
   features?: ProductFeature[]
   specTable?: ProductSpecTable
   specs?: ProductSpec[]
   images?: Array<{ _key: string; asset: { _ref: string }; alt?: string; caption?: string }>
-  featureImages?: Array<{ _key: string; asset: { _ref: string }; caption?: { zhCN: string; en: string } }>
+  featureImages?: Array<{ _key: string; asset: { _ref: string }; caption?: string }>
   featureVideos?: ProductVideo[]
 }
 
@@ -130,9 +130,9 @@ export async function getProductSlugs(series: string): Promise<string[]> {
 export interface SeriesPageData {
   _id: string
   seriesId: string
-  name: { zhCN: string; en: string }
-  tagline?: { zhCN: string; en: string }
-  description?: { zhCN: string; en: string }
+  name: string
+  tagline?: string
+  description?: string
 }
 
 export async function getSeriesPage(seriesId: string): Promise<SeriesPageData | null> {
@@ -150,8 +150,8 @@ export async function getSeriesPage(seriesId: string): Promise<SeriesPageData | 
 export interface ProductSummary {
   _id: string
   slug: string
-  name: { zhCN: string; en: string }
-  tagline?: { zhCN: string; en: string }
+  name: string
+  tagline?: string
   modelCode: string
   thumbnail?: { _ref: string; _type: string }
 }

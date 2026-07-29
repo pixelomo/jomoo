@@ -1,18 +1,14 @@
 import { getSessionCookie } from 'better-auth/cookies'
-import createIntlMiddleware from 'next-intl/middleware'
 import { NextRequest, NextResponse } from 'next/server'
-import { routing } from './i18n/routing'
-
-const handleI18nRouting = createIntlMiddleware(routing)
 
 // Fast cookie-existence check — no DB round-trip in the proxy.
 // Full session validation happens inside each server component / API route.
-const PROTECTED = /^\/(zh-CN|en)\/(dashboard|register|warranty)/
+const PROTECTED = /^\/(dashboard|register|warranty)(\/|$)/
 
 export default function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl
 
-  // Admin portal and its API routes are outside the locale tree
+  // Admin portal and its API routes have their own auth
   if (pathname.startsWith('/admin') || pathname.startsWith('/api/admin')) {
     return NextResponse.next()
   }
@@ -21,15 +17,14 @@ export default function proxy(req: NextRequest) {
   // and our API routes validate sessions themselves.
   if (pathname.startsWith('/api/')) return NextResponse.next()
 
-  if (PROTECTED.test(req.nextUrl.pathname)) {
+  if (PROTECTED.test(pathname)) {
     const session = getSessionCookie(req)
     if (!session) {
-      const locale = req.nextUrl.pathname.split('/')[1] ?? 'zh-CN'
-      return NextResponse.redirect(new URL(`/${locale}/sign-in`, req.url))
+      return NextResponse.redirect(new URL('/sign-in', req.url))
     }
   }
 
-  return handleI18nRouting(req)
+  return NextResponse.next()
 }
 
 export const config = {

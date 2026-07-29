@@ -1,16 +1,5 @@
 import { defineField, defineType } from 'sanity'
 
-const localizedString = (name: string, title: string) =>
-  defineField({
-    name,
-    title,
-    type: 'object',
-    fields: [
-      defineField({ name: 'zhCN', title: '日本語 / 中文', type: 'string' }),
-      defineField({ name: 'en', title: 'English', type: 'string' }),
-    ],
-  })
-
 export const productSeries = defineType({
   name: 'productSeries',
   title: '製品シリーズ / Product Series',
@@ -33,19 +22,24 @@ export const productSeries = defineType({
       validation: Rule => Rule.required(),
     }),
 
-    localizedString('name', 'Series Name'),
+    defineField({
+      name: 'name',
+      title: 'シリーズ名 / Series Name',
+      type: 'string',
+    }),
 
-    localizedString('tagline', 'Tagline (short, 1 line)'),
+    defineField({
+      name: 'tagline',
+      title: 'キャッチコピー / Tagline (short, 1 line)',
+      type: 'string',
+    }),
 
     defineField({
       name: 'description',
-      title: 'Series Description',
-      type: 'object',
+      title: 'シリーズ説明 / Series Description',
+      type: 'text',
+      rows: 3,
       description: 'Displayed below the series heading on the listing page',
-      fields: [
-        defineField({ name: 'zhCN', title: '日本語 / 中文', type: 'text', rows: 3 }),
-        defineField({ name: 'en', title: 'English', type: 'text', rows: 3 }),
-      ],
     }),
 
     defineField({
@@ -57,7 +51,7 @@ export const productSeries = defineType({
   ],
 
   preview: {
-    select: { title: 'name.en', subtitle: 'seriesId' },
+    select: { title: 'name', subtitle: 'seriesId' },
     prepare: ({ title, subtitle }) => ({ title: title ?? 'Untitled series', subtitle }),
   },
 })

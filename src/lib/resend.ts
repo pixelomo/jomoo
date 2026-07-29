@@ -220,15 +220,12 @@ export async function sendVerificationEmail({
 export async function sendMemberWelcome({
   to,
   name,
-  // Must be one of routing.locales — 'ja' would 404
-  locale = 'en',
 }: {
   to: string
   name: string
-  locale?: string
 }) {
-  const signInUrl = `${appUrl()}/${locale}/sign-in`
-  const dashboardUrl = `${appUrl()}/${locale}/dashboard`
+  const signInUrl = `${appUrl()}/sign-in`
+  const dashboardUrl = `${appUrl()}/dashboard`
 
   await deliverEmail({
     to,
@@ -253,37 +250,23 @@ export async function sendRegistrationConfirmation({
   name,
   modelName,
   registrationId,
-  locale = 'zh-CN',
 }: {
   to: string
   name: string
   modelName: string
   registrationId: string
-  locale?: string
 }) {
-  const isZh = locale === 'zh-CN'
-  const dashboardUrl = `${appUrl()}/${locale}/dashboard`
+  const dashboardUrl = `${appUrl()}/dashboard`
 
   await getResend().emails.send({
     from: from(),
     to,
-    subject: isZh
-      ? `产品登记确认 - ${modelName}`
-      : `Product Registration Confirmed — ${modelName}`,
-    html: buildHtml(
-      isZh ? `您好 ${name}，` : `Hello ${name},`,
-      isZh
-        ? [
-            `您的产品 <strong>${modelName}</strong> 登记申请（编号：<code>${registrationId}</code>）已成功提交。`,
-            '我们将在 3–5 个工作日内完成审核，审核结果将通过邮件通知您。',
-            `<a href="${dashboardUrl}" style="color:#18181b">前往会员中心查看进度 →</a>`,
-          ]
-        : [
-            `Your registration for <strong>${modelName}</strong> (ID: <code>${registrationId}</code>) has been received and is under review.`,
-            'We will notify you by email once the review is complete (typically 3–5 business days).',
-            `<a href="${dashboardUrl}" style="color:#18181b">Go to Member Portal →</a>`,
-          ]
-    ),
+    subject: `【JOMOO】製品登録を受け付けました - ${modelName}`,
+    html: buildHtml(`${name} 様`, [
+      `<strong>${modelName}</strong> の製品登録（登録番号：<code>${registrationId}</code>）を受け付けました。`,
+      '3〜5営業日以内に審査を行い、結果をメールにてお知らせいたします。',
+      `<a href="${dashboardUrl}" style="color:#18181b">マイページで進捗を確認する →</a>`,
+    ]),
   })
 }
 
@@ -296,42 +279,29 @@ export async function sendWarrantyIssuedEmail({
   modelName,
   registrationId,
   expiryDate,
-  locale = 'zh-CN',
 }: {
   to: string
   name: string
   modelName: string
   registrationId: string
   expiryDate: string
-  locale?: string
 }) {
-  const isZh = locale === 'zh-CN'
-  const warrantyUrl = `${appUrl()}/${locale}/warranty/${registrationId}`
-  const formattedExpiry = new Date(expiryDate).toLocaleDateString(
-    isZh ? 'zh-CN' : 'en-GB',
-    { year: 'numeric', month: 'long', day: 'numeric' }
-  )
+  const warrantyUrl = `${appUrl()}/warranty/${registrationId}`
+  const formattedExpiry = new Date(expiryDate).toLocaleDateString('ja-JP', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  })
 
   await getResend().emails.send({
     from: from(),
     to,
-    subject: isZh
-      ? `电子保修卡已生成 - ${modelName}`
-      : `Warranty Card Generated — ${modelName}`,
-    html: buildHtml(
-      isZh ? `您好 ${name}，恭喜！` : `Congratulations ${name}!`,
-      isZh
-        ? [
-            `您的产品 <strong>${modelName}</strong> 序列号验证通过，电子保修卡已自动生成。`,
-            `保修有效期至：<strong>${formattedExpiry}</strong>`,
-            `<a href="${warrantyUrl}" style="display:inline-block;margin-top:8px;padding:10px 20px;background:#18181b;color:#fff;border-radius:6px;text-decoration:none;font-weight:600">查看电子保修卡</a>`,
-          ]
-        : [
-            `Your serial number for <strong>${modelName}</strong> has been verified and your electronic warranty card is ready.`,
-            `Warranty valid until: <strong>${formattedExpiry}</strong>`,
-            `<a href="${warrantyUrl}" style="display:inline-block;margin-top:8px;padding:10px 20px;background:#18181b;color:#fff;border-radius:6px;text-decoration:none;font-weight:600">View Warranty Card</a>`,
-          ]
-    ),
+    subject: `【JOMOO】電子保証カードを発行しました - ${modelName}`,
+    html: buildHtml(`${name} 様`, [
+      `<strong>${modelName}</strong> の製造番号を確認し、電子保証カードを発行いたしました。`,
+      `保証期限：<strong>${formattedExpiry}</strong>`,
+      `<a href="${warrantyUrl}" style="display:inline-block;margin-top:8px;padding:10px 20px;background:#18181b;color:#fff;border-radius:6px;text-decoration:none;font-weight:600">電子保証カードを見る</a>`,
+    ]),
   })
 }
 
@@ -343,61 +313,42 @@ export async function sendReviewStatusUpdate({
   name,
   status,
   registrationId,
-  locale = 'zh-CN',
 }: {
   to: string
   name: string
   status: 'RETURNED' | 'REGISTERED_NO_WARRANTY' | 'REGISTERED_WITH_WARRANTY'
   registrationId?: string
-  locale?: string
 }) {
-  const isZh = locale === 'zh-CN'
-  const dashboardUrl = `${appUrl()}/${locale}/dashboard`
+  const dashboardUrl = `${appUrl()}/dashboard`
 
   type MsgMap = Record<typeof status, { subject: string; lines: string[] }>
 
   const messages: MsgMap = {
     RETURNED: {
-      subject: isZh ? '产品登记需要修正' : 'Product Registration Needs Correction',
-      lines: isZh
-        ? [
-            '您的产品登记信息需要修正，请登录会员中心查看具体原因，更新后重新提交。',
-            `<a href="${dashboardUrl}" style="color:#18181b">前往会员中心 →</a>`,
-          ]
-        : [
-            'Your product registration requires correction. Please log in to your member portal, review the feedback, and resubmit.',
-            `<a href="${dashboardUrl}" style="color:#18181b">Go to Member Portal →</a>`,
-          ],
+      subject: '【JOMOO】製品登録の修正のお願い',
+      lines: [
+        'ご登録いただいた内容に修正が必要です。マイページより理由をご確認の上、修正して再度ご提出ください。',
+        `<a href="${dashboardUrl}" style="color:#18181b">マイページへ →</a>`,
+      ],
     },
     REGISTERED_NO_WARRANTY: {
-      subject: isZh ? '产品登记已审核通过' : 'Product Registration Approved',
-      lines: isZh
-        ? [
-            '您的产品登记已审核通过。',
-            '注：由于安装日期超出180天，本次登记不包含延长保修资格。',
-            `<a href="${dashboardUrl}" style="color:#18181b">前往会员中心 →</a>`,
-          ]
-        : [
-            'Your product registration has been approved.',
-            'Note: Extended warranty is not applicable as the installation date exceeds 180 days.',
-            `<a href="${dashboardUrl}" style="color:#18181b">Go to Member Portal →</a>`,
-          ],
+      subject: '【JOMOO】製品登録の審査が完了しました',
+      lines: [
+        'ご登録いただいた製品の審査が完了しました。',
+        '※ 設置日から180日を超えているため、今回のご登録は延長保証の対象外となります。',
+        `<a href="${dashboardUrl}" style="color:#18181b">マイページへ →</a>`,
+      ],
     },
     REGISTERED_WITH_WARRANTY: {
-      subject: isZh ? '电子保修卡已生成' : 'Warranty Card Ready',
+      subject: '【JOMOO】電子保証カードを発行しました',
       lines: (() => {
         const warrantyUrl = registrationId
-          ? `${appUrl()}/${locale}/warranty/${registrationId}`
+          ? `${appUrl()}/warranty/${registrationId}`
           : dashboardUrl
-        return isZh
-          ? [
-              '您的产品登记已审核通过，电子保修卡已生成。',
-              `<a href="${warrantyUrl}" style="display:inline-block;margin-top:8px;padding:10px 20px;background:#18181b;color:#fff;border-radius:6px;text-decoration:none;font-weight:600">查看电子保修卡</a>`,
-            ]
-          : [
-              'Your product registration has been approved and your warranty card is ready.',
-              `<a href="${warrantyUrl}" style="display:inline-block;margin-top:8px;padding:10px 20px;background:#18181b;color:#fff;border-radius:6px;text-decoration:none;font-weight:600">View Warranty Card</a>`,
-            ]
+        return [
+          'ご登録いただいた製品の審査が完了し、電子保証カードを発行いたしました。',
+          `<a href="${warrantyUrl}" style="display:inline-block;margin-top:8px;padding:10px 20px;background:#18181b;color:#fff;border-radius:6px;text-decoration:none;font-weight:600">電子保証カードを見る</a>`,
+        ]
       })(),
     },
   }
@@ -408,7 +359,7 @@ export async function sendReviewStatusUpdate({
     from: from(),
     to,
     subject,
-    html: buildHtml(isZh ? `您好 ${name}，` : `Hello ${name},`, lines),
+    html: buildHtml(`${name} 様`, lines),
   })
 }
 

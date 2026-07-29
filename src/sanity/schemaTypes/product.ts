@@ -1,19 +1,8 @@
 import { defineField, defineType } from 'sanity'
 
-const localizedText = (name: string, title: string, type: 'string' | 'text' = 'string') =>
-  defineField({
-    name,
-    title,
-    type: 'object',
-    fields: [
-      defineField({ name: 'zhCN', title: '日本語 / 中文', type, rows: type === 'text' ? 4 : undefined }),
-      defineField({ name: 'en',   title: 'English',        type, rows: type === 'text' ? 4 : undefined }),
-    ],
-  })
-
 export const product = defineType({
   name: 'product',
-  title: '产品 / Product',
+  title: '製品 / Product',
   type: 'document',
   groups: [
     { name: 'identity',  title: 'Identity',         default: true },
@@ -50,13 +39,10 @@ export const product = defineType({
     }),
     defineField({
       name: 'name',
-      title: 'Product Name',
-      type: 'object',
+      title: '製品名 / Product Name',
+      type: 'string',
       group: 'identity',
-      fields: [
-        defineField({ name: 'zhCN', title: '日本語 / 中文', type: 'string', validation: (Rule) => Rule.required() }),
-        defineField({ name: 'en',   title: 'English Name',  type: 'string', validation: (Rule) => Rule.required() }),
-      ],
+      validation: (Rule) => Rule.required(),
     }),
     defineField({
       name: 'slug',
@@ -68,27 +54,19 @@ export const product = defineType({
     }),
 
     // ── CONTENT ───────────────────────────────────────────────
-    localizedText('tagline', 'Tagline (short)', 'string'),
+    defineField({
+      name: 'tagline',
+      title: 'キャッチコピー / Tagline (short)',
+      type: 'string',
+      group: 'content',
+    }),
 
     defineField({
       name: 'longDescription',
-      title: 'Product Description',
-      type: 'object',
+      title: '製品説明 / Product Description',
+      type: 'array',
       group: 'content',
-      fields: [
-        defineField({
-          name: 'zhCN',
-          title: '日本語 / 中文',
-          type: 'array',
-          of: [{ type: 'block' }],
-        }),
-        defineField({
-          name: 'en',
-          title: 'English',
-          type: 'array',
-          of: [{ type: 'block' }],
-        }),
-      ],
+      of: [{ type: 'block' }],
     }),
 
     defineField({
@@ -102,27 +80,11 @@ export const product = defineType({
           type: 'object',
           fields: [
             defineField({ name: 'icon', title: 'Icon (SVG name or short label, no emoji)', type: 'string' }),
-            defineField({
-              name: 'title',
-              title: 'Feature Title',
-              type: 'object',
-              fields: [
-                defineField({ name: 'zhCN', title: '日本語 / 中文', type: 'string' }),
-                defineField({ name: 'en',   title: 'English',        type: 'string' }),
-              ],
-            }),
-            defineField({
-              name: 'description',
-              title: 'Feature Description',
-              type: 'object',
-              fields: [
-                defineField({ name: 'zhCN', title: '日本語 / 中文', type: 'text', rows: 2 }),
-                defineField({ name: 'en',   title: 'English',        type: 'text', rows: 2 }),
-              ],
-            }),
+            defineField({ name: 'title', title: '特長タイトル / Feature Title', type: 'string' }),
+            defineField({ name: 'description', title: '特長説明 / Feature Description', type: 'text', rows: 2 }),
           ],
           preview: {
-            select: { title: 'title.en', subtitle: 'icon' },
+            select: { title: 'title', subtitle: 'icon' },
             prepare: ({ title, subtitle }) => ({ title: title ?? 'Untitled feature', subtitle }),
           },
         },
@@ -158,19 +120,11 @@ export const product = defineType({
         {
           type: 'object',
           fields: [
-            defineField({
-              name: 'label',
-              title: 'Label',
-              type: 'object',
-              fields: [
-                defineField({ name: 'zhCN', title: '日本語 / 中文', type: 'string' }),
-                defineField({ name: 'en',   title: 'English',        type: 'string' }),
-              ],
-            }),
+            defineField({ name: 'label', title: '項目名 / Label', type: 'string' }),
             defineField({ name: 'value', title: 'Value', type: 'string' }),
           ],
           preview: {
-            select: { title: 'label.en', subtitle: 'value' },
+            select: { title: 'label', subtitle: 'value' },
           },
         },
       ],
@@ -206,18 +160,10 @@ export const product = defineType({
           type: 'image',
           options: { hotspot: true },
           fields: [
-            defineField({
-              name: 'caption',
-              title: 'Caption',
-              type: 'object',
-              fields: [
-                defineField({ name: 'zhCN', title: '中文', type: 'string' }),
-                defineField({ name: 'en',   title: 'English', type: 'string' }),
-              ],
-            }),
+            defineField({ name: 'caption', title: 'キャプション / Caption', type: 'string' }),
           ],
           preview: {
-            select: { title: 'caption.en', media: 'asset' },
+            select: { title: 'caption', media: 'asset' },
             prepare: ({ title, media }) => ({ title: title ?? 'Feature image', media }),
           },
         },
@@ -235,18 +181,10 @@ export const product = defineType({
           type: 'object',
           fields: [
             defineField({ name: 'embedUrl', title: 'Embed URL (YouTube/Vimeo)', type: 'url' }),
-            defineField({
-              name: 'title',
-              title: 'Video Title',
-              type: 'object',
-              fields: [
-                defineField({ name: 'zhCN', title: '日本語 / 中文', type: 'string' }),
-                defineField({ name: 'en',   title: 'English',        type: 'string' }),
-              ],
-            }),
+            defineField({ name: 'title', title: '動画タイトル / Video Title', type: 'string' }),
           ],
           preview: {
-            select: { title: 'title.en', subtitle: 'embedUrl' },
+            select: { title: 'title', subtitle: 'embedUrl' },
             prepare: ({ title, subtitle }) => ({ title: title ?? 'Video', subtitle }),
           },
         },
@@ -264,19 +202,16 @@ export const product = defineType({
 
     defineField({
       name: 'description',
-      title: 'Short Description (registration dropdown tooltip)',
-      type: 'object',
+      title: '短い説明 / Short Description (registration dropdown tooltip)',
+      type: 'text',
+      rows: 2,
       group: 'settings',
-      fields: [
-        defineField({ name: 'zhCN', title: '日本語 / 中文', type: 'text', rows: 2 }),
-        defineField({ name: 'en',   title: 'English',        type: 'text', rows: 2 }),
-      ],
     }),
   ],
 
   preview: {
     select: {
-      title:    'name.en',
+      title:    'name',
       subtitle: 'modelCode',
       media:    'images.0',
     },

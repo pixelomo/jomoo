@@ -6,22 +6,20 @@ import { PortableText } from '@portabletext/react'
 import { getProductDetail, getProductSlugs, imgUrl, type ProductDetail } from '@/lib/sanity'
 import ImageCarousel from '@/components/product/ImageCarousel'
 
-type Params = Promise<{ locale: string; slug: string }>
+type Params = Promise<{ slug: string }>
 
 export async function generateStaticParams() {
-  const slugs = await getProductSlugs('washstand')
-  const locales = ['zh-CN', 'en']
-  return locales.flatMap(locale => slugs.map(slug => ({ locale, slug })))
+  const slugs = await getProductSlugs('faucets')
+  return slugs.map(slug => ({ slug }))
 }
 
 export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
-  const { locale, slug } = await params
-  const product = await getProductDetail('washstand', slug)
+  const { slug } = await params
+  const product = await getProductDetail('faucets', slug)
   if (!product) return {}
-  const name = locale === 'zh-CN' ? product.name.zhCN : product.name.en
   return {
-    title: name,
-    description: locale === 'zh-CN' ? product.tagline?.zhCN : product.tagline?.en,
+    title: product.name,
+    description: product.tagline,
   }
 }
 
@@ -58,27 +56,26 @@ function VideoPlaceholder({ title, embedUrl }: { title: string; embedUrl?: strin
   )
 }
 
-export default async function WashstandDetailPage({ params }: { params: Params }) {
-  const { locale, slug } = await params
+export default async function FaucetsDetailPage({ params }: { params: Params }) {
+  const { slug } = await params
   const t = await getTranslations('home')
 
-  const product: ProductDetail | null = await getProductDetail('washstand', slug)
+  const product: ProductDetail | null = await getProductDetail('faucets', slug)
   if (!product) notFound()
 
-  const isZh = locale === 'zh-CN'
-  const name        = isZh ? product.name.zhCN        : product.name.en
-  const tagline     = isZh ? product.tagline?.zhCN    : product.tagline?.en
-  const description = isZh ? product.longDescription?.zhCN : product.longDescription?.en
+  const name        = product.name
+  const tagline     = product.tagline
+  const description = product.longDescription
 
-  const specLabels: Record<string, { zhCN: string; en: string }> = {
-    dimensions:      { zhCN: 'サイズ (W×D×H)', en: 'Dimensions (W×D×H)' },
-    material:        { zhCN: '素材',            en: 'Material'           },
-    drainageMethod:  { zhCN: '排水方式',        en: 'Drain Type'         },
-    waterConsumption:{ zhCN: 'バウル容量',      en: 'Basin Capacity'     },
-    weight:          { zhCN: '重量',            en: 'Weight'             },
-    color:           { zhCN: 'カラー',          en: 'Available Colors'   },
-    certification:   { zhCN: '認証',            en: 'Certifications'     },
-    power:           { zhCN: '排水規格',        en: 'Drain Standard'     },
+  const specLabels: Record<string, string> = {
+    dimensions:       'サイズ (W×D×H)',
+    material:         '素材',
+    power:            '流量',
+    drainageMethod:   'カートリッジ',
+    waterConsumption: '接続規格',
+    weight:           '重量',
+    color:            'カラー',
+    certification:    '認証',
   }
 
   const slides = (product.images ?? []).map(img => ({
@@ -94,7 +91,7 @@ export default async function WashstandDetailPage({ params }: { params: Params }
       <div className="jm-sec-inner" style={{ paddingTop: 24, paddingBottom: 0, fontSize: 13, color: 'var(--ink-3)', display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
         <Link href="/" style={{ color: 'var(--ink-3)', textDecoration: 'none' }}>ホーム</Link>
         <span>/</span>
-        <Link href="/products/washstand" style={{ color: 'var(--ink-3)', textDecoration: 'none' }}>{t('washstandName')}</Link>
+        <Link href="/products/faucets" style={{ color: 'var(--ink-3)', textDecoration: 'none' }}>{t('faucetsName')}</Link>
         <span>/</span>
         <span style={{ color: 'var(--ink)', fontWeight: 500 }}>{name}</span>
       </div>
@@ -125,8 +122,8 @@ export default async function WashstandDetailPage({ params }: { params: Params }
                   <li key={i} style={{ display: 'flex', gap: 14, alignItems: 'flex-start' }}>
                     <span style={{ width: 18, height: 2, background: 'var(--accent)', flexShrink: 0, marginTop: 11, display: 'inline-block' }} />
                     <div>
-                      <p style={{ fontWeight: 600, fontSize: 14, margin: '0 0 2px', color: 'var(--ink)' }}>{isZh ? f.title.zhCN : f.title.en}</p>
-                      <p style={{ fontSize: 13, color: 'var(--ink-2)', margin: 0, lineHeight: 1.6 }}>{isZh ? f.description.zhCN : f.description.en}</p>
+                      <p style={{ fontWeight: 600, fontSize: 14, margin: '0 0 2px', color: 'var(--ink)' }}>{f.title}</p>
+                      <p style={{ fontSize: 13, color: 'var(--ink-2)', margin: 0, lineHeight: 1.6 }}>{f.description}</p>
                     </div>
                   </li>
                 ))}
@@ -167,8 +164,8 @@ export default async function WashstandDetailPage({ params }: { params: Params }
           <div style={{ display: 'grid', gridTemplateColumns: product.featureVideos.length > 1 ? '1fr 1fr' : '1fr', gap: 32 }}>
             {product.featureVideos.map((v, i) => (
               <div key={i}>
-                <VideoPlaceholder title={isZh ? v.title.zhCN : v.title.en} embedUrl={v.embedUrl} />
-                <p style={{ marginTop: 12, fontSize: 14, fontWeight: 500, color: 'var(--ink)' }}>{isZh ? v.title.zhCN : v.title.en}</p>
+                <VideoPlaceholder title={v.title} embedUrl={v.embedUrl} />
+                <p style={{ marginTop: 12, fontSize: 14, fontWeight: 500, color: 'var(--ink)' }}>{v.title}</p>
               </div>
             ))}
           </div>
@@ -184,10 +181,10 @@ export default async function WashstandDetailPage({ params }: { params: Params }
             {product.specTable && Object.entries(product.specTable).map(([key, val]) => {
               const label = specLabels[key]
               if (!label || !val) return null
-              return <SpecRow key={key} label={isZh ? label.zhCN : label.en} value={val} />
+              return <SpecRow key={key} label={label} value={val} />
             })}
             {product.specs?.map((spec, i) => (
-              <SpecRow key={`custom-${i}`} label={isZh ? spec.label.zhCN : spec.label.en} value={spec.value} />
+              <SpecRow key={`custom-${i}`} label={spec.label} value={spec.value} />
             ))}
           </tbody>
         </table>

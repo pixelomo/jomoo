@@ -22,22 +22,21 @@ import './product-detail.css'
 
 interface Props {
   product: ProductDetail
-  locale: string
   /** Label for the series step of the breadcrumb, e.g. スマートトイレ. */
   seriesLabel: string
   /** Series listing route, e.g. /products/smart-toilet. */
   seriesHref: string
 }
 
-const SPEC_LABELS: Record<string, { zhCN: string; en: string }> = {
-  dimensions:       { zhCN: '外形寸法 (W×D×H)', en: 'Dimensions (W×D×H)' },
-  material:         { zhCN: '素材',              en: 'Material'           },
-  power:            { zhCN: '電源',              en: 'Power Supply'       },
-  drainageMethod:   { zhCN: '排水方式',           en: 'Drainage Method'    },
-  waterConsumption: { zhCN: '洗浄水量',           en: 'Water Consumption'  },
-  weight:           { zhCN: '重量',              en: 'Weight'             },
-  color:            { zhCN: 'カラー',             en: 'Available Colors'   },
-  certification:    { zhCN: '認証',              en: 'Certifications'     },
+const SPEC_LABELS: Record<string, string> = {
+  dimensions:       '外形寸法 (W×D×H)',
+  material:         '素材',
+  power:            '電源',
+  drainageMethod:   '排水方式',
+  waterConsumption: '洗浄水量',
+  weight:           '重量',
+  color:            'カラー',
+  certification:    '認証',
 }
 
 function imgUrlOrUndefined(asset?: { _ref: string }): string | undefined {
@@ -46,13 +45,11 @@ function imgUrlOrUndefined(asset?: { _ref: string }): string | undefined {
 
 export default async function ProductDetailTemplate({
   product,
-  locale,
   seriesLabel,
   seriesHref,
 }: Props) {
-  const isZh = locale === 'zh-CN'
-  const name        = isZh ? product.name.zhCN            : product.name.en
-  const description = isZh ? product.longDescription?.zhCN : product.longDescription?.en
+  const name        = product.name
+  const description = product.longDescription
 
   // Exclude GIFs — no animation survives the Sanity CDN WebP pipeline
   const featureImgs = (product.featureImages ?? []).filter(fi => !fi.asset?._ref?.endsWith('-gif'))
@@ -60,7 +57,7 @@ export default async function ProductDetailTemplate({
   const hero = getHeroContent(
     product.series,
     product.slug.current,
-    product.name.en,
+    product.name,
     imgUrlOrUndefined(product.images?.[0]?.asset)
   )
 
@@ -74,10 +71,10 @@ export default async function ProductDetailTemplate({
         alt: copy.title.join(''),
       }))
     : (product.features ?? []).map((f, i) => {
-        const title = isZh ? f.title.zhCN : f.title.en
+        const title = f.title
         return {
           title: [title],
-          body: [isZh ? f.description.zhCN : f.description.en],
+          body: [f.description],
           image: imgUrlOrUndefined(featureImgs[i]?.asset),
           alt: title || name,
         }
@@ -90,13 +87,13 @@ export default async function ProductDetailTemplate({
   const related = siblings.flatMap(p => {
     const art = getCardArt(p.slug, imgUrlOrUndefined(p.thumbnail))
     if (!art) return []
-    const summary = getHeroContent(product.series, p.slug, p.name.en)
+    const summary = getHeroContent(product.series, p.slug, p.name)
     return [{
       slug: p.slug,
       href: `${seriesHref}/${p.slug}`,
       eyebrow: summary.eyebrow,
       name: summary.title,
-      desc: (isZh ? p.tagline?.zhCN : p.tagline?.en) ?? '',
+      desc: p.tagline ?? '',
       art,
     }]
   })
@@ -111,11 +108,11 @@ export default async function ProductDetailTemplate({
   const specRows: SpecRowView[] = [
     ...Object.entries(product.specTable ?? {}).flatMap(([key, value]) =>
       SPEC_LABELS[key] && value
-        ? [{ label: isZh ? SPEC_LABELS[key].zhCN : SPEC_LABELS[key].en, value }]
+        ? [{ label: SPEC_LABELS[key], value }]
         : []
     ),
     ...(product.specs ?? []).flatMap(spec =>
-      spec.value ? [{ label: isZh ? spec.label.zhCN : spec.label.en, value: spec.value }] : []
+      spec.value ? [{ label: spec.label, value: spec.value }] : []
     ),
   ]
 
@@ -197,7 +194,7 @@ export default async function ProductDetailTemplate({
               }`}
             >
               {product.featureVideos.map((v, i) => {
-                const title = isZh ? v.title.zhCN : v.title.en
+                const title = v.title
                 return (
                   <div key={i} className="pdp-card">
                     <div className="pdp-video__frame">

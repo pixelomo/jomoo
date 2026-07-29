@@ -1,8 +1,11 @@
 /* eslint-disable @next/next/no-img-element */
+/* The chrome deliberately uses plain <a> so each navigation is a full document
+   load: the light/dark scroll observer below reads [data-nav="light"] once on
+   mount, and client-side transitions would leave it watching the old page. */
+/* eslint-disable @next/next/no-html-link-for-pages */
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import { useLocale } from 'next-intl'
 import { useRouter } from 'next/navigation'
 import { authClient } from '@/lib/auth-client'
 
@@ -11,13 +14,12 @@ interface Props {
 }
 
 const NAV_LINKS = [
-  { href: 'products/smart-toilet', label: '商品情報' },
-  { href: 'inspiration', label: 'インスピレーション' },
-  { href: 'company-information', label: '会社情報' },
+  { href: '/products/smart-toilet', label: '商品情報' },
+  { href: '/inspiration', label: 'インスピレーション' },
+  { href: '/company-information', label: '会社情報' },
 ] as const
 
 export default function JomooNav({ isSignedIn }: Props) {
-  const locale = useLocale()
   const router = useRouter()
   const navRef = useRef<HTMLElement>(null)
   const [menuOpen, setMenuOpen] = useState(false)
@@ -78,14 +80,14 @@ export default function JomooNav({ isSignedIn }: Props) {
       className={`nav${menuOpen ? ' is-menu-open' : ''}`}
       ref={navRef}
     >
-      <a href={`/${locale}`} className="nav__logo">
+      <a href="/" className="nav__logo">
         <img src="/logo.svg" alt="JOMOO" />
       </a>
 
       <ul className="nav__menu">
         {NAV_LINKS.map((item) => (
           <li key={item.href}>
-            <a href={`/${locale}/${item.href}`}>{item.label}</a>
+            <a href={item.href}>{item.label}</a>
           </li>
         ))}
       </ul>
@@ -96,7 +98,7 @@ export default function JomooNav({ isSignedIn }: Props) {
             <img src="/images/search.svg" alt="" />
           </button>
           <a
-            href={`/${locale}/contact-us`}
+            href="/contact-us"
             className="nav__btn nav__btn--white nav__btn--contact"
           >
             お問い合わせ
@@ -104,7 +106,7 @@ export default function JomooNav({ isSignedIn }: Props) {
           {isSignedIn ? (
             <>
               <a
-                href={`/${locale}/dashboard`}
+                href="/dashboard"
                 className="nav__btn nav__btn--black nav__btn--dashboard"
               >
                 マイページ
@@ -115,7 +117,7 @@ export default function JomooNav({ isSignedIn }: Props) {
                 aria-label="ログアウト"
                 onClick={async () => {
                   await authClient.signOut()
-                  router.push(`/${locale}`)
+                  router.push("/")
                   router.refresh()
                 }}
               >
@@ -129,13 +131,13 @@ export default function JomooNav({ isSignedIn }: Props) {
           ) : (
             <>
               <a
-                href={`/${locale}/sign-up`}
+                href="/sign-up"
                 className="nav__btn nav__btn--black nav__btn--signup"
               >
                 パートナー登録
               </a>
               <a
-                href={`/${locale}/sign-in`}
+                href="/sign-in"
                 className="nav__auth-icon nav__auth-icon--signin"
                 aria-label="ログイン"
               >
@@ -171,7 +173,7 @@ export default function JomooNav({ isSignedIn }: Props) {
         <ul className="nav__drawer-menu">
           {NAV_LINKS.map((item) => (
             <li key={item.href}>
-              <a href={`/${locale}/${item.href}`} onClick={closeMenu}>
+              <a href={item.href} onClick={closeMenu}>
                 {item.label}
               </a>
             </li>
@@ -179,7 +181,7 @@ export default function JomooNav({ isSignedIn }: Props) {
         </ul>
         <div className="nav__drawer-actions">
           <a
-            href={`/${locale}/contact-us`}
+            href="/contact-us"
             className="nav__drawer-btn nav__drawer-btn--contact"
             onClick={closeMenu}
           >
@@ -187,7 +189,7 @@ export default function JomooNav({ isSignedIn }: Props) {
           </a>
           {!isSignedIn ? (
             <a
-              href={`/${locale}/sign-up`}
+              href="/sign-up"
               className="nav__drawer-btn nav__drawer-btn--signup"
               onClick={closeMenu}
             >
@@ -195,7 +197,7 @@ export default function JomooNav({ isSignedIn }: Props) {
             </a>
           ) : (
             <a
-              href={`/${locale}/dashboard`}
+              href="/dashboard"
               className="nav__drawer-btn"
               onClick={closeMenu}
             >

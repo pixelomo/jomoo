@@ -30,6 +30,15 @@ const nextConfig: NextConfig = {
       { protocol: 'https', hostname: 'cdn.sanity.io' },
     ],
   },
+  // The site used to serve every page under /en and /zh-CN. It is Japanese-only
+  // now and lives at the root, so old links and indexed URLs are redirected
+  // permanently rather than 404ing.
+  async redirects() {
+    return [
+      { source: '/:locale(en|zh-CN)', destination: '/', permanent: true },
+      { source: '/:locale(en|zh-CN)/:path*', destination: '/:path*', permanent: true },
+    ]
+  },
   async headers() {
     return [
       // Global: every route

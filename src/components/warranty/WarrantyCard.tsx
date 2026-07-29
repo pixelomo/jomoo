@@ -120,7 +120,7 @@ function CardField({
 
 function formatDate(dateStr: string): string {
   try {
-    return new Date(dateStr).toLocaleDateString('zh-CN', {
+    return new Date(dateStr).toLocaleDateString('ja-JP', {
       year: 'numeric',
       month: 'long',
       day: 'numeric',

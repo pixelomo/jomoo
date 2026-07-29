@@ -1,5 +1,4 @@
 /* eslint-disable @next/next/no-img-element */
-import { getLocale } from 'next-intl/server'
 import { getSeriesPage, getProductsInSeries, imgUrl } from '@/lib/sanity'
 import { getCardArt, getHeroContent, getSeriesLineup } from '@/lib/product-content'
 import FooterCtaSection from '@/components/home/FooterCtaSection'
@@ -12,32 +11,26 @@ interface Props {
 }
 
 export default async function SeriesPage({ series }: Props) {
-  const [locale, seriesData, products] = await Promise.all([
-    getLocale(),
+  const [seriesData, products] = await Promise.all([
     getSeriesPage(series),
     getProductsInSeries(series),
   ])
 
-  const isZh = locale === 'zh-CN'
-  const seriesName = seriesData?.name
-    ? (isZh ? seriesData.name.zhCN : seriesData.name.en)
-    : series
+  const seriesName = seriesData?.name ?? series
   const seriesDesc = seriesData?.description
-    ? (isZh ? seriesData.description.zhCN : seriesData.description.en)
-    : undefined
 
   const lineup = getSeriesLineup(series, seriesName, seriesDesc)
 
   const cards = products.flatMap(p => {
     const art = getCardArt(p.slug, p.thumbnail ? imgUrl(p.thumbnail, 900) : undefined)
     if (!art) return []
-    const summary = getHeroContent(series, p.slug, p.name.en)
+    const summary = getHeroContent(series, p.slug, p.name)
     return [{
       slug: p.slug,
       href: `/products/${series}/${p.slug}`,
       eyebrow: summary.eyebrow,
       name: summary.title,
-      desc: art.desc ?? (isZh ? p.tagline?.zhCN : p.tagline?.en) ?? '',
+      desc: art.desc ?? p.tagline ?? '',
       art,
     }]
   })

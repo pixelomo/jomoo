@@ -1,7 +1,8 @@
 /* eslint-disable @next/next/no-img-element */
+/* Plain <a> throughout, to match JomooNav — see the note there. */
+/* eslint-disable @next/next/no-html-link-for-pages */
 'use client'
 
-import { useLocale } from 'next-intl'
 import { FaLinkedinIn } from 'react-icons/fa6'
 import {
   SiFacebook,
@@ -21,7 +22,6 @@ const SOCIAL_LINKS = [
 ] as const
 
 export default function JomooFooter() {
-  const locale = useLocale()
   const year = new Date().getFullYear()
 
   return (
@@ -44,17 +44,17 @@ export default function JomooFooter() {
           <div className="footer__col">
             <h4>製品情報</h4>
             <ul>
-              <li><a href={`/${locale}/products/smart-toilet`}>スマートトイレ</a></li>
-              <li><a href={`/${locale}/products/washstand`}>洗面化粧台</a></li>
-              <li><a href={`/${locale}/products/faucets`}>水栓金具</a></li>
-              <li><a href={`/${locale}/products/shower-set`}>シャワーセット</a></li>
+              <li><a href="/products/smart-toilet">スマートトイレ</a></li>
+              <li><a href="/products/washstand">洗面化粧台</a></li>
+              <li><a href="/products/faucets">水栓金具</a></li>
+              <li><a href="/products/shower-set">シャワーセット</a></li>
             </ul>
           </div>
 
           <div className="footer__col">
             <h4>お問い合わせ</h4>
             <ul>
-              <li><a href={`/${locale}/contact-us`}>お客様相談窓口</a></li>
+              <li><a href="/contact-us">お客様相談窓口</a></li>
               <li><a href="#">アフターサービス</a></li>
               <li><a href="#">Q&amp;A</a></li>
               <li><a href="#">施工動画&amp;チュートリアル</a></li>
@@ -64,18 +64,18 @@ export default function JomooFooter() {
           <div className="footer__col">
             <h4>インスピレーション</h4>
             <ul>
-              <li><a href={`/${locale}/inspiration`}>デザインストーリー</a></li>
-              <li><a href={`/${locale}/inspiration`}>プロジェクトショーケース</a></li>
+              <li><a href="/inspiration">デザインストーリー</a></li>
+              <li><a href="/inspiration">プロジェクトショーケース</a></li>
             </ul>
           </div>
 
           <div className="footer__col">
             <h4>会社概要</h4>
             <ul>
-              <li><a href={`/${locale}/company-information`}>会社紹介</a></li>
+              <li><a href="/company-information">会社紹介</a></li>
               <li><a href="#">ニュース＆ブログ</a></li>
               <li className="footer__li--gap">
-                <a href={`/${locale}/register`} className="footer__link--bold">
+                <a href="/register" className="footer__link--bold">
                   製品登録
                 </a>
               </li>

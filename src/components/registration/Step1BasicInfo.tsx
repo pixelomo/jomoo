@@ -6,7 +6,6 @@ import { useTranslations } from 'next-intl'
 import { Step1Schema, type Step1Data } from '@/types/registration'
 import { PROVINCES } from '@/data/provinces'
 import FormField, { inputClass } from '@/components/ui/FormField'
-import { useLocale } from 'next-intl'
 
 interface Props {
   defaultValues?: Partial<Step1Data>
@@ -17,7 +16,6 @@ interface Props {
 export default function Step1BasicInfo({ defaultValues, models, onSubmit }: Props) {
   const t = useTranslations('registration.step1')
   const tc = useTranslations('common')
-  const locale = useLocale()
 
   const {
     register,
@@ -93,7 +91,7 @@ export default function Step1BasicInfo({ defaultValues, models, onSubmit }: Prop
           <option value="">{t('installationAddressStatePlaceholder')}</option>
           {PROVINCES.map((p) => (
             <option key={p.value} value={p.value}>
-              {locale === 'zh-CN' ? p.labelZh : p.labelEn}
+              {p.label}
             </option>
           ))}
         </select>

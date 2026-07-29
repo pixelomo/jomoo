@@ -52,3 +52,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# One-shot migration backup (scripts/migrate-sanity-single-locale.mjs)
+.sanity-pre-migration-backup.json

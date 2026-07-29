@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
-import { useTranslations, useLocale } from 'next-intl'
+import { useTranslations } from 'next-intl'
 import Image from 'next/image'
 import Link from 'next/link'
 import type { DbProductRegistration } from '@/types/database'
@@ -25,7 +25,6 @@ export default function RegistrationCard({ registration: initial }: Props) {
   const t = useTranslations('dashboard')
   const tr = useTranslations('registration.step1')
   const tc = useTranslations('common')
-  const locale = useLocale()
   const router = useRouter()
   const [, startTransition] = useTransition()
 
@@ -61,9 +60,7 @@ export default function RegistrationCard({ registration: initial }: Props) {
             </p>
             <p className="text-sm text-zinc-500">
               {reg.installationAddressState
-                ? PROVINCES.find((p) => p.value === reg.installationAddressState)?.[
-                    locale === 'zh-CN' ? 'labelZh' : 'labelEn'
-                  ] ?? reg.installationAddressState
+                ? PROVINCES.find((p) => p.value === reg.installationAddressState)?.label ?? reg.installationAddressState
                 : null}
               {reg.installationAddressDetail ? `, ${reg.installationAddressDetail}` : null}
             </p>
@@ -237,7 +234,6 @@ function EditModal({
   const t = useTranslations('dashboard')
   const tr = useTranslations('registration.step1')
   const tc = useTranslations('common')
-  const locale = useLocale()
 
   const [fields, setFields] = useState({
     installation_date: registration.installationDate ?? '',
@@ -294,7 +290,7 @@ function EditModal({
             <option value="">{tr('installationAddressStatePlaceholder')}</option>
             {PROVINCES.map((p) => (
               <option key={p.value} value={p.value}>
-                {locale === 'zh-CN' ? p.labelZh : p.labelEn}
+                {p.label}
               </option>
             ))}
           </select>

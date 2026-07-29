@@ -1,10 +1,13 @@
 import { NextIntlClientProvider } from 'next-intl'
 import { getMessages } from 'next-intl/server'
-import { notFound } from 'next/navigation'
+import { headers } from 'next/headers'
 import { Poppins } from 'next/font/google'
-import { routing } from '@/i18n/routing'
 import type { Metadata } from 'next'
+import JomooNav from '@/components/layout/JomooNav'
+import JomooFooter from '@/components/layout/JomooFooter'
+import { auth } from '@/lib/auth'
 import '../globals.css'
+import '@/components/layout/jomoo-chrome.css'
 
 const poppins = Poppins({
   variable: '--font-poppins',
@@ -34,26 +37,24 @@ export const metadata: Metadata = {
   },
 }
 
-export default async function LocaleLayout({
-  children,
-  params,
-}: {
-  children: React.ReactNode
-  params: Promise<{ locale: string }>
-}) {
-  const { locale } = await params
-
-  if (!routing.locales.includes(locale as (typeof routing.locales)[number])) {
-    notFound()
-  }
-
-  const messages = await getMessages()
+// The site is Japanese-only and served without a locale prefix, so this layout
+// owns <html>/<body> for the whole public tree. /studio and /admin sit outside
+// it and provide their own document shell.
+export default async function SiteLayout({ children }: { children: React.ReactNode }) {
+  const [session, messages] = await Promise.all([
+    auth.api.getSession({ headers: await headers() }),
+    getMessages(),
+  ])
 
   return (
-    <html lang={locale} className={`${poppins.variable} h-full antialiased`}>
+    <html lang="ja" className={`${poppins.variable} h-full antialiased`}>
       <body className={`${poppins.className} min-h-full flex flex-col bg-white text-zinc-900`}>
         <NextIntlClientProvider messages={messages}>
-          {children}
+          <JomooNav isSignedIn={Boolean(session?.user)} />
+          <div className="site-main">
+            {children}
+          </div>
+          <JomooFooter />
         </NextIntlClientProvider>
       </body>
     </html>
