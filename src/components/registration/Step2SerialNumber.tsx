@@ -5,6 +5,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useTranslations } from 'next-intl'
 import { Step2Schema, type Step2Data } from '@/types/registration'
+import { normaliseSerialNumber } from '@/lib/serialValidation'
 import FormField, { inputClass } from '@/components/ui/FormField'
 
 interface Props {
@@ -18,6 +19,11 @@ type ValidationState = 'idle' | 'validating' | 'valid' | 'invalid'
 export default function Step2SerialNumber({ defaultValues, onSubmit, onBack }: Props) {
   const t = useTranslations('registration.step2')
   const tc = useTranslations('common')
+  const tv = useTranslations('validation')
+
+  /** Schema messages are catalogue keys like 'validation.serialFormat'. */
+  const fieldError = (message?: string) =>
+    message ? tv(message.replace(/^validation\./, '')) : undefined
 
   const [validationState, setValidationState] = useState<ValidationState>('idle')
 
@@ -59,8 +65,9 @@ export default function Step2SerialNumber({ defaultValues, onSubmit, onBack }: P
     }
   }
 
-  // Users may proceed whether valid or invalid; invalid submissions are
-  // flagged as "Abnormal Serial Number" for reviewer attention.
+  // The format itself is enforced by the schema, so 'invalid' here only happens
+  // once a real serial database is connected and it reports the number as
+  // unknown. Those may still be submitted — they are flagged for staff instead.
   const canProceed = validationState === 'valid' || validationState === 'invalid'
 
   return (
@@ -69,7 +76,7 @@ export default function Step2SerialNumber({ defaultValues, onSubmit, onBack }: P
         label={t('serialNumber')}
         required
         hint={t('serialNumberHint')}
-        error={errors.serialNumber?.message ? tc('required') : undefined}
+        error={fieldError(errors.serialNumber?.message)}
         htmlFor="serialNumber"
       >
         <div className="flex gap-2">
@@ -78,7 +85,15 @@ export default function Step2SerialNumber({ defaultValues, onSubmit, onBack }: P
             type="text"
             className={inputClass}
             placeholder={t('serialNumberPlaceholder')}
-            {...register('serialNumber')}
+            autoComplete="off"
+            spellCheck={false}
+            {...register('serialNumber', {
+              onChange: (e) => {
+                const normalised = normaliseSerialNumber(e.target.value)
+                if (normalised !== e.target.value) setValue('serialNumber', normalised)
+                setValidationState('idle')
+              },
+            })}
           />
           <button
             type="button"

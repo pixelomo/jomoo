@@ -4,6 +4,7 @@ import { db } from '@/lib/db'
 import { productRegistration, warrantyRecord, user } from '@/lib/db/schema'
 import { eq } from 'drizzle-orm'
 import { RegistrationSchema } from '@/types/registration'
+import { validateSerialNumber } from '@/lib/serialValidation'
 import { sendRegistrationConfirmation, sendWarrantyIssuedEmail } from '@/lib/resend'
 
 async function getAuthenticatedUser(req: Request) {
@@ -28,7 +29,13 @@ export async function POST(req: Request) {
 
   const data = parsed.data
   const id = crypto.randomUUID()
-  const flagged = data.serialNumberValid === false
+
+  // Validate server-side and ignore whatever the browser claimed. The request
+  // body carries a `serialNumberValid` flag for the form's own UI; trusting it
+  // here would let anyone with an account issue themselves a warranty.
+  // `data.serialNumber` is already normalised by the schema.
+  const serialCheck = await validateSerialNumber(data.serialNumber)
+  const flagged = !serialCheck.valid
 
   await db.insert(productRegistration).values({
     id,
@@ -43,7 +50,7 @@ export async function POST(req: Request) {
     purchaseDate: data.purchaseDate ?? null,
     dealerName: data.dealerName ?? null,
     serialNumber: data.serialNumber,
-    serialNumberValid: data.serialNumberValid ?? null,
+    serialNumberValid: serialCheck.valid,
     warrantyCardUrl: data.warrantyCardUrl ?? null,
     serialNumberImageUrl: data.serialNumberImageUrl ?? null,
     status: 'PENDING',
@@ -52,7 +59,7 @@ export async function POST(req: Request) {
 
   let finalStatus = 'PENDING'
 
-  if (data.serialNumberValid === true) {
+  if (serialCheck.valid) {
     const baseDate = data.installationDate ? new Date(data.installationDate) : new Date()
     const expiryDate = new Date(baseDate)
     expiryDate.setFullYear(expiryDate.getFullYear() + 2)

@@ -5,10 +5,11 @@ import { useTranslations } from 'next-intl'
 
 export default function VerifyPage() {
   const t = useTranslations('verify')
+  const tc = useTranslations('common')
 
   const [serialNumber, setSerialNumber] = useState('')
   const [checking, setChecking] = useState(false)
-  const [result, setResult] = useState<{ valid: boolean } | null>(null)
+  const [result, setResult] = useState<{ valid: boolean; reason?: string } | null>(null)
   const [error, setError] = useState<string | null>(null)
 
   const handleVerify = async (e: React.FormEvent) => {
@@ -23,7 +24,7 @@ export default function VerifyPage() {
     try {
       const res = await fetch(`/api/serial-validate?sn=${encodeURIComponent(sn)}`)
       if (!res.ok) throw new Error('Request failed')
-      const data: { valid: boolean } = await res.json()
+      const data: { valid: boolean; reason?: string } = await res.json()
       setResult(data)
     } catch {
       setError('error')
@@ -68,45 +69,46 @@ export default function VerifyPage() {
 
       {error && (
         <div className="mt-6 rounded-lg border border-red-200 bg-red-50 px-5 py-4">
-          <p className="text-sm text-red-700">出错了，请重试。</p>
+          <p className="text-sm text-red-700">{tc('error')}</p>
         </div>
       )}
 
-      {result !== null && (
-        <div
-          className={[
-            'mt-6 rounded-lg border px-5 py-5 flex items-start gap-4',
-            result.valid
-              ? 'border-green-200 bg-green-50'
-              : 'border-red-200 bg-red-50',
-          ].join(' ')}
-        >
-          <div
-            className={[
-              'mt-0.5 shrink-0 flex h-8 w-8 items-center justify-center rounded-full',
-              result.valid ? 'bg-green-100' : 'bg-red-100',
-            ].join(' ')}
-          >
-            {result.valid ? (
-              <svg className="w-4 h-4 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+      {result !== null && (() => {
+        // Without a serial database we can only confirm the number is the right
+        // shape — saying "this is genuine" on that basis would not be true.
+        const confirmed = result.valid && result.reason === 'verified'
+        const formatOnly = result.valid && !confirmed
+        const tone = confirmed
+          ? { border: 'border-green-200', bg: 'bg-green-50', dot: 'bg-green-100', icon: 'text-green-600', title: 'text-green-800', body: 'text-green-700' }
+          : formatOnly
+            ? { border: 'border-amber-200', bg: 'bg-amber-50', dot: 'bg-amber-100', icon: 'text-amber-600', title: 'text-amber-900', body: 'text-amber-800' }
+            : { border: 'border-red-200', bg: 'bg-red-50', dot: 'bg-red-100', icon: 'text-red-600', title: 'text-red-800', body: 'text-red-700' }
+
+        return (
+          <div className={`mt-6 rounded-lg border px-5 py-5 flex items-start gap-4 ${tone.border} ${tone.bg}`}>
+            <div className={`mt-0.5 shrink-0 flex h-8 w-8 items-center justify-center rounded-full ${tone.dot}`}>
+              <svg className={`w-4 h-4 ${tone.icon}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5} aria-hidden="true">
+                {confirmed ? (
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                ) : formatOnly ? (
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
+                ) : (
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                )}
               </svg>
-            ) : (
-              <svg className="w-4 h-4 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            )}
+            </div>
+            <div>
+              <p className={`font-semibold text-sm ${tone.title}`}>
+                {confirmed ? t('validTitle') : formatOnly ? t('formatOnlyTitle') : t('invalidTitle')}
+              </p>
+              <p className={`mt-1 text-sm ${tone.body}`}>
+                {confirmed ? t('validDesc') : formatOnly ? t('formatOnlyDesc') : t('invalidDesc')}
+              </p>
+            </div>
           </div>
-          <div>
-            <p className={['font-semibold text-sm', result.valid ? 'text-green-800' : 'text-red-800'].join(' ')}>
-              {result.valid ? t('validTitle') : t('invalidTitle')}
-            </p>
-            <p className={['mt-1 text-sm', result.valid ? 'text-green-700' : 'text-red-700'].join(' ')}>
-              {result.valid ? t('validDesc') : t('invalidDesc')}
-            </p>
-          </div>
-        </div>
-      )}
+        )
+      })()}
+
     </main>
   )
 }

@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { SERIAL_NUMBER_PATTERN, normaliseSerialNumber } from '@/lib/serialValidation'
 
 export const Step1Schema = z.object({
   modelId: z.string().min(1, 'validation.required'),
@@ -13,7 +14,13 @@ export const Step1Schema = z.object({
 })
 
 export const Step2Schema = z.object({
-  serialNumber: z.string().min(1, 'validation.required'),
+  // Normalised before checking so spaces, dashes and full-width digits from a
+  // Japanese IME are accepted rather than bounced back at the member.
+  serialNumber: z
+    .string()
+    .min(1, 'validation.required')
+    .transform(normaliseSerialNumber)
+    .refine((v) => SERIAL_NUMBER_PATTERN.test(v), 'validation.serialFormat'),
   serialNumberValid: z.boolean().optional(),
   proceedDespiteInvalid: z.boolean().optional(),
 })
