@@ -65,12 +65,21 @@ export default function SignInPage() {
     setLoading(true)
     setResendNotice(null)
 
-    const { error: err } = await authClient.sendVerificationEmail({
-      email,
-      callbackURL: '/dashboard',
-    })
+    // Not authClient.sendVerificationEmail: that route answers 200 even when
+    // delivery fails, so a failed resend would report itself as sent.
+    let ok = false
+    try {
+      const res = await fetch('/api/verification/send', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, callbackURL: '/dashboard' }),
+      })
+      ok = res.ok
+    } catch {
+      ok = false
+    }
 
-    setResendNotice(err ? t('verificationResendFailed') : t('verificationResent'))
+    setResendNotice(ok ? t('verificationResent') : t('verificationResendFailed'))
     setLoading(false)
   }
 

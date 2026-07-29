@@ -3,6 +3,7 @@ import { drizzleAdapter } from 'better-auth/adapters/drizzle'
 import { twoFactor } from 'better-auth/plugins'
 import { db } from './db'
 import * as schema from './db/schema'
+import { EMAIL_VERIFICATION_REQUIRED, TWO_FACTOR_ENABLED } from './auth-features'
 
 function resolveAuthBaseURL() {
   if (process.env.NEXT_PUBLIC_APP_URL) {
@@ -14,7 +15,7 @@ function resolveAuthBaseURL() {
   return 'http://localhost:3000'
 }
 
-const authBaseURL = resolveAuthBaseURL()
+export const authBaseURL = resolveAuthBaseURL()
 
 export const auth = betterAuth({
   database: drizzleAdapter(db, {
@@ -37,11 +38,41 @@ export const auth = betterAuth({
   ],
   emailAndPassword: {
     enabled: true,
-    // Accounts cannot sign in until the address is confirmed
-    requireEmailVerification: true,
+    // Off by default — see auth-features.ts. When on, accounts cannot sign in
+    // until the address is confirmed.
+    requireEmailVerification: EMAIL_VERIFICATION_REQUIRED,
+  },
+  databaseHooks: {
+    user: {
+      create: {
+        // With verification off there is no afterEmailVerification hook to hang
+        // the welcome mail on, so it goes out at account creation instead.
+        // Never let a mail failure fail the sign-up: the account is already
+        // written, and the member can use it whether or not the mail lands.
+        after: async (createdUser) => {
+          if (EMAIL_VERIFICATION_REQUIRED) return
+          try {
+            const { sendMemberWelcome } = await import('./resend')
+            await sendMemberWelcome({
+              to: createdUser.email,
+              name: createdUser.name || createdUser.email,
+            })
+          } catch (err) {
+            console.error('[auth] member welcome email failed', {
+              userId: createdUser.id,
+              err,
+            })
+          }
+        },
+      },
+    },
   },
   emailVerification: {
-    sendOnSignUp: true,
+    // Sent from /api/verification/send instead. Better Auth wraps this callback
+    // in runInBackgroundOrAwait, which swallows a delivery failure and still
+    // answers 200 — the member would be told to check an inbox that never
+    // receives anything. See lib/verification-email.ts.
+    sendOnSignUp: false,
     autoSignInAfterVerification: true,
     sendVerificationEmail: async ({ user, url }) => {
       const { sendVerificationEmail: send } = await import('./resend')
@@ -69,14 +100,18 @@ export const auth = betterAuth({
       }
     },
   },
-  plugins: [
-    twoFactor({
-      issuer: 'JOMOO',
-      // Enable 2FA immediately when the user completes the setup flow,
-      // rather than requiring a separate TOTP verification round-trip.
-      skipVerificationOnEnable: true,
-    }),
-  ],
+  // Off by default — see auth-features.ts. The two_factor table and the
+  // enrolment UI are left in place so this is a one-line switch back on.
+  plugins: TWO_FACTOR_ENABLED
+    ? [
+        twoFactor({
+          issuer: 'JOMOO',
+          // Enable 2FA immediately when the user completes the setup flow,
+          // rather than requiring a separate TOTP verification round-trip.
+          skipVerificationOnEnable: true,
+        }),
+      ]
+    : [],
   user: {
     additionalFields: {
       gender: {

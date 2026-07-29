@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import { authClient } from '@/lib/auth-client'
 import MembershipStepIndicator from './MembershipStepIndicator'
@@ -20,9 +21,14 @@ type FormData = Partial<CorporateSignupData & IndividualSignupData>
 export default function SignUpForm() {
   const t = useTranslations('auth')
   const tm = useTranslations('auth.membership')
+  const router = useRouter()
 
   const [step, setStep] = useState(1)
   const [verificationSent, setVerificationSent] = useState(false)
+  // The account exists but the verification mail could not be delivered — the
+  // member must not be told to go looking for it.
+  const [sendFailed, setSendFailed] = useState(false)
+  const [isResending, setIsResending] = useState(false)
   const [membershipType, setMembershipType] = useState<MembershipType | undefined>()
   const [formData, setFormData] = useState<FormData>({})
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -40,6 +46,27 @@ export default function SignUpForm() {
     setFormData(data)
     setError(null)
     setStep(3)
+  }
+
+  /** Resolves false when the mail did not leave, so we can say so. */
+  const sendVerification = async (email: string) => {
+    try {
+      const res = await fetch('/api/verification/send', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, callbackURL: '/dashboard' }),
+      })
+      return res.ok
+    } catch {
+      return false
+    }
+  }
+
+  const handleRetrySend = async () => {
+    if (!formData.email) return
+    setIsResending(true)
+    setSendFailed(!(await sendVerification(formData.email)))
+    setIsResending(false)
   }
 
   const handleComplete = async () => {
@@ -72,12 +99,22 @@ export default function SignUpForm() {
     }
 
     try {
-      const { error: err } = await authClient.signUp.email(payload)
+      const { data, error: err } = await authClient.signUp.email(payload)
 
       if (!err) {
-        // requireEmailVerification is on, so no session exists yet — the member
-        // has to click the link in the verification email before signing in.
+        // A token means better-auth signed them in, which it only does when
+        // verification is not required — straight to the dashboard. Otherwise
+        // token is null and they must confirm the address first.
+        if (data?.token) {
+          router.push('/dashboard')
+          router.refresh()
+          return
+        }
+
+        // The account is created either way; only the mail can still fail.
+        const delivered = await sendVerification(formData.email)
         setVerificationSent(true)
+        setSendFailed(!delivered)
         setIsSubmitting(false)
         return
       }
@@ -113,7 +150,38 @@ export default function SignUpForm() {
         </div>
       )}
 
-      {verificationSent ? (
+      {verificationSent && sendFailed ? (
+        <div className="rounded-xl border border-amber-300/60 bg-amber-50 px-6 py-12 text-center">
+          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-amber-100">
+            <svg
+              className="h-6 w-6 text-amber-600"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2}
+              aria-hidden="true"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"
+              />
+            </svg>
+          </div>
+          <h2 className="text-lg font-semibold text-zinc-900">{t('verificationSendFailedTitle')}</h2>
+          <p className="mt-2 text-sm text-zinc-600">
+            {t('verificationSendFailedBody', { email: formData.email ?? '' })}
+          </p>
+          <button
+            type="button"
+            onClick={handleRetrySend}
+            disabled={isResending}
+            className="mt-6 rounded-lg bg-zinc-900 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-zinc-700 disabled:opacity-50"
+          >
+            {isResending ? t('verificationSending') : t('resendVerification')}
+          </button>
+        </div>
+      ) : verificationSent ? (
         <div className="rounded-xl border border-[#73a4c7]/25 bg-[#73a4c7]/5 px-6 py-12 text-center">
           <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-[#73a4c7]/15">
             <svg

@@ -59,6 +59,13 @@
     "passwordMismatch": "パスワードが一致しません",
     "passwordTooShort": "パスワードは8文字以上で入力してください",
     "signUpFailed": "登録に失敗しました。もう一度お試しください。",
+    "emailNotVerified": "メールアドレスの確認が完了していません。確認メール内のリンクからお手続きください。",
+    "resendVerification": "確認メールを再送する",
+    "verificationResent": "確認メールを再送しました。メールボックスをご確認ください。",
+    "verificationResendFailed": "確認メールの再送に失敗しました。しばらくしてから再度お試しください。",
+    "verificationSendFailedTitle": "確認メールを送信できませんでした",
+    "verificationSendFailedBody": "アカウントは作成されましたが、{email} 宛の確認メールを送信できませんでした。下のボタンから再送してください。解決しない場合はお手数ですがお問い合わせください。",
+    "verificationSending": "送信中…",
     "membership": {
       "title": "JOMOOクラブ会員",
       "corporate": "法人",
@@ -119,11 +126,7 @@
         "passwordMismatch": "パスワードが一致しません",
         "phoneDigitsOnly": "半角数字ハイフンなしで入力ください"
       }
-    },
-    "emailNotVerified": "メールアドレスの確認が完了していません。確認メール内のリンクからお手続きください。",
-    "resendVerification": "確認メールを再送する",
-    "verificationResent": "確認メールを再送しました。メールボックスをご確認ください。",
-    "verificationResendFailed": "確認メールの再送に失敗しました。しばらくしてから再度お試しください。"
+    }
   },
   "dashboard": {
     "title": "Member Portal",

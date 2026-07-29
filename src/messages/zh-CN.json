@@ -59,6 +59,13 @@
     "passwordMismatch": "两次输入的密码不一致",
     "passwordTooShort": "密码至少需要8位",
     "signUpFailed": "注册失败，请重试。",
+    "emailNotVerified": "邮箱尚未验证，请点击验证邮件中的链接完成验证。",
+    "resendVerification": "重新发送验证邮件",
+    "verificationResent": "验证邮件已重新发送，请查收。",
+    "verificationResendFailed": "验证邮件重发失败，请稍后再试。",
+    "verificationSendFailedTitle": "验证邮件发送失败",
+    "verificationSendFailedBody": "账户已创建，但发送至 {email} 的验证邮件未能送出。请点击下方按钮重新发送；若仍未成功，请联系我们。",
+    "verificationSending": "发送中…",
     "membership": {
       "title": "JOMOOクラブ会員",
       "corporate": "法人",
@@ -119,11 +126,7 @@
         "passwordMismatch": "パスワードが一致しません",
         "phoneDigitsOnly": "半角数字ハイフンなしで入力ください"
       }
-    },
-    "emailNotVerified": "邮箱尚未验证，请点击验证邮件中的链接完成验证。",
-    "resendVerification": "重新发送验证邮件",
-    "verificationResent": "验证邮件已重新发送，请查收。",
-    "verificationResendFailed": "验证邮件重发失败，请稍后再试。"
+    }
   },
   "dashboard": {
     "title": "会员中心",

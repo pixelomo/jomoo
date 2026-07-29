@@ -4,6 +4,7 @@ import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import { authClient } from '@/lib/auth-client'
+import { TWO_FACTOR_ENABLED } from '@/lib/auth-features'
 import QRCode from 'react-qr-code'
 import type { Gender } from '@/types/database'
 
@@ -157,6 +158,8 @@ export default function UserProfileSection({ user }: { user: UserProps }) {
       {saveError && <p className="mt-2 text-sm text-red-600">{saveError}</p>}
 
       {/* ── Two-Factor Authentication ────────────────────────────────────────── */}
+      {/* Hidden while the plugin is off: the endpoints it calls do not exist. */}
+      {TWO_FACTOR_ENABLED && (
       <div className="mt-8 rounded-xl border border-zinc-100 bg-white p-5">
         <div className="flex items-center justify-between mb-3">
           <div>
@@ -250,6 +253,7 @@ export default function UserProfileSection({ user }: { user: UserProps }) {
           </form>
         )}
       </div>
+      )}
 
       {/* ── Delete account ───────────────────────────────────────────────────── */}
       <div className="mt-8 pt-6 border-t border-zinc-100">
