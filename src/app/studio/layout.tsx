@@ -3,7 +3,7 @@ import type { Metadata, Viewport } from 'next'
 
 export const metadata: Metadata = {
   ...studioMetadata,
-  title: 'JoMoo CMS',
+  title: 'JOMOO CMS',
 }
 
 export const viewport: Viewport = {
