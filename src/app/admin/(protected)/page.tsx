@@ -27,35 +27,39 @@ function statusBadge(status: string) {
 }
 
 export default async function AdminDashboard() {
-  const [userRow] = await db.select({ count: sql<number>`count(*)::int` }).from(user)
-  const [withWarranty] = await db
-    .select({ count: sql<number>`count(*)::int` })
-    .from(productRegistration)
-    .where(eq(productRegistration.status, 'REGISTERED_WITH_WARRANTY'))
-  const [noWarranty] = await db
-    .select({ count: sql<number>`count(*)::int` })
-    .from(productRegistration)
-    .where(eq(productRegistration.status, 'REGISTERED_NO_WARRANTY'))
+  // The three counts were three separate statements, and each round-trip to
+  // Railway costs ~80ms from a Vercel function. They collapse into one
+  // aggregate, issued alongside the recent-registrations query so the driver
+  // pipelines both on its single connection: four round-trips become one.
+  const [[counts], recent] = await Promise.all([
+    db
+      .select({
+        users: sql<number>`(select count(*) from ${user})::int`,
+        withWarranty: sql<number>`count(*) filter (where ${productRegistration.status} = 'REGISTERED_WITH_WARRANTY')::int`,
+        noWarranty: sql<number>`count(*) filter (where ${productRegistration.status} = 'REGISTERED_NO_WARRANTY')::int`,
+      })
+      .from(productRegistration),
 
-  const recent = await db
-    .select({
-      id: productRegistration.id,
-      modelName: productRegistration.modelName,
-      serialNumber: productRegistration.serialNumber,
-      status: productRegistration.status,
-      submittedAt: productRegistration.submittedAt,
-      userName: user.name,
-      userEmail: user.email,
-    })
-    .from(productRegistration)
-    .leftJoin(user, eq(productRegistration.userId, user.id))
-    .orderBy(desc(productRegistration.submittedAt))
-    .limit(10)
+    db
+      .select({
+        id: productRegistration.id,
+        modelName: productRegistration.modelName,
+        serialNumber: productRegistration.serialNumber,
+        status: productRegistration.status,
+        submittedAt: productRegistration.submittedAt,
+        userName: user.name,
+        userEmail: user.email,
+      })
+      .from(productRegistration)
+      .leftJoin(user, eq(productRegistration.userId, user.id))
+      .orderBy(desc(productRegistration.submittedAt))
+      .limit(10),
+  ])
 
   const stats = [
-    { label: 'Total Users', value: userRow.count, href: '/admin/users' },
-    { label: 'With Warranty', value: withWarranty.count, href: '/admin/registrations?filter=warranty' },
-    { label: 'No Warranty', value: noWarranty.count, href: '/admin/registrations?filter=no_warranty' },
+    { label: 'Total Users', value: counts.users, href: '/admin/users' },
+    { label: 'With Warranty', value: counts.withWarranty, href: '/admin/registrations?filter=warranty' },
+    { label: 'No Warranty', value: counts.noWarranty, href: '/admin/registrations?filter=no_warranty' },
   ]
 
   return (
