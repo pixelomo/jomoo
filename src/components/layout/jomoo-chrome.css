@@ -578,7 +578,11 @@
     position: static;
     transform: none;
     grid-column: 2;
-    justify-self: center;
+    /* Sits against the actions rather than centred — with 会社情報 and
+       インスピレーション hidden there is only one link, and centring one item
+       in the middle column leaves it stranded. */
+    justify-self: end;
+    margin-right: 28px;
     gap: clamp(1rem, 2.2vw, 36px);
     font-size: clamp(16px, 1.15vw, 20px);
     white-space: nowrap;
@@ -592,9 +596,3 @@
   }
 }
 
-@media (min-width: 1600px) {
-  .nav__menu {
-    justify-self: end;
-    margin-right: 28px;
-  }
-}
