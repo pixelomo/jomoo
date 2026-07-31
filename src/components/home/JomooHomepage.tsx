@@ -58,12 +58,14 @@ export default function JomooHomepage() {
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     if (prefersReducedMotion) return
 
+    // Re-armed on every change, including a pagination click, so a slide the
+    // reader picks gets its full turn instead of whatever was left on the clock.
     const interval = window.setInterval(() => {
       setHeroSlide((index) => (index + 1) % heroSlideCount)
     }, HERO_SLIDE_MS)
 
     return () => window.clearInterval(interval)
-  }, [heroSlideCount])
+  }, [heroSlideCount, heroSlide])
 
   useEffect(() => {
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
@@ -474,6 +476,20 @@ export default function JomooHomepage() {
               </>
             )}
           </div>
+        </div>
+
+        <div className="hero__pagination" role="tablist" aria-label="ヒーロースライド">
+          {Array.from({ length: heroSlideCount }, (_, index) => (
+            <button
+              key={index}
+              type="button"
+              role="tab"
+              aria-selected={index === heroSlide}
+              aria-label={`スライド ${index + 1} を表示`}
+              className={`hero__pagination-line${index === heroSlide ? ' is-active' : ''}`}
+              onClick={() => setHeroSlide(index)}
+            />
+          ))}
         </div>
       </header>
 

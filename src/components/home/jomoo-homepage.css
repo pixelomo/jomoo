@@ -85,6 +85,38 @@ img {
   background: #ffffff;
 }
 
+/* Same treatment as .spotlight__pagination, sat over the artwork so the lines
+   are white rather than the light-background greys. */
+.hero__pagination {
+  position: absolute;
+  right: 3rem;
+  bottom: 3rem;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.hero__pagination-line {
+  width: 1.5rem;
+  height: 3px;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: #ffffff;
+  opacity: 0.35;
+  cursor: pointer;
+  transition: opacity 0.25s ease;
+}
+
+.hero__pagination-line.is-active {
+  opacity: 1;
+}
+
+.hero__pagination-line:hover:not(.is-active) {
+  opacity: 0.65;
+}
+
 .hero::before {
   content: '';
   position: absolute;

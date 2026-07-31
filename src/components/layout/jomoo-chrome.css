@@ -292,7 +292,7 @@
 }
 
 .nav__btn {
-  padding: 10px 20px;
+  padding: 4px 20px;
   border: 1px solid currentColor;
   border-radius: 999px;
   color: inherit;
@@ -316,7 +316,7 @@
 .nav__btn--black {
   background: #000000;
   color: #ffffff;
-  border-color: rgba(255, 255, 255, 0.45);
+  border-color: #ffffff;
 }
 
 .nav__btn--black:hover {
