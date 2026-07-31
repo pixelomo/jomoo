@@ -89,8 +89,8 @@ img {
    are white rather than the light-background greys. */
 .hero__pagination {
   position: absolute;
-  right: 3rem;
-  bottom: 3rem;
+  right: 5rem;
+  bottom: 5rem;
   z-index: 3;
   display: flex;
   align-items: center;
