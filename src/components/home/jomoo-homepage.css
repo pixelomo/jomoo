@@ -1097,12 +1097,19 @@ img {
 /* ============================================
    GLOBAL PROJECTS — landmark carousel
    ============================================ */
-.global-projects {
-  background-color: transparent;
+/* Spans global projects, the stats row and the award logos as one backdrop.
+   Stretched rather than cover-fit so it reaches the bottom of the band whatever
+   the combined height turns out to be. */
+.global-band {
+  position: relative;
   background-image: url('/images/globalbg.png');
   background-repeat: no-repeat;
   background-position: center top;
-  background-size: cover;
+  background-size: 100% 100%;
+}
+
+.global-projects {
+  background: transparent;
   color: var(--text-dark);
   padding: 140px 0 160px;
   overflow: hidden;

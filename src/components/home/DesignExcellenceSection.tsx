@@ -15,9 +15,9 @@ const COL1_IMAGES: LaneImage[] = [
 ]
 
 const COL2_IMAGES: LaneImage[] = [
-  { src: '/images/design-col2-1.png' },
-  { src: '/images/design-col2-2.png', onBackdrop: true },
-  { src: '/images/design-col2-4.png', onBackdrop: true },
+  { src: '/images/design-col2-1.png', onBackdrop: true },
+  { src: '/images/design-col2-2.png' },
+  { src: '/images/design-col2-3.png', onBackdrop: true },
 ]
 
 function VerticalLane({

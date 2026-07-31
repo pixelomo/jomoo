@@ -615,6 +615,8 @@ export default function JomooHomepage() {
         </div>
       </section>
 
+      {/* One backdrop runs behind projects, stats and the award logos */}
+      <div className="global-band">
       <GlobalProjectsSection />
 
       {/* STATS */}
@@ -731,6 +733,7 @@ export default function JomooHomepage() {
           </div>
         </div>
       </section>
+      </div>
 
       <DesignExcellenceSection />
 
