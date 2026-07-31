@@ -509,10 +509,10 @@ export default function JomooHomepage() {
                   <img src="/images/world1.jpg" alt="" />
                 </figure>
                 <figure className="world__photo world__photo--forest">
-                  <img src="/images/world2.jpg" alt="" />
+                  <img src="/images/world2n.jpg" alt="" />
                 </figure>
                 <figure className="world__photo world__photo--shower">
-                  <img src="/images/world3.jpg" alt="" />
+                  <img src="/images/world3n.jpg" alt="" />
                 </figure>
               </div>
             </div>
