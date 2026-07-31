@@ -15,9 +15,26 @@ interface Props {
 
 const NAV_LINKS = [
   { href: '/products/smart-toilet', label: '商品情報' },
-  { href: '/inspiration', label: 'インスピレーション' },
-  { href: '/company-information', label: '会社情報' },
+  // Hidden until those pages are built — restore both when they ship.
+  // { href: '/inspiration', label: 'インスピレーション' },
+  // { href: '/company-information', label: '会社情報' },
 ] as const
+
+/**
+ * Sign-in glyph: a solid arrow entering an open door frame, redrawn from
+ * public/images/signin.png so it scales and takes the nav's current colour.
+ */
+function SignInGlyph() {
+  return (
+    <svg className="nav__auth-glyph" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <path
+        className="nav__auth-glyph-frame"
+        d="M12.8 3.6h4.4a3.2 3.2 0 0 1 3.2 3.2v10.4a3.2 3.2 0 0 1-3.2 3.2h-4.4"
+      />
+      <path className="nav__auth-glyph-arrow" d="M1.8 9.7h5.5V4.3L14.5 12l-7.2 7.7v-5.4H1.8z" />
+    </svg>
+  )
+}
 
 export default function JomooNav({ isSignedIn }: Props) {
   const router = useRouter()
@@ -136,16 +153,9 @@ export default function JomooNav({ isSignedIn }: Props) {
               >
                 パートナー登録
               </a>
-              <a
-                href="/sign-in"
-                className="nav__auth-icon nav__auth-icon--signin"
-                aria-label="ログイン"
-              >
-                <svg viewBox="0 0 24 24" aria-hidden="true">
-                  <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
-                  <path d="M10 17l-5-5 5-5" />
-                  <path d="M3 12h12" />
-                </svg>
+              <a href="/sign-in" className="nav__auth-icon nav__auth-icon--signin">
+                <SignInGlyph />
+                ログイン
               </a>
             </>
           )}

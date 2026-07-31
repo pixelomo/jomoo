@@ -248,6 +248,45 @@
   stroke-linejoin: round;
 }
 
+/* Sign-in carries a label, so it grows into a pill rather than staying a
+   36px circle. Must sit after .nav__auth-icon:hover to win on source order. */
+.nav__auth-icon--signin {
+  width: auto;
+  gap: 8px;
+  padding: 0 18px 0 14px;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  letter-spacing: 0.08em;
+  white-space: nowrap;
+}
+
+.nav__auth-icon--signin:hover {
+  opacity: 1;
+  background: var(--text-light);
+  color: var(--bg-dark);
+}
+
+/* Redrawn from signin.png: the frame is stroked, the arrow is solid, so both
+   have to opt out of the generic stroked-icon rule above. */
+.nav__auth-icon .nav__auth-glyph {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+.nav__auth-glyph-frame {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.1;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.nav__auth-glyph-arrow {
+  fill: currentColor;
+  stroke: none;
+}
+
 .nav__btn {
   padding: 10px 20px;
   border: 1px solid currentColor;

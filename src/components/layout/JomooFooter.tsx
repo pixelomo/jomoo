@@ -61,6 +61,7 @@ export default function JomooFooter() {
             </ul>
           </div>
 
+          {/* Hidden until the インスピレーション pages are built — restore this column when they ship.
           <div className="footer__col">
             <h4>インスピレーション</h4>
             <ul>
@@ -68,11 +69,14 @@ export default function JomooFooter() {
               <li><a href="/inspiration">プロジェクトショーケース</a></li>
             </ul>
           </div>
+          */}
 
           <div className="footer__col">
             <h4>会社概要</h4>
             <ul>
+              {/* Hidden until /company-information is built.
               <li><a href="/company-information">会社紹介</a></li>
+              */}
               <li><a href="#">ニュース＆ブログ</a></li>
               <li className="footer__li--gap">
                 <a href="/register" className="footer__link--bold">
