@@ -69,9 +69,11 @@ export default function DesignExcellenceSection() {
               <br />
               世界基準のデザイナーが製造しています。
             </p>
+            {/* Hidden until /inspiration is built — restore this CTA when it ships.
             <a className="design-excellence__link reveal" href="/inspiration">
               詳しく見る&gt;
             </a>
+            */}
           </div>
         </div>
       </div>
