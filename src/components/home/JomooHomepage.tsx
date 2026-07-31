@@ -535,7 +535,6 @@ export default function JomooHomepage() {
       <section className="expand expand--animate" ref={expandRef}>
         <div className="expand__stage">
           <img className="expand__media" src="/images/smart.jpg" alt="Smart toilet in luxury interior" />
-          <div className="expand__shade" />
           <div className="expand__label">SMART TOILET</div>
         </div>
       </section>

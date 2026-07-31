@@ -1,24 +1,30 @@
 /* eslint-disable @next/next/no-img-element */
 'use client'
 
-const COL1_IMAGES = [
-  '/images/design-col1-1.jpeg',
-  '/images/design-col1-2.jpeg',
-  '/images/design-col1-3.jpeg',
-  '/images/design-col1-4.jpeg',
+interface LaneImage {
+  src: string
+  /** Cut-outs with a transparent background need design-colbg behind them. */
+  onBackdrop?: boolean
+}
+
+const COL1_IMAGES: LaneImage[] = [
+  { src: '/images/design-col1-1.png' },
+  { src: '/images/design-col1-2.png', onBackdrop: true },
+  { src: '/images/design-col1-3.png' },
+  { src: '/images/design-col1-4.png', onBackdrop: true },
 ]
 
-const COL2_IMAGES = [
-  '/images/design-col2-1.jpeg',
-  '/images/design-col2-2.jpeg',
-  '/images/design-col2-3.jpeg',
+const COL2_IMAGES: LaneImage[] = [
+  { src: '/images/design-col2-1.png' },
+  { src: '/images/design-col2-2.png', onBackdrop: true },
+  { src: '/images/design-col2-4.png', onBackdrop: true },
 ]
 
 function VerticalLane({
   images,
   direction,
 }: {
-  images: string[]
+  images: LaneImage[]
   direction: 'down' | 'up'
 }) {
   const loop = [...images, ...images]
@@ -26,9 +32,14 @@ function VerticalLane({
   return (
     <div className={`design-excellence__lane design-excellence__lane--${direction}`}>
       <div className={`design-excellence__track design-excellence__track--${direction}`}>
-        {loop.map((src, index) => (
-          <div key={`${src}-${index}`} className="design-excellence__card">
-            <img src={src} alt="" loading="lazy" decoding="async" />
+        {loop.map((image, index) => (
+          <div
+            key={`${image.src}-${index}`}
+            className={`design-excellence__card${
+              image.onBackdrop ? ' design-excellence__card--backdrop' : ''
+            }`}
+          >
+            <img src={image.src} alt="" loading="lazy" decoding="async" />
           </div>
         ))}
       </div>
