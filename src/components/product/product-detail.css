@@ -215,7 +215,7 @@
   /* Sticks under the fixed site nav so the jump links stay reachable and the
      current-section highlight stays visible while reading. */
   position: sticky;
-  top: calc(var(--nav-height) + 1rem);
+  top: var(--nav-height);
   z-index: 20;
   background: #ffffff;
 }
@@ -251,7 +251,7 @@
   /* padding-block only — .site-container owns the horizontal gutter */
   padding-block: 5rem;
   /* Clears the fixed site nav plus the sticky bar when jumped to */
-  scroll-margin-top: calc(var(--nav-height) + 6.5rem);
+  scroll-margin-top: calc(var(--nav-height) + 5.5rem);
 }
 
 .pdp-tabs__panel:first-of-type {
@@ -885,13 +885,7 @@
   }
 }
 
-/* The site nav loses its button row below 980px and gets shorter, so the bar
-   sits flush against it again. */
 @media (max-width: 979px) {
-  .pdp-tabs__nav {
-    top: var(--nav-height);
-  }
-
   .pdp-tabs__panel {
     scroll-margin-top: calc(var(--nav-height) + 4.5rem);
   }
