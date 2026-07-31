@@ -248,36 +248,39 @@
   stroke-linejoin: round;
 }
 
-/* Sign-in carries a label, so it grows into a pill rather than staying a
-   36px circle. Must sit after .nav__auth-icon:hover to win on source order. */
-.nav__auth-icon--signin {
+/* Sign in / out carry a label and sit as plain text beside the pills, not in
+   one. Must follow .nav__auth-icon:hover to win on source order. */
+.nav__auth-icon--signin,
+.nav__auth-icon--signout {
   width: auto;
   gap: 8px;
-  padding: 0 18px 0 14px;
-  border: 1px solid currentColor;
-  border-radius: 999px;
+  padding: 0 2px;
+  border: 0;
+  border-radius: 0;
+  font-weight: 600;
   letter-spacing: 0.08em;
   white-space: nowrap;
 }
 
-.nav__auth-icon--signin:hover {
+.nav__auth-icon--signin:hover,
+.nav__auth-icon--signout:hover {
   opacity: 1;
-  background: var(--text-light);
-  color: var(--bg-dark);
+  background: transparent;
 }
 
-/* Redrawn from signin.png: the frame is stroked, the arrow is solid, so both
-   have to opt out of the generic stroked-icon rule above. */
+/* Traced from signin.png: the frame is stroked, the arrow is solid, so both
+   have to opt out of the generic stroked-icon rule above. 22x17.6 keeps the
+   source's 51:41 aspect. */
 .nav__auth-icon .nav__auth-glyph {
-  width: 20px;
-  height: 20px;
+  width: 22px;
+  height: 17.6px;
   flex-shrink: 0;
 }
 
 .nav__auth-glyph-frame {
   fill: none;
   stroke: currentColor;
-  stroke-width: 2.1;
+  stroke-width: 2;
   stroke-linecap: round;
   stroke-linejoin: round;
 }

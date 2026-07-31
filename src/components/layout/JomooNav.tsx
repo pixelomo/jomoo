@@ -21,17 +21,26 @@ const NAV_LINKS = [
 ] as const
 
 /**
- * Sign-in glyph: a solid arrow entering an open door frame, redrawn from
- * public/images/signin.png so it scales and takes the nav's current colour.
+ * Auth glyphs, traced from public/images/signin.png (51x41) rather than
+ * approximated: the viewBox keeps that aspect, the arrowhead runs the full
+ * height so its tips sit level with the door's corners, and the bar is the
+ * source's full 37% of the height.
+ *
+ * Sign-in:  door on the right, open on the left, arrow entering it.
+ * Sign-out: door mirrored to the left, arrow leaving through it.
  */
-function SignInGlyph() {
+const DOOR_IN = 'M13.7 1.5H21.5a2 2 0 0 1 2 2v13a2 2 0 0 1-2 2H13.7'
+const ARROW_IN = 'M0.5 6.3H8.8V0.5L18.6 10 8.8 19.5v-5.8H0.5z'
+
+const DOOR_OUT = 'M11.3 1.5H3.5a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h7.8'
+const ARROW_OUT = 'M5.8 6.3H15V0.5L24.2 10 15 19.5v-5.8H5.8z'
+
+function AuthGlyph({ direction }: { direction: 'in' | 'out' }) {
+  const isIn = direction === 'in'
   return (
-    <svg className="nav__auth-glyph" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-      <path
-        className="nav__auth-glyph-frame"
-        d="M12.8 3.6h4.4a3.2 3.2 0 0 1 3.2 3.2v10.4a3.2 3.2 0 0 1-3.2 3.2h-4.4"
-      />
-      <path className="nav__auth-glyph-arrow" d="M1.8 9.7h5.5V4.3L14.5 12l-7.2 7.7v-5.4H1.8z" />
+    <svg className="nav__auth-glyph" viewBox="0 0 25 20" aria-hidden="true" focusable="false">
+      <path className="nav__auth-glyph-frame" d={isIn ? DOOR_IN : DOOR_OUT} />
+      <path className="nav__auth-glyph-arrow" d={isIn ? ARROW_IN : ARROW_OUT} />
     </svg>
   )
 }
@@ -131,18 +140,14 @@ export default function JomooNav({ isSignedIn }: Props) {
               <button
                 type="button"
                 className="nav__auth-icon nav__auth-icon--signout"
-                aria-label="ログアウト"
                 onClick={async () => {
                   await authClient.signOut()
-                  router.push("/")
+                  router.push('/')
                   router.refresh()
                 }}
               >
-                <svg viewBox="0 0 24 24" aria-hidden="true">
-                  <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-                  <path d="M16 17l5-5-5-5" />
-                  <path d="M21 12H9" />
-                </svg>
+                <AuthGlyph direction="out" />
+                ログアウト
               </button>
             </>
           ) : (
@@ -154,7 +159,7 @@ export default function JomooNav({ isSignedIn }: Props) {
                 パートナー登録
               </a>
               <a href="/sign-in" className="nav__auth-icon nav__auth-icon--signin">
-                <SignInGlyph />
+                <AuthGlyph direction="in" />
                 ログイン
               </a>
             </>
