@@ -9,7 +9,7 @@ import FooterCtaSection from './FooterCtaSection'
 import './jomoo-homepage.css'
 
 const HERO_SLIDES = [
-  { type: 'video' as const, src: '/images/01.mov' },
+  { type: 'image' as const, src: '/images/hero1.jpg' },
   { type: 'video' as const, src: '/images/02.mp4' },
   { type: 'image' as const, src: '/images/03.png' },
 ]
@@ -412,7 +412,13 @@ export default function JomooHomepage() {
 
             return (
               <div key={slide.src} className={slideClassName}>
-                <img src={slide.src} alt="" />
+                {/* The first slide is the hero's largest paint — fetch it ahead
+                    of the queue rather than letting it wait behind the video. */}
+                <img
+                  src={slide.src}
+                  alt=""
+                  fetchPriority={index === 0 ? 'high' : undefined}
+                />
               </div>
             )
           })}
