@@ -29,6 +29,8 @@ export type SerialValidationReason =
   | 'verified'
   | 'invalid_format'
   | 'not_found'
+  /** Someone — not necessarily this member — has already registered it. */
+  | 'already_registered'
   | 'service_unavailable'
 
 export interface SerialValidationResult {

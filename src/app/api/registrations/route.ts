@@ -5,6 +5,7 @@ import { productRegistration, warrantyRecord, user } from '@/lib/db/schema'
 import { eq } from 'drizzle-orm'
 import { RegistrationSchema } from '@/types/registration'
 import { validateSerialNumber } from '@/lib/serialValidation'
+import { findRegistrationBySerial } from '@/lib/serialRegistry'
 import { sendRegistrationConfirmation, sendWarrantyIssuedEmail } from '@/lib/resend'
 
 async function getAuthenticatedUser(req: Request) {
@@ -36,6 +37,11 @@ export async function POST(req: Request) {
   // `data.serialNumber` is already normalised by the schema.
   const serialCheck = await validateSerialNumber(data.serialNumber)
   const flagged = !serialCheck.valid
+
+  // One physical product, one registration — by anyone, not just per member.
+  if (await findRegistrationBySerial(data.serialNumber)) {
+    return NextResponse.json({ error: 'SERIAL_ALREADY_REGISTERED' }, { status: 409 })
+  }
 
   await db.insert(productRegistration).values({
     id,

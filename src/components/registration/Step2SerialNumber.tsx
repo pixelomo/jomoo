@@ -14,7 +14,7 @@ interface Props {
   onBack: () => void
 }
 
-type ValidationState = 'idle' | 'validating' | 'valid' | 'invalid'
+type ValidationState = 'idle' | 'validating' | 'valid' | 'invalid' | 'duplicate'
 
 export default function Step2SerialNumber({ defaultValues, onSubmit, onBack }: Props) {
   const t = useTranslations('registration.step2')
@@ -50,13 +50,13 @@ export default function Step2SerialNumber({ defaultValues, onSubmit, onBack }: P
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ serialNumber }),
       })
-      const data: { valid: boolean } = await res.json()
+      const data: { valid: boolean; reason?: string } = await res.json()
 
       if (data.valid) {
         setValidationState('valid')
         setValue('serialNumberValid', true)
       } else {
-        setValidationState('invalid')
+        setValidationState(data.reason === 'already_registered' ? 'duplicate' : 'invalid')
         setValue('serialNumberValid', false)
       }
     } catch {
@@ -68,6 +68,7 @@ export default function Step2SerialNumber({ defaultValues, onSubmit, onBack }: P
   // The format itself is enforced by the schema, so 'invalid' here only happens
   // once a real serial database is connected and it reports the number as
   // unknown. Those may still be submitted — they are flagged for staff instead.
+  // A duplicate is a hard stop: that product already has a registration.
   const canProceed = validationState === 'valid' || validationState === 'invalid'
 
   return (
@@ -119,6 +120,12 @@ export default function Step2SerialNumber({ defaultValues, onSubmit, onBack }: P
       {validationState === 'invalid' && (
         <div className="rounded-md bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">
           {t('invalid')}
+        </div>
+      )}
+
+      {validationState === 'duplicate' && (
+        <div className="rounded-md bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">
+          {t('duplicate')}
         </div>
       )}
 

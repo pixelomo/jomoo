@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
 import { z } from 'zod'
 import { validateSerialNumber } from '@/lib/serialValidation'
+import { findRegistrationBySerial } from '@/lib/serialRegistry'
 
 const RequestSchema = z.object({ serialNumber: z.string().min(1) })
 
@@ -30,5 +31,12 @@ export async function POST(req: Request) {
   }
 
   const result = await validateSerialNumber(parsed.data.serialNumber)
+
+  // Only for signed-in members mid-registration. The public GET above
+  // deliberately skips this — it would let anyone probe which serials exist.
+  if (result.valid && (await findRegistrationBySerial(parsed.data.serialNumber))) {
+    return NextResponse.json({ valid: false, reason: 'already_registered' })
+  }
+
   return NextResponse.json(result)
 }

@@ -17,6 +17,7 @@ type FormState = Partial<Step1Data & Step2Data & Step3Data>
 
 export default function RegistrationForm({ models }: Props) {
   const t = useTranslations('registration')
+  const tc = useTranslations('common')
   const router = useRouter()
 
   const [step, setStep] = useState(1)
@@ -52,8 +53,14 @@ export default function RegistrationForm({ models }: Props) {
       })
 
       if (!res.ok) {
-        const error: { error?: string } = await res.json()
-        throw new Error(error.error ?? 'Submission failed')
+        const body: { error?: string } = await res.json().catch(() => ({}))
+        // The server re-checks on submit, so a serial registered between step 2
+        // and now still lands here rather than slipping through.
+        throw new Error(
+          body.error === 'SERIAL_ALREADY_REGISTERED'
+            ? t('step2.duplicate')
+            : tc('error')
+        )
       }
 
       const result: { id: string; status: string } = await res.json()
