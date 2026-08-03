@@ -5,7 +5,7 @@ import { productRegistration, warrantyRecord, user } from '@/lib/db/schema'
 import { eq } from 'drizzle-orm'
 import { RegistrationSchema } from '@/types/registration'
 import { validateSerialNumber } from '@/lib/serialValidation'
-import { findRegistrationBySerial } from '@/lib/serialRegistry'
+import { findRegistrationBySerial, isDuplicateSerialError } from '@/lib/serialRegistry'
 import { sendRegistrationConfirmation, sendWarrantyIssuedEmail } from '@/lib/resend'
 
 async function getAuthenticatedUser(req: Request) {
@@ -43,25 +43,35 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'SERIAL_ALREADY_REGISTERED' }, { status: 409 })
   }
 
-  await db.insert(productRegistration).values({
-    id,
-    userId: sessionUser.id,
-    modelId: data.modelId,
-    modelName: data.modelName,
-    installationDate: data.installationDate,
-    installationAddressState: data.installationAddressState,
-    installationAddressDetail: data.installationAddressDetail,
-    contactPerson: data.contactPerson,
-    phoneNumber: data.phoneNumber ?? null,
-    purchaseDate: data.purchaseDate ?? null,
-    dealerName: data.dealerName ?? null,
-    serialNumber: data.serialNumber,
-    serialNumberValid: serialCheck.valid,
-    warrantyCardUrl: data.warrantyCardUrl ?? null,
-    serialNumberImageUrl: data.serialNumberImageUrl ?? null,
-    status: 'PENDING',
-    flaggedForReview: flagged,
-  })
+  // The lookup above is the friendly path; this catches the narrow window where
+  // two submissions race each other past it. idx_reg_serial_unique is what
+  // actually decides, so a loser gets the same 409 rather than a 500.
+  try {
+    await db.insert(productRegistration).values({
+      id,
+      userId: sessionUser.id,
+      modelId: data.modelId,
+      modelName: data.modelName,
+      installationDate: data.installationDate,
+      installationAddressState: data.installationAddressState,
+      installationAddressDetail: data.installationAddressDetail,
+      contactPerson: data.contactPerson,
+      phoneNumber: data.phoneNumber ?? null,
+      purchaseDate: data.purchaseDate ?? null,
+      dealerName: data.dealerName ?? null,
+      serialNumber: data.serialNumber,
+      serialNumberValid: serialCheck.valid,
+      warrantyCardUrl: data.warrantyCardUrl ?? null,
+      serialNumberImageUrl: data.serialNumberImageUrl ?? null,
+      status: 'PENDING',
+      flaggedForReview: flagged,
+    })
+  } catch (err) {
+    if (isDuplicateSerialError(err)) {
+      return NextResponse.json({ error: 'SERIAL_ALREADY_REGISTERED' }, { status: 409 })
+    }
+    throw err
+  }
 
   let finalStatus = 'PENDING'
 

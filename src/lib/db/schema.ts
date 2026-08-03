@@ -1,4 +1,4 @@
-import { pgTable, text, boolean, timestamp, date, index } from 'drizzle-orm/pg-core'
+import { pgTable, text, boolean, timestamp, date, index, uniqueIndex } from 'drizzle-orm/pg-core'
 
 // ─── Better Auth core tables ──────────────────────────────────────────────────
 
@@ -90,6 +90,9 @@ export const productRegistration = pgTable('product_registrations', {
 }, (t) => [
   index('idx_reg_user_id').on(t.userId),
   index('idx_reg_status').on(t.status),
+  // One physical product, one registration. Declared here so `db:push` keeps it
+  // — the app check in serialRegistry.ts cannot survive two racing submissions.
+  uniqueIndex('idx_reg_serial_unique').on(t.serialNumber),
 ])
 
 export const warrantyRecord = pgTable('warranty_records', {

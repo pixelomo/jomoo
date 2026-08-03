@@ -22,3 +22,22 @@ export async function findRegistrationBySerial(serialNumber: string) {
     .limit(1)
   return existing ?? null
 }
+
+/**
+ * True when a write failed because the serial is already taken.
+ *
+ * Drizzle wraps driver errors, so the Postgres SQLSTATE sits on the cause
+ * rather than the thrown object — checking only the top level silently misses
+ * every collision and turns a 409 into a 500.
+ */
+export function isDuplicateSerialError(err: unknown): boolean {
+  let current: unknown = err
+  for (let depth = 0; current && depth < 5; depth++) {
+    const candidate = current as { code?: unknown; constraint_name?: unknown; cause?: unknown }
+    if (candidate.code === '23505' && candidate.constraint_name === 'idx_reg_serial_unique') {
+      return true
+    }
+    current = candidate.cause
+  }
+  return false
+}
