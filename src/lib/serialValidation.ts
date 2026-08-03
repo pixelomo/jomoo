@@ -56,6 +56,19 @@ export function normaliseSerialNumber(input: string): string {
   return input.normalize('NFKC').replace(SEPARATORS, '').toUpperCase()
 }
 
+/**
+ * Constrains the field as it is typed: one prefix character followed by digits,
+ * capped at the full length. Deliberately does not force the prefix to "J" —
+ * rewriting someone's first keystroke is more confusing than letting the format
+ * error explain it. Everything that could never be part of a serial (symbols,
+ * kana, emoji, a second letter, a 21st character) simply cannot be entered.
+ */
+export function maskSerialInput(raw: string): string {
+  const cleaned = normaliseSerialNumber(raw).replace(/[^A-Z0-9]/g, '')
+  if (!cleaned) return ''
+  return (cleaned[0] + cleaned.slice(1).replace(/\D/g, '')).slice(0, SERIAL_NUMBER_LENGTH)
+}
+
 export function hasValidSerialFormat(input: string): boolean {
   return SERIAL_NUMBER_PATTERN.test(normaliseSerialNumber(input))
 }

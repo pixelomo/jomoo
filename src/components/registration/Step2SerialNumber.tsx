@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useTranslations } from 'next-intl'
 import { Step2Schema, type Step2Data } from '@/types/registration'
-import { normaliseSerialNumber } from '@/lib/serialValidation'
+import { maskSerialInput, SERIAL_NUMBER_LENGTH } from '@/lib/serialValidation'
 import FormField, { inputClass } from '@/components/ui/FormField'
 
 interface Props {
@@ -87,10 +87,11 @@ export default function Step2SerialNumber({ defaultValues, onSubmit, onBack }: P
             placeholder={t('serialNumberPlaceholder')}
             autoComplete="off"
             spellCheck={false}
+            maxLength={SERIAL_NUMBER_LENGTH}
             {...register('serialNumber', {
               onChange: (e) => {
-                const normalised = normaliseSerialNumber(e.target.value)
-                if (normalised !== e.target.value) setValue('serialNumber', normalised)
+                const masked = maskSerialInput(e.target.value)
+                if (masked !== e.target.value) setValue('serialNumber', masked)
                 setValidationState('idle')
               },
             })}
