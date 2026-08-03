@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useTranslations } from 'next-intl'
+import { maskSerialInput, SERIAL_NUMBER_LENGTH } from '@/lib/serialValidation'
 
 export default function VerifyPage() {
   const t = useTranslations('verify')
@@ -49,11 +50,12 @@ export default function VerifyPage() {
             id="sn"
             type="text"
             value={serialNumber}
-            onChange={(e) => { setSerialNumber(e.target.value); setResult(null) }}
+            onChange={(e) => { setSerialNumber(maskSerialInput(e.target.value)); setResult(null) }}
             placeholder={t('inputPlaceholder')}
             className="w-full rounded-lg border border-zinc-200 px-4 py-3 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-zinc-900 transition"
             autoComplete="off"
             spellCheck={false}
+            maxLength={SERIAL_NUMBER_LENGTH}
           />
           <p className="mt-1.5 text-xs text-zinc-400">{t('hint')}</p>
         </div>
