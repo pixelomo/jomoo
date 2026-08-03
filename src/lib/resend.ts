@@ -1,5 +1,5 @@
 import { Resend } from 'resend'
-import { categoryLabel, type ContactCategory } from '@/types/contact'
+import { categoryEmail, categoryLabel, type ContactCategory } from '@/types/contact'
 
 function isResendConfigured() {
   return Boolean(process.env.RESEND_API_KEY?.trim() && process.env.RESEND_FROM_EMAIL?.trim())
@@ -28,27 +28,24 @@ function appUrl() {
   return (process.env.NEXT_PUBLIC_APP_URL ?? '').replace(/\/$/, '')
 }
 
-/** Inquiry category → env var holding that department's address. */
-const CATEGORY_ENV: Record<ContactCategory, string> = {
-  product:      'CONTACT_TO_PRODUCT',
-  purchase:     'CONTACT_TO_PURCHASE',
-  support:      'CONTACT_TO_SUPPORT',
-  installation: 'CONTACT_TO_INSTALLATION',
-  partnership:  'CONTACT_TO_PARTNERSHIP',
-  other:        'CONTACT_TO_OTHER',
-}
-
 /**
- * Routes to the department that owns the selected category, falling back to
- * CONTACT_TO_EMAIL whenever a department address is not configured — an
- * unrouted inquiry still lands somewhere a human reads.
+ * Routes to the department that owns the selected category.
+ *
+ * The address in types/contact.ts is the source of truth; a CONTACT_TO_<ID>
+ * environment variable overrides it so a department can be redirected without
+ * a deploy. CONTACT_TO_EMAIL is the last resort and should never be reached —
+ * every category ships with an address.
  */
-function contactTo(category: ContactCategory) {
+export function contactAddressFor(category: ContactCategory) {
   if (process.env.NODE_ENV === 'development' && process.env.CONTACT_DEV_TO_EMAIL?.trim()) {
     return process.env.CONTACT_DEV_TO_EMAIL.trim()
   }
-  const departmentAddress = process.env[CATEGORY_ENV[category]]?.trim()
-  return departmentAddress || process.env.CONTACT_TO_EMAIL?.trim() || 'alan.s@uralaverse.com'
+
+  const override = process.env[`CONTACT_TO_${category.toUpperCase()}`]?.trim()
+  const address = override || categoryEmail(category) || process.env.CONTACT_TO_EMAIL?.trim()
+
+  if (!address) throw new Error(`No contact address configured for category "${category}"`)
+  return address
 }
 
 async function deliverEmail({
@@ -156,7 +153,7 @@ export async function sendContactInquiry({
     .join('')
 
   await deliverEmail({
-    to: contactTo(category),
+    to: contactAddressFor(category),
     replyTo: email,
     subject: `【JOMOO】${label}: ${fullName}`,
     devLabel: `contact inquiry (${category})`,

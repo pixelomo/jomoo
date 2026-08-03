@@ -1,17 +1,23 @@
 import { z } from 'zod'
 
 /**
- * Inquiry categories. `id` drives routing — each id has a matching
- * CONTACT_TO_<ID> env var holding that department's address (see CATEGORY_ENV
- * in lib/resend.ts). `label` is what the visitor picks from.
+ * Inquiry categories, in the order the visitor sees them.
+ *
+ * `email` is the department the inquiry is sent to. These are the client's own
+ * business addresses rather than secrets, so they live here where the routing
+ * is reviewable in a diff — and, unlike environment variables, cannot silently
+ * go missing and dump every category into one inbox.
+ *
+ * A CONTACT_TO_<ID> environment variable still overrides the address if one is
+ * set, so a department can be redirected without a deploy.
  */
 export const CONTACT_CATEGORIES = [
-  { id: 'product',      label: '製品について' },
-  { id: 'purchase',     label: 'ご購入・お見積り' },
-  { id: 'support',      label: 'アフターサービス・修理' },
-  { id: 'installation', label: '施工・技術サポート' },
-  { id: 'partnership',  label: 'パートナーシップ・代理店' },
-  { id: 'other',        label: 'その他' },
+  { id: 'partnership', label: '業務提携・アライアンスについて',   email: 'business@jomoogroup.com'   },
+  { id: 'product',     label: '製品・サービスに関するお問い合わせ', email: 'aftersales@jomoogroup.com' },
+  { id: 'materials',   label: '資料請求・お見積り',              email: 'business@jomoogroup.com'   },
+  { id: 'support',     label: 'ご利用中のお客様サポート',         email: 'aftersales@jomoogroup.com' },
+  { id: 'fault',       label: '不具合・障害報告',                email: 'aftersales@jomoogroup.com' },
+  { id: 'recruitment', label: '採用に関するお問い合わせ',         email: 'yangyang01@jomoo.com'      },
 ] as const
 
 export type ContactCategory = (typeof CONTACT_CATEGORIES)[number]['id']
@@ -23,6 +29,11 @@ const CATEGORY_IDS = CONTACT_CATEGORIES.map(c => c.id) as [
 
 export function categoryLabel(id: ContactCategory): string {
   return CONTACT_CATEGORIES.find(c => c.id === id)?.label ?? id
+}
+
+/** The department address an inquiry in this category belongs to. */
+export function categoryEmail(id: ContactCategory): string | undefined {
+  return CONTACT_CATEGORIES.find(c => c.id === id)?.email
 }
 
 export const ContactSchema = z
