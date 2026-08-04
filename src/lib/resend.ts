@@ -1,5 +1,24 @@
 import { Resend } from 'resend'
-import { categoryEmail, categoryLabel, type ContactCategory } from '@/types/contact'
+import {
+  categoryEmail,
+  categoryLabel,
+  type ContactCategory,
+  type ContactData,
+} from '@/types/contact'
+import { notificationConfig, type NotificationKey } from '@/lib/notifications'
+
+/**
+ * Everything a visitor typed goes into an HTML email, so it has to be escaped —
+ * otherwise a contact form message can inject markup into the mail staff read.
+ */
+function escapeHtml(value: unknown): string {
+  return String(value ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;')
+}
 
 function isResendConfigured() {
   return Boolean(process.env.RESEND_API_KEY?.trim() && process.env.RESEND_FROM_EMAIL?.trim())
@@ -55,6 +74,7 @@ async function deliverEmail({
   replyTo,
   devLabel,
   devSummary,
+  notification,
 }: {
   to: string | string[]
   subject: string
@@ -62,7 +82,19 @@ async function deliverEmail({
   replyTo?: string
   devLabel: string
   devSummary: Record<string, unknown>
+  /** Looked up so admins can switch it off or copy operational staff. */
+  notification?: NotificationKey
 }) {
+  let cc: string[] = []
+  if (notification) {
+    const config = await notificationConfig(notification)
+    if (!config.enabled) {
+      console.info(`[email] ${devLabel} skipped — switched off in the admin portal`)
+      return { skipped: true as const }
+    }
+    cc = config.cc
+  }
+
   if (!isResendConfigured()) {
     if (contactDevFallbackEnabled()) {
       console.info(`[email:dev-fallback] ${devLabel}`, { to, replyTo, ...devSummary })
@@ -74,6 +106,7 @@ async function deliverEmail({
   const { data, error } = await getResend().emails.send({
     from: from(),
     to,
+    ...(cc.length && { cc }),
     replyTo,
     subject,
     html,
@@ -146,8 +179,8 @@ export async function sendContactInquiry({
     .map(
       ([label, value]) => `
         <tr>
-          <td style="padding:10px 12px;border-bottom:1px solid #f4f4f5;font-size:13px;color:#71717a;vertical-align:top;width:140px">${label}</td>
-          <td style="padding:10px 12px;border-bottom:1px solid #f4f4f5;font-size:14px;color:#18181b;white-space:pre-wrap">${value}</td>
+          <td style="padding:10px 12px;border-bottom:1px solid #f4f4f5;font-size:13px;color:#71717a;vertical-align:top;width:140px">${escapeHtml(label)}</td>
+          <td style="padding:10px 12px;border-bottom:1px solid #f4f4f5;font-size:14px;color:#18181b;white-space:pre-wrap">${escapeHtml(value)}</td>
         </tr>`
     )
     .join('')
@@ -156,6 +189,7 @@ export async function sendContactInquiry({
     to: contactAddressFor(category),
     replyTo: email,
     subject: `【JOMOO】${label}: ${fullName}`,
+    notification: 'contact_staff',
     devLabel: `contact inquiry (${category})`,
     devSummary: {
       category,
@@ -227,6 +261,7 @@ export async function sendMemberWelcome({
   await deliverEmail({
     to,
     subject: '【JOMOO】会員登録が完了しました',
+    notification: 'welcome',
     devLabel: 'member welcome',
     devSummary: { name },
     html: buildHtml(`${name} 様`, [
@@ -255,9 +290,11 @@ export async function sendRegistrationConfirmation({
 }) {
   const dashboardUrl = `${appUrl()}/dashboard`
 
-  await getResend().emails.send({
-    from: from(),
+  await deliverEmail({
     to,
+    notification: 'registration',
+    devLabel: 'registration received',
+    devSummary: { modelName, registrationId },
     subject: `【JOMOO】製品登録を受け付けました - ${modelName}`,
     html: buildHtml(`${name} 様`, [
       `<strong>${modelName}</strong> の製品登録（登録番号：<code>${registrationId}</code>）を受け付けました。`,
@@ -290,9 +327,11 @@ export async function sendWarrantyIssuedEmail({
     day: 'numeric',
   })
 
-  await getResend().emails.send({
-    from: from(),
+  await deliverEmail({
     to,
+    notification: 'warranty',
+    devLabel: 'warranty issued',
+    devSummary: { modelName, registrationId, formattedExpiry },
     subject: `【JOMOO】電子保証カードを発行しました - ${modelName}`,
     html: buildHtml(`${name} 様`, [
       `<strong>${modelName}</strong> の製造番号を確認し、電子保証カードを発行いたしました。`,
@@ -352,9 +391,11 @@ export async function sendReviewStatusUpdate({
 
   const { subject, lines } = messages[status]
 
-  await getResend().emails.send({
-    from: from(),
+  await deliverEmail({
     to,
+    notification: 'registration',
+    devLabel: `review outcome (${status})`,
+    devSummary: { status, registrationId },
     subject,
     html: buildHtml(`${name} 様`, lines),
   })
@@ -384,4 +425,54 @@ function buildHtml(greeting: string, lines: string[]): string {
   </div>
 </body>
 </html>`
+}
+
+// ─────────────────────────────────────────────
+// Password reset (wired to Better Auth's forgot-password flow)
+// ─────────────────────────────────────────────
+export async function sendPasswordReset({
+  to,
+  name,
+  url,
+}: {
+  to: string
+  name: string
+  url: string
+}) {
+  await deliverEmail({
+    to,
+    notification: 'password_reset',
+    devLabel: 'password reset',
+    devSummary: { name, url },
+    subject: '【JOMOO】パスワード再設定のご案内',
+    html: buildHtml(`${name} 様`, [
+      'パスワード再設定のご依頼を承りました。',
+      '下記のボタンから新しいパスワードをご設定ください。',
+      `<a href="${url}" style="display:inline-block;margin-top:8px;padding:10px 20px;background:#18181b;color:#fff;border-radius:6px;text-decoration:none;font-weight:600">パスワードを再設定する</a>`,
+      `<span style="font-size:13px;color:#71717a">ボタンが開かない場合は、次のURLをブラウザに貼り付けてください:<br /><span style="word-break:break-all">${url}</span></span>`,
+      '<span style="font-size:13px;color:#71717a">このリンクの有効期限は1時間です。お心当たりのない場合は、お手数ですがこのメールを破棄してください。</span>',
+    ]),
+  })
+}
+
+// ─────────────────────────────────────────────
+// Contact form acknowledgement, to the person who wrote in
+// ─────────────────────────────────────────────
+export async function sendContactAcknowledgement(data: ContactData) {
+  const fullName = `${data.lastName} ${data.firstName}`.trim()
+
+  await deliverEmail({
+    to: data.email,
+    notification: 'contact_reply',
+    devLabel: 'contact acknowledgement',
+    devSummary: { category: data.category, to: data.email },
+    subject: '【JOMOO】お問い合わせありがとうございます',
+    html: buildHtml(`${fullName} 様`, [
+      'このたびはJOMOOへお問い合わせいただき、誠にありがとうございます。',
+      '以下の内容で承りました。担当部署より順次ご連絡いたしますので、今しばらくお待ちください。',
+      `<span style="font-size:13px;color:#71717a">お問い合わせ種別：${categoryLabel(data.category)}</span>`,
+      `<span style="display:block;padding:12px 16px;background:#f4f4f5;border-radius:6px;white-space:pre-wrap">${escapeHtml(data.message)}</span>`,
+      '<span style="font-size:13px;color:#71717a">本メールは送信専用です。ご返信いただいてもお答えできませんのでご了承ください。</span>',
+    ]),
+  })
 }

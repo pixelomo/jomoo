@@ -160,3 +160,18 @@ export const contactSubmission = pgTable('contact_submissions', {
   index('idx_contact_submitted_at').on(t.submittedAt),
   index('idx_contact_category').on(t.category),
 ])
+
+/**
+ * Which automatic emails go out, and who else is copied.
+ *
+ * One row per notification rather than one column each, so adding a new
+ * notification is a seed row instead of a migration.
+ */
+export const notificationSetting = pgTable('notification_settings', {
+  /** Stable key from lib/notifications.ts — never shown to staff. */
+  key: text('key').primaryKey(),
+  enabled: boolean('enabled').notNull().default(true),
+  /** Comma-separated operational addresses copied on every send. */
+  ccAddresses: text('cc_addresses'),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+})

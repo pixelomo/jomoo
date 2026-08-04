@@ -17,7 +17,9 @@ export async function POST(request: Request) {
   }
 
   const data = parsed.data
-  const { sendContactInquiry, contactAddressFor } = await import('@/lib/resend')
+  const { sendContactInquiry, sendContactAcknowledgement, contactAddressFor } = await import(
+    '@/lib/resend'
+  )
 
   // Recorded before the send, so an enquiry survives a delivery failure instead
   // of disappearing with it — and so staff have something to export.
@@ -55,6 +57,14 @@ export async function POST(request: Request) {
     await db.update(contactSubmission).set({ delivered: true }).where(eq(contactSubmission.id, id))
   } catch {
     // The mail went out; a missed flag is not worth failing the request over.
+  }
+
+  // The enquiry already reached the department, so a failed acknowledgement
+  // must not turn a successful submission into an error for the visitor.
+  try {
+    await sendContactAcknowledgement(data)
+  } catch (err) {
+    console.error('[contact] acknowledgement failed', err)
   }
 
   return NextResponse.json({ ok: true })

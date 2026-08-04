@@ -41,6 +41,16 @@ export const auth = betterAuth({
     // Off by default — see auth-features.ts. When on, accounts cannot sign in
     // until the address is confirmed.
     requireEmailVerification: EMAIL_VERIFICATION_REQUIRED,
+    // Better Auth builds and signs the link; we own the delivery so a failure
+    // is logged rather than swallowed, and admins can switch it off.
+    sendResetPassword: async ({ user: member, url }) => {
+      const { sendPasswordReset } = await import('./resend')
+      await sendPasswordReset({
+        to: member.email,
+        name: member.name || member.email,
+        url,
+      })
+    },
   },
   databaseHooks: {
     user: {
