@@ -17,10 +17,45 @@
  * themselves a warranty.
  */
 
-export const SERIAL_NUMBER_PATTERN = /^J\d{19}$/
+/**
+ * Digits after the "J" — the length differs by product line, so the rule is
+ * keyed on the Sanity series rather than being one pattern for everything.
+ *
+ * washstand and faucets are the client's defaults until they confirm their own
+ * lengths; change the two numbers here and nothing else needs touching.
+ */
+export const SERIAL_DIGITS_BY_SERIES: Record<string, number> = {
+  'smart-toilet': 19,
+  'shower-set': 20,
+  washstand: 19,
+  faucets: 19,
+}
 
-/** Human-readable form used in hints and placeholders. */
-export const SERIAL_NUMBER_LENGTH = 20
+/** Used when a serial is checked without knowing which product it belongs to. */
+export const DEFAULT_SERIAL_DIGITS = 19
+
+export function serialDigitsFor(series?: string | null): number {
+  return (series && SERIAL_DIGITS_BY_SERIES[series]) || DEFAULT_SERIAL_DIGITS
+}
+
+export function serialPatternFor(series?: string | null): RegExp {
+  return new RegExp(`^J\\d{${serialDigitsFor(series)}}$`)
+}
+
+/** Total characters including the leading J. */
+export function serialLengthFor(series?: string | null): number {
+  return serialDigitsFor(series) + 1
+}
+
+/** Widest form any product uses — the input cap must not cut a longer serial short. */
+export const MAX_SERIAL_LENGTH =
+  Math.max(...Object.values(SERIAL_DIGITS_BY_SERIES), DEFAULT_SERIAL_DIGITS) + 1
+
+/** @deprecated prefer serialPatternFor(series) */
+export const SERIAL_NUMBER_PATTERN = serialPatternFor()
+
+/** @deprecated prefer serialLengthFor(series) */
+export const SERIAL_NUMBER_LENGTH = MAX_SERIAL_LENGTH
 
 export type SerialValidationReason =
   /** Format is correct; there is no serial database to check it against yet. */
@@ -65,22 +100,24 @@ export function normaliseSerialNumber(input: string): string {
  * error explain it. Everything that could never be part of a serial (symbols,
  * kana, emoji, a second letter, a 21st character) simply cannot be entered.
  */
-export function maskSerialInput(raw: string): string {
+export function maskSerialInput(raw: string, series?: string | null): string {
   const cleaned = normaliseSerialNumber(raw).replace(/[^A-Z0-9]/g, '')
   if (!cleaned) return ''
-  return (cleaned[0] + cleaned.slice(1).replace(/\D/g, '')).slice(0, SERIAL_NUMBER_LENGTH)
+  return (cleaned[0] + cleaned.slice(1).replace(/\D/g, '')).slice(0, serialLengthFor(series))
 }
 
-export function hasValidSerialFormat(input: string): boolean {
-  return SERIAL_NUMBER_PATTERN.test(normaliseSerialNumber(input))
+export function hasValidSerialFormat(input: string, series?: string | null): boolean {
+  return serialPatternFor(series).test(normaliseSerialNumber(input))
 }
 
 export async function validateSerialNumber(
-  serialNumber: string
+  serialNumber: string,
+  /** Sanity series of the product being registered; picks the digit count. */
+  series?: string | null
 ): Promise<SerialValidationResult> {
   const serial = normaliseSerialNumber(serialNumber)
 
-  if (!SERIAL_NUMBER_PATTERN.test(serial)) {
+  if (!serialPatternFor(series).test(serial)) {
     return { valid: false, reason: 'invalid_format' }
   }
 

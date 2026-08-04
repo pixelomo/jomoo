@@ -213,7 +213,7 @@
       "title": "製造番号の確認",
       "serialNumber": "製品製造番号",
       "serialNumberPlaceholder": "J1234567890123456789",
-      "serialNumberHint": "製造番号は「J」で始まる20桁です（J のあとに数字19桁）。製品本体のラベルまたは保証書に記載されています。",
+      "serialNumberHint": "製造番号は「J」で始まります。桁数は製品によって異なりますので、製品本体のラベルまたは保証書に記載の番号をそのままご入力ください。",
       "validate": "製造番号を照合する",
       "validating": "照合中...",
       "valid": "製造番号を確認しました",
@@ -498,7 +498,7 @@
     "invalidPhone": "有効な電話番号を入力してください",
     "fileTooLarge": "ファイルサイズは 10MB 以下にしてください",
     "invalidFileType": "JPG・PNG・HEIC 形式のみ対応しています",
-    "serialFormat": "製造番号は「J」＋数字19桁の形式で入力してください"
+    "serialFormat": "製造番号の形式が正しくありません。製品に記載の製造番号をご確認ください。"
   },
   "notFound": {
     "code": "404",

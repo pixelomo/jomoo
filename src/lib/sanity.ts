@@ -36,17 +36,43 @@ export function imgUrl(source: any, width: number, quality = 82): string {
 }
 
 // Fetch all active products for the model dropdown
-export async function getProductModels(): Promise<{ _id: string; name: string; modelCode: string }[]> {
+export interface ProductModel {
+  _id: string
+  name: string
+  modelCode: string
+  /** Drives the serial number length — see lib/serialValidation.ts. */
+  series: string
+}
+
+export async function getProductModels(): Promise<ProductModel[]> {
   try {
     return await getSanityClient().fetch(
       `*[_type == "product" && isActive == true && defined(modelCode)] | order(name asc) {
         _id,
         "name": coalesce(name, "Unknown"),
-        modelCode
+        modelCode,
+        series
       }`
     )
   } catch {
     return []
+  }
+}
+
+/**
+ * Series for one product, looked up server-side. The registration API must not
+ * take the client's word for which product line a serial belongs to — that
+ * would let a shorter serial through by claiming the wrong category.
+ */
+export async function getProductSeriesById(modelId: string): Promise<string | null> {
+  try {
+    const result = await getSanityClient().fetch<string | null>(
+      `*[_type == "product" && _id == $modelId][0].series`,
+      { modelId }
+    )
+    return result ?? null
+  } catch {
+    return null
   }
 }
 

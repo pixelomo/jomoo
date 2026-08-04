@@ -10,7 +10,7 @@ import Step3Attachments from './Step3Attachments'
 import type { Step1Data, Step2Data, Step3Data } from '@/types/registration'
 
 interface Props {
-  models: { _id: string; name: string; modelCode: string }[]
+  models: { _id: string; name: string; modelCode: string; series: string }[]
 }
 
 type FormState = Partial<Step1Data & Step2Data & Step3Data>

@@ -9,7 +9,7 @@ import FormField, { inputClass } from '@/components/ui/FormField'
 
 interface Props {
   defaultValues?: Partial<Step1Data>
-  models: { _id: string; name: string; modelCode: string }[]
+  models: { _id: string; name: string; modelCode: string; series: string }[]
   onSubmit: (data: Step1Data) => void
 }
 
@@ -33,12 +33,15 @@ export default function Step1BasicInfo({ defaultValues, models, onSubmit }: Prop
     const model = models.find((m) => m._id === modelId)
     setValue('modelId', modelId)
     setValue('modelName', model?.name ?? '')
+    // Step 2 needs this to know how many digits the serial should carry.
+    setValue('modelSeries', model?.series ?? '')
   }
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
       {/* Hidden modelName field */}
       <input type="hidden" {...register('modelName')} />
+      <input type="hidden" {...register('modelSeries')} />
 
       <FormField
         label={t('model')}

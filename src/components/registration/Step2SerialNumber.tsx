@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useTranslations } from 'next-intl'
 import { Step2Schema, type Step2Data } from '@/types/registration'
-import { maskSerialInput, SERIAL_NUMBER_LENGTH } from '@/lib/serialValidation'
+import { maskSerialInput, serialLengthFor } from '@/lib/serialValidation'
 import FormField, { inputClass } from '@/components/ui/FormField'
 
 interface Props {
@@ -17,6 +17,8 @@ interface Props {
 type ValidationState = 'idle' | 'validating' | 'valid' | 'invalid' | 'duplicate'
 
 export default function Step2SerialNumber({ defaultValues, onSubmit, onBack }: Props) {
+  const series = defaultValues?.modelSeries
+  const maxLength = serialLengthFor(series)
   const t = useTranslations('registration.step2')
   const tc = useTranslations('common')
   const tv = useTranslations('validation')
@@ -48,7 +50,7 @@ export default function Step2SerialNumber({ defaultValues, onSubmit, onBack }: P
       const res = await fetch('/api/serial-validate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ serialNumber }),
+        body: JSON.stringify({ serialNumber, modelSeries: series }),
       })
       const data: { valid: boolean; reason?: string } = await res.json()
 
@@ -88,10 +90,10 @@ export default function Step2SerialNumber({ defaultValues, onSubmit, onBack }: P
             placeholder={t('serialNumberPlaceholder')}
             autoComplete="off"
             spellCheck={false}
-            maxLength={SERIAL_NUMBER_LENGTH}
+            maxLength={maxLength}
             {...register('serialNumber', {
               onChange: (e) => {
-                const masked = maskSerialInput(e.target.value)
+                const masked = maskSerialInput(e.target.value, series)
                 if (masked !== e.target.value) setValue('serialNumber', masked)
                 setValidationState('idle')
               },

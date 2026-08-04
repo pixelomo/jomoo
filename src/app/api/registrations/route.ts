@@ -6,6 +6,7 @@ import { eq } from 'drizzle-orm'
 import { RegistrationSchema } from '@/types/registration'
 import { validateSerialNumber } from '@/lib/serialValidation'
 import { findRegistrationBySerial, isDuplicateSerialError } from '@/lib/serialRegistry'
+import { getProductSeriesById } from '@/lib/sanity'
 import { sendRegistrationConfirmation, sendWarrantyIssuedEmail } from '@/lib/resend'
 
 async function getAuthenticatedUser(req: Request) {
@@ -35,7 +36,10 @@ export async function POST(req: Request) {
   // body carries a `serialNumberValid` flag for the form's own UI; trusting it
   // here would let anyone with an account issue themselves a warranty.
   // `data.serialNumber` is already normalised by the schema.
-  const serialCheck = await validateSerialNumber(data.serialNumber)
+  // Look the series up rather than trusting data.modelSeries — a shorter serial
+  // could otherwise be waved through by claiming the wrong product line.
+  const series = await getProductSeriesById(data.modelId)
+  const serialCheck = await validateSerialNumber(data.serialNumber, series)
   const flagged = !serialCheck.valid
 
   // One physical product, one registration — by anyone, not just per member.

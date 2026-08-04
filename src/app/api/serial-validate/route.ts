@@ -4,7 +4,11 @@ import { z } from 'zod'
 import { validateSerialNumber } from '@/lib/serialValidation'
 import { findRegistrationBySerial } from '@/lib/serialRegistry'
 
-const RequestSchema = z.object({ serialNumber: z.string().min(1) })
+const RequestSchema = z.object({
+  serialNumber: z.string().min(1),
+  /** Sanity series of the product being registered; sets the digit count. */
+  modelSeries: z.string().optional(),
+})
 
 // Public endpoint — used by the /verify page (no auth required)
 export async function GET(req: Request) {
@@ -30,7 +34,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'Invalid request', details: parsed.error.flatten() }, { status: 400 })
   }
 
-  const result = await validateSerialNumber(parsed.data.serialNumber)
+  const result = await validateSerialNumber(parsed.data.serialNumber, parsed.data.modelSeries)
 
   // Only for signed-in members mid-registration. The public GET above
   // deliberately skips this — it would let anyone probe which serials exist.
