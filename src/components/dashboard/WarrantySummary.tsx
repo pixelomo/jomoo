@@ -13,10 +13,13 @@ interface Warranty {
  * itself lives at /warranty/[id].
  */
 export default function WarrantySummary({ warranties }: { warranties: Warranty[] }) {
+  const heading = `ご契約一覧（${warranties.length}件）`
+
   if (warranties.length === 0) {
     return (
       <section className="member-card">
-        <h2 className="member-card__title">ご契約中の保証はありません</h2>
+        <h2 className="member-card__title">{heading}</h2>
+        <p className="member-card__body">現在ご契約中の保証はありません。</p>
         <p className="member-card__body">
           製品を登録いただくと、保証内容をこちらでご確認いただけます。
         </p>
@@ -31,7 +34,7 @@ export default function WarrantySummary({ warranties }: { warranties: Warranty[]
 
   return (
     <section className="member-card">
-      <h2 className="member-card__title member-card__title--sub">ご契約情報</h2>
+      <h2 className="member-card__title">{heading}</h2>
       <div className="member-panel__legacy">
         {warranties.map((w) => (
           <div key={w.registrationId} className="member-card__row">

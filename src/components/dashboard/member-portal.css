@@ -40,8 +40,8 @@
 .member-hero__scrim {
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, #000000 0%, rgba(0, 0, 0, 0.35) 100%);
-  opacity: 0.2;
+  background: linear-gradient(180deg, #001f3d, rgba(0, 0, 0, 0.35));
+  opacity: 0.6;
 }
 
 .member-hero__title {
@@ -53,10 +53,11 @@
   margin-inline: auto;
   padding-inline: var(--gutter);
   color: #ffffff;
-  font-size: clamp(1.75rem, 3.4vw, 2.75rem);
+  font-size: 3.6rem;
   font-weight: 700;
   letter-spacing: 0.04em;
   line-height: 1.2;
+  text-align: center;
 }
 
 /* ── tabs ──────────────────────────────────────────────── */
@@ -76,7 +77,7 @@
   background: none;
   font-family: var(--font-jp);
   font-size: 1.75rem;
-  font-weight: 500;
+  font-weight: 600;
   line-height: 1.4;
   color: var(--member-ink);
   text-align: center;
@@ -106,10 +107,14 @@
 .member-card {
   width: 100%;
   background: #ffffff;
-  border-radius: 0.5rem;
-  padding: 3rem clamp(1.5rem, 4vw, 3.5rem);
+  border-radius: 1rem;
+  padding: 5rem clamp(1.5rem, 4vw, 3.5rem);
+  text-align: center;
+  /* Column, so the button keeps its own row while everything stays centred. */
   display: flex;
   flex-direction: column;
+  align-items: center;
+  justify-content: center;
   gap: 2rem;
 }
 
@@ -134,11 +139,12 @@
   color: var(--member-ink-soft);
 }
 
-/* Title and copy on one row beside the artwork; the button gets its own. */
+/* Artwork on the left, copy on the right; the button gets its own row below. */
 .member-card__row {
   display: flex;
   align-items: center;
   gap: clamp(1.5rem, 4vw, 3rem);
+  width: 100%;
 }
 
 .member-card__copy {
@@ -147,6 +153,7 @@
   display: flex;
   flex-direction: column;
   gap: 1rem;
+  text-align: left;
 }
 
 .member-card__art {
@@ -167,6 +174,9 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  width: 615px;
+  max-width: 100%;
+  height: 90px;
   padding: 1rem 2.5rem;
   border: 0;
   border-radius: 0.5rem;
@@ -231,6 +241,163 @@
   }
 
   .member-btn {
+    width: 100%;
+  }
+}
+
+/* ── お客様情報 ────────────────────────────────────────── */
+.member-profile-card {
+  width: 100%;
+  background: #ffffff;
+  border: 1px solid #f4f4f5;
+  border-radius: 0.75rem;
+  padding: 3rem;
+  text-align: left;
+}
+
+.member-profile-card__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.member-profile-card__title {
+  margin: 0;
+  font-size: clamp(1.5rem, 2.4vw, 2rem);
+  font-weight: 700;
+  line-height: 1.4;
+  color: var(--member-ink);
+}
+
+/* Outlined pill — the one control for the whole card, rather than a pencil per row. */
+.member-edit-pill {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.6rem 1.75rem;
+  border: 1px solid #2563eb;
+  border-radius: 999px;
+  background: #ffffff;
+  color: #2563eb;
+  font-family: var(--font-jp);
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1.4;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.member-edit-pill:hover,
+.member-edit-pill:focus-visible {
+  background: #2563eb;
+  color: #ffffff;
+}
+
+.member-edit-pill--ghost {
+  border-color: #d4d4d8;
+  color: var(--member-ink-soft);
+}
+
+.member-edit-pill--ghost:hover,
+.member-edit-pill--ghost:focus-visible {
+  background: #f4f4f5;
+  color: var(--member-ink);
+}
+
+.member-field {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 1.25rem 0;
+  /* Matches the product spec table's rule rather than the card's hairline. */
+  border-bottom: 1px solid #000000;
+}
+
+.member-field:first-of-type {
+  border-top: 1px solid #000000;
+}
+
+.member-field__label {
+  flex: 0 0 12rem;
+  font-size: 1.0625rem;
+  font-weight: 600;
+  color: var(--member-ink);
+}
+
+.member-field__value {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-size: 1.0625rem;
+  color: var(--member-ink-soft);
+}
+
+.member-field__value input,
+.member-field__value select {
+  width: 100%;
+  max-width: 24rem;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #d4d4d8;
+  border-radius: 0.375rem;
+  font-family: var(--font-jp);
+  font-size: 1rem;
+  color: var(--member-ink);
+  background: #ffffff;
+}
+
+.member-field__unset {
+  color: #a1a1aa;
+}
+
+.member-profile-card__actions {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 2rem;
+}
+
+/* Sits below the card, not inside it. */
+.member-delete {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 2rem;
+  padding: 0.85rem 2.25rem;
+  border: 1px solid #dc2626;
+  border-radius: 999px;
+  background: #dc2626;
+  color: #ffffff;
+  font-family: var(--font-jp);
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1.4;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.member-delete:hover,
+.member-delete:focus-visible {
+  background: #b91c1c;
+  border-color: #b91c1c;
+}
+
+@media (max-width: 767px) {
+  .member-profile-card {
+    padding: 1.75rem 1.25rem;
+  }
+
+  .member-field {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .member-field__label {
+    flex: 0 0 auto;
+  }
+
+  .member-delete {
     width: 100%;
   }
 }

@@ -9,6 +9,9 @@ const UpdateUserSchema = z.object({
   name: z.string().min(1).max(100).optional(),
   gender: z.enum(['male', 'female', 'other', 'prefer_not_to_say']).nullable().optional(),
   dateOfBirth: z.string().nullable().optional(),
+  phoneNumber: z.string().max(30).nullable().optional(),
+  postalCode: z.string().max(16).nullable().optional(),
+  address: z.string().max(200).nullable().optional(),
 })
 
 export async function GET(req: Request) {
@@ -36,6 +39,9 @@ export async function PATCH(req: Request) {
     ...(d.name !== undefined && { name: d.name }),
     ...(d.gender !== undefined && { gender: d.gender }),
     ...(d.dateOfBirth !== undefined && { dateOfBirth: d.dateOfBirth }),
+    ...(d.phoneNumber !== undefined && { phoneNumber: d.phoneNumber }),
+    ...(d.postalCode !== undefined && { postalCode: d.postalCode }),
+    ...(d.address !== undefined && { address: d.address }),
     updatedAt: new Date(),
   }).where(eq(user.id, session.user.id))
 

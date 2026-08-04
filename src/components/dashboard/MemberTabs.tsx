@@ -79,12 +79,6 @@ export default function MemberTabs({ products, contract, profile, isEmpty }: Pro
 
               <section className="member-card">
                 <div className="member-card__row">
-                  <div className="member-card__copy">
-                    <h2 className="member-card__title member-card__title--sub">保証延長</h2>
-                    <p className="member-card__body">
-                      当社の定める対象製品を登録すると保証期間が3年に延長されます。引渡／購入日から6か月以内であれば、さらに安心が長く続く長期保証サービス（有料）へのお申し込みもできます。
-                    </p>
-                  </div>
                   <img
                     className="member-card__art"
                     src="/images/register.png"
@@ -92,6 +86,12 @@ export default function MemberTabs({ products, contract, profile, isEmpty }: Pro
                     width={215}
                     height={215}
                   />
+                  <div className="member-card__copy">
+                    <h2 className="member-card__title member-card__title--sub">保証延長</h2>
+                    <p className="member-card__body">
+                      当社の定める対象製品を登録すると保証期間が3年に延長されます。引渡／購入日から6か月以内であれば、さらに安心が長く続く長期保証サービス（有料）へのお申し込みもできます。
+                    </p>
+                  </div>
                 </div>
                 <div className="member-card__actions">
                   <Link className="member-btn" href="/register">

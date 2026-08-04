@@ -151,7 +151,7 @@
     "profile": {
       "title": "プロフィール",
       "email": "メールアドレス",
-      "name": "表示名",
+      "name": "名前",
       "gender": "性別",
       "dateOfBirth": "生年月日",
       "notSet": "未設定",
@@ -178,7 +178,10 @@
       "deleteAccountWarning": "アカウント、プロフィール、およびすべての製品登録が完全に削除されます。この操作は取り消せません。",
       "deleteAccountConfirmPrompt": "確認のため DELETE と入力してください",
       "deleteAccountConfirm": "アカウントを削除する",
-      "deleteAccountError": "アカウントの削除に失敗しました。もう一度お試しください。"
+      "deleteAccountError": "アカウントの削除に失敗しました。もう一度お試しください。",
+      "phoneNumber": "電話番号",
+      "postalCode": "郵便番号",
+      "address": "住所"
     }
   },
   "registration": {

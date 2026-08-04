@@ -15,6 +15,9 @@ export const user = pgTable('user', {
   // Custom profile fields
   gender: text('gender'),
   dateOfBirth: date('date_of_birth'),
+  phoneNumber: text('phone_number'),
+  postalCode: text('postal_code'),
+  address: text('address'),
 })
 
 export const session = pgTable('session', {

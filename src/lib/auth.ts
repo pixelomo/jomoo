@@ -125,6 +125,23 @@ export const auth = betterAuth({
         input: true,
         fieldName: 'date_of_birth',
       },
+      phoneNumber: {
+        type: 'string',
+        nullable: true,
+        input: true,
+        fieldName: 'phone_number',
+      },
+      postalCode: {
+        type: 'string',
+        nullable: true,
+        input: true,
+        fieldName: 'postal_code',
+      },
+      address: {
+        type: 'string',
+        nullable: true,
+        input: true,
+      },
     },
   },
 })

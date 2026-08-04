@@ -7,17 +7,29 @@ import { authClient } from '@/lib/auth-client'
 import { TWO_FACTOR_ENABLED } from '@/lib/auth-features'
 import QRCode from 'react-qr-code'
 import type { Gender } from '@/types/database'
+import './member-portal.css'
 
 interface UserProps {
   email: string
   name: string
   gender: string | null
   dateOfBirth: string | null
+  phoneNumber: string | null
+  postalCode: string | null
+  address: string | null
   twoFactorEnabled: boolean
 }
 
 const GENDER_OPTIONS: Gender[] = ['male', 'female', 'other', 'prefer_not_to_say']
-type EditableField = 'name' | 'gender' | 'dateOfBirth'
+type EditableField = 'name' | 'gender' | 'dateOfBirth' | 'phoneNumber' | 'postalCode' | 'address'
+
+/** 1990-01-31 → 1990年1月31日 */
+function formatBirthDate(value: string | null): string | null {
+  if (!value) return null
+  const [y, m, d] = value.split('-').map(Number)
+  if (!y || !m || !d) return value
+  return `${y}年${m}月${d}日`
+}
 type TwoFAStep = 'idle' | 'password' | 'qr' | 'verify' | 'backup' | 'done'
 
 export default function UserProfileSection({ user }: { user: UserProps }) {
@@ -27,25 +39,40 @@ export default function UserProfileSection({ user }: { user: UserProps }) {
   const [, startTransition] = useTransition()
 
   // ── Profile editing ───────────────────────────────────────────────────────
-  const [editing, setEditing] = useState<EditableField | null>(null)
-  const [values, setValues] = useState({ name: user.name, gender: user.gender ?? '', dateOfBirth: user.dateOfBirth ?? '' })
+  const [editing, setEditing] = useState(false)
+  const blank = {
+    name: user.name,
+    gender: user.gender ?? '',
+    dateOfBirth: user.dateOfBirth ?? '',
+    phoneNumber: user.phoneNumber ?? '',
+    postalCode: user.postalCode ?? '',
+    address: user.address ?? '',
+  }
+  const [values, setValues] = useState(blank)
   const [saving, setSaving] = useState(false)
   const [saveError, setSaveError] = useState<string | null>(null)
 
-  const save = async (field: EditableField) => {
+  // One 編集する button opens the whole card, so every field saves together.
+  const save = async () => {
     setSaving(true)
     setSaveError(null)
-    const body: Record<string, string | null> = { [field]: values[field] === '' ? null : values[field] }
-    const res = await fetch('/api/user', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
+    const body = Object.fromEntries(
+      (Object.keys(blank) as EditableField[]).map((k) => [k, values[k] === '' ? null : values[k]])
+    )
+    const res = await fetch('/api/user', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    })
     if (!res.ok) { setSaveError(t('saveError')); setSaving(false); return }
-    setEditing(null)
+    setEditing(false)
     setSaving(false)
     startTransition(() => router.refresh())
   }
 
   const cancel = () => {
-    setValues({ name: user.name, gender: user.gender ?? '', dateOfBirth: user.dateOfBirth ?? '' })
-    setEditing(null)
+    setValues(blank)
+    setEditing(false)
     setSaveError(null)
   }
 
@@ -111,49 +138,60 @@ export default function UserProfileSection({ user }: { user: UserProps }) {
 
   const inputClass = 'rounded-md border border-zinc-200 px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-zinc-900'
 
+  const genderLabel = user.gender ? t(`gender_${user.gender}`) : null
+
   return (
-    <section className="mb-10">
-      <h2 className="text-lg font-semibold mb-4">{t('title')}</h2>
-      <div className="rounded-xl border border-zinc-100 bg-white divide-y divide-zinc-100">
-
-        {/* Email — read-only */}
-        <ProfileRow label={t('email')}>
-          <span className="text-zinc-700">{user.email}</span>
-        </ProfileRow>
-
-        {/* Display name */}
-        <ProfileRow label={t('name')} onEdit={editing !== 'name' ? () => { setSaveError(null); setEditing('name') } : undefined}>
-          {editing === 'name' ? (
-            <InlineInput value={values.name} onChange={v => setValues(s => ({ ...s, name: v }))} onSave={() => save('name')} onCancel={cancel} saving={saving} type="text" />
-          ) : (
-            <span className="text-zinc-700">{user.name || <Unset label={t('notSet')} />}</span>
+    <section>
+      <div className="member-profile-card">
+        <div className="member-profile-card__head">
+          <h2 className="member-profile-card__title">お客様の基本情報</h2>
+          {!editing && (
+            <button type="button" className="member-edit-pill" onClick={() => { setSaveError(null); setEditing(true) }}>
+              編集する
+            </button>
           )}
-        </ProfileRow>
+        </div>
 
-        {/* Gender */}
-        <ProfileRow label={t('gender')} onEdit={editing !== 'gender' ? () => { setSaveError(null); setEditing('gender') } : undefined}>
-          {editing === 'gender' ? (
-            <div className="flex items-center gap-2 flex-wrap">
-              <select value={values.gender} onChange={e => setValues(s => ({ ...s, gender: e.target.value }))} className={inputClass}>
-                <option value="">{t('notSet')}</option>
-                {GENDER_OPTIONS.map(g => <option key={g} value={g}>{t(`gender_${g}`)}</option>)}
-              </select>
-              <SaveCancelButtons onSave={() => save('gender')} onCancel={cancel} saving={saving} />
-            </div>
-          ) : (
-            <span className="text-zinc-700">{user.gender ? t(`gender_${user.gender}`) : <Unset label={t('notSet')} />}</span>
-          )}
-        </ProfileRow>
+        {/* Email is the sign-in identity, so it is shown but never editable here. */}
+        <ProfileField label={t('email')} value={user.email} />
 
-        {/* Date of birth */}
-        <ProfileRow label={t('dateOfBirth')} onEdit={editing !== 'dateOfBirth' ? () => { setSaveError(null); setEditing('dateOfBirth') } : undefined}>
-          {editing === 'dateOfBirth' ? (
-            <InlineInput value={values.dateOfBirth} onChange={v => setValues(s => ({ ...s, dateOfBirth: v }))} onSave={() => save('dateOfBirth')} onCancel={cancel} saving={saving} type="date" />
-          ) : (
-            <span className="text-zinc-700">{user.dateOfBirth ?? <Unset label={t('notSet')} />}</span>
-          )}
-        </ProfileRow>
+        <ProfileField label={t('name')} value={user.name} editing={editing}>
+          <input type="text" value={values.name} onChange={e => setValues(v => ({ ...v, name: e.target.value }))} />
+        </ProfileField>
 
+        <ProfileField label={t('gender')} value={genderLabel} editing={editing}>
+          <select value={values.gender} onChange={e => setValues(v => ({ ...v, gender: e.target.value }))}>
+            <option value="">{t('notSet')}</option>
+            {GENDER_OPTIONS.map(g => <option key={g} value={g}>{t(`gender_${g}`)}</option>)}
+          </select>
+        </ProfileField>
+
+        <ProfileField label={t('dateOfBirth')} value={formatBirthDate(user.dateOfBirth)} editing={editing}>
+          <input type="date" value={values.dateOfBirth} onChange={e => setValues(v => ({ ...v, dateOfBirth: e.target.value }))} />
+        </ProfileField>
+
+        <ProfileField label={t('phoneNumber')} value={user.phoneNumber} editing={editing}>
+          <input type="tel" inputMode="tel" value={values.phoneNumber} onChange={e => setValues(v => ({ ...v, phoneNumber: e.target.value }))} />
+        </ProfileField>
+
+        <ProfileField label={t('postalCode')} value={user.postalCode} editing={editing}>
+          <input type="text" inputMode="numeric" value={values.postalCode} onChange={e => setValues(v => ({ ...v, postalCode: e.target.value }))} />
+        </ProfileField>
+
+        <ProfileField label={t('address')} value={user.address} editing={editing}>
+          <input type="text" value={values.address} onChange={e => setValues(v => ({ ...v, address: e.target.value }))} />
+        </ProfileField>
+
+        {editing && (
+          <div className="member-profile-card__actions">
+            <button type="button" className="member-edit-pill" onClick={save} disabled={saving}>
+              {saving ? '…' : tc('save')}
+            </button>
+            <button type="button" className="member-edit-pill member-edit-pill--ghost" onClick={cancel} disabled={saving}>
+              {tc('cancel')}
+            </button>
+          </div>
+        )}
       </div>
       {saveError && <p className="mt-2 text-sm text-red-600">{saveError}</p>}
 
@@ -256,11 +294,13 @@ export default function UserProfileSection({ user }: { user: UserProps }) {
       )}
 
       {/* ── Delete account ───────────────────────────────────────────────────── */}
-      <div className="mt-8 pt-6 border-t border-zinc-100">
-        <button type="button" onClick={() => { setShowDeleteModal(true); setDeleteConfirm(''); setDeleteError(null) }} className="text-sm text-red-500 hover:text-red-700 transition-colors underline underline-offset-2">
-          {t('deleteAccount')}
-        </button>
-      </div>
+      <button
+        type="button"
+        className="member-delete"
+        onClick={() => { setShowDeleteModal(true); setDeleteConfirm(''); setDeleteError(null) }}
+      >
+        {t('deleteAccount')}
+      </button>
 
       {showDeleteModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
@@ -285,41 +325,31 @@ export default function UserProfileSection({ user }: { user: UserProps }) {
   )
 }
 
-function ProfileRow({ label, children, onEdit }: { label: string; children: React.ReactNode; onEdit?: () => void }) {
+function ProfileField({
+  label,
+  value,
+  editing,
+  children,
+}: {
+  label: string
+  value: string | null
+  /** Absent for read-only fields such as the email address. */
+  editing?: boolean
+  children?: React.ReactNode
+}) {
+  const t = useTranslations('dashboard.profile')
   return (
-    <div className="flex items-center gap-4 px-5 py-3.5">
-      <span className="w-36 shrink-0 text-sm text-zinc-500">{label}</span>
-      <div className="flex-1 text-sm">{children}</div>
-      {onEdit && (
-        <button type="button" onClick={onEdit} className="shrink-0 text-zinc-400 hover:text-zinc-700 transition-colors" aria-label="Edit">
-          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125" />
-          </svg>
-        </button>
-      )}
+    <div className="member-field">
+      <span className="member-field__label">{label}</span>
+      <div className="member-field__value">
+        {editing && children ? (
+          children
+        ) : value ? (
+          value
+        ) : (
+          <span className="member-field__unset">{t('notSet')}</span>
+        )}
+      </div>
     </div>
   )
-}
-
-function InlineInput({ value, onChange, onSave, onCancel, saving, type }: { value: string; onChange: (v: string) => void; onSave: () => void; onCancel: () => void; saving: boolean; type: string }) {
-  return (
-    <div className="flex items-center gap-2 flex-wrap">
-      <input type={type} value={value} onChange={e => onChange(e.target.value)} className="rounded-md border border-zinc-200 px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-zinc-900" autoFocus onKeyDown={e => { if (e.key === 'Enter') onSave(); if (e.key === 'Escape') onCancel() }} />
-      <SaveCancelButtons onSave={onSave} onCancel={onCancel} saving={saving} />
-    </div>
-  )
-}
-
-function SaveCancelButtons({ onSave, onCancel, saving }: { onSave: () => void; onCancel: () => void; saving: boolean }) {
-  const t = useTranslations('common')
-  return (
-    <div className="flex gap-1.5">
-      <button type="button" onClick={onSave} disabled={saving} className="rounded px-2.5 py-1 text-xs font-medium bg-zinc-900 text-white hover:bg-zinc-700 disabled:opacity-50 transition-colors">{t('save')}</button>
-      <button type="button" onClick={onCancel} disabled={saving} className="rounded px-2.5 py-1 text-xs font-medium border border-zinc-200 hover:bg-zinc-50 disabled:opacity-50 transition-colors">{t('cancel')}</button>
-    </div>
-  )
-}
-
-function Unset({ label }: { label: string }) {
-  return <span className="text-zinc-400 italic">{label}</span>
 }

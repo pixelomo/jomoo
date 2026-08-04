@@ -50,6 +50,9 @@ export default async function DashboardPage() {
             name: u.name,
             gender: (u as { gender?: string | null }).gender ?? null,
             dateOfBirth: (u as { dateOfBirth?: string | null }).dateOfBirth ?? null,
+            phoneNumber: (u as { phoneNumber?: string | null }).phoneNumber ?? null,
+            postalCode: (u as { postalCode?: string | null }).postalCode ?? null,
+            address: (u as { address?: string | null }).address ?? null,
             twoFactorEnabled: (u as { twoFactorEnabled?: boolean | null }).twoFactorEnabled ?? false,
           }}
         />
