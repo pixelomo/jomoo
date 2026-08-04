@@ -137,7 +137,59 @@ export const auth = betterAuth({
         input: true,
         fieldName: 'postal_code',
       },
-      address: {
+      companyName: {
+        type: 'string',
+        nullable: true,
+        input: true,
+        fieldName: 'company_name',
+      },
+      companyNameKana: {
+        type: 'string',
+        nullable: true,
+        input: true,
+        fieldName: 'company_name_kana',
+      },
+      lastName: {
+        type: 'string',
+        nullable: true,
+        input: true,
+        fieldName: 'last_name',
+      },
+      firstName: {
+        type: 'string',
+        nullable: true,
+        input: true,
+        fieldName: 'first_name',
+      },
+      lastNameKana: {
+        type: 'string',
+        nullable: true,
+        input: true,
+        fieldName: 'last_name_kana',
+      },
+      firstNameKana: {
+        type: 'string',
+        nullable: true,
+        input: true,
+        fieldName: 'first_name_kana',
+      },
+      prefecture: {
+        type: 'string',
+        nullable: true,
+        input: true,
+      },
+      city: {
+        type: 'string',
+        nullable: true,
+        input: true,
+      },
+      streetAddress: {
+        type: 'string',
+        nullable: true,
+        input: true,
+        fieldName: 'street_address',
+      },
+      building: {
         type: 'string',
         nullable: true,
         input: true,

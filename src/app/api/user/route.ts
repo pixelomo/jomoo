@@ -11,7 +11,16 @@ const UpdateUserSchema = z.object({
   dateOfBirth: z.string().nullable().optional(),
   phoneNumber: z.string().max(30).nullable().optional(),
   postalCode: z.string().max(16).nullable().optional(),
-  address: z.string().max(200).nullable().optional(),
+  companyName: z.string().max(120).nullable().optional(),
+  companyNameKana: z.string().max(120).nullable().optional(),
+  lastName: z.string().max(120).nullable().optional(),
+  firstName: z.string().max(120).nullable().optional(),
+  lastNameKana: z.string().max(120).nullable().optional(),
+  firstNameKana: z.string().max(120).nullable().optional(),
+  prefecture: z.string().max(120).nullable().optional(),
+  city: z.string().max(120).nullable().optional(),
+  streetAddress: z.string().max(120).nullable().optional(),
+  building: z.string().max(120).nullable().optional(),
 })
 
 export async function GET(req: Request) {
@@ -41,7 +50,16 @@ export async function PATCH(req: Request) {
     ...(d.dateOfBirth !== undefined && { dateOfBirth: d.dateOfBirth }),
     ...(d.phoneNumber !== undefined && { phoneNumber: d.phoneNumber }),
     ...(d.postalCode !== undefined && { postalCode: d.postalCode }),
-    ...(d.address !== undefined && { address: d.address }),
+    ...(d.companyName !== undefined && { companyName: d.companyName }),
+    ...(d.companyNameKana !== undefined && { companyNameKana: d.companyNameKana }),
+    ...(d.lastName !== undefined && { lastName: d.lastName }),
+    ...(d.firstName !== undefined && { firstName: d.firstName }),
+    ...(d.lastNameKana !== undefined && { lastNameKana: d.lastNameKana }),
+    ...(d.firstNameKana !== undefined && { firstNameKana: d.firstNameKana }),
+    ...(d.prefecture !== undefined && { prefecture: d.prefecture }),
+    ...(d.city !== undefined && { city: d.city }),
+    ...(d.streetAddress !== undefined && { streetAddress: d.streetAddress }),
+    ...(d.building !== undefined && { building: d.building }),
     updatedAt: new Date(),
   }).where(eq(user.id, session.user.id))
 

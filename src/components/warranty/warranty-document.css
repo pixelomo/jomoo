@@ -1,0 +1,164 @@
+/* HTML rebuild of the printed 保証証, so an issued warranty can be read on
+   screen and printed on one A4 page rather than shipped as an image. */
+
+.warranty-intro {
+  max-width: var(--container);
+  margin-inline: auto;
+  padding: 3.5rem var(--gutter) 0;
+  text-align: center;
+}
+
+.warranty-intro__title {
+  margin: 0 0 1rem;
+  font-size: clamp(1.75rem, 3vw, 2.5rem);
+  font-weight: 700;
+  line-height: 1.4;
+  color: #0a0a0a;
+}
+
+.warranty-intro__lead {
+  margin: 0;
+  font-size: clamp(1rem, 1.5vw, 1.125rem);
+  line-height: 1.9;
+  color: #3a3a3a;
+}
+
+.warranty-doc {
+  max-width: 52rem;
+  margin: 2.5rem auto 5rem;
+  padding: clamp(1.5rem, 4vw, 3.5rem);
+  background: #ffffff;
+  border: 1px solid #e4e4e7;
+  border-radius: 0.75rem;
+  color: #0a0a0a;
+  font-size: 0.95rem;
+  line-height: 1.9;
+}
+
+.warranty-doc__logo {
+  display: block;
+  height: 2.25rem;
+  margin: 0 auto 2rem;
+}
+
+.warranty-doc__title {
+  margin: 0;
+  padding: 0.75rem 0;
+  border-top: 1px solid #0a0a0a;
+  border-bottom: 1px solid #0a0a0a;
+  font-size: clamp(1.5rem, 2.6vw, 2rem);
+  font-weight: 700;
+  letter-spacing: 0.5em;
+  text-indent: 0.5em; /* letter-spacing adds a trailing gap; recentre */
+  text-align: center;
+}
+
+.warranty-doc__body {
+  margin: 1.75rem 0 0;
+}
+
+.warranty-doc__body--strong {
+  font-weight: 700;
+}
+
+/* Diagram beside the note about where the serial is printed. */
+.warranty-doc__serial {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  align-items: start;
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+
+.warranty-doc__diagram {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.warranty-doc__note {
+  border: 1px solid #0a0a0a;
+  padding: 1.25rem;
+  font-size: 0.875rem;
+  line-height: 1.9;
+}
+
+.warranty-doc__table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 2rem;
+  table-layout: fixed;
+}
+
+.warranty-doc__table th,
+.warranty-doc__table td {
+  border: 1px solid #0a0a0a;
+  padding: 0.9rem 1rem;
+  vertical-align: middle;
+  word-break: break-word;
+}
+
+.warranty-doc__table th {
+  background: #e4e4e7;
+  font-weight: 400;
+  text-align: center;
+}
+
+/* Row labels in the customer block sit in a shaded left column. */
+.warranty-doc__table th[scope='row'],
+.warranty-doc__table th[scope='rowgroup'] {
+  text-align: center;
+}
+
+.warranty-doc__table td {
+  height: 3.25rem;
+}
+
+.warranty-doc__dealer-phone {
+  display: block;
+  text-align: right;
+}
+
+.warranty-doc__hotline {
+  margin-top: 2.5rem;
+}
+
+.warranty-doc__hotline h2 {
+  margin: 0 0 0.5rem;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.warranty-doc__hotline p {
+  margin: 0;
+}
+
+.warranty-actions {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin: 0 auto 4rem;
+}
+
+@media (max-width: 767px) {
+  .warranty-doc__serial {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media print {
+  .warranty-intro,
+  .warranty-actions,
+  .nav,
+  .footer {
+    display: none !important;
+  }
+
+  .warranty-doc {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    max-width: none;
+  }
+}

@@ -71,9 +71,9 @@ export default function MemberTabs({ products, contract, profile, isEmpty }: Pro
                   <div className="member-panel__legacy">{products}</div>
                 )}
                 <div className="member-card__actions">
-                  <a className="member-btn" href="#">
+                  <Link className="member-btn" href="/contact-us?category=fault">
                     その他の製品をWEB修理依頼する
-                  </a>
+                  </Link>
                 </div>
               </section>
 

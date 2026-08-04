@@ -1,11 +1,17 @@
 'use client'
 
 import { useState } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import FormField, { inputClass } from '@/components/ui/FormField'
 import { COUNTRY_CODES } from '@/data/jp-prefectures'
-import { CONTACT_CATEGORIES, ContactSchema, type ContactData } from '@/types/contact'
+import {
+  CONTACT_CATEGORIES,
+  ContactSchema,
+  type ContactCategory,
+  type ContactData,
+} from '@/types/contact'
 import ContactStepIndicator from './ContactStepIndicator'
 
 const SUBMIT_ERROR_MESSAGE =
@@ -25,6 +31,14 @@ export default function ContactForm() {
 
   const stepLabels = ['お問い合わせ', '送信完了']
 
+  // ?category=fault preselects the dropdown, so links like the dashboard's
+  // WEB修理依頼 button land the visitor on the right department already chosen.
+  const searchParams = useSearchParams()
+  const requested = searchParams.get('category')
+  const presetCategory = CONTACT_CATEGORIES.some((c) => c.id === requested)
+    ? (requested as ContactCategory)
+    : undefined
+
   const {
     register,
     handleSubmit,
@@ -35,6 +49,7 @@ export default function ContactForm() {
     defaultValues: {
       countryCode: '+81',
       showroomReservation: false,
+      ...(presetCategory && { category: presetCategory }),
     },
   })
 
@@ -92,7 +107,7 @@ export default function ContactForm() {
             hint="内容に応じた担当部署へお繋ぎします。"
             error={resolveError(errors.category?.message)}
           >
-            <select id="category" className={inputClass} defaultValue="" {...register('category')}>
+            <select id="category" className={inputClass} defaultValue={presetCategory ?? ''} {...register('category')}>
               <option value="" disabled>
                 選択してください
               </option>

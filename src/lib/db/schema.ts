@@ -17,7 +17,16 @@ export const user = pgTable('user', {
   dateOfBirth: date('date_of_birth'),
   phoneNumber: text('phone_number'),
   postalCode: text('postal_code'),
-  address: text('address'),
+  companyName: text('company_name'),
+  companyNameKana: text('company_name_kana'),
+  lastName: text('last_name'),
+  firstName: text('first_name'),
+  lastNameKana: text('last_name_kana'),
+  firstNameKana: text('first_name_kana'),
+  prefecture: text('prefecture'),
+  city: text('city'),
+  streetAddress: text('street_address'),
+  building: text('building'),
 })
 
 export const session = pgTable('session', {

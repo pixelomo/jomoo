@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useTransition } from 'react'
+import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import { authClient } from '@/lib/auth-client'
@@ -16,6 +17,7 @@ interface UserProps {
   dateOfBirth: string | null
   phoneNumber: string | null
   postalCode: string | null
+  /** Composed by the caller from prefecture / city / street / building. */
   address: string | null
   twoFactorEnabled: boolean
 }
@@ -145,11 +147,9 @@ export default function UserProfileSection({ user }: { user: UserProps }) {
       <div className="member-profile-card">
         <div className="member-profile-card__head">
           <h2 className="member-profile-card__title">お客様の基本情報</h2>
-          {!editing && (
-            <button type="button" className="member-edit-pill" onClick={() => { setSaveError(null); setEditing(true) }}>
-              編集する
-            </button>
-          )}
+          <Link className="member-edit-pill" href="/account">
+            編集する
+          </Link>
         </div>
 
         {/* Email is the sign-in identity, so it is shown but never editable here. */}

@@ -52,7 +52,15 @@ export default async function DashboardPage() {
             dateOfBirth: (u as { dateOfBirth?: string | null }).dateOfBirth ?? null,
             phoneNumber: (u as { phoneNumber?: string | null }).phoneNumber ?? null,
             postalCode: (u as { postalCode?: string | null }).postalCode ?? null,
-            address: (u as { address?: string | null }).address ?? null,
+            address:
+              [
+                (u as { prefecture?: string | null }).prefecture,
+                (u as { city?: string | null }).city,
+                (u as { streetAddress?: string | null }).streetAddress,
+                (u as { building?: string | null }).building,
+              ]
+                .filter(Boolean)
+                .join(' ') || null,
             twoFactorEnabled: (u as { twoFactorEnabled?: boolean | null }).twoFactorEnabled ?? false,
           }}
         />
