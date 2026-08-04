@@ -12,10 +12,12 @@ export default async function RegisterPage() {
   const t = await getTranslations('registration')
   const models = await getProductModels()
 
+  // The hero in the shared layout already says マイページ, so this page leads
+  // with what it is for rather than repeating it.
   return (
     <main className="flex-1 px-4 py-12 max-w-2xl mx-auto w-full">
       <div className="mb-8">
-        <h1 className="text-2xl font-bold">{t('title')}</h1>
+        <h2 className="text-2xl font-bold">{t('title')}</h2>
         <p className="text-zinc-500 mt-1">{t('subtitle')}</p>
       </div>
       <RegistrationForm models={models} />

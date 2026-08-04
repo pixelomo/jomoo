@@ -1,0 +1,236 @@
+/* Member portal chrome — shared by the dashboard, product registration and
+   warranty views. Mirrors the product page's tab bar so the two halves of the
+   site read as one design, but the tabs here switch panels rather than jump to
+   anchors. */
+
+.member {
+  --member-ink: #0a0a0a;
+  --member-ink-soft: #3a3a3a;
+  --member-primary: #73a4c7;
+  --member-line: #d3d3d3;
+
+  font-family: var(--font-jp);
+  color: var(--member-ink);
+}
+
+/* ── slim hero ─────────────────────────────────────────── */
+.member-hero {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1672 / 407;
+  max-height: 20rem;
+  min-height: 9rem;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+}
+
+.member-hero__media {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Sits over the photograph, under the title. Graduated rather than a flat wash
+   so the type has more to sit against at the top without dulling the whole
+   image; 0.2 is its strongest point. */
+.member-hero__scrim {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, #000000 0%, rgba(0, 0, 0, 0.35) 100%);
+  opacity: 0.2;
+}
+
+.member-hero__title {
+  position: relative;
+  z-index: 1;
+  margin: 0;
+  width: 100%;
+  max-width: var(--container);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+  color: #ffffff;
+  font-size: clamp(1.75rem, 3.4vw, 2.75rem);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  line-height: 1.2;
+}
+
+/* ── tabs ──────────────────────────────────────────────── */
+.member-tabs {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  border-bottom: 1px solid var(--member-line);
+  background: #ffffff;
+}
+
+.member-tabs__tab {
+  display: block;
+  padding: 1.5rem 1rem;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  background: none;
+  font-family: var(--font-jp);
+  font-size: 1.75rem;
+  font-weight: 500;
+  line-height: 1.4;
+  color: var(--member-ink);
+  text-align: center;
+  cursor: pointer;
+  transition: color 0.25s ease, border-color 0.25s ease;
+}
+
+.member-tabs__tab:hover,
+.member-tabs__tab:focus-visible {
+  color: var(--member-primary);
+}
+
+.member-tabs__tab[aria-selected='true'] {
+  border-bottom-color: var(--member-primary);
+}
+
+/* ── panels and cards ──────────────────────────────────── */
+.member-panel {
+  max-width: var(--container);
+  margin-inline: auto;
+  padding: 3.5rem var(--gutter) 6rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.member-card {
+  width: 100%;
+  background: #ffffff;
+  border-radius: 0.5rem;
+  padding: 3rem clamp(1.5rem, 4vw, 3.5rem);
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.member-card__title {
+  margin: 0;
+  font-size: clamp(1.5rem, 2.6vw, 2.25rem);
+  font-weight: 700;
+  line-height: 1.5;
+  color: var(--member-ink);
+}
+
+/* 保証延長 — deliberately a step down from the empty-state heading. */
+.member-card__title--sub {
+  font-size: clamp(1.25rem, 1.9vw, 1.6rem);
+}
+
+.member-card__body {
+  margin: 0;
+  font-size: clamp(1.25rem, 1.9vw, 1.6rem);
+  font-weight: 400;
+  line-height: 1.9;
+  color: var(--member-ink-soft);
+}
+
+/* Title and copy on one row beside the artwork; the button gets its own. */
+.member-card__row {
+  display: flex;
+  align-items: center;
+  gap: clamp(1.5rem, 4vw, 3rem);
+}
+
+.member-card__copy {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.member-card__art {
+  flex: 0 0 auto;
+  width: 215px;
+  height: 215px;
+  object-fit: contain;
+  display: block;
+}
+
+.member-card__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.member-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem 2.5rem;
+  border: 0;
+  border-radius: 0.5rem;
+  background: #000000;
+  color: #ffffff;
+  font-family: var(--font-jp);
+  font-size: 1.125rem;
+  font-weight: 600;
+  line-height: 1.4;
+  letter-spacing: 0.04em;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.member-btn:hover,
+.member-btn:focus-visible {
+  background: #262626;
+}
+
+/* Existing dashboard sections keep their own markup; this just gives them the
+   same rhythm as the cards above. */
+.member-panel__legacy {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+@media (max-width: 1023px) {
+  .member-tabs__tab {
+    padding: 1.25rem 0.75rem;
+    font-size: 1.35rem;
+  }
+
+  .member-panel {
+    padding-block: 2.5rem 4rem;
+  }
+
+  .member-card {
+    padding: 2.25rem 1.5rem;
+    gap: 1.5rem;
+  }
+}
+
+@media (max-width: 767px) {
+  .member-tabs__tab {
+    padding: 1rem 0.5rem;
+    font-size: 1.05rem;
+  }
+
+  .member-card__row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1.5rem;
+  }
+
+  .member-card__art {
+    width: 160px;
+    height: 160px;
+    align-self: center;
+  }
+
+  .member-btn {
+    width: 100%;
+  }
+}
