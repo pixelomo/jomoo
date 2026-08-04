@@ -5,6 +5,7 @@ import { db } from '@/lib/db'
 import { productRegistration, warrantyRecord } from '@/lib/db/schema'
 import { eq, and } from 'drizzle-orm'
 import WarrantyDocument from '@/components/warranty/WarrantyDocument'
+import WarrantyTerms from '@/components/warranty/WarrantyTerms'
 
 interface Props {
   params: Promise<{ id: string }>
@@ -48,6 +49,7 @@ export default async function WarrantyPage({ params }: Props) {
         phoneNumber={reg.phoneNumber}
         dealerName={reg.dealerName}
       />
+      <WarrantyTerms />
     </main>
   )
 }

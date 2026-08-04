@@ -6,7 +6,7 @@ import { useTranslations } from 'next-intl'
 import Image from 'next/image'
 import Link from 'next/link'
 import type { DbProductRegistration } from '@/types/database'
-import { PROVINCES } from '@/data/provinces'
+import { JP_PREFECTURES } from '@/data/jp-prefectures'
 
 interface Props {
   registration: DbProductRegistration
@@ -60,7 +60,7 @@ export default function RegistrationCard({ registration: initial }: Props) {
             </p>
             <p className="text-sm text-zinc-500">
               {reg.installationAddressState
-                ? PROVINCES.find((p) => p.value === reg.installationAddressState)?.label ?? reg.installationAddressState
+                ? reg.installationAddressState
                 : null}
               {reg.installationAddressDetail ? `, ${reg.installationAddressDetail}` : null}
             </p>
@@ -288,9 +288,9 @@ function EditModal({
           <span className="text-xs text-zinc-500 mb-1 block">{tr('installationAddressState')}</span>
           <select value={fields.installation_address_state} onChange={set('installation_address_state')} className={inputClass}>
             <option value="">{tr('installationAddressStatePlaceholder')}</option>
-            {PROVINCES.map((p) => (
-              <option key={p.value} value={p.value}>
-                {p.label}
+            {JP_PREFECTURES.map((p) => (
+              <option key={p} value={p}>
+                {p}
               </option>
             ))}
           </select>

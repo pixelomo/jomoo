@@ -1,7 +1,6 @@
 /* eslint-disable @next/next/no-img-element */
 'use client'
 
-import { PROVINCES } from '@/data/provinces'
 import './warranty-document.css'
 
 interface Props {
@@ -21,12 +20,8 @@ const formatDate = (iso: string) => {
   return y && m && d ? `${y}年${m}月${d}日` : iso
 }
 
-/** Registrations store the romanised value ('tokyo'); the document shows 東京都. */
-const prefectureLabel = (value: string) =>
-  PROVINCES.find((p) => p.value === value)?.label ?? value
-
 export default function WarrantyDocument(props: Props) {
-  const address = [prefectureLabel(props.addressState), props.addressDetail]
+  const address = [props.addressState, props.addressDetail]
     .filter(Boolean)
     .join(' ')
 

@@ -162,3 +162,113 @@
     max-width: none;
   }
 }
+
+/* ── 無料修理規定 and the club sections below the certificate ── */
+.warranty-section {
+  padding: 4rem 0;
+}
+
+.warranty-section--grey {
+  background: #f4f4f5;
+}
+
+.warranty-section__inner {
+  max-width: 52rem;
+  margin: 0 auto;
+  padding-inline: var(--gutter);
+}
+
+.warranty-section__title {
+  margin: 0 0 2rem;
+  font-size: clamp(1.5rem, 2.8vw, 2.25rem);
+  font-weight: 700;
+  line-height: 1.5;
+  color: #0a0a0a;
+}
+
+.warranty-section__lead {
+  margin: 0 0 1.5rem;
+}
+
+.warranty-terms {
+  font-size: 0.95rem;
+  line-height: 2;
+  color: #3a3a3a;
+}
+
+.warranty-terms ol {
+  margin: 0 0 1.75rem;
+  padding-left: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.warranty-terms ol ol {
+  margin: 0.5rem 0 0;
+  gap: 0.5rem;
+}
+
+.warranty-terms li::marker {
+  color: #0a0a0a;
+  font-weight: 600;
+}
+
+/* The sub-clauses are numbered 1）2）in the source, not 1. 2. */
+.warranty-terms ol ol > li {
+  list-style: none;
+  position: relative;
+}
+
+.warranty-terms ol ol > li > span:first-child {
+  font-weight: 600;
+  margin-right: 0.35rem;
+}
+
+.warranty-terms__closing {
+  margin: 0;
+  padding-top: 1.5rem;
+  border-top: 1px solid #d4d4d8;
+}
+
+.warranty-club__cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 2rem;
+  padding: 1rem 2.5rem;
+  border-radius: 0.5rem;
+  background: #000000;
+  color: #ffffff;
+  font-size: 1.0625rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.warranty-club h3 {
+  margin: 2rem 0 0.75rem;
+  font-size: 1.0625rem;
+  font-weight: 700;
+  color: #0a0a0a;
+}
+
+.warranty-maker {
+  background: #ffffff;
+  padding: 3rem 0 5rem;
+}
+
+.warranty-maker__inner {
+  max-width: 52rem;
+  margin: 0 auto;
+  padding-inline: var(--gutter);
+  font-size: 0.875rem;
+  line-height: 2;
+  color: #3a3a3a;
+}
+
+@media print {
+  .warranty-section,
+  .warranty-maker {
+    display: none !important;
+  }
+}

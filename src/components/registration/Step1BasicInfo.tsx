@@ -4,7 +4,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useTranslations } from 'next-intl'
 import { Step1Schema, type Step1Data } from '@/types/registration'
-import { PROVINCES } from '@/data/provinces'
+import { JP_PREFECTURES } from '@/data/jp-prefectures'
 import FormField, { inputClass } from '@/components/ui/FormField'
 
 interface Props {
@@ -89,9 +89,9 @@ export default function Step1BasicInfo({ defaultValues, models, onSubmit }: Prop
           {...register('installationAddressState')}
         >
           <option value="">{t('installationAddressStatePlaceholder')}</option>
-          {PROVINCES.map((p) => (
-            <option key={p.value} value={p.value}>
-              {p.label}
+          {JP_PREFECTURES.map((p) => (
+            <option key={p} value={p}>
+              {p}
             </option>
           ))}
         </select>
