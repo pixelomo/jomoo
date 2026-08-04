@@ -34,7 +34,12 @@ export async function GET(req: Request) {
     ? await baseQuery.where(or(ilike(user.name, `%${q}%`), ilike(user.email, `%${q}%`)))
     : await baseQuery
 
-  const [{ total }] = await db.select({ total: sql<number>`count(*)::int` }).from(user)
+  // Count the same set the list shows — counting every member made the page
+  // numbers wrong as soon as a search was applied.
+  const totalQuery = db.select({ total: sql<number>`count(*)::int` }).from(user)
+  const [{ total }] = q.trim()
+    ? await totalQuery.where(or(ilike(user.name, `%${q}%`), ilike(user.email, `%${q}%`)))
+    : await totalQuery
 
   return NextResponse.json({ users, total, page, limit })
 }

@@ -8,6 +8,7 @@ const NAV = [
   { href: '/admin/users', label: 'Users', icon: '⊙' },
   { href: '/admin/registrations', label: 'Registrations', icon: '≡' },
   { href: '/admin/warranties', label: 'Warranties', icon: '◈' },
+  { href: '/admin/enquiries', label: 'Enquiries', icon: '✉' },
 ]
 
 export default function AdminSidebar() {

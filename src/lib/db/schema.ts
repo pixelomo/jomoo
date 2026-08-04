@@ -130,3 +130,33 @@ export const ownershipTransfer = pgTable('ownership_transfers', {
   newPhoneNumber: text('new_phone_number'),
   createdAt: timestamp('created_at').notNull().defaultNow(),
 }, (t) => [index('idx_ot_reg_id').on(t.registrationId)])
+
+/**
+ * Contact form enquiries.
+ *
+ * These used to be emailed and then forgotten — nothing was written down, so
+ * "download all questions received from the contact form" had no source. The
+ * row is written before the mail is sent, so an enquiry survives a delivery
+ * failure rather than vanishing with it.
+ */
+export const contactSubmission = pgTable('contact_submissions', {
+  id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
+  category: text('category').notNull(),
+  lastName: text('last_name').notNull(),
+  firstName: text('first_name').notNull(),
+  companyName: text('company_name'),
+  email: text('email').notNull(),
+  countryCode: text('country_code'),
+  phoneNumber: text('phone_number'),
+  message: text('message').notNull(),
+  showroomReservation: boolean('showroom_reservation').notNull().default(false),
+  preferredDateTime: text('preferred_date_time'),
+  /** Where it was routed, captured at the time in case routing changes later. */
+  routedTo: text('routed_to'),
+  /** False when Resend rejected it; the enquiry is still recorded. */
+  delivered: boolean('delivered').notNull().default(false),
+  submittedAt: timestamp('submitted_at').notNull().defaultNow(),
+}, (t) => [
+  index('idx_contact_submitted_at').on(t.submittedAt),
+  index('idx_contact_category').on(t.category),
+])

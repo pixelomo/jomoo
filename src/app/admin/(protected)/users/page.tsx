@@ -2,6 +2,7 @@ import { db } from '@/lib/db'
 import { user, productRegistration } from '@/lib/db/schema'
 import { eq, desc, sql, ilike, or } from 'drizzle-orm'
 import Link from 'next/link'
+import DownloadButton from '@/components/admin/DownloadButton'
 import { Suspense } from 'react'
 import AdminSearch from '@/components/admin/AdminSearch'
 
@@ -36,13 +37,21 @@ export default async function AdminUsersPage({
     ? await query.where(or(ilike(user.name, `%${q}%`), ilike(user.email, `%${q}%`)))
     : await query
 
-  const [{ total }] = await db.select({ total: sql<number>`count(*)::int` }).from(user)
+  // Count the same set the list shows — counting every member made the page
+  // numbers wrong as soon as a search was applied.
+  const totalQuery = db.select({ total: sql<number>`count(*)::int` }).from(user)
+  const [{ total }] = q.trim()
+    ? await totalQuery.where(or(ilike(user.name, `%${q}%`), ilike(user.email, `%${q}%`)))
+    : await totalQuery
 
   return (
     <div>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16, marginBottom: 24 }}>
         <h1 style={{ fontSize: 22, fontWeight: 700, color: 'var(--ink)', margin: 0 }}>Users</h1>
-        <span style={{ fontSize: 13, color: 'var(--ink-3)' }}>{total} total</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+          <span style={{ fontSize: 13, color: 'var(--ink-3)' }}>{total} total</span>
+          <DownloadButton href="/api/admin/export/users" label="Download CSV" />
+        </div>
       </div>
 
       <Suspense fallback={<div style={{ height: 38, background: 'var(--line-2)', borderRadius: 7 }} />}>
