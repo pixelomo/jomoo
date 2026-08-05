@@ -181,12 +181,16 @@ export default function JomooHomepage() {
           )
 
           worldImages.forEach((el) => {
+            // The bathroom figure drifts in from the left as well as up; the
+            // matching start state is in .world--animate in the stylesheet.
+            const fromLeft = el.classList.contains('world__figure--bathroom')
             const tween = gsap.fromTo(
               el,
-              { opacity: 0, y: 48 },
+              { opacity: 0, y: 48, x: fromLeft ? -80 : 0 },
               {
                 opacity: 1,
                 y: 0,
+                x: 0,
                 ease: 'power1.out',
                 scrollTrigger: {
                   trigger: el,

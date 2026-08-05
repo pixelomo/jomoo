@@ -89,12 +89,15 @@ const SLIDES: SpotlightSlide[] = [
 ]
 
 const DRAG_THRESHOLD = 48
+const AUTOPLAY_MS = 6000
 
 export default function SpotlightCarousel() {
   const [activeIndex, setActiveIndex] = useState(0)
   const [dragOffset, setDragOffset] = useState(0)
   const [isDragging, setIsDragging] = useState(false)
   const [playingIndex, setPlayingIndex] = useState<number | null>(null)
+  /** Set while the reader is hovering or tabbing through the carousel. */
+  const [paused, setPaused] = useState(false)
 
   const viewportRef = useRef<HTMLDivElement>(null)
   const trackRef = useRef<HTMLDivElement>(null)
@@ -136,6 +139,22 @@ export default function SpotlightCarousel() {
       }
     })
   }, [activeIndex, playingIndex])
+
+  // Advances on its own, but never over the top of someone using it: dragging,
+  // a playing video, hover and keyboard focus all hold it. Re-armed whenever the
+  // slide changes, so a manual move gets a full interval rather than the
+  // remainder of the previous one.
+  useEffect(() => {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+    if (isDragging || paused || playingIndex !== null) return
+
+    const timer = window.setInterval(() => {
+      setActiveIndex((index) => (index + 1) % slideCount)
+      setDragOffset(0)
+    }, AUTOPLAY_MS)
+
+    return () => window.clearInterval(timer)
+  }, [isDragging, paused, playingIndex, slideCount, activeIndex])
 
   const goTo = useCallback(
     (index: number) => {
@@ -244,6 +263,10 @@ export default function SpotlightCarousel() {
             onPointerMove={handlePointerMove}
             onPointerUp={finishDrag}
             onPointerCancel={finishDrag}
+            onMouseEnter={() => setPaused(true)}
+            onMouseLeave={() => setPaused(false)}
+            onFocusCapture={() => setPaused(true)}
+            onBlurCapture={() => setPaused(false)}
           >
           <div
             ref={trackRef}

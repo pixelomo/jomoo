@@ -374,10 +374,15 @@ img {
   will-change: transform, opacity;
 }
 
-.world--animate .world__photo,
-.world--animate .world__figure--bathroom {
+.world--animate .world__photo {
   opacity: 0;
   transform: translateY(3rem);
+}
+
+/* Also drifts in from the left; the matching GSAP tween is in JomooHomepage. */
+.world--animate .world__figure--bathroom {
+  opacity: 0;
+  transform: translate(-80px, 48px);
 }
 
 .world__photo img,
@@ -397,20 +402,28 @@ img {
   z-index: 1;
 }
 
+/* Forest and shower sit side by side directly under the hero, 1rem below it
+   and 1rem apart, both cropped to the same landscape tile. */
 .world__photo--forest {
-  top: 30rem;
-  left: 40%;
-  width: 22rem;
-  height: 16.5rem;
+  top: calc(38rem + 1rem);
+  left: 50%;
+  width: 310px;
+  height: 265px;
   z-index: 3;
 }
 
 .world__photo--shower {
-  bottom: -20rem;
-  right: 0;
-  width: 16.25rem;
-  height: 26rem;
+  top: calc(38rem + 1rem);
+  left: calc(50% + 310px + 1rem);
+  width: 310px;
+  height: 265px;
   z-index: 4;
+}
+
+/* Portrait original in a landscape tile — anchor to the top so it reads as the
+   top half of the shot rather than a centre crop. */
+.world__photo--shower img {
+  object-position: top;
 }
 
 .world__lower {
@@ -527,17 +540,11 @@ img {
     aspect-ratio: 75 / 38;
   }
 
-  .world__photo--forest {
-    width: 22rem;
-    height: 16.5rem;
-    max-width: 100%;
-  }
-
+  .world__photo--forest,
   .world__photo--shower {
-    width: 16.25rem;
-    height: 26rem;
+    width: 310px;
+    height: 265px;
     max-width: 100%;
-    align-self: flex-end;
   }
 
   .world__lower {
