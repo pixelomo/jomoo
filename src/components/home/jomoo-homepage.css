@@ -510,13 +510,15 @@ img {
     display: none;
   }
 
+  /* Wraps rather than stacks, so the hero takes a row of its own and the forest
+     and shower stay side by side underneath it the way they do on desktop. */
   .world__photos {
     position: relative;
     inset: auto;
     display: flex;
-    flex-direction: column;
+    flex-wrap: wrap;
     align-items: stretch;
-    gap: 1.5rem;
+    gap: 1rem;
     min-height: 0;
     overflow: visible;
     pointer-events: auto;
@@ -535,16 +537,22 @@ img {
   }
 
   .world__photo--hero {
+    flex: 0 0 100%;
     width: 100%;
     height: auto;
     aspect-ratio: 75 / 38;
   }
 
+  /* Share the row evenly and shrink with it — the fixed 310x265 tile becomes a
+     ratio so the pair never wraps onto separate lines, however narrow it gets.
+     min-width: 0 stops the image's intrinsic size holding the item open. */
   .world__photo--forest,
   .world__photo--shower {
-    width: 310px;
-    height: 265px;
-    max-width: 100%;
+    flex: 1 1 0;
+    min-width: 0;
+    width: auto;
+    height: auto;
+    aspect-ratio: 310 / 265;
   }
 
   .world__lower {
