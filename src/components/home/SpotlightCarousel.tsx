@@ -89,7 +89,7 @@ const SLIDES: SpotlightSlide[] = [
 ]
 
 const DRAG_THRESHOLD = 48
-const AUTOPLAY_MS = 6000
+const AUTOPLAY_MS = 3000
 
 export default function SpotlightCarousel() {
   const [activeIndex, setActiveIndex] = useState(0)
