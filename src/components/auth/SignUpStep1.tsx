@@ -1,44 +1,57 @@
 'use client'
 
+import { useState } from 'react'
 import { useTranslations } from 'next-intl'
+import SignUpField from './SignUpField'
 import type { MembershipType } from '@/types/membership-signup'
 
 interface Props {
   value?: MembershipType
-  onSelect: (type: MembershipType) => void
+  onSubmit: (type: MembershipType) => void
 }
 
-export default function SignUpStep1({ value, onSelect }: Props) {
+export default function SignUpStep1({ value, onSubmit }: Props) {
   const t = useTranslations('auth.membership')
+  const [selected, setSelected] = useState<MembershipType | ''>(value ?? '')
+  const [error, setError] = useState<string | null>(null)
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!selected) {
+      setError(t('errors.required'))
+      return
+    }
+    onSubmit(selected)
+  }
 
   return (
-    <div className="space-y-8">
-      <div className="flex flex-col gap-3 sm:flex-row">
-        <button
-          type="button"
-          onClick={() => onSelect('corporate')}
-          className={[
-            'flex-1 rounded-xl border-2 px-6 py-5 text-center text-lg font-semibold transition-colors',
-            value === 'corporate'
-              ? 'border-[#73a4c7] bg-[#73a4c7] text-white'
-              : 'border-[#73a4c7] bg-white text-[#73a4c7] hover:bg-[#73a4c7]/5',
-          ].join(' ')}
-        >
-          {t('corporate')}
-        </button>
-        <button
-          type="button"
-          onClick={() => onSelect('individual')}
-          className={[
-            'flex-1 rounded-xl border-2 px-6 py-5 text-center text-lg font-semibold transition-colors',
-            value === 'individual'
-              ? 'border-[#73a4c7] bg-[#73a4c7] text-white'
-              : 'border-[#73a4c7] bg-white text-[#73a4c7] hover:bg-[#73a4c7]/5',
-          ].join(' ')}
-        >
-          {t('individual')}
+    <form onSubmit={handleSubmit} noValidate>
+      <section className="signup__section">
+        <h2 className="signup__legend">{t('typeSection')}</h2>
+
+        <SignUpField label={t('typeLabel')} htmlFor="membershipType" error={error ?? undefined}>
+          <select
+            id="membershipType"
+            className="account-select signup__select"
+            value={selected}
+            onChange={(e) => {
+              setSelected(e.target.value as MembershipType)
+              setError(null)
+            }}
+          >
+            <option value="">{t('selectPlaceholder')}</option>
+            <option value="corporate">{t('corporate')}</option>
+            <option value="individual">{t('individual')}</option>
+          </select>
+        </SignUpField>
+      </section>
+
+      <div className="signup__actions">
+        <button type="submit" className="signup__next">
+          <span>{t('next')}</span>
+          <span aria-hidden="true">&rsaquo;</span>
         </button>
       </div>
-    </div>
+    </form>
   )
 }

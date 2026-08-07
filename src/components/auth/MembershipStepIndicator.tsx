@@ -1,68 +1,87 @@
+import { Fragment } from 'react'
+
 interface MembershipStepIndicatorProps {
   currentStep: number
   labels: string[]
+  activeStatus: string
+  completeStatus: string
 }
 
-const PRIMARY = '#73a4c7'
+function Check() {
+  return (
+    <svg
+      className="account-steps__check"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={3}
+      aria-hidden="true"
+    >
+      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+    </svg>
+  )
+}
 
 export default function MembershipStepIndicator({
   currentStep,
   labels,
+  activeStatus,
+  completeStatus,
 }: MembershipStepIndicatorProps) {
   return (
-    <nav aria-label="Membership registration steps" className="mb-10">
-      <ol className="flex items-start justify-center">
+    <nav aria-label="JOMOOクラブ会員登録の手順">
+      <ol className="account-steps">
         {labels.map((label, index) => {
           const step = index + 1
-          const isComplete = step < currentStep
-          const isActive = step === currentStep
-          const isFuture = step > currentStep
+          // The last step is the completion screen — reaching it means every
+          // step is done, itself included.
+          const isLast = step === labels.length
+          const isComplete = step < currentStep || (isLast && currentStep === step)
+          const isActive = step === currentStep && !isComplete
+
+          const status = isComplete ? completeStatus : isActive ? activeStatus : null
 
           return (
-            <li key={label} className="flex items-center">
-              <div className="flex flex-col items-center min-w-[6.5rem]">
+            <Fragment key={label}>
+              {index > 0 && (
                 <div
-                  className="flex h-9 w-9 items-center justify-center rounded-full border-2 transition-colors"
-                  style={{
-                    borderColor: PRIMARY,
-                    backgroundColor: isFuture ? '#ffffff' : PRIMARY,
-                    color: isFuture ? PRIMARY : '#ffffff',
-                  }}
-                  aria-current={isActive ? 'step' : undefined}
-                >
-                  {isComplete ? (
-                    <svg
-                      className="h-4 w-4"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth={2.5}
-                      aria-hidden="true"
-                    >
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                    </svg>
-                  ) : (
-                    <span className="text-sm font-medium">{step}</span>
-                  )}
-                </div>
-                <span
                   className={[
-                    'mt-2 text-center text-xs font-medium leading-snug',
-                    isActive || isComplete ? 'text-zinc-900' : 'text-zinc-400',
-                  ].join(' ')}
-                >
-                  {label}
-                </span>
-              </div>
-
-              {index < labels.length - 1 && (
-                <div
-                  className="mx-3 mb-6 h-px w-16 sm:w-24"
-                  style={{ backgroundColor: isComplete ? PRIMARY : '#d7e6f0' }}
+                    'account-steps__line',
+                    step <= currentStep ? 'account-steps__line--complete' : '',
+                  ]
+                    .filter(Boolean)
+                    .join(' ')}
                   aria-hidden="true"
                 />
               )}
-            </li>
+              <li className="account-steps__cell">
+                <div
+                  className={[
+                    'account-steps__dot',
+                    isComplete ? 'account-steps__dot--complete' : '',
+                    !isComplete && !isActive ? 'account-steps__dot--upcoming' : '',
+                  ]
+                    .filter(Boolean)
+                    .join(' ')}
+                  aria-current={isActive ? 'step' : undefined}
+                >
+                  {isComplete ? <Check /> : step}
+                </div>
+                <span className="account-steps__label">{label}</span>
+                {status && (
+                  <span
+                    className={[
+                      'account-steps__status',
+                      isActive ? 'account-steps__status--active' : '',
+                    ]
+                      .filter(Boolean)
+                      .join(' ')}
+                  >
+                    {status}
+                  </span>
+                )}
+              </li>
+            </Fragment>
           )
         })}
       </ol>

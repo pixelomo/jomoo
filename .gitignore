@@ -56,3 +56,6 @@ next-env.d.ts
 # One-shot migration backup (scripts/migrate-sanity-single-locale.mjs)
 .sanity-pre-migration-backup.json
 .sanity-pre-seed-backup.json
+
+# Design references — screenshots and comps we build from, not shipped assets
+design/

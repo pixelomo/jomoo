@@ -2,7 +2,6 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import { authClient } from '@/lib/auth-client'
 import MembershipStepIndicator from './MembershipStepIndicator'
@@ -10,125 +9,93 @@ import SignUpStep1 from './SignUpStep1'
 import SignUpStep2 from './SignUpStep2'
 import SignUpStep3 from './SignUpStep3'
 import {
+  buildDateOfBirth,
   buildDisplayName,
-  type CorporateSignupData,
-  type IndividualSignupData,
   type MembershipType,
+  type SignupData,
 } from '@/types/membership-signup'
+import '@/components/dashboard/member-portal.css'
 
-type FormData = Partial<CorporateSignupData & IndividualSignupData>
+/** A field left blank is omitted from the payload rather than sent as an empty
+ *  string, so the column keeps its NULL rather than storing "". */
+function optional(value: string | undefined) {
+  return value && value.trim() !== '' ? value.trim() : undefined
+}
 
 export default function SignUpForm() {
   const t = useTranslations('auth')
   const tm = useTranslations('auth.membership')
-  const router = useRouter()
 
   const [step, setStep] = useState(1)
-  const [verificationSent, setVerificationSent] = useState(false)
-  // The account exists but the verification mail could not be delivered — the
-  // member must not be told to go looking for it.
-  const [sendFailed, setSendFailed] = useState(false)
-  const [isResending, setIsResending] = useState(false)
   const [membershipType, setMembershipType] = useState<MembershipType | undefined>()
-  const [formData, setFormData] = useState<FormData>({})
+  const [formData, setFormData] = useState<SignupData>({})
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
   const stepLabels = [tm('steps.type'), tm('steps.info'), tm('steps.complete')]
 
-  const handleTypeSelect = (type: MembershipType) => {
+  const handleTypeSubmit = (type: MembershipType) => {
     setMembershipType(type)
     setError(null)
     setStep(2)
   }
 
-  const handleStep2 = (data: CorporateSignupData | IndividualSignupData) => {
+  /** Step 2's 次へ is the point of no return: it creates the account and moves
+   *  to 登録完了. There is no review screen between the two. */
+  const handleRegister = async (data: SignupData) => {
+    if (!membershipType || !data.email || !data.password) return
+
     setFormData(data)
-    setError(null)
-    setStep(3)
-  }
-
-  /** Resolves false when the mail did not leave, so we can say so. */
-  const sendVerification = async (email: string) => {
-    try {
-      const res = await fetch('/api/verification/send', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, callbackURL: '/dashboard' }),
-      })
-      return res.ok
-    } catch {
-      return false
-    }
-  }
-
-  const handleRetrySend = async () => {
-    if (!formData.email) return
-    setIsResending(true)
-    setSendFailed(!(await sendVerification(formData.email)))
-    setIsResending(false)
-  }
-
-  const handleComplete = async () => {
-    if (!membershipType || !formData.email || !formData.password) return
-
     setIsSubmitting(true)
     setError(null)
 
-    const name = buildDisplayName(
-      membershipType,
-      formData as CorporateSignupData | IndividualSignupData
-    )
-
-    const payload: {
-      name: string
-      email: string
-      password: string
-      gender?: string
-      dateOfBirth?: string
-    } = {
-      name,
-      email: formData.email,
-      password: formData.password,
-    }
-
-    if (membershipType === 'individual') {
-      const individual = formData as IndividualSignupData
-      if (individual.gender) payload.gender = individual.gender
-      if (individual.dateOfBirth) payload.dateOfBirth = individual.dateOfBirth
-    }
-
     try {
-      const { data, error: err } = await authClient.signUp.email(payload)
+      const { error: err } = await authClient.signUp.email({
+        name: buildDisplayName(membershipType, data),
+        email: data.email,
+        password: data.password,
+        gender: optional(data.gender),
+        dateOfBirth: buildDateOfBirth(data),
+        phoneNumber: optional(
+          data.phoneNumber ? `${data.countryCode ?? ''}${data.phoneNumber}` : undefined
+        ),
+        companyName: optional(data.companyName),
+        companyNameKana: optional(data.companyNameKana),
+        lastName: optional(data.lastName),
+        firstName: optional(data.firstName),
+        lastNameKana: optional(data.lastNameKana),
+        firstNameKana: optional(data.firstNameKana),
+        postalCode: optional(data.postalCode),
+        prefecture: optional(data.prefecture),
+        city: optional(data.city),
+        streetAddress: optional(data.streetAddress),
+        building: optional(data.building),
+      })
 
-      if (!err) {
-        // A token means better-auth signed them in, which it only does when
-        // verification is not required — straight to the dashboard. Otherwise
-        // token is null and they must confirm the address first.
-        if (data?.token) {
-          router.push('/dashboard')
-          router.refresh()
-          return
-        }
+      if (err) {
+        // better-auth reports a duplicate address under a few different shapes
+        // depending on where it is caught, so match on the message too rather
+        // than falling through to the generic failure text.
+        const alreadyExists =
+          err.code === 'USER_ALREADY_EXISTS' ||
+          err.status === 422 ||
+          /already exists|already registered/i.test(err.message ?? '')
 
-        // The account is created either way; only the mail can still fail.
-        const delivered = await sendVerification(formData.email)
-        setVerificationSent(true)
-        setSendFailed(!delivered)
+        setError(alreadyExists ? t('emailTaken') : t('signUpFailed'))
+        console.error('[sign-up] failed', {
+          code: err.code,
+          status: err.status,
+          message: err.message,
+        })
         setIsSubmitting(false)
         return
       }
 
-      // better-auth reports a duplicate address under a few different shapes
-      // depending on where it is caught, so match on the message too rather
-      // than falling through to the generic failure text.
-      const alreadyExists =
-        err.code === 'USER_ALREADY_EXISTS' ||
-        err.status === 422 ||
-        /already exists|already registered/i.test(err.message ?? '')
-
-      setError(alreadyExists ? t('emailTaken') : t('signUpFailed'))
-      console.error('[sign-up] failed', { code: err.code, status: err.status, message: err.message })
+      // No verification mail is sent from here. Sign-up is deliberately the
+      // shortest path the client could have — when EMAIL_VERIFICATION_REQUIRED
+      // is off, better-auth signs the member straight in, and when it is on the
+      // sign-in page is what tells them to confirm and offers the resend.
+      setStep(3)
     } catch {
       setError(t('signUpFailed'))
     }
@@ -136,118 +103,47 @@ export default function SignUpForm() {
     setIsSubmitting(false)
   }
 
+  const isComplete = step === 3
+
   return (
-    <div className="w-full max-w-2xl">
-      <div className="mb-8 text-center">
-        <h1 className="text-2xl font-bold text-zinc-900">{tm('title')}</h1>
-      </div>
+    <div className="signup">
+      <header className="signup__header">
+        <h1 className="signup__title">{tm('title')}</h1>
+        <p className="signup__subtitle">{tm('subtitle')}</p>
+      </header>
 
-      <MembershipStepIndicator currentStep={step} labels={stepLabels} />
+      <MembershipStepIndicator
+        currentStep={step}
+        labels={stepLabels}
+        activeStatus={tm('stepStatusActive')}
+        completeStatus={tm('stepStatusComplete')}
+      />
 
-      {error && step !== 3 && (
-        <div className="mb-6 rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-          {error}
-        </div>
-      )}
-
-      {verificationSent && sendFailed ? (
-        <div className="rounded-xl border border-amber-300/60 bg-amber-50 px-6 py-12 text-center">
-          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-amber-100">
-            <svg
-              className="h-6 w-6 text-amber-600"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth={2}
-              aria-hidden="true"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"
-              />
-            </svg>
-          </div>
-          <h2 className="text-lg font-semibold text-zinc-900">{t('verificationSendFailedTitle')}</h2>
-          <p className="mt-2 text-sm text-zinc-600">
-            {t('verificationSendFailedBody', { email: formData.email ?? '' })}
-          </p>
-          <button
-            type="button"
-            onClick={handleRetrySend}
-            disabled={isResending}
-            className="mt-6 rounded-lg bg-zinc-900 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-zinc-700 disabled:opacity-50"
-          >
-            {isResending ? t('verificationSending') : t('resendVerification')}
-          </button>
-        </div>
-      ) : verificationSent ? (
-        <div className="rounded-xl border border-[#73a4c7]/25 bg-[#73a4c7]/5 px-6 py-12 text-center">
-          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-[#73a4c7]/15">
-            <svg
-              className="h-6 w-6 text-[#73a4c7]"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth={2}
-              aria-hidden="true"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-              />
-            </svg>
-          </div>
-          <h2 className="text-lg font-semibold text-zinc-900">確認メールを送信しました</h2>
-          <p className="mt-2 text-sm text-zinc-600">
-            <span className="font-medium text-zinc-900">{formData.email}</span>{' '}
-            宛にメールをお送りしました。
-            <br />
-            メール内のボタンからメールアドレスをご確認ください。
-          </p>
-          <p className="mt-4 text-xs text-zinc-500">
-            メールが届かない場合は、迷惑メールフォルダをご確認ください。
-          </p>
-        </div>
+      {isComplete ? (
+        <SignUpStep3 />
       ) : (
         <>
-      {step === 1 && <SignUpStep1 value={membershipType} onSelect={handleTypeSelect} />}
+          <div className="signup__card">
+            {step === 1 && <SignUpStep1 value={membershipType} onSubmit={handleTypeSubmit} />}
 
-      {step === 2 && membershipType && (
-        <SignUpStep2
-          membershipType={membershipType}
-          defaultValues={formData}
-          onSubmit={handleStep2}
-          onBack={() => setStep(1)}
-        />
-      )}
+            {step === 2 && membershipType && (
+              <SignUpStep2
+                membershipType={membershipType}
+                defaultValues={formData}
+                onSubmit={handleRegister}
+                onBack={() => {
+                  setError(null)
+                  setStep(1)
+                }}
+                isSubmitting={isSubmitting}
+                submitError={error}
+              />
+            )}
+          </div>
 
-      {step === 3 && membershipType && formData.email && (
-        <SignUpStep3
-          membershipType={membershipType}
-          formData={formData}
-          onEdit={() => {
-            setError(null)
-            setStep(2)
-          }}
-          onContinue={handleComplete}
-          isSubmitting={isSubmitting}
-          error={error}
-        />
-      )}
-
-      {step < 3 && (
-        <p className="mt-8 text-center text-sm text-zinc-500">
-          {t('hasAccount')}{' '}
-          <Link
-            href="/sign-in"
-            className="font-medium text-zinc-900 underline underline-offset-2 hover:text-zinc-700"
-          >
-            {t('signInLink')}
-          </Link>
-        </p>
-      )}
+          <p className="signup__signin">
+            {t('hasAccount')} <Link href="/sign-in">{t('signInLink')}</Link>
+          </p>
         </>
       )}
     </div>

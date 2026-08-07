@@ -1,7 +1,11 @@
 'use client'
 
 import { createAuthClient } from 'better-auth/react'
-import { twoFactorClient } from 'better-auth/client/plugins'
+import { inferAdditionalFields, twoFactorClient } from 'better-auth/client/plugins'
+// Type-only, so the server config does not reach the client bundle. It teaches
+// the client about the columns declared in auth.ts's additionalFields, which is
+// what lets signUp.email accept the address and name fields the form collects.
+import type { auth } from '@/lib/auth'
 
 function getAuthBaseURL() {
   if (typeof window !== 'undefined') {
@@ -13,7 +17,7 @@ function getAuthBaseURL() {
 
 export const authClient = createAuthClient({
   baseURL: getAuthBaseURL(),
-  plugins: [twoFactorClient()],
+  plugins: [twoFactorClient(), inferAdditionalFields<typeof auth>()],
 })
 
 export const { signIn, signOut, signUp } = authClient
