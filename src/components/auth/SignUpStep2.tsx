@@ -1,5 +1,6 @@
 'use client'
 
+import { useEffect, useRef } from 'react'
 import { useForm, type Resolver } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useTranslations } from 'next-intl'
@@ -56,6 +57,15 @@ export default function SignUpStep2({
 }: Props) {
   const t = useTranslations('auth.membership')
   const isCorporate = membershipType === 'corporate'
+  const alertRef = useRef<HTMLDivElement>(null)
+
+  // The alert sits at the foot of a form several screens long. Submitting from
+  // anywhere above leaves it out of view, so bring it to the member.
+  useEffect(() => {
+    if (submitError) {
+      alertRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    }
+  }, [submitError])
 
   const {
     register,
@@ -75,8 +85,6 @@ export default function SignUpStep2({
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} noValidate>
-      {submitError && <div className="signup__alert">{submitError}</div>}
-
       <section className="signup__section">
         <h2 className="signup__legend">{t('memberInfo')}</h2>
 
@@ -398,6 +406,12 @@ export default function SignUpStep2({
           />
         </SignUpField>
       </section>
+
+      {submitError && (
+        <div className="signup__alert" role="alert" ref={alertRef}>
+          {submitError}
+        </div>
+      )}
 
       {/* The design shows 次へ alone, but without 戻る someone who picked the
           wrong 法人／個人 has no way back to step 1. */}

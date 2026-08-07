@@ -73,12 +73,12 @@ export default function SignUpForm() {
       })
 
       if (err) {
-        // better-auth reports a duplicate address under a few different shapes
-        // depending on where it is caught, so match on the message too rather
-        // than falling through to the generic failure text.
+        // Match the duplicate on its code or its wording only. 422 is what
+        // better-auth answers for *any* creation failure — FAILED_TO_CREATE_USER
+        // included — so treating the status alone as a duplicate told members
+        // their address was taken when the real fault was at our end.
         const alreadyExists =
           err.code === 'USER_ALREADY_EXISTS' ||
-          err.status === 422 ||
           /already exists|already registered/i.test(err.message ?? '')
 
         setError(alreadyExists ? t('emailTaken') : t('signUpFailed'))
