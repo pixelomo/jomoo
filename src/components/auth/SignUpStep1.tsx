@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useTranslations } from 'next-intl'
 import SignUpField from './SignUpField'
+import NextCaret from './NextCaret'
 import type { MembershipType } from '@/types/membership-signup'
 
 interface Props {
@@ -49,7 +50,7 @@ export default function SignUpStep1({ value, onSubmit }: Props) {
       <div className="signup__actions">
         <button type="submit" className="signup__next">
           <span>{t('next')}</span>
-          <span aria-hidden="true">&rsaquo;</span>
+          <NextCaret />
         </button>
       </div>
     </form>

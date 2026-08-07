@@ -4,6 +4,7 @@ import { useForm, type Resolver } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useTranslations } from 'next-intl'
 import SignUpField from './SignUpField'
+import NextCaret from './NextCaret'
 import { COUNTRY_CODES, JP_PREFECTURES } from '@/data/jp-prefectures'
 import {
   CorporateSignupSchema,
@@ -406,7 +407,7 @@ export default function SignUpStep2({
         </button>
         <button type="submit" className="signup__next" disabled={isSubmitting}>
           <span>{t('next')}</span>
-          <span aria-hidden="true">&rsaquo;</span>
+          <NextCaret />
         </button>
       </div>
     </form>
