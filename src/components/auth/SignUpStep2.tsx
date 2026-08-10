@@ -1,27 +1,36 @@
 'use client'
 
-import { useForm } from 'react-hook-form'
+import { useEffect, useRef } from 'react'
+import { useForm, type Resolver } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useTranslations } from 'next-intl'
-import AccountField from '@/components/ui/AccountField'
+import SignUpField from './SignUpField'
+import NextCaret from './NextCaret'
 import { COUNTRY_CODES, JP_PREFECTURES } from '@/data/jp-prefectures'
 import {
   CorporateSignupSchema,
   GENDER_OPTIONS,
   IndividualSignupSchema,
-  type CorporateSignupData,
-  type IndividualSignupData,
   type MembershipType,
+  type SignupData,
 } from '@/types/membership-signup'
 
 type Props = {
   membershipType: MembershipType
-  defaultValues?: Partial<CorporateSignupData & IndividualSignupData>
-  onSubmit: (data: CorporateSignupData | IndividualSignupData) => void
+  defaultValues?: SignupData
+  onSubmit: (data: SignupData) => void
   onBack: () => void
   isSubmitting?: boolean
+  submitError?: string | null
 }
 
+const CURRENT_YEAR = new Date().getFullYear()
+const YEARS = Array.from({ length: 120 }, (_, i) => String(CURRENT_YEAR - i))
+const MONTHS = Array.from({ length: 12 }, (_, i) => String(i + 1))
+const DAYS = Array.from({ length: 31 }, (_, i) => String(i + 1))
+
+/** The schemas carry a message only where the wording is specific; everything
+ *  else is a missing required field. */
 function resolveError(
   message: string | undefined,
   t: ReturnType<typeof useTranslations<'auth.membership'>>
@@ -44,257 +53,375 @@ export default function SignUpStep2({
   onSubmit,
   onBack,
   isSubmitting = false,
+  submitError = null,
 }: Props) {
   const t = useTranslations('auth.membership')
-  const tc = useTranslations('common')
   const isCorporate = membershipType === 'corporate'
+  const alertRef = useRef<HTMLDivElement>(null)
+
+  // The alert sits at the foot of a form several screens long. Submitting from
+  // anywhere above leaves it out of view, so bring it to the member.
+  useEffect(() => {
+    if (submitError) {
+      alertRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    }
+  }, [submitError])
 
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<CorporateSignupData | IndividualSignupData>({
-    resolver: zodResolver(isCorporate ? CorporateSignupSchema : IndividualSignupSchema),
+  } = useForm<SignupData>({
+    resolver: zodResolver(
+      isCorporate ? CorporateSignupSchema : IndividualSignupSchema
+    ) as Resolver<SignupData>,
     defaultValues: {
       countryCode: '+81',
       ...defaultValues,
     },
   })
 
+  const err = (field: keyof SignupData) => resolveError(errors[field]?.message as string, t)
+
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
-      <section className="account-form__section">
-        <h2 className="account-form__legend">{t('memberInfo')}</h2>
-        <p className="account-form__sectionnote">{t('emailRegistration')}</p>
+    <form onSubmit={handleSubmit(onSubmit)} noValidate>
+      <section className="signup__section">
+        <h2 className="signup__legend">{t('memberInfo')}</h2>
 
-      <AccountField
-        label={t('email')}
-        required
-        htmlFor="email"
-        error={resolveError(errors.email?.message, t)}
-      >
-        <input id="email" type="email" className="account-input" {...register('email')} />
-      </AccountField>
+        <SignUpField label={t('email')} required htmlFor="email" error={err('email')}>
+          <input
+            id="email"
+            type="email"
+            className="account-input"
+            placeholder={t('emailPlaceholder')}
+            autoComplete="email"
+            {...register('email')}
+          />
+        </SignUpField>
 
-      {isCorporate && (
-        <>
-          <AccountField label={t('companyName')} htmlFor="companyName">
-            <input id="companyName" type="text" className="account-input" {...register('companyName')} />
-          </AccountField>
-          <AccountField label={t('companyNameKana')} htmlFor="companyNameKana">
-            <input
-              id="companyNameKana"
-              type="text"
-              className="account-input"
-              {...register('companyNameKana')}
-            />
-          </AccountField>
-        </>
-      )}
+        {isCorporate && (
+          <>
+            <SignUpField
+              label={t('companyName')}
+              required
+              htmlFor="companyName"
+              error={err('companyName')}
+            >
+              <input
+                id="companyName"
+                type="text"
+                className="account-input"
+                placeholder={t('companyNamePlaceholder')}
+                {...register('companyName')}
+              />
+            </SignUpField>
 
-      <div className="account-row account-row--two">
-        <AccountField
-          label={t('contactLastName')}
+            <SignUpField
+              label={t('companyNameKana')}
+              htmlFor="companyNameKana"
+              error={err('companyNameKana')}
+            >
+              <input
+                id="companyNameKana"
+                type="text"
+                className="account-input"
+                placeholder={t('companyNameKanaPlaceholder')}
+                {...register('companyNameKana')}
+              />
+            </SignUpField>
+          </>
+        )}
+
+        <SignUpField
+          label={isCorporate ? t('contactName') : t('name')}
           required
           htmlFor="lastName"
-          error={resolveError(errors.lastName?.message, t)}
+          error={err('lastName') ?? err('firstName')}
         >
-          <input id="lastName" type="text" className="account-input" {...register('lastName')} />
-        </AccountField>
-        <AccountField
-          label={t('contactFirstName')}
-          required
-          htmlFor="firstName"
-          error={resolveError(errors.firstName?.message, t)}
-        >
-          <input id="firstName" type="text" className="account-input" {...register('firstName')} />
-        </AccountField>
-      </div>
+          <div className="account-field__pair">
+            <input
+              id="lastName"
+              type="text"
+              className="account-input"
+              placeholder={t('lastNamePlaceholder')}
+              {...register('lastName')}
+            />
+            <input
+              id="firstName"
+              type="text"
+              className="account-input"
+              placeholder={t('firstNamePlaceholder')}
+              {...register('firstName')}
+            />
+          </div>
+        </SignUpField>
 
-      <div className="account-row account-row--two">
-        <AccountField
-          label={t('lastNameKana')}
+        <SignUpField
+          label={isCorporate ? t('contactNameKana') : t('nameKana')}
           required
           htmlFor="lastNameKana"
-          error={resolveError(errors.lastNameKana?.message, t)}
+          error={err('lastNameKana') ?? err('firstNameKana')}
         >
-          <input id="lastNameKana" type="text" className="account-input" {...register('lastNameKana')} />
-        </AccountField>
-        <AccountField
-          label={t('firstNameKana')}
-          required
-          htmlFor="firstNameKana"
-          error={resolveError(errors.firstNameKana?.message, t)}
-        >
-          <input id="firstNameKana" type="text" className="account-input" {...register('firstNameKana')} />
-        </AccountField>
-      </div>
-
-      {!isCorporate && (
-        <div className="account-row account-row--two">
-          <AccountField label={t('gender')} htmlFor="gender">
-            <select id="gender" className="account-select" defaultValue="" {...register('gender')}>
-              <option value="">{t('genderPlaceholder')}</option>
-              {GENDER_OPTIONS.map((option) => (
-                <option key={option} value={option}>
-                  {t(`gender_${option}`)}
-                </option>
-              ))}
-            </select>
-          </AccountField>
-          <AccountField label={t('dateOfBirth')} htmlFor="dateOfBirth">
+          <div className="account-field__pair">
             <input
-              id="dateOfBirth"
-              type="date"
+              id="lastNameKana"
+              type="text"
               className="account-input"
-              max={new Date().toISOString().split('T')[0]}
-              {...register('dateOfBirth')}
+              placeholder={t('lastNameKanaPlaceholder')}
+              {...register('lastNameKana')}
             />
-          </AccountField>
-        </div>
-      )}
+            <input
+              id="firstNameKana"
+              type="text"
+              className="account-input"
+              placeholder={t('firstNameKanaPlaceholder')}
+              {...register('firstNameKana')}
+            />
+          </div>
+        </SignUpField>
 
-      <p className="account-note">{t('phoneHint')}</p>
+        {!isCorporate && (
+          <>
+            {/* Drawn as a free-text box, but kept a fixed list so a stored
+                value still displays in the dashboard and admin dropdowns,
+                which only know these four. */}
+            <SignUpField label={t('gender')} htmlFor="gender" error={err('gender')}>
+              <select
+                id="gender"
+                className="account-select signup__select"
+                defaultValue=""
+                {...register('gender')}
+              >
+                <option value="">{t('selectPlaceholder')}</option>
+                {GENDER_OPTIONS.map((option) => (
+                  <option key={option} value={option}>
+                    {t(`gender_${option}`)}
+                  </option>
+                ))}
+              </select>
+            </SignUpField>
 
-      <div className="account-row account-row--code">
-        <AccountField
-          label={t('countryCode')}
-          required
-          htmlFor="countryCode"
-          error={resolveError(errors.countryCode?.message, t)}
-        >
-          <select id="countryCode" className="account-select" {...register('countryCode')}>
-            {COUNTRY_CODES.map((code) => (
-              <option key={code.value} value={code.value}>
-                {code.label}
-              </option>
-            ))}
-          </select>
-        </AccountField>
-        <AccountField
-          label={t('phoneNumber')}
-          required
-          htmlFor="phoneNumber"
-          error={resolveError(errors.phoneNumber?.message, t)}
-        >
-          <input
-            id="phoneNumber"
-            type="tel"
-            inputMode="numeric"
-            className="account-input"
-            {...register('phoneNumber')}
-          />
-        </AccountField>
-      </div>
+            <SignUpField label={t('dateOfBirth')} htmlFor="birthYear">
+              <div className="signup__birth">
+                <select
+                  id="birthYear"
+                  className="account-select"
+                  defaultValue=""
+                  {...register('birthYear')}
+                >
+                  <option value="">{t('selectPlaceholder')}</option>
+                  {YEARS.map((year) => (
+                    <option key={year} value={year}>
+                      {year}
+                    </option>
+                  ))}
+                </select>
+                <span>{t('birthYear')}</span>
 
+                <select
+                  id="birthMonth"
+                  className="account-select"
+                  defaultValue=""
+                  aria-label={t('birthMonth')}
+                  {...register('birthMonth')}
+                >
+                  <option value="">–</option>
+                  {MONTHS.map((month) => (
+                    <option key={month} value={month}>
+                      {month}
+                    </option>
+                  ))}
+                </select>
+                <span>{t('birthMonth')}</span>
+
+                <select
+                  id="birthDay"
+                  className="account-select"
+                  defaultValue=""
+                  aria-label={t('birthDay')}
+                  {...register('birthDay')}
+                >
+                  <option value="">–</option>
+                  {DAYS.map((day) => (
+                    <option key={day} value={day}>
+                      {day}
+                    </option>
+                  ))}
+                </select>
+                <span>{t('birthDay')}</span>
+              </div>
+            </SignUpField>
+
+            <SignUpField
+              label={t('phoneNumber')}
+              required
+              htmlFor="phoneNumber"
+              error={err('countryCode') ?? err('phoneNumber')}
+            >
+              <div className="signup__phone">
+                <select
+                  id="countryCode"
+                  className="account-select"
+                  aria-label={t('countryCodePlaceholder')}
+                  {...register('countryCode')}
+                >
+                  {COUNTRY_CODES.map((code) => (
+                    <option key={code.value} value={code.value}>
+                      {code.label}
+                    </option>
+                  ))}
+                </select>
+                <input
+                  id="phoneNumber"
+                  type="tel"
+                  inputMode="numeric"
+                  className="account-input"
+                  placeholder={t('phoneNumberPlaceholder')}
+                  autoComplete="tel-national"
+                  {...register('phoneNumber')}
+                />
+              </div>
+            </SignUpField>
+          </>
+        )}
       </section>
 
-      <section className="account-form__section">
-        <h2 className="account-form__legend">{t('address')}</h2>
-        <AccountField
-          label={t('postalCode')}
-          required
-          htmlFor="postalCode"
-          error={resolveError(errors.postalCode?.message, t)}
-        >
-          <input id="postalCode" type="text" className="account-input" {...register('postalCode')} />
-        </AccountField>
+      <section className="signup__section">
+        <h2 className="signup__legend">{t('addressSection')}</h2>
 
-        <AccountField
-          label={t('prefecture')}
-          required
-          htmlFor="prefecture"
-          error={resolveError(errors.prefecture?.message, t)}
+        <SignUpField
+          label={t('postalCode')}
+          required={isCorporate}
+          htmlFor="postalCode"
+          error={err('postalCode')}
         >
-          <select id="prefecture" className="account-select" defaultValue="" {...register('prefecture')}>
-            <option value="">{t('prefecturePlaceholder')}</option>
+          <input
+            id="postalCode"
+            type="text"
+            inputMode="numeric"
+            className="account-input"
+            placeholder={t('postalCodePlaceholder')}
+            autoComplete="postal-code"
+            {...register('postalCode')}
+          />
+        </SignUpField>
+
+        <SignUpField
+          label={t('prefecture')}
+          required={isCorporate}
+          htmlFor="prefecture"
+          error={err('prefecture')}
+        >
+          <select
+            id="prefecture"
+            className="account-select signup__select"
+            defaultValue=""
+            {...register('prefecture')}
+          >
+            <option value="">{t('selectPlaceholder')}</option>
             {JP_PREFECTURES.map((prefecture) => (
               <option key={prefecture} value={prefecture}>
                 {prefecture}
               </option>
             ))}
           </select>
-        </AccountField>
+        </SignUpField>
 
-        <AccountField
+        <SignUpField
           label={t('city')}
-          required
+          required={isCorporate}
           htmlFor="city"
-          error={resolveError(errors.city?.message, t)}
-          hint={t('cityHint')}
+          error={err('city')}
         >
-          <input id="city" type="text" className="account-input" {...register('city')} />
-        </AccountField>
+          <input
+            id="city"
+            type="text"
+            className="account-input"
+            placeholder={t('cityPlaceholder')}
+            {...register('city')}
+          />
+        </SignUpField>
 
-        <AccountField
+        <SignUpField
           label={t('streetAddress')}
-          required
+          required={isCorporate}
           htmlFor="streetAddress"
-          error={resolveError(errors.streetAddress?.message, t)}
+          error={err('streetAddress')}
         >
-          <input id="streetAddress" type="text" className="account-input" {...register('streetAddress')} />
-        </AccountField>
+          <input
+            id="streetAddress"
+            type="text"
+            className="account-input"
+            placeholder={t('streetAddressPlaceholder')}
+            {...register('streetAddress')}
+          />
+        </SignUpField>
 
-        <AccountField label={t('building')} htmlFor="building">
-        <input id="building" type="text" className="account-input" {...register('building')} />
-        </AccountField>
+        <SignUpField
+          label={t('building')}
+          required={isCorporate}
+          htmlFor="building"
+          error={err('building')}
+        >
+          <input
+            id="building"
+            type="text"
+            className="account-input"
+            placeholder={t('buildingPlaceholder')}
+            {...register('building')}
+          />
+        </SignUpField>
       </section>
 
-      <section className="account-form__section">
-        <h2 className="account-form__legend">{t('password')}</h2>
-        <AccountField
-          label={t('password')}
-          required
-          htmlFor="password"
-          error={resolveError(errors.password?.message, t)}
-          note={
-            <>
-              {t('passwordHint1')}
-              <br />
-              {t('passwordHint2')}
-            </>
-          }
-        >
+      <section className="signup__section">
+        <h2 className="signup__legend">{t('passwordSection')}</h2>
+
+        <SignUpField label={t('password')} required htmlFor="password" error={err('password')}>
           <input
             id="password"
             type="password"
             className="account-input"
+            placeholder={t('passwordPlaceholder')}
             autoComplete="new-password"
             {...register('password')}
           />
-        </AccountField>
+        </SignUpField>
 
-        <AccountField
-        label={t('confirmPassword')}
-        required
-        htmlFor="confirmPassword"
-        error={resolveError(errors.confirmPassword?.message, t)}
-      >
-        <input
-          id="confirmPassword"
-          type="password"
-          className="account-input"
-          autoComplete="new-password"
-          {...register('confirmPassword')}
-        />
-        </AccountField>
+        <p className="signup__note">{t('passwordHint1')}</p>
+        <p className="signup__note">{t('passwordHint2')}</p>
+
+        <SignUpField
+          label={t('confirmPassword')}
+          required
+          htmlFor="confirmPassword"
+          error={err('confirmPassword')}
+        >
+          <input
+            id="confirmPassword"
+            type="password"
+            className="account-input"
+            placeholder={t('passwordPlaceholder')}
+            autoComplete="new-password"
+            {...register('confirmPassword')}
+          />
+        </SignUpField>
       </section>
 
-      <div className="account-form__actions account-form__actions--pair">
-        <button
-          type="button"
-          onClick={onBack}
-          disabled={isSubmitting}
-          className="member-btn member-btn--ghost"
-        >
+      {submitError && (
+        <div className="signup__alert" role="alert" ref={alertRef}>
+          {submitError}
+        </div>
+      )}
+
+      {/* The design shows 次へ alone, but without 戻る someone who picked the
+          wrong 法人／個人 has no way back to step 1. */}
+      <div className="signup__actions">
+        <button type="button" className="signup__back" onClick={onBack} disabled={isSubmitting}>
           {t('back')}
         </button>
-        <button
-          type="submit"
-          disabled={isSubmitting}
-          className="member-btn"
-        >
-          {isSubmitting ? tc('loading') : t('next')}
+        <button type="submit" className="signup__next" disabled={isSubmitting}>
+          <span>{t('next')}</span>
+          <NextCaret />
         </button>
       </div>
     </form>

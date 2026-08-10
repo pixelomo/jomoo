@@ -956,7 +956,7 @@
   grid-template-columns: 17rem minmax(0, 1fr);
   align-items: start;
   gap: 1rem 1.5rem;
-  padding: 1.25rem 0;
+  padding: 0.5rem 0;
 }
 
 .account-field__label {
@@ -968,17 +968,19 @@
   padding-top: 0.65rem;
 }
 
-/* Thin outline, transparent fill — a marker, not a button. */
+/* Thin blue outline, transparent fill — a marker, not a button. The blue is the
+   signup step indicator's, so the 必須 markers and the progress dots are the
+   same colour rather than two competing blues. Shared with 登録情報変更. */
 .account-required {
   display: inline-flex;
   align-items: center;
-  padding: 0.15rem 0.5rem;
-  border: 1px solid var(--member-primary);
+  padding: 0.1rem 0.5rem;
+  border: 1px solid #5c9fcc;
   border-radius: 0.3rem;
   background: transparent;
-  color: var(--member-primary);
-  font-size: 1.1rem;
-  font-weight: 500;
+  color: #5c9fcc;
+  font-size: 0.8rem;
+  font-weight: 700;
   line-height: 1.4;
   white-space: nowrap;
 }
@@ -1002,11 +1004,23 @@
   width: 100%;
   padding: 0.85rem 1.15rem;
   border: 1px solid #d4d4d8;
-  border-radius: 0.6rem;
+  border-radius: 10px;
   background: #ffffff;
   font-family: var(--font-jp);
   font-size: 1rem;
   color: var(--member-ink);
+}
+
+/* The native caret cannot be sized, so it is replaced with our own chevron and
+   given a clear 1rem of space to the left of it. */
+.account-select {
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230a0a0a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 1.15rem center;
+  background-size: 1.5rem 1.5rem;
+  padding-right: 3.65rem;
 }
 
 .account-input:focus,
@@ -1088,5 +1102,375 @@
 
   .account-field__label {
     padding-top: 0;
+  }
+}
+
+/* ── JOMOOクラブ会員登録 ────────────────────────────────────
+   The signup wizard. Field rows, the 必須 badge and the inputs are the
+   .account-* ones above, so the form a visitor fills in before joining and the
+   one they edit afterwards are the same form. Only the chrome is new: the
+   header, the three-step indicator and the card the steps sit in. */
+.signup {
+  --signup-primary: #458fc6;
+
+  min-height: 100%;
+  padding: 4rem var(--gutter) 6rem;
+  background: #f5f6f7;
+  font-family: var(--font-jp);
+  color: #0a0a0a;
+}
+
+.signup__header {
+  text-align: center;
+  margin-bottom: 3.5rem;
+}
+
+.signup__title {
+  margin: 0 0 1.25rem;
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+.signup__subtitle {
+  margin: 0;
+  font-size: 1.05rem;
+  color: #3a3a3a;
+}
+
+/* ── step indicator ────────────────────────────────────── */
+.account-steps {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  max-width: 40rem;
+  margin: 0 auto 3.5rem;
+  padding: 0;
+  list-style: none;
+}
+
+.account-steps__item {
+  display: contents;
+}
+
+/* Only as wide as the dot, so the connecting rules meet the circles instead of
+   stopping short of them. The label and status are wider than the cell and
+   overflow it evenly on both sides, which keeps them centred under the dot. */
+.account-steps__cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 3rem;
+}
+
+.account-steps__dot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 3rem;
+  height: 3rem;
+  border: 2px solid var(--signup-primary);
+  border-radius: 50%;
+  background: #fff;
+  color: var(--signup-primary);
+  font-size: 1.15rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+/* Upcoming steps are drawn in grey so the eye lands on the current one. */
+.account-steps__dot--upcoming {
+  border-color: #c9ccd0;
+  color: #b0b4b9;
+}
+
+.account-steps__dot--complete {
+  border-color: var(--signup-primary);
+  background: var(--signup-primary);
+  color: #fff;
+}
+
+.account-steps__check {
+  width: 1.35rem;
+  height: 1.35rem;
+}
+
+.account-steps__label {
+  margin-top: 0.85rem;
+  font-size: 0.95rem;
+  font-weight: 700;
+  text-align: center;
+  white-space: nowrap;
+}
+
+/* Both 入力中 and 完了 are bold — they carry the same weight of meaning as the
+   step name above them. Only the colour separates the current step. */
+.account-steps__status {
+  margin-top: 0.35rem;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #a0a4a9;
+  white-space: nowrap;
+}
+
+.account-steps__status--active {
+  color: var(--signup-primary);
+}
+
+/* The rule between two dots. It turns blue once the step behind it is done, so
+   the line reads as a progress bar rather than decoration. */
+/* Sits at the dot's vertical centre — half of the 3rem circle, less half the
+   rule's own height — and stops 6px short of each circle. */
+.account-steps__line {
+  flex: 1 1 0;
+  min-width: 3rem;
+  max-width: 11rem;
+  height: 3px;
+  margin-top: calc(1.5rem - 1.5px);
+  margin-inline: 6px;
+  background: #d5d8dc;
+}
+
+.account-steps__line--complete {
+  background: var(--signup-primary);
+}
+
+/* ── card ──────────────────────────────────────────────── */
+.signup__card {
+  max-width: 56rem;
+  margin: 0 auto;
+  padding: 4rem 4.5rem;
+  border-radius: 1.25rem;
+  background: #fff;
+}
+
+.signup__legend {
+  margin: 0 0 0.5rem;
+  padding-bottom: 1.25rem;
+  border-bottom: 1px solid #d9dbde;
+  font-size: 1.35rem;
+  font-weight: 700;
+}
+
+.signup__legend + .account-field {
+  padding-top: 1.75rem;
+}
+
+.signup__section + .signup__section {
+  margin-top: 3.5rem;
+}
+
+/* 選択してください dropdowns are drawn narrower than a text input and outlined
+   in ink rather than grey — the design treats a choice differently to typing. */
+.signup__select {
+  max-width: 26rem;
+  border-color: #0a0a0a;
+}
+
+.signup__note {
+  margin: 0.35rem 0 0;
+  font-size: 0.95rem;
+  line-height: 1.8;
+  color: #3a3a3a;
+}
+
+.signup__error {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #dc2626;
+}
+
+/* Sits directly above 次へ rather than at the top of a form that can run several
+   screens long — an alert up there is off-screen at the moment it appears. */
+.signup__alert {
+  max-width: 40rem;
+  margin: 3rem auto 0;
+  padding: 0.9rem 1.15rem;
+  border: 1px solid #fecaca;
+  border-radius: 10px;
+  background: #fef2f2;
+  font-size: 0.95rem;
+  text-align: center;
+  color: #b91c1c;
+}
+
+.signup__alert + .signup__actions {
+  margin-top: 1.25rem;
+}
+
+/* 生年月日: three selects, each followed by its unit. */
+.signup__birth {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+/* Wide enough for the value plus the chevron and its 1rem of clearance. */
+.signup__birth select {
+  width: auto;
+  min-width: 8.5rem;
+  border-color: #0a0a0a;
+}
+
+.signup__birth span {
+  font-size: 1rem;
+}
+
+/* 電話番号: a narrow 国際番号 box beside the number itself. */
+.signup__phone {
+  display: grid;
+  grid-template-columns: 9rem minmax(0, 1fr);
+  gap: 1rem;
+}
+
+/* ── actions ───────────────────────────────────────────── */
+.signup__actions {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 3.5rem;
+}
+
+/* The label is centred in the button and the chevron is taken out of the flow
+   and pinned right, so the text sits dead centre rather than being pushed off
+   it by the chevron's width. */
+.signup__next {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: 25rem;
+  padding: 1.35rem 3.75rem;
+  border: none;
+  border-radius: 10px;
+  background: #2e2b29;
+  color: #fff;
+  font-family: inherit;
+  font-size: 1.25rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.signup__next-caret {
+  position: absolute;
+  right: 2.25rem;
+  width: 1.8rem;
+  height: 1.8rem;
+  /* The design's chevron is a hairline, not a heavy arrow. */
+  stroke-width: 1.25;
+}
+
+.signup__next:hover:not(:disabled) {
+  background: #454140;
+}
+
+.signup__next:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* Matches 次へ's corners so the pair reads as one control group. */
+.signup__back {
+  min-width: 12rem;
+  padding: 1.35rem 2.5rem;
+  border: 1px solid #d4d4d8;
+  border-radius: 10px;
+  background: #fff;
+  font-family: inherit;
+  font-size: 1.05rem;
+  color: #3a3a3a;
+  cursor: pointer;
+}
+
+.signup__back:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* ── 登録完了 ──────────────────────────────────────────── */
+.signup__complete {
+  margin: 5rem auto 0;
+  text-align: center;
+  font-size: clamp(1.5rem, 3vw, 2.35rem);
+  font-weight: 700;
+  line-height: 1.7;
+}
+
+.signup__complete p {
+  margin: 0;
+}
+
+.signup__signin {
+  margin-top: 2.5rem;
+  text-align: center;
+  font-size: 0.95rem;
+  color: #6b7076;
+}
+
+.signup__signin a {
+  color: #0a0a0a;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+@media (max-width: 767px) {
+  .signup {
+    padding: 2.5rem var(--gutter) 4rem;
+  }
+
+  .signup__card {
+    padding: 2rem 1.5rem;
+  }
+
+  .account-steps__cell {
+    width: 2.5rem;
+  }
+
+  .account-steps__dot {
+    width: 2.5rem;
+    height: 2.5rem;
+    font-size: 1rem;
+  }
+
+  .account-steps__label {
+    font-size: 0.8rem;
+  }
+
+  .account-steps__status {
+    font-size: 0.75rem;
+  }
+
+  .account-steps__line {
+    min-width: 2.75rem;
+    margin-top: calc(1.25rem - 1px);
+  }
+
+  .signup__next {
+    padding: 1.15rem 3.25rem;
+    font-size: 1.1rem;
+  }
+
+  .signup__next-caret {
+    right: 1.5rem;
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+
+  .signup__phone {
+    grid-template-columns: 7rem minmax(0, 1fr);
+  }
+
+  .signup__actions {
+    flex-direction: column-reverse;
+  }
+
+  .signup__next,
+  .signup__back {
+    max-width: none;
+    width: 100%;
   }
 }
