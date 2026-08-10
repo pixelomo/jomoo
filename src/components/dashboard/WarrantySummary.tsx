@@ -33,28 +33,33 @@ export default function WarrantySummary({ warranties }: { warranties: Warranty[]
   }
 
   return (
-    <section className="member-card">
+    <section className="member-card member-card--list">
       <h2 className="member-card__title">{heading}</h2>
-      <div className="member-panel__legacy">
+      <div className="member-products">
         {warranties.map((w) => (
-          <div key={w.registrationId} className="member-card__row">
-            <div className="member-card__copy">
-              <p className="member-card__body">
-                {w.modelName}
-                <br />
-                製造番号：{w.serialNumber}
-                <br />
-                保証期限：
-                {new Date(w.expiryDate).toLocaleDateString('ja-JP', {
-                  year: 'numeric',
-                  month: 'long',
-                  day: 'numeric',
-                })}
-              </p>
+          <div key={w.registrationId} className="member-product">
+            {/* Copy takes the whole row and the button sits under it, rather
+                than the two sharing a line — a full-width button beside a short
+                paragraph left the text squeezed into what was left. */}
+            <div className="member-card__row member-card__row--stack">
+              <div className="member-card__copy">
+                <p className="member-card__body">
+                  {w.modelName}
+                  <br />
+                  製造番号：{w.serialNumber}
+                  <br />
+                  保証期限：
+                  {new Date(w.expiryDate).toLocaleDateString('ja-JP', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                  })}
+                </p>
+              </div>
+              <Link className="member-product__action" href={`/warranty/${w.registrationId}`}>
+                電子保証カードを見る
+              </Link>
             </div>
-            <Link className="member-btn" href={`/warranty/${w.registrationId}`}>
-              電子保証カードを見る
-            </Link>
           </div>
         ))}
       </div>

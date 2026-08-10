@@ -132,6 +132,7 @@
     "title": "マイページ",
     "welcome": "おかえりなさい",
     "myProducts": "登録済み製品",
+    "serialNumber": "製造番号",
     "noProducts": "まだ製品が登録されていません",
     "registerFirst": "製品を登録する",
     "status": {

@@ -6,6 +6,7 @@ import {
   type ContactData,
 } from '@/types/contact'
 import { notificationConfig, type NotificationKey } from '@/lib/notifications'
+import { buildEmail } from '@/lib/emailTemplates'
 
 /**
  * Everything a visitor typed goes into an HTML email, so it has to be escaped —
@@ -175,7 +176,9 @@ export async function sendContactInquiry({
     ['お問い合わせ内容', message],
   ]
 
-  const bodyHtml = rows
+  // Built here rather than in the template so the cells stay escaped whatever
+  // an admin does to the wording around them.
+  const detailsTable = rows
     .map(
       ([label, value]) => `
         <tr>
@@ -188,7 +191,6 @@ export async function sendContactInquiry({
   await deliverEmail({
     to: contactAddressFor(category),
     replyTo: email,
-    subject: `【JOMOO】${label}: ${fullName}`,
     notification: 'contact_staff',
     devLabel: `contact inquiry (${category})`,
     devSummary: {
@@ -200,21 +202,11 @@ export async function sendContactInquiry({
       showroom,
       message,
     },
-    html: `
-<!DOCTYPE html>
-<html>
-<head><meta charset="utf-8" /></head>
-<body style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f4f4f5;margin:0;padding:32px 16px">
-  <div style="max-width:640px;margin:0 auto;background:#fff;border-radius:8px;overflow:hidden;border:1px solid #e4e4e7">
-    <div style="background:#18181b;padding:20px 28px">
-      <p style="margin:0;color:#fff;font-size:18px;font-weight:700;letter-spacing:0.05em">JOMOO お問い合わせ</p>
-    </div>
-    <div style="padding:24px 28px 8px">
-      <table style="width:100%;border-collapse:collapse">${bodyHtml}</table>
-    </div>
-  </div>
-</body>
-</html>`,
+    ...(await buildEmail('contact_staff', {
+      name: fullName,
+      categoryLabel: label,
+      detailsTable,
+    })),
   })
 }
 
@@ -232,16 +224,9 @@ export async function sendVerificationEmail({
 }) {
   await deliverEmail({
     to,
-    subject: '【JOMOO】メールアドレスのご確認',
     devLabel: 'email verification',
     devSummary: { name, url },
-    html: buildHtml(`${name} 様`, [
-      'JOMOO の会員登録ありがとうございます。',
-      '下記のボタンからメールアドレスのご確認をお願いいたします。確認完了後、マイページをご利用いただけます。',
-      `<a href="${url}" style="display:inline-block;margin-top:8px;padding:10px 20px;background:#18181b;color:#fff;border-radius:6px;text-decoration:none;font-weight:600">メールアドレスを確認する</a>`,
-      `<span style="font-size:13px;color:#71717a">ボタンが開かない場合は、次のURLをブラウザに貼り付けてください:<br /><span style="word-break:break-all">${url}</span></span>`,
-      '<span style="font-size:13px;color:#71717a">お心当たりのない場合は、お手数ですがこのメールを破棄してください。</span>',
-    ]),
+    ...(await buildEmail('email_verification', { name, url })),
   })
 }
 
@@ -260,17 +245,10 @@ export async function sendMemberWelcome({
 
   await deliverEmail({
     to,
-    subject: '【JOMOO】会員登録が完了しました',
     notification: 'welcome',
     devLabel: 'member welcome',
     devSummary: { name },
-    html: buildHtml(`${name} 様`, [
-      'この度は JOMOO の会員登録をいただき、誠にありがとうございます。',
-      '会員登録が完了しました。マイページより製品登録や保証書の確認、各種お手続きがご利用いただけます。',
-      `<a href="${dashboardUrl}" style="display:inline-block;margin-top:8px;padding:10px 20px;background:#18181b;color:#fff;border-radius:6px;text-decoration:none;font-weight:600">マイページへ</a>`,
-      `<span style="font-size:13px;color:#71717a">ログインは <a href="${signInUrl}" style="color:#18181b">こちら</a> から行えます。</span>`,
-      '<span style="font-size:13px;color:#71717a">お心当たりのない場合は、お手数ですがこのメールを破棄してください。</span>',
-    ]),
+    ...(await buildEmail('welcome', { name, dashboardUrl, signInUrl })),
   })
 }
 
@@ -295,12 +273,12 @@ export async function sendRegistrationConfirmation({
     notification: 'registration',
     devLabel: 'registration received',
     devSummary: { modelName, registrationId },
-    subject: `【JOMOO】製品登録を受け付けました - ${modelName}`,
-    html: buildHtml(`${name} 様`, [
-      `<strong>${modelName}</strong> の製品登録（登録番号：<code>${registrationId}</code>）を受け付けました。`,
-      '3〜5営業日以内に審査を行い、結果をメールにてお知らせいたします。',
-      `<a href="${dashboardUrl}" style="color:#18181b">マイページで進捗を確認する →</a>`,
-    ]),
+    ...(await buildEmail('registration_received', {
+      name,
+      modelName,
+      registrationId,
+      dashboardUrl,
+    })),
   })
 }
 
@@ -332,12 +310,12 @@ export async function sendWarrantyIssuedEmail({
     notification: 'warranty',
     devLabel: 'warranty issued',
     devSummary: { modelName, registrationId, formattedExpiry },
-    subject: `【JOMOO】電子保証カードを発行しました - ${modelName}`,
-    html: buildHtml(`${name} 様`, [
-      `<strong>${modelName}</strong> の製造番号を確認し、電子保証カードを発行いたしました。`,
-      `保証期限：<strong>${formattedExpiry}</strong>`,
-      `<a href="${warrantyUrl}" style="display:inline-block;margin-top:8px;padding:10px 20px;background:#18181b;color:#fff;border-radius:6px;text-decoration:none;font-weight:600">電子保証カードを見る</a>`,
-    ]),
+    ...(await buildEmail('warranty_issued', {
+      name,
+      modelName,
+      expiryDate: formattedExpiry,
+      warrantyUrl,
+    })),
   })
 }
 
@@ -357,74 +335,25 @@ export async function sendReviewStatusUpdate({
 }) {
   const dashboardUrl = `${appUrl()}/dashboard`
 
-  type MsgMap = Record<typeof status, { subject: string; lines: string[] }>
-
-  const messages: MsgMap = {
-    RETURNED: {
-      subject: '【JOMOO】製品登録の修正のお願い',
-      lines: [
-        'ご登録いただいた内容に修正が必要です。マイページより理由をご確認の上、修正して再度ご提出ください。',
-        `<a href="${dashboardUrl}" style="color:#18181b">マイページへ →</a>`,
-      ],
-    },
-    REGISTERED_NO_WARRANTY: {
-      subject: '【JOMOO】製品登録の審査が完了しました',
-      lines: [
-        'ご登録いただいた製品の審査が完了しました。',
-        '※ 設置日から180日を超えているため、今回のご登録は延長保証の対象外となります。',
-        `<a href="${dashboardUrl}" style="color:#18181b">マイページへ →</a>`,
-      ],
-    },
-    REGISTERED_WITH_WARRANTY: {
-      subject: '【JOMOO】電子保証カードを発行しました',
-      lines: (() => {
-        const warrantyUrl = registrationId
-          ? `${appUrl()}/warranty/${registrationId}`
-          : dashboardUrl
-        return [
-          'ご登録いただいた製品の審査が完了し、電子保証カードを発行いたしました。',
-          `<a href="${warrantyUrl}" style="display:inline-block;margin-top:8px;padding:10px 20px;background:#18181b;color:#fff;border-radius:6px;text-decoration:none;font-weight:600">電子保証カードを見る</a>`,
-        ]
-      })(),
-    },
+  const templateFor: Record<typeof status, string> = {
+    RETURNED: 'review_returned',
+    REGISTERED_NO_WARRANTY: 'review_no_warranty',
+    REGISTERED_WITH_WARRANTY: 'review_with_warranty',
   }
-
-  const { subject, lines } = messages[status]
 
   await deliverEmail({
     to,
     notification: 'registration',
     devLabel: `review outcome (${status})`,
     devSummary: { status, registrationId },
-    subject,
-    html: buildHtml(`${name} 様`, lines),
+    ...(await buildEmail(templateFor[status], {
+      name,
+      dashboardUrl,
+      // Falls back to the dashboard when there is no registration to link to,
+      // so the button in the template never points at /warranty/undefined.
+      warrantyUrl: registrationId ? `${appUrl()}/warranty/${registrationId}` : dashboardUrl,
+    })),
   })
-}
-
-// ─────────────────────────────────────────────
-// Shared HTML wrapper
-// ─────────────────────────────────────────────
-function buildHtml(greeting: string, lines: string[]): string {
-  const body = lines.map((l) => `<p style="margin:0 0 12px">${l}</p>`).join('')
-  return `
-<!DOCTYPE html>
-<html>
-<head><meta charset="utf-8" /></head>
-<body style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f4f4f5;margin:0;padding:32px 16px">
-  <div style="max-width:560px;margin:0 auto;background:#fff;border-radius:8px;overflow:hidden;border:1px solid #e4e4e7">
-    <div style="background:#18181b;padding:20px 28px">
-      <p style="margin:0;color:#fff;font-size:18px;font-weight:700;letter-spacing:0.05em">JOMOO</p>
-    </div>
-    <div style="padding:28px 28px 8px">
-      <p style="margin:0 0 16px;font-size:15px;color:#18181b">${greeting}</p>
-      <div style="font-size:14px;color:#3f3f46;line-height:1.6">${body}</div>
-    </div>
-    <div style="padding:16px 28px 24px;border-top:1px solid #f4f4f5;margin-top:8px">
-      <p style="margin:0;font-size:12px;color:#a1a1aa">JOMOO Member Services — このメールに返信しないでください</p>
-    </div>
-  </div>
-</body>
-</html>`
 }
 
 // ─────────────────────────────────────────────
@@ -444,14 +373,7 @@ export async function sendPasswordReset({
     notification: 'password_reset',
     devLabel: 'password reset',
     devSummary: { name, url },
-    subject: '【JOMOO】パスワード再設定のご案内',
-    html: buildHtml(`${name} 様`, [
-      'パスワード再設定のご依頼を承りました。',
-      '下記のボタンから新しいパスワードをご設定ください。',
-      `<a href="${url}" style="display:inline-block;margin-top:8px;padding:10px 20px;background:#18181b;color:#fff;border-radius:6px;text-decoration:none;font-weight:600">パスワードを再設定する</a>`,
-      `<span style="font-size:13px;color:#71717a">ボタンが開かない場合は、次のURLをブラウザに貼り付けてください:<br /><span style="word-break:break-all">${url}</span></span>`,
-      '<span style="font-size:13px;color:#71717a">このリンクの有効期限は1時間です。お心当たりのない場合は、お手数ですがこのメールを破棄してください。</span>',
-    ]),
+    ...(await buildEmail('password_reset', { name, url })),
   })
 }
 
@@ -466,13 +388,10 @@ export async function sendContactAcknowledgement(data: ContactData) {
     notification: 'contact_reply',
     devLabel: 'contact acknowledgement',
     devSummary: { category: data.category, to: data.email },
-    subject: '【JOMOO】お問い合わせありがとうございます',
-    html: buildHtml(`${fullName} 様`, [
-      'このたびはJOMOOへお問い合わせいただき、誠にありがとうございます。',
-      '以下の内容で承りました。担当部署より順次ご連絡いたしますので、今しばらくお待ちください。',
-      `<span style="font-size:13px;color:#71717a">お問い合わせ種別：${categoryLabel(data.category)}</span>`,
-      `<span style="display:block;padding:12px 16px;background:#f4f4f5;border-radius:6px;white-space:pre-wrap">${escapeHtml(data.message)}</span>`,
-      '<span style="font-size:13px;color:#71717a">本メールは送信専用です。ご返信いただいてもお答えできませんのでご了承ください。</span>',
-    ]),
+    ...(await buildEmail('contact_reply', {
+      name: fullName,
+      categoryLabel: categoryLabel(data.category),
+      message: data.message,
+    })),
   })
 }

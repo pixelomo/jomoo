@@ -149,6 +149,11 @@ export default async function ProductDetailTemplate({ product }: Props) {
         specs={specGroups}
         specNote={product.specNote}
         specImage={url(product.specImage?.asset, 1400)}
+        introVideoUrl={
+          product.slug.current === 'x40-b' || product.slug.current === 'x40-c'
+            ? 'https://www.youtube.com/embed/-AfN9573Yhk?rel=0&iv_load_policy=3&playsinline=1&hl=ja&color=white'
+            : undefined
+        }
         type={{
           eyebrow: hero.eyebrow,
           name: hero.title,

@@ -38,7 +38,7 @@ export default async function WarrantyPage({ params }: Props) {
   if (!warranty) notFound()
 
   return (
-    <main className="flex-1">
+    <main className="flex-1 warranty-page">
       <WarrantyDocument
         modelName={reg.modelName}
         serialNumber={reg.serialNumber}

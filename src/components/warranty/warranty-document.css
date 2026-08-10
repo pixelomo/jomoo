@@ -164,8 +164,16 @@
 }
 
 /* ── 無料修理規定 and the club sections below the certificate ── */
+
+/* The certificate is a document, so the page behind it is paper rather than the
+   member portal's grey. Only the club section breaks that. */
+.warranty-page {
+  background: #ffffff;
+}
+
 .warranty-section {
   padding: 4rem 0;
+  background: #ffffff;
 }
 
 .warranty-section--grey {
@@ -175,15 +183,18 @@
 .warranty-section__inner {
   max-width: 52rem;
   margin: 0 auto;
-  padding-inline: var(--gutter);
 }
 
 .warranty-section__title {
   margin: 0 0 2rem;
-  font-size: clamp(1.5rem, 2.8vw, 2.25rem);
+  font-size: 2.5rem;
   font-weight: 700;
   line-height: 1.5;
   color: #0a0a0a;
+}
+
+.warranty-section__title--center {
+  text-align: center;
 }
 
 .warranty-section__lead {
@@ -191,26 +202,40 @@
 }
 
 .warranty-terms {
-  font-size: 0.95rem;
+  font-size: 1.25rem;
   line-height: 2;
-  color: #3a3a3a;
+  color: #000000;
+}
+
+/* The client marked these passages for emphasis in the supplied copy. */
+.warranty-hi {
+  color: #e41712;
 }
 
 .warranty-terms ol {
   margin: 0 0 1.75rem;
-  padding-left: 1.5rem;
+  padding-left: 0;
+  list-style-position: inside;
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  /* 2em at line-height 2 is exactly one blank line, so each clause reads as its
+     own paragraph the way the source copy is spaced. */
+  gap: 2em;
 }
 
+/* Sub-clauses run on without the blank line between them. */
 .warranty-terms ol ol {
   margin: 0.5rem 0 0;
   gap: 0.5rem;
 }
 
+/* …except the 免責事項 list, which the copy separates from its lead-in. */
+.warranty-terms ol ol.warranty-terms__sub--gap {
+  margin-top: 2em;
+}
+
 .warranty-terms li::marker {
-  color: #0a0a0a;
+  color: #000000;
   font-weight: 600;
 }
 
@@ -220,7 +245,9 @@
   position: relative;
 }
 
-.warranty-terms ol ol > li > span:first-child {
+/* Only the marker carries weight. Matching on the first <span> instead caught
+   the emphasis wrapper too, which set whole clauses in bold. */
+.warranty-terms__marker {
   font-weight: 600;
   margin-right: 0.35rem;
 }
@@ -232,7 +259,8 @@
 }
 
 .warranty-club__cta {
-  display: inline-flex;
+  display: flex;
+  width: 100%;
   align-items: center;
   justify-content: center;
   margin-bottom: 2rem;
@@ -240,15 +268,20 @@
   border-radius: 0.5rem;
   background: #000000;
   color: #ffffff;
-  font-size: 1.0625rem;
+  font-size: 1.5rem;
   font-weight: 700;
   letter-spacing: 0.04em;
+  text-align: center;
 }
 
+/* Rule down the left, the way a section marker is set in Japanese print. */
 .warranty-club h3 {
-  margin: 2rem 0 0.75rem;
-  font-size: 1.0625rem;
+  margin: 2em 0 1rem;
+  padding-left: 1rem;
+  border-left: 5px solid #000000;
+  font-size: 1.375rem;
   font-weight: 700;
+  line-height: 1.6;
   color: #0a0a0a;
 }
 
@@ -260,10 +293,9 @@
 .warranty-maker__inner {
   max-width: 52rem;
   margin: 0 auto;
-  padding-inline: var(--gutter);
-  font-size: 0.875rem;
+  font-size: 1.2rem;
   line-height: 2;
-  color: #3a3a3a;
+  color: #000000;
 }
 
 @media print {

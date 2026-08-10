@@ -1,5 +1,10 @@
 import { NextResponse } from 'next/server'
-import { signAdminToken, ADMIN_COOKIE, adminCookieOptions } from '@/lib/admin-auth'
+import {
+  authenticateAdmin,
+  signAdminToken,
+  ADMIN_COOKIE,
+  adminCookieOptions,
+} from '@/lib/admin-auth'
 
 export async function POST(req: Request) {
   let body: { username?: string; password?: string }
@@ -7,15 +12,13 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 })
   }
 
-  if (
-    body.username !== process.env.ADMIN_USERNAME ||
-    body.password !== process.env.ADMIN_PASSWORD
-  ) {
+  const session = authenticateAdmin(body.username ?? '', body.password ?? '')
+  if (!session) {
     return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 })
   }
 
-  const token = await signAdminToken()
-  const res = NextResponse.json({ success: true })
+  const token = await signAdminToken(session)
+  const res = NextResponse.json({ success: true, role: session.role })
   res.cookies.set(ADMIN_COOKIE, token, adminCookieOptions())
   return res
 }

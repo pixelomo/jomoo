@@ -8,6 +8,10 @@
   --member-ink-soft: #3a3a3a;
   --member-primary: #73a4c7;
   --member-line: #d3d3d3;
+  /* Rules under a field or between list rows. Softer than the hairline used
+     for card edges, and shared so the field list, the product list and the
+     form legends never drift apart. */
+  --member-rule: #cecece;
 
   font-family: var(--font-jp);
   color: var(--member-ink);
@@ -156,6 +160,17 @@
   text-align: left;
 }
 
+/* Copy on its own full-width line, action beneath it. */
+.member-card__row--stack {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1.25rem;
+}
+
+.member-card__row--stack .member-card__copy {
+  width: 100%;
+}
+
 .member-card__art {
   flex: 0 0 auto;
   width: 215px;
@@ -183,7 +198,7 @@
   background: #000000;
   color: #ffffff;
   font-family: var(--font-jp);
-  font-size: 1.125rem;
+  font-size: 1.5rem;
   font-weight: 600;
   line-height: 1.4;
   letter-spacing: 0.04em;
@@ -204,6 +219,225 @@
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
+}
+
+/* ── ご登録製品 list ───────────────────────────────────── */
+
+/* The card centres its contents, which is right for the empty state and wrong
+   for a list — a registered product needs the full width of the card and a
+   left edge to line up against. */
+.member-card--list {
+  align-items: stretch;
+  justify-content: flex-start;
+  text-align: left;
+  padding: clamp(2rem, 4vw, 3.25rem) clamp(1.5rem, 4vw, 3.5rem);
+  gap: 1.75rem;
+}
+
+.member-card--list .member-card__actions {
+  justify-content: center;
+}
+
+.member-products {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Same rules as .member-field, so the product list and the profile card read as
+   one system. */
+.member-product {
+  width: 100%;
+  padding: 1.75rem 0;
+  border-bottom: 1px solid var(--member-rule);
+}
+
+.member-product:first-of-type {
+  border-top: 1px solid var(--member-rule);
+}
+
+/* Everything sits in one column, photographs included. Floating the thumbnails
+   into a gutter beside the text indented the rows that had a photo and left
+   the rest against the card edge, so the list read as ragged. */
+.member-product__body {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  align-items: flex-start;
+}
+
+.member-product__head {
+  width: 100%;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.member-product__name {
+  margin: 0;
+  font-size: clamp(1.125rem, 1.7vw, 1.375rem);
+  font-weight: 700;
+  line-height: 1.5;
+  color: var(--member-ink);
+}
+
+.member-product__meta {
+  margin: 0;
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
+  gap: 0.4rem 1.5rem;
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+.member-product__meta dt {
+  color: #71717a;
+  font-weight: 600;
+}
+
+.member-product__meta dd {
+  margin: 0;
+  color: var(--member-ink-soft);
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.member-product__status {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  padding: 0.3rem 0.9rem;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  font-size: 0.875rem;
+  font-weight: 700;
+  line-height: 1.4;
+  white-space: nowrap;
+}
+
+.member-product__status--pending { color: #b45309; background: #fffbeb; }
+.member-product__status--returned { color: #dc2626; background: #fef2f2; }
+.member-product__status--registered { color: #15803d; background: #f0fdf4; }
+.member-product__status--warranty { color: var(--member-primary); background: #f1f7fb; }
+
+.member-product__thumbs {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.member-product__thumb {
+  position: relative;
+  width: 6rem;
+  height: 4.5rem;
+  padding: 0;
+  border: 1px solid var(--member-line);
+  border-radius: 0.5rem;
+  overflow: hidden;
+  background: #fafafa;
+  cursor: pointer;
+}
+
+.member-product__thumb img {
+  object-fit: cover;
+}
+
+.member-product__thumb-label {
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0;
+  padding: 0.15rem 0.35rem;
+  background: rgba(0, 0, 0, 0.55);
+  color: #ffffff;
+  font-size: 0.7rem;
+  line-height: 1.4;
+  text-align: center;
+}
+
+.member-product__actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+/* Smaller sibling of .member-edit-pill — the row carries up to three of these,
+   so the profile card's size would crowd it. */
+.member-product__action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.45rem 1.25rem;
+  border: 1px solid var(--member-primary);
+  border-radius: 999px;
+  background: #ffffff;
+  color: var(--member-primary);
+  font-family: var(--font-jp);
+  font-size: 0.9375rem;
+  font-weight: 700;
+  line-height: 1.4;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.member-product__action:hover,
+.member-product__action:focus-visible {
+  background: var(--member-primary);
+  color: #ffffff;
+}
+
+.member-product__action--ghost {
+  border-color: #d4d4d8;
+  color: var(--member-ink-soft);
+}
+
+.member-product__action--ghost:hover,
+.member-product__action--ghost:focus-visible {
+  background: #f4f4f5;
+  color: var(--member-ink);
+}
+
+.member-product__action--danger {
+  border-color: #dc2626;
+  color: #dc2626;
+}
+
+.member-product__action--danger:hover,
+.member-product__action--danger:focus-visible {
+  background: #dc2626;
+  color: #ffffff;
+}
+
+@media (max-width: 767px) {
+  .member-product {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .member-product__head {
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+
+  .member-product__status {
+    align-self: flex-start;
+  }
+
+  .member-product__meta {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.15rem;
+  }
+
+  .member-product__meta dt {
+    margin-top: 0.5rem;
+  }
+
+  .member-product__action {
+    flex: 1 1 auto;
+  }
 }
 
 @media (max-width: 1023px) {
@@ -278,10 +512,10 @@
   align-items: center;
   justify-content: center;
   padding: 0.6rem 1.75rem;
-  border: 1px solid #2563eb;
+  border: 1px solid var(--member-primary);
   border-radius: 999px;
   background: #ffffff;
-  color: #2563eb;
+  color: var(--member-primary);
   font-family: var(--font-jp);
   font-size: 1rem;
   font-weight: 700;
@@ -292,7 +526,7 @@
 
 .member-edit-pill:hover,
 .member-edit-pill:focus-visible {
-  background: #2563eb;
+  background: var(--member-primary);
   color: #ffffff;
 }
 
@@ -312,12 +546,11 @@
   align-items: center;
   gap: 1.5rem;
   padding: 1.25rem 0;
-  /* Matches the product spec table's rule rather than the card's hairline. */
-  border-bottom: 1px solid #000000;
+  border-bottom: 1px solid var(--member-rule);
 }
 
 .member-field:first-of-type {
-  border-top: 1px solid #000000;
+  border-top: 1px solid var(--member-rule);
 }
 
 .member-field__label {
@@ -403,11 +636,36 @@
 }
 
 /* ── 登録情報変更 form ─────────────────────────────────── */
-.account-form {
-  max-width: 52rem;
-  margin: 0 auto;
+
+/* The page keeps the gutter; the form itself is a card, matching the dashboard. */
+.account-page {
+  max-width: var(--container);
+  margin-inline: auto;
   padding: 3.5rem var(--gutter) 6rem;
+}
+
+.account-form {
+  width: 100%;
+  background: #ffffff;
+  border-radius: 1rem;
+  padding: clamp(2rem, 4vw, 3.5rem);
   text-align: left;
+}
+
+/* Sign-in has two fields; the 1200px card the edit form uses would swim. */
+.account-page--narrow {
+  max-width: 52rem;
+}
+
+/* Label on its own row, input on the next. The side-by-side grid suits a long
+   form of short values; a two-field sign-in reads better stacked full width. */
+.account-form--stacked .account-field {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0.5rem;
+}
+
+.account-form--stacked .account-field__label {
+  padding-top: 0;
 }
 
 .account-form__title {
@@ -417,6 +675,268 @@
   text-align: center;
 }
 
+/* Sits under the title, above the first section. */
+.account-form__intro {
+  margin: -1.5rem 0 2.5rem;
+  font-size: 1.15rem;
+  line-height: 1.8;
+  color: var(--member-ink-soft);
+  text-align: center;
+}
+
+/* Whole-form messages — a failed sign-in, a taken address. */
+.account-alert {
+  margin: 0 0 1.5rem;
+  padding: 1rem 1.25rem;
+  border: 1px solid #f0c2c2;
+  border-radius: 0.6rem;
+  background: #fdf3f3;
+  font-size: 1.05rem;
+  line-height: 1.7;
+  color: #b3261e;
+}
+
+.account-alert--notice {
+  border-color: #ffe082;
+  background: #fffbeb;
+  color: #8d6e00;
+}
+
+.account-alert--done {
+  border-color: #a5d6a7;
+  background: #f1f8f2;
+  color: #2e7d32;
+}
+
+/* A quiet link-style control inside a form — resend, go back a step. */
+.account-linkbtn {
+  padding: 0;
+  border: 0;
+  background: none;
+  font-family: var(--font-jp);
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+  cursor: pointer;
+}
+
+.account-linkbtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ── sign-up step indicator ────────────────────────────── */
+.account-steps {
+  margin-bottom: 2.5rem;
+}
+
+.account-steps__list {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.account-steps__item {
+  display: flex;
+  align-items: center;
+}
+
+.account-steps__marker {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 7rem;
+}
+
+.account-steps__dot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border: 2px solid var(--member-primary);
+  border-radius: 50%;
+  background: var(--member-primary);
+  color: #ffffff;
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+
+.account-steps__dot.is-future {
+  background: #ffffff;
+  color: var(--member-primary);
+}
+
+.account-steps__dot svg {
+  width: 1.1rem;
+  height: 1.1rem;
+}
+
+.account-steps__label {
+  margin-top: 0.6rem;
+  font-size: 1rem;
+  font-weight: 500;
+  line-height: 1.5;
+  text-align: center;
+  color: var(--member-ink);
+}
+
+.account-steps__label.is-future {
+  color: #a1a1aa;
+}
+
+.account-steps__line {
+  width: 4rem;
+  height: 1px;
+  margin: 0 0.75rem 2rem;
+  background: #d7e6f0;
+}
+
+.account-steps__line.is-complete {
+  background: var(--member-primary);
+}
+
+@media (max-width: 767px) {
+  .account-steps__marker {
+    min-width: 5rem;
+  }
+
+  .account-steps__line {
+    width: 2rem;
+    margin-inline: 0.35rem;
+  }
+
+  .account-steps__label {
+    font-size: 0.9rem;
+  }
+}
+
+/* Sits under a legend to explain the section. */
+.account-form__sectionnote {
+  margin: -0.75rem 0 1.5rem;
+  font-size: 1.05rem;
+  line-height: 1.8;
+  color: var(--member-ink-soft);
+}
+
+/* 姓 / 名 side by side. Each child is a full .account-field, so the label
+   column is dropped inside a pair — two 17rem columns would leave no room for
+   the inputs. */
+.account-row--two,
+.account-row--code {
+  display: grid;
+  gap: 0 1.5rem;
+}
+
+.account-row--two {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.account-row--code {
+  grid-template-columns: 10rem minmax(0, 1fr);
+}
+
+.account-row--two .account-field,
+.account-row--code .account-field {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0.5rem;
+}
+
+.account-row--two .account-field__label,
+.account-row--code .account-field__label {
+  padding-top: 0;
+}
+
+@media (max-width: 767px) {
+  .account-row--two,
+  .account-row--code {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* 法人 / 個人 — the one choice on sign-up step 1. */
+.account-choice {
+  display: flex;
+  gap: 1rem;
+}
+
+.account-choice__option {
+  flex: 1 1 0;
+  padding: 1.5rem 1.5rem;
+  border: 2px solid var(--member-primary);
+  border-radius: 0.6rem;
+  background: #ffffff;
+  color: var(--member-primary);
+  font-family: var(--font-jp);
+  font-size: 1.35rem;
+  font-weight: 700;
+  line-height: 1.4;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.account-choice__option:hover,
+.account-choice__option:focus-visible {
+  background: #f1f7fb;
+}
+
+.account-choice__option.is-selected {
+  background: var(--member-primary);
+  color: #ffffff;
+}
+
+@media (max-width: 767px) {
+  .account-choice {
+    flex-direction: column;
+  }
+}
+
+/* Terminal states — "we sent you an email", "that send failed". */
+.account-outcome {
+  padding: 2rem 0;
+  text-align: center;
+}
+
+.account-outcome__title {
+  margin: 0 0 1rem;
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--member-ink);
+}
+
+.account-outcome__body {
+  margin: 0;
+  font-size: 1.15rem;
+  line-height: 1.9;
+  color: var(--member-ink-soft);
+}
+
+.account-outcome__note {
+  margin: 1.5rem 0 0;
+  font-size: 1rem;
+  color: var(--member-ink-soft);
+}
+
+/* Under the card: "already have an account?" and friends. */
+.account-page__aside {
+  margin: 1.5rem 0 0;
+  font-size: 1.15rem;
+  color: var(--member-ink-soft);
+  text-align: center;
+}
+
+.account-page__aside a {
+  color: var(--member-ink);
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
 .account-form__section {
   margin-bottom: 3rem;
 }
@@ -424,14 +944,16 @@
 .account-form__legend {
   margin: 0 0 1.5rem;
   padding-bottom: 0.75rem;
-  border-bottom: 1px solid #000000;
-  font-size: 1.25rem;
+  border-bottom: 1px solid var(--member-rule);
+  font-size: 1.5rem;
   font-weight: 700;
 }
 
 .account-field {
   display: grid;
-  grid-template-columns: 14rem minmax(0, 1fr);
+  /* Wide enough that the longest label — パスワード(確認用) — keeps its 必須
+     badge on the same line now the label type is 1.2rem. */
+  grid-template-columns: 17rem minmax(0, 1fr);
   align-items: start;
   gap: 1rem 1.5rem;
   padding: 1.25rem 0;
@@ -441,22 +963,22 @@
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  font-size: 1rem;
-  font-weight: 600;
+  font-size: 1.2rem;
+  font-weight: 500;
   padding-top: 0.65rem;
 }
 
-/* Thin blue outline, transparent fill — a marker, not a button. */
+/* Thin outline, transparent fill — a marker, not a button. */
 .account-required {
   display: inline-flex;
   align-items: center;
   padding: 0.15rem 0.5rem;
-  border: 1px solid #2563eb;
+  border: 1px solid var(--member-primary);
   border-radius: 0.3rem;
   background: transparent;
-  color: #2563eb;
-  font-size: 0.75rem;
-  font-weight: 700;
+  color: var(--member-primary);
+  font-size: 1.1rem;
+  font-weight: 500;
   line-height: 1.4;
   white-space: nowrap;
 }
@@ -480,7 +1002,7 @@
   width: 100%;
   padding: 0.85rem 1.15rem;
   border: 1px solid #d4d4d8;
-  border-radius: 1rem;
+  border-radius: 0.6rem;
   background: #ffffff;
   font-family: var(--font-jp);
   font-size: 1rem;
@@ -498,16 +1020,26 @@
   color: #a1a1aa;
 }
 
+/* Spans both grid columns rather than sitting in the input column, so the note
+   runs the full width of the form instead of being ragged under the field. */
 .account-note {
+  grid-column: 1 / -1;
   margin: 0;
-  font-size: 0.85rem;
+  font-size: 1.25rem;
+  line-height: 1.7;
+  color: #000000;
+}
+
+.account-hint {
+  margin: 0;
+  font-size: 1rem;
   line-height: 1.7;
   color: var(--member-ink-soft);
 }
 
 .account-error {
   margin: 0;
-  font-size: 0.85rem;
+  font-size: 1rem;
   color: #dc2626;
 }
 
@@ -515,6 +1047,36 @@
   display: flex;
   justify-content: center;
   margin-top: 2.5rem;
+}
+
+/* Back beside Next on the multi-step sign-up. Reversed on narrow screens so
+   the primary action is the one under the thumb. */
+.account-form__actions--pair {
+  flex-direction: row;
+  gap: 1rem;
+}
+
+.account-form__actions--pair .member-btn {
+  width: auto;
+  flex: 1 1 0;
+}
+
+/* Outlined twin of .member-btn, for the secondary half of a pair. */
+.member-btn--ghost {
+  background: #ffffff;
+  border: 1px solid var(--member-line);
+  color: var(--member-ink);
+}
+
+.member-btn--ghost:hover,
+.member-btn--ghost:focus-visible {
+  background: var(--bg-soft, #f4f4f5);
+}
+
+@media (max-width: 767px) {
+  .account-form__actions--pair {
+    flex-direction: column-reverse;
+  }
 }
 
 @media (max-width: 767px) {

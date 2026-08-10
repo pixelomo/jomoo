@@ -18,8 +18,8 @@ interface Props {
   products?: ReactNode
   contract?: ReactNode
   profile?: ReactNode
-  /** True when the member has nothing registered yet. */
-  isEmpty: boolean
+  /** Drives both the heading's count and the empty state. */
+  productCount: number
 }
 
 /**
@@ -27,9 +27,10 @@ interface Props {
  * anchors — so they are buttons in a tablist, not links, and the inactive
  * panels leave the document entirely.
  */
-export default function MemberTabs({ products, contract, profile, isEmpty }: Props) {
+export default function MemberTabs({ products, contract, profile, productCount }: Props) {
   const [active, setActive] = useState<MemberTabId>('products')
   const base = useId()
+  const isEmpty = productCount === 0
 
   const panelFor = (id: MemberTabId) =>
     id === 'products' ? products : id === 'contract' ? contract : profile
@@ -64,12 +65,13 @@ export default function MemberTabs({ products, contract, profile, isEmpty }: Pro
         >
           {tab.id === 'products' ? (
             <>
-              <section className="member-card">
-                {isEmpty ? (
-                  <h2 className="member-card__title">製品がまだ登録されていません</h2>
-                ) : (
-                  <div className="member-panel__legacy">{products}</div>
-                )}
+              <section className={`member-card${isEmpty ? '' : ' member-card--list'}`}>
+                {/* The heading stays whether or not anything is registered —
+                    a list that arrives with no title reads as a stray block. */}
+                <h2 className="member-card__title">
+                  {isEmpty ? '製品がまだ登録されていません' : `ご登録製品（${productCount}件）`}
+                </h2>
+                {!isEmpty && <div className="member-products">{products}</div>}
                 <div className="member-card__actions">
                   <Link className="member-btn" href="/contact-us?category=fault">
                     その他の製品をWEB修理依頼する

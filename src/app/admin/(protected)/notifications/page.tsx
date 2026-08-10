@@ -1,10 +1,11 @@
 import { NOTIFICATIONS, allNotificationConfigs } from '@/lib/notifications'
+import { allTemplates } from '@/lib/emailTemplates'
 import NotificationSettingsForm from '@/components/admin/NotificationSettingsForm'
 
 export const metadata = { title: 'Notifications | JOMOO Admin' }
 
 export default async function NotificationsPage() {
-  const configs = await allNotificationConfigs()
+  const [configs, templates] = await Promise.all([allNotificationConfigs(), allTemplates()])
 
   return (
     <div>
@@ -13,7 +14,8 @@ export default async function NotificationsPage() {
       </h1>
       <p style={{ fontSize: 13, color: 'var(--ink-3)', margin: '0 0 28px', maxWidth: 640 }}>
         Switch each automatic email on or off, and copy operational staff on any of them.
-        Turning one off stops it being sent to customers.
+        Turning one off stops it being sent to customers. <strong>Edit template</strong> changes
+        the wording customers actually read.
       </p>
 
       <NotificationSettingsForm
@@ -22,6 +24,7 @@ export default async function NotificationsPage() {
           enabled: configs[n.key].enabled,
           ccAddresses: configs[n.key].cc.join(', '),
         }))}
+        templates={templates}
       />
     </div>
   )

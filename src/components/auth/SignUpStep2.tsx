@@ -3,7 +3,7 @@
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useTranslations } from 'next-intl'
-import FormField, { inputClass } from '@/components/ui/FormField'
+import AccountField from '@/components/ui/AccountField'
 import { COUNTRY_CODES, JP_PREFECTURES } from '@/data/jp-prefectures'
 import {
   CorporateSignupSchema,
@@ -62,84 +62,78 @@ export default function SignUpStep2({
   })
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-      <div>
-        <h2 className="text-lg font-semibold text-zinc-900">{t('memberInfo')}</h2>
-        <p className="mt-1 text-sm text-zinc-500">{t('emailRegistration')}</p>
-      </div>
+    <form onSubmit={handleSubmit(onSubmit)}>
+      <section className="account-form__section">
+        <h2 className="account-form__legend">{t('memberInfo')}</h2>
+        <p className="account-form__sectionnote">{t('emailRegistration')}</p>
 
-      <FormField
+      <AccountField
         label={t('email')}
         required
-        requiredBadge
         htmlFor="email"
         error={resolveError(errors.email?.message, t)}
       >
-        <input id="email" type="email" className={inputClass} {...register('email')} />
-      </FormField>
+        <input id="email" type="email" className="account-input" {...register('email')} />
+      </AccountField>
 
       {isCorporate && (
         <>
-          <FormField label={t('companyName')} htmlFor="companyName">
-            <input id="companyName" type="text" className={inputClass} {...register('companyName')} />
-          </FormField>
-          <FormField label={t('companyNameKana')} htmlFor="companyNameKana">
+          <AccountField label={t('companyName')} htmlFor="companyName">
+            <input id="companyName" type="text" className="account-input" {...register('companyName')} />
+          </AccountField>
+          <AccountField label={t('companyNameKana')} htmlFor="companyNameKana">
             <input
               id="companyNameKana"
               type="text"
-              className={inputClass}
+              className="account-input"
               {...register('companyNameKana')}
             />
-          </FormField>
+          </AccountField>
         </>
       )}
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <FormField
+      <div className="account-row account-row--two">
+        <AccountField
           label={t('contactLastName')}
           required
-          requiredBadge
           htmlFor="lastName"
           error={resolveError(errors.lastName?.message, t)}
         >
-          <input id="lastName" type="text" className={inputClass} {...register('lastName')} />
-        </FormField>
-        <FormField
+          <input id="lastName" type="text" className="account-input" {...register('lastName')} />
+        </AccountField>
+        <AccountField
           label={t('contactFirstName')}
           required
-          requiredBadge
           htmlFor="firstName"
           error={resolveError(errors.firstName?.message, t)}
         >
-          <input id="firstName" type="text" className={inputClass} {...register('firstName')} />
-        </FormField>
+          <input id="firstName" type="text" className="account-input" {...register('firstName')} />
+        </AccountField>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <FormField
+      <div className="account-row account-row--two">
+        <AccountField
           label={t('lastNameKana')}
           required
-          requiredBadge
           htmlFor="lastNameKana"
           error={resolveError(errors.lastNameKana?.message, t)}
         >
-          <input id="lastNameKana" type="text" className={inputClass} {...register('lastNameKana')} />
-        </FormField>
-        <FormField
+          <input id="lastNameKana" type="text" className="account-input" {...register('lastNameKana')} />
+        </AccountField>
+        <AccountField
           label={t('firstNameKana')}
           required
-          requiredBadge
           htmlFor="firstNameKana"
           error={resolveError(errors.firstNameKana?.message, t)}
         >
-          <input id="firstNameKana" type="text" className={inputClass} {...register('firstNameKana')} />
-        </FormField>
+          <input id="firstNameKana" type="text" className="account-input" {...register('firstNameKana')} />
+        </AccountField>
       </div>
 
       {!isCorporate && (
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <FormField label={t('gender')} htmlFor="gender">
-            <select id="gender" className={inputClass} defaultValue="" {...register('gender')}>
+        <div className="account-row account-row--two">
+          <AccountField label={t('gender')} htmlFor="gender">
+            <select id="gender" className="account-select" defaultValue="" {...register('gender')}>
               <option value="">{t('genderPlaceholder')}</option>
               {GENDER_OPTIONS.map((option) => (
                 <option key={option} value={option}>
@@ -147,41 +141,39 @@ export default function SignUpStep2({
                 </option>
               ))}
             </select>
-          </FormField>
-          <FormField label={t('dateOfBirth')} htmlFor="dateOfBirth">
+          </AccountField>
+          <AccountField label={t('dateOfBirth')} htmlFor="dateOfBirth">
             <input
               id="dateOfBirth"
               type="date"
-              className={inputClass}
+              className="account-input"
               max={new Date().toISOString().split('T')[0]}
               {...register('dateOfBirth')}
             />
-          </FormField>
+          </AccountField>
         </div>
       )}
 
-      <p className="text-xs text-zinc-500">{t('phoneHint')}</p>
+      <p className="account-note">{t('phoneHint')}</p>
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-[8rem_1fr]">
-        <FormField
+      <div className="account-row account-row--code">
+        <AccountField
           label={t('countryCode')}
           required
-          requiredBadge
           htmlFor="countryCode"
           error={resolveError(errors.countryCode?.message, t)}
         >
-          <select id="countryCode" className={inputClass} {...register('countryCode')}>
+          <select id="countryCode" className="account-select" {...register('countryCode')}>
             {COUNTRY_CODES.map((code) => (
               <option key={code.value} value={code.value}>
                 {code.label}
               </option>
             ))}
           </select>
-        </FormField>
-        <FormField
+        </AccountField>
+        <AccountField
           label={t('phoneNumber')}
           required
-          requiredBadge
           htmlFor="phoneNumber"
           error={resolveError(errors.phoneNumber?.message, t)}
         >
@@ -189,118 +181,118 @@ export default function SignUpStep2({
             id="phoneNumber"
             type="tel"
             inputMode="numeric"
-            className={inputClass}
+            className="account-input"
             {...register('phoneNumber')}
           />
-        </FormField>
+        </AccountField>
       </div>
 
-      <div>
-        <h3 className="mb-4 text-sm font-semibold text-zinc-900">{t('address')}</h3>
-        <div className="space-y-4">
-          <FormField
-            label={t('postalCode')}
-            required
-            requiredBadge
-            htmlFor="postalCode"
-            error={resolveError(errors.postalCode?.message, t)}
-          >
-            <input id="postalCode" type="text" className={inputClass} {...register('postalCode')} />
-          </FormField>
+      </section>
 
-          <FormField
-            label={t('prefecture')}
-            required
-            requiredBadge
-            htmlFor="prefecture"
-            error={resolveError(errors.prefecture?.message, t)}
-          >
-            <select id="prefecture" className={inputClass} defaultValue="" {...register('prefecture')}>
-              <option value="">{t('prefecturePlaceholder')}</option>
-              {JP_PREFECTURES.map((prefecture) => (
-                <option key={prefecture} value={prefecture}>
-                  {prefecture}
-                </option>
-              ))}
-            </select>
-          </FormField>
+      <section className="account-form__section">
+        <h2 className="account-form__legend">{t('address')}</h2>
+        <AccountField
+          label={t('postalCode')}
+          required
+          htmlFor="postalCode"
+          error={resolveError(errors.postalCode?.message, t)}
+        >
+          <input id="postalCode" type="text" className="account-input" {...register('postalCode')} />
+        </AccountField>
 
-          <FormField
-            label={t('city')}
-            required
-            requiredBadge
-            htmlFor="city"
-            error={resolveError(errors.city?.message, t)}
-            hint={t('cityHint')}
-          >
-            <input id="city" type="text" className={inputClass} {...register('city')} />
-          </FormField>
+        <AccountField
+          label={t('prefecture')}
+          required
+          htmlFor="prefecture"
+          error={resolveError(errors.prefecture?.message, t)}
+        >
+          <select id="prefecture" className="account-select" defaultValue="" {...register('prefecture')}>
+            <option value="">{t('prefecturePlaceholder')}</option>
+            {JP_PREFECTURES.map((prefecture) => (
+              <option key={prefecture} value={prefecture}>
+                {prefecture}
+              </option>
+            ))}
+          </select>
+        </AccountField>
 
-          <FormField
-            label={t('streetAddress')}
-            required
-            requiredBadge
-            htmlFor="streetAddress"
-            error={resolveError(errors.streetAddress?.message, t)}
-          >
-            <input id="streetAddress" type="text" className={inputClass} {...register('streetAddress')} />
-          </FormField>
+        <AccountField
+          label={t('city')}
+          required
+          htmlFor="city"
+          error={resolveError(errors.city?.message, t)}
+          hint={t('cityHint')}
+        >
+          <input id="city" type="text" className="account-input" {...register('city')} />
+        </AccountField>
 
-          <FormField label={t('building')} htmlFor="building">
-            <input id="building" type="text" className={inputClass} {...register('building')} />
-          </FormField>
-        </div>
-      </div>
+        <AccountField
+          label={t('streetAddress')}
+          required
+          htmlFor="streetAddress"
+          error={resolveError(errors.streetAddress?.message, t)}
+        >
+          <input id="streetAddress" type="text" className="account-input" {...register('streetAddress')} />
+        </AccountField>
 
-      <div className="space-y-1.5">
-        <FormField
+        <AccountField label={t('building')} htmlFor="building">
+        <input id="building" type="text" className="account-input" {...register('building')} />
+        </AccountField>
+      </section>
+
+      <section className="account-form__section">
+        <h2 className="account-form__legend">{t('password')}</h2>
+        <AccountField
           label={t('password')}
           required
-          requiredBadge
           htmlFor="password"
           error={resolveError(errors.password?.message, t)}
+          note={
+            <>
+              {t('passwordHint1')}
+              <br />
+              {t('passwordHint2')}
+            </>
+          }
         >
           <input
             id="password"
             type="password"
-            className={inputClass}
+            className="account-input"
             autoComplete="new-password"
             {...register('password')}
           />
-        </FormField>
-        <p className="text-xs text-zinc-500">{t('passwordHint1')}</p>
-        <p className="text-xs text-zinc-500">{t('passwordHint2')}</p>
-      </div>
+        </AccountField>
 
-      <FormField
+        <AccountField
         label={t('confirmPassword')}
         required
-        requiredBadge
         htmlFor="confirmPassword"
         error={resolveError(errors.confirmPassword?.message, t)}
       >
         <input
           id="confirmPassword"
           type="password"
-          className={inputClass}
+          className="account-input"
           autoComplete="new-password"
           {...register('confirmPassword')}
         />
-      </FormField>
+        </AccountField>
+      </section>
 
-      <div className="flex flex-col-reverse gap-3 pt-2 sm:flex-row">
+      <div className="account-form__actions account-form__actions--pair">
         <button
           type="button"
           onClick={onBack}
           disabled={isSubmitting}
-          className="inline-flex flex-1 items-center justify-center rounded-lg border border-zinc-200 bg-white px-4 py-2.5 text-sm font-medium text-zinc-700 hover:bg-zinc-50 transition-colors disabled:opacity-50"
+          className="member-btn member-btn--ghost"
         >
           {t('back')}
         </button>
         <button
           type="submit"
           disabled={isSubmitting}
-          className="inline-flex flex-1 items-center justify-center rounded-lg bg-zinc-900 px-4 py-2.5 text-sm font-medium text-white hover:bg-zinc-700 transition-colors disabled:opacity-50"
+          className="member-btn"
         >
           {isSubmitting ? tc('loading') : t('next')}
         </button>

@@ -6,6 +6,7 @@ import { eq } from 'drizzle-orm'
 import { RegistrationSchema } from '@/types/registration'
 import { validateSerialNumber } from '@/lib/serialValidation'
 import { findRegistrationBySerial, isDuplicateSerialError } from '@/lib/serialRegistry'
+import { bindSerialToRegistration } from '@/lib/serialLibrary'
 import { getProductSeriesById } from '@/lib/sanity'
 import { sendRegistrationConfirmation, sendWarrantyIssuedEmail } from '@/lib/resend'
 
@@ -76,6 +77,15 @@ export async function POST(req: Request) {
     }
     throw err
   }
+
+  // Claim the serial in the library if it is in there. Best effort on purpose:
+  // the library is empty until the factory sends a batch, and a member must
+  // not be blocked from registering because of it.
+  await bindSerialToRegistration({
+    serialNumber: data.serialNumber,
+    registrationId: id,
+    userId: sessionUser.id,
+  })
 
   let finalStatus = 'PENDING'
 

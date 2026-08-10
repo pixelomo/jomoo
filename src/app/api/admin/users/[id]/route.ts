@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
-import { getAdminSession } from '@/lib/admin-auth'
+import { can, getAdminSession } from '@/lib/admin-auth'
+import { releaseSerialsForUsers } from '@/lib/serialLibrary'
 import { db } from '@/lib/db'
 import { user, productRegistration, warrantyRecord } from '@/lib/db/schema'
 import { eq, desc } from 'drizzle-orm'
@@ -68,10 +69,17 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
 }
 
 export async function DELETE(_req: Request, { params }: { params: Promise<{ id: string }> }) {
-  if (!(await getAdminSession())) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  const session = await getAdminSession()
+  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  if (!can(session, 'delete')) {
+    return NextResponse.json({ error: 'FORBIDDEN', permission: 'delete' }, { status: 403 })
   }
   const { id } = await params
+
+  // Deleting the member cascades their registrations away, which would leave
+  // any serial they registered stranded as BOUND to a registration that no
+  // longer exists — and unregisterable by the next owner of the product.
+  await releaseSerialsForUsers([id], session.username)
 
   await db.delete(user).where(eq(user.id, id))
   return NextResponse.json({ success: true })

@@ -15,6 +15,9 @@ import {
   type IndividualSignupData,
   type MembershipType,
 } from '@/types/membership-signup'
+// Wears the member portal's form styling, so signing up and editing your
+// details look like the same product.
+import '@/components/dashboard/member-portal.css'
 
 type FormData = Partial<CorporateSignupData & IndividualSignupData>
 
@@ -137,118 +140,81 @@ export default function SignUpForm() {
   }
 
   return (
-    <div className="w-full max-w-2xl">
-      <div className="mb-8 text-center">
-        <h1 className="text-2xl font-bold text-zinc-900">{tm('title')}</h1>
+    <div className="member account-page">
+      <div className="account-form">
+        <h1 className="account-form__title">{tm('title')}</h1>
+
+        <MembershipStepIndicator currentStep={step} labels={stepLabels} />
+
+        {error && step !== 3 && (
+          <p className="account-alert" role="alert">
+            {error}
+          </p>
+        )}
+
+        {verificationSent && sendFailed ? (
+          <div className="account-outcome">
+            <h2 className="account-outcome__title">{t('verificationSendFailedTitle')}</h2>
+            <p className="account-outcome__body">
+              {t('verificationSendFailedBody', { email: formData.email ?? '' })}
+            </p>
+            <div className="account-form__actions">
+              <button
+                type="button"
+                onClick={handleRetrySend}
+                disabled={isResending}
+                className="member-btn"
+              >
+                {isResending ? t('verificationSending') : t('resendVerification')}
+              </button>
+            </div>
+          </div>
+        ) : verificationSent ? (
+          <div className="account-outcome">
+            <h2 className="account-outcome__title">確認メールを送信しました</h2>
+            <p className="account-outcome__body">
+              <strong>{formData.email}</strong> 宛にメールをお送りしました。
+              <br />
+              メール内のボタンからメールアドレスをご確認ください。
+            </p>
+            <p className="account-outcome__note">
+              メールが届かない場合は、迷惑メールフォルダをご確認ください。
+            </p>
+          </div>
+        ) : (
+          <>
+            {step === 1 && <SignUpStep1 value={membershipType} onSelect={handleTypeSelect} />}
+
+            {step === 2 && membershipType && (
+              <SignUpStep2
+                membershipType={membershipType}
+                defaultValues={formData}
+                onSubmit={handleStep2}
+                onBack={() => setStep(1)}
+              />
+            )}
+
+            {step === 3 && membershipType && formData.email && (
+              <SignUpStep3
+                membershipType={membershipType}
+                formData={formData}
+                onEdit={() => {
+                  setError(null)
+                  setStep(2)
+                }}
+                onContinue={handleComplete}
+                isSubmitting={isSubmitting}
+                error={error}
+              />
+            )}
+          </>
+        )}
       </div>
 
-      <MembershipStepIndicator currentStep={step} labels={stepLabels} />
-
-      {error && step !== 3 && (
-        <div className="mb-6 rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-          {error}
-        </div>
-      )}
-
-      {verificationSent && sendFailed ? (
-        <div className="rounded-xl border border-amber-300/60 bg-amber-50 px-6 py-12 text-center">
-          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-amber-100">
-            <svg
-              className="h-6 w-6 text-amber-600"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth={2}
-              aria-hidden="true"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"
-              />
-            </svg>
-          </div>
-          <h2 className="text-lg font-semibold text-zinc-900">{t('verificationSendFailedTitle')}</h2>
-          <p className="mt-2 text-sm text-zinc-600">
-            {t('verificationSendFailedBody', { email: formData.email ?? '' })}
-          </p>
-          <button
-            type="button"
-            onClick={handleRetrySend}
-            disabled={isResending}
-            className="mt-6 rounded-lg bg-zinc-900 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-zinc-700 disabled:opacity-50"
-          >
-            {isResending ? t('verificationSending') : t('resendVerification')}
-          </button>
-        </div>
-      ) : verificationSent ? (
-        <div className="rounded-xl border border-[#73a4c7]/25 bg-[#73a4c7]/5 px-6 py-12 text-center">
-          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-[#73a4c7]/15">
-            <svg
-              className="h-6 w-6 text-[#73a4c7]"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth={2}
-              aria-hidden="true"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-              />
-            </svg>
-          </div>
-          <h2 className="text-lg font-semibold text-zinc-900">確認メールを送信しました</h2>
-          <p className="mt-2 text-sm text-zinc-600">
-            <span className="font-medium text-zinc-900">{formData.email}</span>{' '}
-            宛にメールをお送りしました。
-            <br />
-            メール内のボタンからメールアドレスをご確認ください。
-          </p>
-          <p className="mt-4 text-xs text-zinc-500">
-            メールが届かない場合は、迷惑メールフォルダをご確認ください。
-          </p>
-        </div>
-      ) : (
-        <>
-      {step === 1 && <SignUpStep1 value={membershipType} onSelect={handleTypeSelect} />}
-
-      {step === 2 && membershipType && (
-        <SignUpStep2
-          membershipType={membershipType}
-          defaultValues={formData}
-          onSubmit={handleStep2}
-          onBack={() => setStep(1)}
-        />
-      )}
-
-      {step === 3 && membershipType && formData.email && (
-        <SignUpStep3
-          membershipType={membershipType}
-          formData={formData}
-          onEdit={() => {
-            setError(null)
-            setStep(2)
-          }}
-          onContinue={handleComplete}
-          isSubmitting={isSubmitting}
-          error={error}
-        />
-      )}
-
-      {step < 3 && (
-        <p className="mt-8 text-center text-sm text-zinc-500">
-          {t('hasAccount')}{' '}
-          <Link
-            href="/sign-in"
-            className="font-medium text-zinc-900 underline underline-offset-2 hover:text-zinc-700"
-          >
-            {t('signInLink')}
-          </Link>
+      {step < 3 && !verificationSent && (
+        <p className="account-page__aside">
+          {t('hasAccount')} <Link href="/sign-in">{t('signInLink')}</Link>
         </p>
-      )}
-        </>
       )}
     </div>
   )

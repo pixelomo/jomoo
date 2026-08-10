@@ -38,7 +38,7 @@ export default async function DashboardPage() {
 
   return (
     <MemberTabs
-      isEmpty={registrations.length === 0}
+      productCount={registrations.length}
       products={registrations.map((reg) => (
         <RegistrationCard key={reg.id} registration={reg as unknown as DbProductRegistration} />
       ))}

@@ -69,6 +69,8 @@ interface Props {
   specNote?: string
   /** Dimension drawing shown above the spec table. */
   specImage?: string
+  /** Full-width YouTube (etc.) embed shown above おすすめ機能. */
+  introVideoUrl?: string
   type: TypeCardView
 }
 
@@ -86,6 +88,7 @@ export default function ProductTabs({
   specs,
   specNote,
   specImage,
+  introVideoUrl,
   type,
 }: Props) {
   const [active, setActive] = useState<SectionId>('features')
@@ -133,6 +136,19 @@ export default function ProductTabs({
       <div className="site-container">
         {/* おすすめ機能 */}
         <section className="pdp-tabs__panel" id="pdp-panel-features">
+          {introVideoUrl && (
+            <div className="pdp-tabs__intro-video">
+              <div className="pdp-video__frame">
+                <iframe
+                  src={introVideoUrl}
+                  title="製品紹介動画"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  referrerPolicy="strict-origin-when-cross-origin"
+                  allowFullScreen
+                />
+              </div>
+            </div>
+          )}
           <h2 className="pdp-title pdp-title--center">{SECTIONS[0].label}</h2>
           <div className="pdp-rule pdp-rule--center" aria-hidden="true" />
 

@@ -1,4 +1,4 @@
-import { pgTable, text, boolean, timestamp, date, index, uniqueIndex } from 'drizzle-orm/pg-core'
+import { pgTable, text, boolean, timestamp, date, jsonb, index, uniqueIndex } from 'drizzle-orm/pg-core'
 
 // ─── Better Auth core tables ──────────────────────────────────────────────────
 
@@ -175,3 +175,87 @@ export const notificationSetting = pgTable('notification_settings', {
   ccAddresses: text('cc_addresses'),
   updatedAt: timestamp('updated_at').notNull().defaultNow(),
 })
+
+/**
+ * Admin-edited wording for the automatic emails.
+ *
+ * A row exists only once someone has edited that email — an absent row means
+ * "use the default in lib/emailTemplates.ts", so resetting is a delete and the
+ * shipped copy keeps improving for anything nobody has touched.
+ */
+export const emailTemplate = pgTable('email_templates', {
+  /** Template id from lib/emailTemplates.ts. */
+  id: text('id').primaryKey(),
+  subject: text('subject').notNull(),
+  /** The line above the body; unused by the internal enquiry email. */
+  greeting: text('greeting'),
+  /** One paragraph per line; {{variable}} placeholders are filled at send time. */
+  body: text('body').notNull(),
+  updatedBy: text('updated_by'),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+})
+
+/**
+ * The serial numbers the factory has issued.
+ *
+ * Until this table has rows, a registration is accepted on format alone (see
+ * serialValidation.ts) — the products had not been manufactured when the site
+ * was built. Importing a batch here is what turns that into a real check, and
+ * `status` is what the warranty desk works from afterwards.
+ */
+export const serialNumberEntry = pgTable('serial_numbers', {
+  id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
+  /** Stored normalised (uppercase, no dashes) so lookups always match. */
+  serialNumber: text('serial_number').notNull(),
+  /** Sanity series key — decides how many digits the serial should have. */
+  series: text('series'),
+  modelName: text('model_name'),
+  /** Free-text label for the import it arrived in, e.g. a delivery note number. */
+  batch: text('batch'),
+  /** UNUSED · BOUND · REVOKED · ABNORMAL — see lib/serialLibrary.ts. */
+  status: text('status').notNull().default('UNUSED'),
+  note: text('note'),
+  /** Set when a member registers this serial; cleared if that registration goes. */
+  registrationId: text('registration_id').references(() => productRegistration.id, {
+    onDelete: 'set null',
+  }),
+  boundUserId: text('bound_user_id').references(() => user.id, { onDelete: 'set null' }),
+  boundAt: timestamp('bound_at'),
+  createdBy: text('created_by'),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+}, (t) => [
+  // Two imports of the same delivery note must not double up, and a serial can
+  // only describe one physical product.
+  uniqueIndex('idx_serial_number_unique').on(t.serialNumber),
+  index('idx_serial_status').on(t.status),
+  index('idx_serial_batch').on(t.batch),
+])
+
+/**
+ * Who changed what, and when.
+ *
+ * Deliberately not a foreign key to serial_numbers: the point of the log is to
+ * answer "who deleted it", which a cascade would erase along with the row. The
+ * serial is copied in as text for the same reason.
+ */
+export const serialAuditLog = pgTable('serial_audit_logs', {
+  id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
+  serialId: text('serial_id'),
+  serialNumber: text('serial_number'),
+  /** IMPORT · CREATE · UPDATE · DELETE · BIND · UNBIND · EXPORT */
+  action: text('action').notNull(),
+  /** Admin username from the session — never the browser's word for it. */
+  operator: text('operator').notNull(),
+  /** One line a human can read in the log table. */
+  details: text('details'),
+  /** Field-level before/after, for the detail view. */
+  changes: jsonb('changes'),
+  /** Groups the rows written by one batch action. */
+  batchId: text('batch_id'),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+}, (t) => [
+  index('idx_serial_audit_created_at').on(t.createdAt),
+  index('idx_serial_audit_serial_id').on(t.serialId),
+  index('idx_serial_audit_action').on(t.action),
+])

@@ -1,13 +1,15 @@
 import { desc, eq, sql } from 'drizzle-orm'
-import { getAdminSession } from '@/lib/admin-auth'
+import { can, getAdminSession } from '@/lib/admin-auth'
 import { db } from '@/lib/db'
 import { user, productRegistration } from '@/lib/db/schema'
 import { csvResponse, toCsv } from '@/lib/csv'
 
 /** Every member with their profile and registration count, as a spreadsheet. */
 export async function GET() {
-  if (!(await getAdminSession())) {
-    return new Response('Unauthorized', { status: 401 })
+  const session = await getAdminSession()
+  if (!session) return new Response('Unauthorized', { status: 401 })
+  if (!can(session, 'export')) {
+    return new Response('Your role cannot export data.', { status: 403 })
   }
 
   const rows = await db

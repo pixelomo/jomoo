@@ -254,6 +254,11 @@
   scroll-margin-top: calc(var(--nav-height) + 5.5rem);
 }
 
+.pdp-tabs__intro-video {
+  width: 100%;
+  margin: 0 0 4rem;
+}
+
 .pdp-tabs__panel:first-of-type {
   padding-top: 7rem;
 }

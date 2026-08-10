@@ -12,33 +12,18 @@ export default function SignUpStep1({ value, onSelect }: Props) {
   const t = useTranslations('auth.membership')
 
   return (
-    <div className="space-y-8">
-      <div className="flex flex-col gap-3 sm:flex-row">
+    <div className="account-choice">
+      {(['corporate', 'individual'] as const).map((type) => (
         <button
+          key={type}
           type="button"
-          onClick={() => onSelect('corporate')}
-          className={[
-            'flex-1 rounded-xl border-2 px-6 py-5 text-center text-lg font-semibold transition-colors',
-            value === 'corporate'
-              ? 'border-[#73a4c7] bg-[#73a4c7] text-white'
-              : 'border-[#73a4c7] bg-white text-[#73a4c7] hover:bg-[#73a4c7]/5',
-          ].join(' ')}
+          onClick={() => onSelect(type)}
+          aria-pressed={value === type}
+          className={`account-choice__option${value === type ? ' is-selected' : ''}`}
         >
-          {t('corporate')}
+          {t(type)}
         </button>
-        <button
-          type="button"
-          onClick={() => onSelect('individual')}
-          className={[
-            'flex-1 rounded-xl border-2 px-6 py-5 text-center text-lg font-semibold transition-colors',
-            value === 'individual'
-              ? 'border-[#73a4c7] bg-[#73a4c7] text-white'
-              : 'border-[#73a4c7] bg-white text-[#73a4c7] hover:bg-[#73a4c7]/5',
-          ].join(' ')}
-        >
-          {t('individual')}
-        </button>
-      </div>
+      ))}
     </div>
   )
 }

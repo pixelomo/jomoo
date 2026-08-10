@@ -7,6 +7,9 @@ import Image from 'next/image'
 import Link from 'next/link'
 import type { DbProductRegistration } from '@/types/database'
 import { JP_PREFECTURES } from '@/data/jp-prefectures'
+// The row wears the portal's own chrome, so it carries the stylesheet itself
+// rather than relying on MemberTabs having been rendered first.
+import './member-portal.css'
 
 interface Props {
   registration: DbProductRegistration
@@ -14,11 +17,11 @@ interface Props {
 
 const MUTABLE_STATUSES = ['PENDING', 'RETURNED']
 
-const STATUS_COLOURS: Record<string, string> = {
-  PENDING: 'bg-yellow-50 text-yellow-700 border-yellow-200',
-  RETURNED: 'bg-red-50 text-red-700 border-red-200',
-  REGISTERED_NO_WARRANTY: 'bg-green-50 text-green-700 border-green-200',
-  REGISTERED_WITH_WARRANTY: 'bg-blue-50 text-blue-700 border-blue-200',
+const STATUS_MODIFIER: Record<string, string> = {
+  PENDING: 'pending',
+  RETURNED: 'returned',
+  REGISTERED_NO_WARRANTY: 'registered',
+  REGISTERED_WITH_WARRANTY: 'warranty',
 }
 
 export default function RegistrationCard({ registration: initial }: Props) {
@@ -50,78 +53,80 @@ export default function RegistrationCard({ registration: initial }: Props) {
 
   return (
     <>
-      <div className="rounded-xl border border-zinc-100 bg-white p-5 space-y-4">
-        {/* Header row */}
-        <div className="flex items-start justify-between gap-4">
-          <div>
-            <p className="font-semibold text-zinc-900">{reg.modelName}</p>
-            <p className="text-sm text-zinc-500 mt-0.5">
-              {tr('installationDate')}: {reg.installationDate}
-            </p>
-            <p className="text-sm text-zinc-500">
-              {reg.installationAddressState
-                ? reg.installationAddressState
-                : null}
-              {reg.installationAddressDetail ? `, ${reg.installationAddressDetail}` : null}
-            </p>
-          </div>
-          <span
-            className={`shrink-0 inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-medium ${STATUS_COLOURS[reg.status] ?? 'bg-zinc-50 text-zinc-600 border-zinc-200'}`}
-          >
-            {t(`status.${reg.status}`)}
-          </span>
-        </div>
-
-        {/* Image thumbnails */}
-        {(reg.warrantyCardUrl || reg.serialNumberImageUrl) && (
-          <div className="flex gap-3">
-            {reg.warrantyCardUrl && (
-              <Thumbnail
-                url={reg.warrantyCardUrl}
-                label={t('warrantyCardPhoto')}
-                onClick={() => setLightbox(reg.warrantyCardUrl!)}
-              />
-            )}
-            {reg.serialNumberImageUrl && (
-              <Thumbnail
-                url={reg.serialNumberImageUrl}
-                label={t('serialNumberPhoto')}
-                onClick={() => setLightbox(reg.serialNumberImageUrl!)}
-              />
-            )}
-          </div>
-        )}
-
-        {/* Action row */}
-        <div className="flex items-center gap-3 pt-1 border-t border-zinc-50">
-          {reg.status === 'REGISTERED_WITH_WARRANTY' && (
-            <Link
-              href={`/warranty/${reg.id}`}
-              className="text-sm font-medium text-zinc-900 underline-offset-4 hover:underline"
+      <article className="member-product">
+        <div className="member-product__body">
+          <div className="member-product__head">
+            <h3 className="member-product__name">{reg.modelName}</h3>
+            <span
+              className={`member-product__status member-product__status--${
+                STATUS_MODIFIER[reg.status] ?? 'pending'
+              }`}
             >
-              {t('viewWarranty')}
-            </Link>
+              {t(`status.${reg.status}`)}
+            </span>
+          </div>
+
+          <dl className="member-product__meta">
+            <dt>{tr('installationDate')}</dt>
+            <dd>{reg.installationDate || '—'}</dd>
+
+            <dt>{tr('installationAddressState')}</dt>
+            <dd>
+              {[reg.installationAddressState, reg.installationAddressDetail]
+                .filter(Boolean)
+                .join(' ') || '—'}
+            </dd>
+
+            <dt>{t('serialNumber')}</dt>
+            <dd style={{ fontFamily: 'monospace' }}>{reg.serialNumber || '—'}</dd>
+          </dl>
+
+          {(reg.warrantyCardUrl || reg.serialNumberImageUrl) && (
+            <div className="member-product__thumbs">
+              {reg.warrantyCardUrl && (
+                <Thumbnail
+                  url={reg.warrantyCardUrl}
+                  label={t('warrantyCardPhoto')}
+                  onClick={() => setLightbox(reg.warrantyCardUrl!)}
+                />
+              )}
+              {reg.serialNumberImageUrl && (
+                <Thumbnail
+                  url={reg.serialNumberImageUrl}
+                  label={t('serialNumberPhoto')}
+                  onClick={() => setLightbox(reg.serialNumberImageUrl!)}
+                />
+              )}
+            </div>
           )}
-          {canMutate && (
-            <>
-              <button
-                type="button"
-                onClick={() => setShowEdit(true)}
-                className="text-sm font-medium text-zinc-600 hover:text-zinc-900 transition-colors"
-              >
-                {t('editRegistration')}
-              </button>
-              <button
-                type="button"
-                onClick={() => setShowDeleteConfirm(true)}
-                className="text-sm font-medium text-red-500 hover:text-red-700 transition-colors"
-              >
-                {t('deleteRegistration')}
-              </button>
-            </>
-          )}
+
+          <div className="member-product__actions">
+            {reg.status === 'REGISTERED_WITH_WARRANTY' && (
+              <Link href={`/warranty/${reg.id}`} className="member-product__action">
+                {t('viewWarranty')}
+              </Link>
+            )}
+            {canMutate && (
+              <>
+                <button
+                  type="button"
+                  onClick={() => setShowEdit(true)}
+                  className="member-product__action member-product__action--ghost"
+                >
+                  {t('editRegistration')}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowDeleteConfirm(true)}
+                  className="member-product__action member-product__action--danger"
+                >
+                  {t('deleteRegistration')}
+                </button>
+              </>
+            )}
+          </div>
         </div>
-      </div>
+      </article>
 
       {/* Lightbox */}
       {lightbox && (
@@ -184,22 +189,9 @@ export default function RegistrationCard({ registration: initial }: Props) {
 
 function Thumbnail({ url, label, onClick }: { url: string; label: string; onClick: () => void }) {
   return (
-    <button
-      type="button"
-      onClick={onClick}
-      className="group relative w-20 h-16 rounded-lg overflow-hidden border border-zinc-200 bg-zinc-50 shrink-0"
-      title={label}
-    >
-      <Image
-        src={url}
-        alt={label}
-        fill
-        className="object-cover group-hover:opacity-80 transition-opacity"
-        sizes="80px"
-      />
-      <span className="absolute bottom-0 inset-x-0 bg-black/40 text-white text-[10px] px-1 py-0.5 truncate">
-        {label}
-      </span>
+    <button type="button" onClick={onClick} className="member-product__thumb" title={label}>
+      <Image src={url} alt={label} fill sizes="96px" />
+      <span className="member-product__thumb-label">{label}</span>
     </button>
   )
 }

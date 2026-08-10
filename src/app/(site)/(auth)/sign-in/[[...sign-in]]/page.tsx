@@ -5,6 +5,10 @@ import { useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import Link from 'next/link'
 import { authClient } from '@/lib/auth-client'
+import AccountField from '@/components/ui/AccountField'
+// Wears the member portal's form styling, so signing in and editing your
+// details look like the same product.
+import '@/components/dashboard/member-portal.css'
 
 type Step = 'credentials' | 'totp'
 
@@ -100,79 +104,115 @@ export default function SignInPage() {
     setLoading(false)
   }
 
-  const inputClass = 'w-full rounded-lg border border-zinc-200 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-zinc-900 transition'
-
   return (
-    <main className="flex flex-1 items-center justify-center px-4 py-24">
-      <div className="w-full max-w-sm">
-        <div className="mb-8 text-center">
-          <h1 className="text-2xl font-bold text-zinc-900">{t('signInTitle')}</h1>
-          <p className="text-sm text-zinc-500 mt-1">{t('signInDescription')}</p>
-        </div>
+    <main className="member account-page account-page--narrow">
+      {step === 'credentials' ? (
+        <form className="account-form account-form--stacked" onSubmit={handleCredentials}>
+          <h1 className="account-form__title">{t('signInTitle')}</h1>
+          <p className="account-form__intro">{t('signInDescription')}</p>
 
-        {step === 'credentials' ? (
-          <form onSubmit={handleCredentials} className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-zinc-700 mb-1.5">{t('email')}</label>
-              <input type="email" value={email} onChange={e => setEmail(e.target.value)} required autoFocus className={inputClass} />
+          {error && <p className="account-alert" role="alert">{error}</p>}
+
+          {needsVerification && (
+            <div className="account-alert account-alert--notice">
+              <button
+                type="button"
+                onClick={handleResendVerification}
+                disabled={loading}
+                className="account-linkbtn"
+              >
+                {t('resendVerification')}
+              </button>
+              {resendNotice && <p style={{ margin: '0.5rem 0 0' }}>{resendNotice}</p>}
             </div>
-            <div>
-              <label className="block text-sm font-medium text-zinc-700 mb-1.5">{t('password')}</label>
-              <input type="password" value={password} onChange={e => setPassword(e.target.value)} required className={inputClass} />
-            </div>
-            {error && <p className="text-sm text-red-600">{error}</p>}
-            {needsVerification && (
-              <div className="rounded-md border border-amber-200 bg-amber-50 px-3 py-2.5">
-                <button
-                  type="button"
-                  onClick={handleResendVerification}
-                  disabled={loading}
-                  className="text-sm font-medium text-amber-900 underline underline-offset-2 disabled:opacity-50"
-                >
-                  {t('resendVerification')}
-                </button>
-                {resendNotice && <p className="mt-1.5 text-xs text-amber-800">{resendNotice}</p>}
-              </div>
-            )}
-            <button type="submit" disabled={loading} className="w-full rounded-lg bg-zinc-900 px-4 py-3 text-sm font-medium text-white hover:bg-zinc-700 disabled:opacity-50 transition-colors">
+          )}
+
+          <section className="account-form__section">
+            <AccountField label={t('email')} required htmlFor="signin-email">
+              <input
+                id="signin-email"
+                className="account-input"
+                type="email"
+                autoComplete="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                autoFocus
+              />
+            </AccountField>
+
+            <AccountField label={t('password')} required htmlFor="signin-password">
+              <input
+                id="signin-password"
+                className="account-input"
+                type="password"
+                autoComplete="current-password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+            </AccountField>
+          </section>
+
+          <div className="account-form__actions">
+            <button type="submit" className="member-btn" disabled={loading}>
               {loading ? tc('loading') : t('signInBtn')}
             </button>
-          </form>
-        ) : (
-          <form onSubmit={handleTotp} className="space-y-4">
-            <p className="text-sm text-zinc-600 text-center">{t('totpPrompt')}</p>
-            <div>
-              <label className="block text-sm font-medium text-zinc-700 mb-1.5">{t('totpLabel')}</label>
+          </div>
+        </form>
+      ) : (
+        <form className="account-form account-form--stacked" onSubmit={handleTotp}>
+          <h1 className="account-form__title">{t('signInTitle')}</h1>
+          <p className="account-form__intro">{t('totpPrompt')}</p>
+
+          {error && <p className="account-alert" role="alert">{error}</p>}
+
+          <section className="account-form__section">
+            <AccountField label={t('totpLabel')} required htmlFor="signin-totp">
               <input
+                id="signin-totp"
+                className="account-input"
                 type="text"
                 inputMode="numeric"
                 pattern="[0-9]*"
                 maxLength={6}
                 value={totp}
-                onChange={e => setTotp(e.target.value.replace(/\D/g, ''))}
+                onChange={(e) => setTotp(e.target.value.replace(/\D/g, ''))}
                 required
                 autoFocus
-                className={`${inputClass} text-center font-mono tracking-[0.3em] text-lg`}
                 placeholder="000000"
+                style={{
+                  fontFamily: 'monospace',
+                  fontSize: '1.5rem',
+                  letterSpacing: '0.3em',
+                  textAlign: 'center',
+                }}
               />
-            </div>
-            {error && <p className="text-sm text-red-600">{error}</p>}
-            <button type="submit" disabled={loading || totp.length < 6} className="w-full rounded-lg bg-zinc-900 px-4 py-3 text-sm font-medium text-white hover:bg-zinc-700 disabled:opacity-50 transition-colors">
+            </AccountField>
+          </section>
+
+          <div className="account-form__actions account-form__actions--pair">
+            <button
+              type="button"
+              className="member-btn member-btn--ghost"
+              onClick={() => {
+                setStep('credentials')
+                setTotp('')
+                setError(null)
+              }}
+            >
+              {tc('back')}
+            </button>
+            <button type="submit" className="member-btn" disabled={loading || totp.length < 6}>
               {loading ? tc('loading') : t('verifyBtn')}
             </button>
-            <button type="button" onClick={() => { setStep('credentials'); setTotp(''); setError(null) }} className="w-full text-sm text-zinc-500 hover:text-zinc-700">
-              ← {tc('back')}
-            </button>
-          </form>
-        )}
+          </div>
+        </form>
+      )}
 
-        <p className="mt-6 text-center text-sm text-zinc-500">
-          {t('noAccount')}{' '}
-          <Link href="/sign-up" className="font-medium text-zinc-900 underline underline-offset-2 hover:text-zinc-700">
-            {t('signUpLink')}
-          </Link>
-        </p>
-      </div>
+      <p className="account-page__aside">
+        {t('noAccount')} <Link href="/sign-up">{t('signUpLink')}</Link>
+      </p>
     </main>
   )
 }

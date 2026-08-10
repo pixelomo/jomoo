@@ -7,12 +7,19 @@ const NAV = [
   { href: '/admin', label: 'Dashboard', icon: '⊞' },
   { href: '/admin/users', label: 'Users', icon: '⊙' },
   { href: '/admin/registrations', label: 'Registrations', icon: '≡' },
+  { href: '/admin/serials', label: 'Serial Numbers', icon: '⌗' },
   { href: '/admin/warranties', label: 'Warranties', icon: '◈' },
   { href: '/admin/enquiries', label: 'Enquiries', icon: '✉' },
   { href: '/admin/notifications', label: 'Emails', icon: '⚙' },
 ]
 
-export default function AdminSidebar() {
+export default function AdminSidebar({
+  username,
+  roleLabel,
+}: {
+  username?: string
+  roleLabel?: string
+}) {
   const pathname = usePathname()
   const router = useRouter()
 
@@ -76,6 +83,19 @@ export default function AdminSidebar() {
 
       {/* Logout */}
       <div style={{ padding: '16px 12px', borderTop: '1px solid rgba(255,255,255,0.08)' }}>
+        {username && (
+          // Which role is signed in decides whether the export and delete
+          // buttons appear at all, so it has to be visible somewhere — otherwise
+          // a missing button looks like a bug rather than a permission.
+          <div style={{ padding: '0 12px 12px' }}>
+            <span style={{ display: 'block', fontSize: 13, color: 'rgba(255,255,255,0.75)' }}>
+              {username}
+            </span>
+            <span style={{ display: 'block', fontSize: 11, color: 'rgba(255,255,255,0.4)', marginTop: 2 }}>
+              {roleLabel}
+            </span>
+          </div>
+        )}
         <button
           onClick={handleLogout}
           style={{

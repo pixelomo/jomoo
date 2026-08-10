@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation'
-import { getAdminSession } from '@/lib/admin-auth'
+import { getAdminSession, ROLE_LABELS } from '@/lib/admin-auth'
 import type { ReactNode } from 'react'
 import AdminSidebar from '@/components/admin/AdminSidebar'
 
@@ -14,7 +14,7 @@ export default async function AdminPortalLayout({ children }: { children: ReactN
       fontFamily: 'var(--font-poppins, sans-serif)',
       background: 'var(--bg-soft)',
     }}>
-      <AdminSidebar />
+      <AdminSidebar username={session.username} roleLabel={ROLE_LABELS[session.role]} />
       <main style={{ flex: 1, padding: '32px 40px', minWidth: 0 }}>
         {children}
       </main>
