@@ -4,7 +4,9 @@ import { useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import FormField, { inputClass } from '@/components/ui/FormField'
+import SignUpField from '@/components/auth/SignUpField'
+import NextCaret from '@/components/auth/NextCaret'
+import ContactStepIndicator from './ContactStepIndicator'
 import { COUNTRY_CODES } from '@/data/jp-prefectures'
 import {
   CONTACT_CATEGORIES,
@@ -12,10 +14,11 @@ import {
   type ContactCategory,
   type ContactData,
 } from '@/types/contact'
-import ContactStepIndicator from './ContactStepIndicator'
+// Same stylesheet as 会員登録: the enquiry form and the sign-up form are the
+// same design, so they share the chrome rather than each having their own.
+import '@/components/dashboard/member-portal.css'
 
-const SUBMIT_ERROR_MESSAGE =
-  '送信に失敗しました。しばらくしてから再度お試しください。'
+const SUBMIT_ERROR_MESSAGE = '送信に失敗しました。しばらくしてから再度お試しください。'
 
 function resolveError(message: string | undefined) {
   if (!message) return undefined
@@ -79,172 +82,163 @@ export default function ContactForm() {
   }
 
   return (
-    <div className="w-full max-w-2xl">
-      <div className="mb-8 text-center">
-        <h1 className="text-2xl font-bold text-zinc-900">お問い合わせ</h1>
+    <div className="signup">
+      <header className="signup__header">
+        <h1 className="signup__title">お問い合わせ</h1>
         {step === 1 && (
-          <p className="mt-2 text-sm text-zinc-600">
-            下記項目をご入力のうえ、お問い合わせください。
-          </p>
+          <p className="signup__subtitle">下記項目をご入力のうえ、お問い合わせください。</p>
         )}
-      </div>
+      </header>
 
       <ContactStepIndicator currentStep={step} labels={stepLabels} />
 
-      {submitError && step === 1 && (
-        <div className="mb-6 rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-          {submitError}
-        </div>
-      )}
+      {step === 1 ? (
+        <form onSubmit={handleSubmit(onSubmit)} noValidate>
+          <div className="signup__card">
+            {/* 「ご用件」 rather than 「お問い合わせ内容」: the legend would
+                otherwise repeat the label of the field directly beneath it. */}
+            <section className="signup__section">
+              <h2 className="signup__legend">ご用件</h2>
 
-      {step === 1 && (
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-          <FormField
-            label="お問い合わせ種別"
-            required
-            requiredBadge
-            htmlFor="category"
-            hint="内容に応じた担当部署へお繋ぎします。"
-            error={resolveError(errors.category?.message)}
-          >
-            <select id="category" className={inputClass} defaultValue={presetCategory ?? ''} {...register('category')}>
-              <option value="" disabled>
-                選択してください
-              </option>
-              {CONTACT_CATEGORIES.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.label}
-                </option>
-              ))}
-            </select>
-          </FormField>
-
-          <div>
-            <div className="mb-4 flex items-center justify-between gap-3">
-              <h2 className="text-sm font-semibold text-zinc-900">名前</h2>
-              <span className="shrink-0 rounded px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-[#73a4c7] bg-[#73a4c7]/12">
-                必須
-              </span>
-            </div>
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <FormField label="姓" required requiredBadge htmlFor="lastName" error={resolveError(errors.lastName?.message)}>
-                <input id="lastName" type="text" className={inputClass} {...register('lastName')} />
-              </FormField>
-              <FormField label="名" required requiredBadge htmlFor="firstName" error={resolveError(errors.firstName?.message)}>
-                <input id="firstName" type="text" className={inputClass} {...register('firstName')} />
-              </FormField>
-            </div>
-          </div>
-
-          <FormField label="会社名" htmlFor="companyName" hint="※法人の場合のみご記入ください。">
-            <input id="companyName" type="text" className={inputClass} {...register('companyName')} />
-          </FormField>
-
-          <FormField
-            label="メールアドレス"
-            required
-            requiredBadge
-            htmlFor="email"
-            error={resolveError(errors.email?.message)}
-          >
-            <input id="email" type="email" className={inputClass} {...register('email')} />
-          </FormField>
-
-          <div>
-            <div className="mb-4">
-              <h2 className="text-sm font-semibold text-zinc-900">会社電話番号</h2>
-              <p className="mt-1 text-xs text-zinc-500">※法人の場合のみご記入ください。</p>
-            </div>
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-[8rem_1fr]">
-              <FormField label="国番号" htmlFor="countryCode">
-                <select id="countryCode" className={inputClass} {...register('countryCode')}>
-                  {COUNTRY_CODES.map((code) => (
-                    <option key={code.value} value={code.value}>
-                      {code.label}
+              <SignUpField
+                label="お問い合わせ種別"
+                required
+                htmlFor="category"
+                error={resolveError(errors.category?.message)}
+              >
+                <select
+                  id="category"
+                  className="account-select signup__select"
+                  defaultValue={presetCategory ?? ''}
+                  {...register('category')}
+                >
+                  <option value="" disabled>
+                    選択してください
+                  </option>
+                  {CONTACT_CATEGORIES.map((c) => (
+                    <option key={c.id} value={c.id}>
+                      {c.label}
                     </option>
                   ))}
                 </select>
-              </FormField>
-              <FormField
-                label="電話番号"
+                <p className="signup__note">内容に応じた担当部署へお繋ぎします。</p>
+              </SignUpField>
+
+              <SignUpField
+                label="お問い合わせ内容"
+                required
+                htmlFor="message"
+                error={resolveError(errors.message?.message)}
+              >
+                <textarea id="message" rows={6} className="account-input" {...register('message')} />
+              </SignUpField>
+            </section>
+
+            <section className="signup__section">
+              <h2 className="signup__legend">お客様情報</h2>
+
+              <SignUpField label="姓" required htmlFor="lastName" error={resolveError(errors.lastName?.message)}>
+                <input id="lastName" type="text" className="account-input" {...register('lastName')} />
+              </SignUpField>
+
+              <SignUpField label="名" required htmlFor="firstName" error={resolveError(errors.firstName?.message)}>
+                <input id="firstName" type="text" className="account-input" {...register('firstName')} />
+              </SignUpField>
+
+              <SignUpField label="会社名" htmlFor="companyName">
+                <input id="companyName" type="text" className="account-input" {...register('companyName')} />
+                <p className="signup__note">※法人の場合のみご記入ください。</p>
+              </SignUpField>
+
+              <SignUpField
+                label="メールアドレス"
+                required
+                htmlFor="email"
+                error={resolveError(errors.email?.message)}
+              >
+                <input id="email" type="email" className="account-input" {...register('email')} />
+              </SignUpField>
+
+              <SignUpField
+                label="会社電話番号"
                 htmlFor="phoneNumber"
                 error={resolveError(errors.phoneNumber?.message)}
               >
-                <input
-                  id="phoneNumber"
-                  type="tel"
-                  inputMode="numeric"
-                  className={inputClass}
-                  {...register('phoneNumber')}
-                />
-              </FormField>
-            </div>
+                <div className="signup__phone">
+                  <select
+                    id="countryCode"
+                    className="account-select"
+                    aria-label="国番号"
+                    {...register('countryCode')}
+                  >
+                    {COUNTRY_CODES.map((code) => (
+                      <option key={code.value} value={code.value}>
+                        {code.label}
+                      </option>
+                    ))}
+                  </select>
+                  <input
+                    id="phoneNumber"
+                    type="tel"
+                    inputMode="numeric"
+                    className="account-input"
+                    {...register('phoneNumber')}
+                  />
+                </div>
+                <p className="signup__note">※法人の場合のみご記入ください。</p>
+              </SignUpField>
+            </section>
+
+            <section className="signup__section">
+              <h2 className="signup__legend">ショールーム予約</h2>
+
+              <SignUpField label="ご予約" htmlFor="showroomReservation">
+                <label className="signup__check">
+                  <input
+                    id="showroomReservation"
+                    type="checkbox"
+                    {...register('showroomReservation')}
+                  />
+                  ショールーム予約を希望する
+                </label>
+              </SignUpField>
+
+              {showroomReservation && (
+                <SignUpField
+                  label="日時"
+                  required
+                  htmlFor="preferredDateTime"
+                  error={resolveError(errors.preferredDateTime?.message)}
+                >
+                  <input
+                    id="preferredDateTime"
+                    type="datetime-local"
+                    className="account-input signup__select"
+                    {...register('preferredDateTime')}
+                  />
+                </SignUpField>
+              )}
+            </section>
           </div>
 
-          <FormField
-            label="お問い合わせ内容"
-            required
-            requiredBadge
-            htmlFor="message"
-            error={resolveError(errors.message?.message)}
-          >
-            <textarea id="message" rows={5} className={inputClass} {...register('message')} />
-          </FormField>
-
-          <label className="flex items-center gap-3 text-sm text-zinc-700">
-            <input
-              type="checkbox"
-              className="h-4 w-4 rounded border-zinc-300"
-              {...register('showroomReservation')}
-            />
-            ショールーム予約
-          </label>
-
-          {showroomReservation && (
-            <FormField
-              label="日時"
-              required
-              requiredBadge
-              htmlFor="preferredDateTime"
-              error={resolveError(errors.preferredDateTime?.message)}
-            >
-              <input
-                id="preferredDateTime"
-                type="datetime-local"
-                className={inputClass}
-                {...register('preferredDateTime')}
-              />
-            </FormField>
+          {/* Sits directly above 次へ, where it is on screen when it appears. */}
+          {submitError && (
+            <p className="signup__alert" role="alert">
+              {submitError}
+            </p>
           )}
 
-          <div className="pt-2">
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className="w-full rounded-lg bg-zinc-900 px-4 py-3 text-sm font-medium text-white hover:bg-zinc-700 transition-colors disabled:opacity-50"
-            >
-              {isSubmitting ? '送信中...' : '次へ'}
+          <div className="signup__actions">
+            <button type="submit" className="signup__next" disabled={isSubmitting}>
+              <span>{isSubmitting ? '送信中…' : '次へ'}</span>
+              <NextCaret />
             </button>
           </div>
         </form>
-      )}
-
-      {step === 2 && (
-        <div className="rounded-xl border border-[#73a4c7]/25 bg-[#73a4c7]/5 px-6 py-12 text-center">
-          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-[#73a4c7]/15">
-            <svg
-              className="h-6 w-6 text-[#73a4c7]"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth={2}
-              aria-hidden="true"
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-            </svg>
-          </div>
-          <h2 className="text-lg font-semibold text-zinc-900">お問い合わせありがとうございます！</h2>
-          <p className="mt-2 text-sm text-zinc-600">送信完了しました。</p>
+      ) : (
+        <div className="signup__complete">
+          <p>お問い合わせありがとうございます。</p>
+          <p>送信完了しました。</p>
         </div>
       )}
     </div>

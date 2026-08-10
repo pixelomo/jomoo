@@ -1317,6 +1317,24 @@
   font-size: 1rem;
 }
 
+/* A checkbox reads as a control, not a sentence — sized up to sit with the
+   inputs rather than the 1rem default browsers draw. */
+.signup__check {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 1rem;
+  line-height: 1.6;
+  cursor: pointer;
+}
+
+.signup__check input {
+  width: 1.15rem;
+  height: 1.15rem;
+  accent-color: var(--signup-primary, #458fc6);
+  cursor: pointer;
+}
+
 /* 電話番号: a narrow 国際番号 box beside the number itself. */
 .signup__phone {
   display: grid;
