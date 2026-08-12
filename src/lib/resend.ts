@@ -7,6 +7,7 @@ import {
 } from '@/types/contact'
 import { notificationConfig, type NotificationKey } from '@/lib/notifications'
 import { buildEmail } from '@/lib/emailTemplates'
+import { appOrigin } from '@/lib/appUrl'
 
 /**
  * Everything a visitor typed goes into an HTML email, so it has to be escaped —
@@ -44,9 +45,7 @@ function from() {
   return addr
 }
 
-function appUrl() {
-  return (process.env.NEXT_PUBLIC_APP_URL ?? '').replace(/\/$/, '')
-}
+const appUrl = appOrigin
 
 /**
  * Routes to the department that owns the selected category.

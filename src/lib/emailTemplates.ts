@@ -8,6 +8,7 @@ import {
   type AdminTemplate,
 } from '@/lib/emailTemplateDefs'
 import { renderTemplate, DEFAULT_EMAIL_LOGO, type RenderedEmail } from '@/lib/emailRender'
+import { appOrigin } from '@/lib/appUrl'
 
 export {
   EMAIL_TEMPLATES,
@@ -47,8 +48,8 @@ export async function buildEmail(
   const override = await templateOverride(id)
 
   // Absolute, because an email has no origin to resolve a relative path
-  // against. Follows NEXT_PUBLIC_APP_URL, so it moves with the domain.
-  const origin = (process.env.NEXT_PUBLIC_APP_URL ?? '').replace(/\/$/, '')
+  // against. Built from appOrigin(), so a domain change is one env var.
+  const origin = appOrigin()
 
   return renderTemplate(
     def,

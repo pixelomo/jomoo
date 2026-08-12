@@ -4,18 +4,9 @@ import { twoFactor } from 'better-auth/plugins'
 import { db } from './db'
 import * as schema from './db/schema'
 import { EMAIL_VERIFICATION_REQUIRED, TWO_FACTOR_ENABLED } from './auth-features'
+import { appOrigin } from './appUrl'
 
-function resolveAuthBaseURL() {
-  if (process.env.NEXT_PUBLIC_APP_URL) {
-    return process.env.NEXT_PUBLIC_APP_URL.replace(/\/$/, '')
-  }
-  if (process.env.VERCEL_URL) {
-    return `https://${process.env.VERCEL_URL}`
-  }
-  return 'http://localhost:3000'
-}
-
-export const authBaseURL = resolveAuthBaseURL()
+export const authBaseURL = appOrigin()
 
 export const auth = betterAuth({
   database: drizzleAdapter(db, {

@@ -65,12 +65,17 @@ export function fillPlain(text: string, vars: Record<string, unknown>): string {
 function footerHtml(logoUrl: string, padding: string): string {
   return `<div style="padding:${padding};border-top:1px solid #e4e4e7;text-align:center">
       <img src="${logoUrl}" alt="JOMOO" width="116" height="24" style="display:inline-block;width:116px;height:24px;border:0;outline:none;text-decoration:none" />
-      <p style="margin:12px 0 0;font-size:12px;color:#a1a1aa;line-height:1.6">${COPYRIGHT}</p>
+      <p style="margin:12px 0 0;font-size:12px;color:#a1a1aa;line-height:1.6">${copyright()}</p>
     </div>`
 }
 
-/** Fixed rather than built from the current year — this is the client's wording. */
-const COPYRIGHT = '\u00a9 2026 JOMOO KITCHEN &amp; BATH CO., LTD. All Rights Reserved.'
+/**
+ * Rolls over on its own. Evaluated when the email is rendered — which is when
+ * it is sent — so nobody has to remember to change it in January.
+ */
+function copyright(): string {
+  return `\u00a9 ${new Date().getFullYear()} JOMOO KITCHEN &amp; BATH CO., LTD. All Rights Reserved.`
+}
 
 /** Where the wordmark is served from when a caller does not say. */
 export const DEFAULT_EMAIL_LOGO = '/images/logo-email.png'
