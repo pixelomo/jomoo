@@ -6,16 +6,22 @@ import { useTranslations } from 'next-intl'
 import StepIndicator from '@/components/ui/StepIndicator'
 import Step1BasicInfo from './Step1BasicInfo'
 import Step2SerialNumber from './Step2SerialNumber'
+import Step2SerialPhoto from './Step2SerialPhoto'
 import Step3Attachments from './Step3Attachments'
 import type { Step1Data, Step2Data, Step3Data } from '@/types/registration'
 
 interface Props {
   models: { _id: string; name: string; modelCode: string; series: string }[]
+  /**
+   * Photograph-first serial entry, from /register?auto=true. Off by default —
+   * the typed flow stays exactly as it was.
+   */
+  auto?: boolean
 }
 
 type FormState = Partial<Step1Data & Step2Data & Step3Data>
 
-export default function RegistrationForm({ models }: Props) {
+export default function RegistrationForm({ models, auto = false }: Props) {
   const t = useTranslations('registration')
   const tc = useTranslations('common')
   const router = useRouter()
@@ -35,7 +41,7 @@ export default function RegistrationForm({ models }: Props) {
     setStep(2)
   }
 
-  const handleStep2 = (data: Step2Data) => {
+  const handleStep2 = (data: Step2Data & { serialNumberImageUrl?: string }) => {
     setFormData((prev) => ({ ...prev, ...data }))
     setStep(3)
   }
@@ -126,13 +132,20 @@ export default function RegistrationForm({ models }: Props) {
         />
       )}
 
-      {step === 2 && (
-        <Step2SerialNumber
-          defaultValues={formData}
-          onSubmit={handleStep2}
-          onBack={() => setStep(1)}
-        />
-      )}
+      {step === 2 &&
+        (auto ? (
+          <Step2SerialPhoto
+            defaultValues={formData}
+            onSubmit={handleStep2}
+            onBack={() => setStep(1)}
+          />
+        ) : (
+          <Step2SerialNumber
+            defaultValues={formData}
+            onSubmit={handleStep2}
+            onBack={() => setStep(1)}
+          />
+        ))}
 
       {step === 3 && (
         <Step3Attachments

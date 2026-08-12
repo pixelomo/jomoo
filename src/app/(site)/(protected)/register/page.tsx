@@ -5,7 +5,12 @@ import { auth } from '@/lib/auth'
 import { getProductModels } from '@/lib/sanity'
 import RegistrationForm from '@/components/registration/RegistrationForm'
 
-export default async function RegisterPage() {
+export default async function RegisterPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ auto?: string }>
+}) {
+  const { auto } = await searchParams
   const session = await auth.api.getSession({ headers: await headers() })
   if (!session) redirect('/sign-in')
 
@@ -19,8 +24,13 @@ export default async function RegisterPage() {
       <div className="mb-8">
         <h2 className="text-2xl font-bold">{t('title')}</h2>
         <p className="text-zinc-500 mt-1">{t('subtitle')}</p>
+        {auto === 'true' && (
+          <p className="mt-3 rounded-md bg-[#73a4c7]/10 border border-[#73a4c7]/30 px-4 py-2.5 text-sm text-zinc-700">
+            {t('auto.banner')}
+          </p>
+        )}
       </div>
-      <RegistrationForm models={models} />
+      <RegistrationForm models={models} auto={auto === 'true'} />
     </main>
   )
 }

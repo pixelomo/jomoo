@@ -60,17 +60,20 @@ function FileUploadField({
   folder,
   onUploaded,
   error,
+  initialUrl,
 }: {
   label: string
   hint: string
   folder: 'warranty-cards' | 'serial-numbers'
   onUploaded: (url: string) => void
   error?: string
+  /** Already uploaded earlier in the flow — shown as done rather than asked for again. */
+  initialUrl?: string
 }) {
   const t = useTranslations('registration.step3')
   const tv = useTranslations('validation')
-  const [state, setState] = useState<UploadState>('idle')
-  const [preview, setPreview] = useState<string>()
+  const [state, setState] = useState<UploadState>(initialUrl ? 'done' : 'idle')
+  const [preview, setPreview] = useState<string | undefined>(initialUrl)
   const [fileError, setFileError] = useState<string>()
 
   const handleChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -174,6 +177,7 @@ export default function Step3Attachments({ defaultValues, onSubmit, onBack, isSu
         hint={t('serialNumberImageHint')}
         folder="serial-numbers"
         onUploaded={(url) => setValue('serialNumberImageUrl', url, { shouldValidate: true })}
+        initialUrl={defaultValues?.serialNumberImageUrl}
         error={errors.serialNumberImageUrl?.message ? tc('required') : undefined}
       />
 
