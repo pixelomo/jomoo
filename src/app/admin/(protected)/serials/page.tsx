@@ -10,6 +10,7 @@ import AdminSearch from '@/components/admin/AdminSearch'
 import DownloadButton from '@/components/admin/DownloadButton'
 import SerialTable, { type SerialRow } from '@/components/admin/SerialTable'
 import SerialAddButton from '@/components/admin/SerialAddButton'
+import SerialImportButton from '@/components/admin/SerialImportButton'
 import SerialTabs from '@/components/admin/SerialTabs'
 
 export const metadata = { title: 'Serial Numbers | JOMOO Admin' }
@@ -95,7 +96,7 @@ export default async function SerialLibraryPage({
         </h1>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           <SerialAddButton />
-          <Link href="/admin/serials/import" style={outlineLink}>Import</Link>
+          <SerialImportButton />
           {permissions.export ? (
             <DownloadButton href={`/api/admin/export/serials?${query}`} label="Download CSV" />
           ) : (
@@ -148,11 +149,9 @@ export default async function SerialLibraryPage({
             lineHeight: 1.6,
           }}
         >
-          The library is empty, so registrations are still accepted on serial format alone.{' '}
-          <Link href="/admin/serials/import" style={{ color: 'var(--accent)' }}>
-            Import a batch
-          </Link>{' '}
-          to start tracking real numbers.
+          The library is empty, so registrations are still accepted on serial format alone.
+          Import a batch — a CSV or a plain list of serial numbers — to start tracking real
+          numbers.
         </p>
       )}
 
@@ -205,17 +204,6 @@ function FilterChip({
   )
 }
 
-const outlineLink: React.CSSProperties = {
-  padding: '9px 16px',
-  borderRadius: 8,
-  border: '1px solid var(--line)',
-  background: 'var(--paper)',
-  color: 'var(--ink-2)',
-  fontSize: 13,
-  fontWeight: 600,
-  textDecoration: 'none',
-  whiteSpace: 'nowrap',
-}
 
 const disabledButton: React.CSSProperties = {
   padding: '9px 16px',
