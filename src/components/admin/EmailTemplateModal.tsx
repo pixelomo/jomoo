@@ -29,7 +29,7 @@ export default function EmailTemplateModal({ templates, onClose }: Props) {
         templates.map((t) => [t.id, { subject: t.subject, greeting: t.greeting, body: t.body }])
       )
   )
-  const [tab, setTab] = useState<'edit' | 'preview'>('edit')
+  const [pane, setPane] = useState<'preview' | 'html'>('preview')
   const [saving, setSaving] = useState(false)
   const [message, setMessage] = useState<{ tone: 'ok' | 'error'; text: string } | null>(null)
 
@@ -54,7 +54,10 @@ export default function EmailTemplateModal({ templates, onClose }: Props) {
       renderTemplate(
         active,
         current,
-        Object.fromEntries(active.variables.map((v) => [v.name, v.sample]))
+        Object.fromEntries(active.variables.map((v) => [v.name, v.sample])),
+        // The footer wordmark is served from this same origin in the admin,
+        // so the preview shows the real image rather than a broken one.
+        typeof window === 'undefined' ? '' : `${window.location.origin}/images/logo-email.png`
       ),
     [active, current]
   )
@@ -170,31 +173,8 @@ export default function EmailTemplateModal({ templates, onClose }: Props) {
           </div>
         )}
 
-        <div style={{ display: 'flex', gap: 20, borderBottom: '1px solid var(--line)', marginBottom: 16 }}>
-          {(['edit', 'preview'] as const).map((t) => (
-            <button
-              key={t}
-              type="button"
-              onClick={() => setTab(t)}
-              style={{
-                padding: '8px 0',
-                background: 'transparent',
-                border: 0,
-                borderBottom: `2px solid ${tab === t ? 'var(--ink)' : 'transparent'}`,
-                marginBottom: -1,
-                fontSize: 13,
-                fontWeight: tab === t ? 600 : 400,
-                color: tab === t ? 'var(--ink)' : 'var(--ink-3)',
-                cursor: 'pointer',
-              }}
-            >
-              {t === 'edit' ? 'Edit' : 'Preview'}
-            </button>
-          ))}
-        </div>
-
-        {tab === 'edit' ? (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+        <div style={split}>
+          <div style={{ minWidth: 0, display: 'flex', flexDirection: 'column', gap: 14 }}>
             <label>
               <span style={label}>Subject</span>
               <input
@@ -251,30 +231,78 @@ export default function EmailTemplateModal({ templates, onClose }: Props) {
               </p>
             </div>
           </div>
-        ) : (
-          <div>
-            <p style={{ fontSize: 12, color: 'var(--ink-3)', margin: '0 0 8px' }}>
+
+          {/* Updates as you type, so the wording is never saved unseen. */}
+          <div style={{ minWidth: 0, display: 'flex', flexDirection: 'column' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
+              {(['preview', 'html'] as const).map((k) => (
+                <button
+                  key={k}
+                  type="button"
+                  onClick={() => setPane(k)}
+                  style={{
+                    padding: '4px 11px',
+                    borderRadius: 6,
+                    fontSize: 12,
+                    fontWeight: pane === k ? 600 : 400,
+                    color: pane === k ? 'var(--accent)' : 'var(--ink-3)',
+                    background: pane === k ? 'var(--accent-soft, #eef4ff)' : 'transparent',
+                    border: `1px solid ${pane === k ? '#b3ceff' : 'var(--line)'}`,
+                    cursor: 'pointer',
+                  }}
+                >
+                  {k === 'preview' ? 'Preview' : 'HTML'}
+                </button>
+              ))}
+              <span style={{ marginLeft: 'auto', fontSize: 11, color: 'var(--ink-3)' }}>
+                example values shown
+              </span>
+            </div>
+
+            <p style={{ fontSize: 12, color: 'var(--ink-3)', margin: '0 0 8px', wordBreak: 'break-word' }}>
               Subject: <strong style={{ color: 'var(--ink-2)' }}>{preview.subject}</strong>
             </p>
-            <iframe
-              // Sandboxed: the preview renders the admin's own HTML, and it has
-              // no reason to run scripts or reach the page around it.
-              sandbox=""
-              srcDoc={preview.html}
-              title={`${active.label} preview`}
-              style={{
-                width: '100%',
-                height: 420,
-                border: '1px solid var(--line)',
-                borderRadius: 8,
-                background: '#f4f4f5',
-              }}
-            />
-            <p style={{ fontSize: 11, color: 'var(--ink-3)', margin: '8px 0 0' }}>
-              Shown with example values in place of the tags.
-            </p>
+
+            {pane === 'preview' ? (
+              <iframe
+                // Sandboxed: the preview renders the admin's own HTML, and it
+                // has no reason to run scripts or reach the page around it.
+                sandbox=""
+                srcDoc={preview.html}
+                title={`${active.label} preview`}
+                style={{
+                  width: '100%',
+                  flex: 1,
+                  minHeight: 460,
+                  border: '1px solid var(--line)',
+                  borderRadius: 8,
+                  background: '#f4f4f5',
+                }}
+              />
+            ) : (
+              <textarea
+                readOnly
+                value={preview.html}
+                onFocus={(e) => e.currentTarget.select()}
+                style={{
+                  width: '100%',
+                  flex: 1,
+                  minHeight: 460,
+                  padding: '10px 12px',
+                  border: '1px solid var(--line)',
+                  borderRadius: 8,
+                  background: 'var(--bg-soft)',
+                  fontFamily: 'monospace',
+                  fontSize: 11,
+                  lineHeight: 1.6,
+                  color: 'var(--ink-2)',
+                  resize: 'none',
+                  boxSizing: 'border-box',
+                }}
+              />
+            )}
           </div>
-        )}
+        </div>
 
         {message && (
           <p
@@ -392,11 +420,19 @@ const overlay: React.CSSProperties = {
   padding: 16,
 }
 
+/* Editor and preview side by side; stacked once there is no room for two. */
+const split: React.CSSProperties = {
+  display: 'grid',
+  gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))',
+  gap: 24,
+  alignItems: 'start',
+}
+
 const dialog: React.CSSProperties = {
   background: 'var(--paper)',
   borderRadius: 12,
   padding: 28,
-  maxWidth: 720,
+  maxWidth: 1120,
   width: '100%',
   maxHeight: '92vh',
   overflowY: 'auto',

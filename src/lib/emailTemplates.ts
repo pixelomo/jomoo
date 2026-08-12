@@ -7,7 +7,7 @@ import {
   EMAIL_TEMPLATES_BY_ID,
   type AdminTemplate,
 } from '@/lib/emailTemplateDefs'
-import { renderTemplate, type RenderedEmail } from '@/lib/emailRender'
+import { renderTemplate, DEFAULT_EMAIL_LOGO, type RenderedEmail } from '@/lib/emailRender'
 
 export {
   EMAIL_TEMPLATES,
@@ -46,6 +46,10 @@ export async function buildEmail(
 
   const override = await templateOverride(id)
 
+  // Absolute, because an email has no origin to resolve a relative path
+  // against. Follows NEXT_PUBLIC_APP_URL, so it moves with the domain.
+  const origin = (process.env.NEXT_PUBLIC_APP_URL ?? '').replace(/\/$/, '')
+
   return renderTemplate(
     def,
     {
@@ -53,7 +57,8 @@ export async function buildEmail(
       greeting: override?.greeting ?? def.greeting,
       body: override?.body ?? def.body,
     },
-    vars
+    vars,
+    `${origin}${DEFAULT_EMAIL_LOGO}`
   )
 }
 

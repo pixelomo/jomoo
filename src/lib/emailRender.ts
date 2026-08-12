@@ -50,8 +50,33 @@ export function fillPlain(text: string, vars: Record<string, unknown>): string {
   return text.replace(/\{\{\{?\s*(\w+)\s*\}?\}\}/g, (_m, key: string) => String(vars[key] ?? ''))
 }
 
+
+/**
+ * Shared footer: the wordmark and the copyright line, on every email.
+ *
+ * A hosted PNG rather than the SVG the site uses — Gmail strips SVG, and it
+ * strips data: URIs too, so the only thing that renders everywhere is an image
+ * served over https. `logoUrl` is absolute for the same reason: an email has no
+ * origin to resolve a relative path against.
+ *
+ * Clients that block remote images will show the alt text, which is why it is
+ * the brand name and not "logo".
+ */
+function footerHtml(logoUrl: string, padding: string): string {
+  return `<div style="padding:${padding};border-top:1px solid #e4e4e7;text-align:center">
+      <img src="${logoUrl}" alt="JOMOO" width="116" height="24" style="display:inline-block;width:116px;height:24px;border:0;outline:none;text-decoration:none" />
+      <p style="margin:12px 0 0;font-size:12px;color:#a1a1aa;line-height:1.6">${COPYRIGHT}</p>
+    </div>`
+}
+
+/** Fixed rather than built from the current year — this is the client's wording. */
+const COPYRIGHT = '\u00a9 2026 JOMOO KITCHEN &amp; BATH CO., LTD. All Rights Reserved.'
+
+/** Where the wordmark is served from when a caller does not say. */
+export const DEFAULT_EMAIL_LOGO = '/images/logo-email.png'
+
 /** The JOMOO member email — one column, greeting, paragraphs, footer. */
-function standardWrapper(greeting: string, body: string): string {
+function standardWrapper(greeting: string, body: string, logoUrl: string): string {
   return `
 <!DOCTYPE html>
 <html>
@@ -65,16 +90,17 @@ function standardWrapper(greeting: string, body: string): string {
       <p style="margin:0 0 16px;font-size:15px;color:#18181b">${greeting}</p>
       <div style="font-size:14px;color:#3f3f46;line-height:1.6">${body}</div>
     </div>
-    <div style="padding:16px 28px 24px;border-top:1px solid #f4f4f5;margin-top:8px">
+    <div style="padding:16px 28px 0;margin-top:8px">
       <p style="margin:0;font-size:12px;color:#a1a1aa">JOMOO Member Services — このメールに返信しないでください</p>
     </div>
+    ${footerHtml(logoUrl, '20px 28px 24px')}
   </div>
 </body>
 </html>`
 }
 
 /** The wider internal one, for the enquiry table staff read. */
-function contactWrapper(body: string): string {
+function contactWrapper(body: string, logoUrl: string): string {
   return `
 <!DOCTYPE html>
 <html>
@@ -84,9 +110,10 @@ function contactWrapper(body: string): string {
     <div style="background:#18181b;padding:20px 28px">
       <p style="margin:0;color:#fff;font-size:18px;font-weight:700;letter-spacing:0.05em">JOMOO お問い合わせ</p>
     </div>
-    <div style="padding:24px 28px 8px">
+    <div style="padding:24px 28px 16px">
       <table style="width:100%;border-collapse:collapse">${body}</table>
     </div>
+    ${footerHtml(logoUrl, '20px 28px 24px')}
   </div>
 </body>
 </html>`
@@ -110,7 +137,10 @@ export interface TemplateContent {
 export function renderTemplate(
   def: Pick<EmailTemplateDef, 'wrapper'>,
   content: TemplateContent,
-  vars: Record<string, unknown>
+  vars: Record<string, unknown>,
+  /** Absolute URL of the footer wordmark. The admin preview passes its own
+   *  origin; the send path passes the public site's. */
+  logoUrl: string = DEFAULT_EMAIL_LOGO
 ): RenderedEmail {
   const subject = fillPlain(content.subject, vars)
 
@@ -122,14 +152,15 @@ export function renderTemplate(
 
   if (def.wrapper === 'contact') {
     // The enquiry table is one raw fragment, not a run of paragraphs.
-    return { subject, html: contactWrapper(paragraphs.join('')) }
+    return { subject, html: contactWrapper(paragraphs.join(''), logoUrl) }
   }
 
   return {
     subject,
     html: standardWrapper(
       fillTemplate(content.greeting ?? '', vars),
-      paragraphs.map((p) => `<p style="margin:0 0 12px">${p}</p>`).join('')
+      paragraphs.map((p) => `<p style="margin:0 0 12px">${p}</p>`).join(''),
+      logoUrl
     ),
   }
 }
