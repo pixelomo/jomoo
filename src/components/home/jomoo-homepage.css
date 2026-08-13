@@ -172,6 +172,11 @@ img {
   inset: 0;
 }
 
+/* Hidden until the scene stops filling the frame; see the narrow rules below. */
+.hero__slide .hero__slide-fill {
+  display: none;
+}
+
 /* The lockup itself. Full width and auto height, so it scales with the window
    at every size rather than being cropped by cover — which is what kept this
    slide off narrow screens while it was one flattened image. Centred on the
@@ -182,11 +187,40 @@ img {
 .hero__slide .hero__slide-fg {
   position: absolute;
   top: 50%;
-  left: 0;
+  left: 50%;
   width: 100%;
+  /* Past its own width the artwork only grows taller than the hero and gets
+     clipped top and bottom, so it stops here and stays centred. */
+  max-width: 1440px;
   height: auto;
   object-fit: contain;
-  transform: translateY(-50%);
+  transform: translate(-50%, -50%);
+}
+
+/* Below this the frame is portrait enough that cover throws away both sides of
+   the scene — the buildings and the product — leaving only the dark middle. The
+   whole image is shown instead, scaled to width so it registers with the
+   lockup, over a blurred copy of itself rather than a flat band. */
+@media (max-width: 700px) {
+  .hero__slide .hero__slide-bg {
+    inset: auto;
+    top: 50%;
+    left: 0;
+    width: 100%;
+    height: auto;
+    object-fit: contain;
+    transform: translateY(-50%);
+  }
+
+  .hero__slide .hero__slide-fill {
+    display: block;
+    position: absolute;
+    inset: 0;
+    object-fit: cover;
+    filter: blur(28px) brightness(0.5);
+    /* The blur samples past the edges; scaling up hides the soft border. */
+    transform: scale(1.15);
+  }
 }
 
 .hero__content {
