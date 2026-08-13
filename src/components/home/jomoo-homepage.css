@@ -172,10 +172,6 @@ img {
   inset: 0;
 }
 
-/* Hidden until the scene stops filling the frame; see the narrow rules below. */
-.hero__slide .hero__slide-fill {
-  display: none;
-}
 
 /* The lockup itself. Full width and auto height, so it scales with the window
    at every size rather than being cropped by cover — which is what kept this
@@ -197,29 +193,24 @@ img {
   transform: translate(-50%, -50%);
 }
 
-/* Below this the frame is portrait enough that cover throws away both sides of
-   the scene — the buildings and the product — leaving only the dark middle. The
-   whole image is shown instead, scaled to width so it registers with the
-   lockup, over a blurred copy of itself rather than a flat band. */
+/* On a portrait phone the scene cannot both fill the height and show its full
+   width, so it keeps filling and is anchored right: at 390x608 the visible
+   window is 693px of the 1920px artwork, and anchoring right puts the product
+   (x 1450-1850) inside it with room either side.
+
+   The lockup grows to meet it. Its content — the non-transparent box, x
+   447-1547, 57% of the artwork — spans the screen exactly at 174.4%, so this
+   sits just under that: edge to edge left the outer stats touching the bezel
+   with the last character clipping. max-height stops the growth once it reaches
+   the top and bottom of the frame on a wider phone. */
 @media (max-width: 700px) {
   .hero__slide .hero__slide-bg {
-    inset: auto;
-    top: 50%;
-    left: 0;
-    width: 100%;
-    height: auto;
-    object-fit: contain;
-    transform: translateY(-50%);
+    object-position: 100% 50%;
   }
 
-  .hero__slide .hero__slide-fill {
-    display: block;
-    position: absolute;
-    inset: 0;
-    object-fit: cover;
-    filter: blur(28px) brightness(0.5);
-    /* The blur samples past the edges; scaling up hides the soft border. */
-    transform: scale(1.15);
+  .hero__slide .hero__slide-fg {
+    width: 164%;
+    max-height: 100%;
   }
 }
 

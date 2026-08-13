@@ -403,10 +403,6 @@ export default function JomooHomepage() {
             if (slide.type === 'split') {
               return (
                 <div key={slide.src} className={`${slideClassName} hero__slide--split`}>
-                  {/* A blurred copy fills the frame behind the scene, so the
-                      letterbox on a narrow screen is the photograph itself
-                      rather than a flat band seaming against its edges. */}
-                  <img className="hero__slide-fill" src={slide.src} alt="" aria-hidden="true" />
                   <img className="hero__slide-bg" src={slide.src} alt="" />
                   <img className="hero__slide-fg" src={slide.fg} alt="" />
                 </div>
