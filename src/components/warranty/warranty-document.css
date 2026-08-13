@@ -298,6 +298,23 @@
   color: #000000;
 }
 
+/* The inners are capped at 52rem and centred, so above this width they already
+   sit clear of the edges. Below it the section itself has to hold the margin —
+   otherwise the text runs into the bezel. */
+@media (max-width: 980px) {
+  .warranty-actions {
+    margin: 0 1rem 4rem;
+  }
+
+  .warranty-section {
+    padding: 4rem 1.5rem;
+  }
+
+  .warranty-maker {
+    padding: 3rem 1.5rem 5rem;
+  }
+}
+
 @media print {
   .warranty-section,
   .warranty-maker {
