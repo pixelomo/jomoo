@@ -8,18 +8,20 @@ import DesignExcellenceSection from './DesignExcellenceSection'
 import FooterCtaSection from './FooterCtaSection'
 import './jomoo-homepage.css'
 
+/**
+ * The third slide is two layers rather than one flattened image: the scene
+ * fills the frame like any other slide, while the GLOBAL No.1 lockup sits over
+ * it at full width so it scales with the window instead of being cropped by
+ * object-fit: cover. That is what lets it run on a phone, where the flattened
+ * version had to be hidden.
+ */
 const HERO_SLIDES = [
   { type: 'image' as const, src: '/images/hero1.jpg' },
   { type: 'video' as const, src: '/images/02.mp4' },
-  { type: 'image' as const, src: '/images/03.png' },
+  { type: 'split' as const, src: '/images/03bg.jpg', fg: '/images/03fg.png' },
 ]
 
 const HERO_SLIDE_MS = 6000
-const HERO_NARROW_MAX_WIDTH = 700
-
-function getHeroSlideCount(viewportWidth: number) {
-  return viewportWidth <= HERO_NARROW_MAX_WIDTH ? 2 : HERO_SLIDES.length
-}
 
 function getStatStep(target: number) {
   if (target === 300000) return 10000
@@ -38,21 +40,7 @@ export default function JomooHomepage() {
   const statsGridRef = useRef<HTMLDivElement>(null)
   const heroVideoRefs = useRef<(HTMLVideoElement | null)[]>([])
   const [heroSlide, setHeroSlide] = useState(0)
-  const [heroSlideCount, setHeroSlideCount] = useState(HERO_SLIDES.length)
-
-  useEffect(() => {
-    function updateHeroSlideCount() {
-      setHeroSlideCount(getHeroSlideCount(window.innerWidth))
-    }
-
-    updateHeroSlideCount()
-    window.addEventListener('resize', updateHeroSlideCount)
-    return () => window.removeEventListener('resize', updateHeroSlideCount)
-  }, [])
-
-  useEffect(() => {
-    setHeroSlide((index) => (index >= heroSlideCount ? 0 : index))
-  }, [heroSlideCount])
+  const heroSlideCount = HERO_SLIDES.length
 
   useEffect(() => {
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
@@ -388,11 +376,7 @@ export default function JomooHomepage() {
         <div className="hero__carousel" aria-hidden="true">
           {HERO_SLIDES.map((slide, index) => {
             const isActive = index === heroSlide
-            const slideClassName = [
-              'hero__slide',
-              isActive && 'is-active',
-              index === 2 && 'hero__slide--wide-only',
-            ]
+            const slideClassName = ['hero__slide', isActive && 'is-active']
               .filter(Boolean)
               .join(' ')
 
@@ -412,6 +396,15 @@ export default function JomooHomepage() {
                     onLoadedData={() => handleHeroVideoReady(index)}
                     onCanPlay={() => handleHeroVideoReady(index)}
                   />
+                </div>
+              )
+            }
+
+            if (slide.type === 'split') {
+              return (
+                <div key={slide.src} className={slideClassName}>
+                  <img className="hero__slide-bg" src={slide.src} alt="" />
+                  <img className="hero__slide-fg" src={slide.fg} alt="" />
                 </div>
               )
             }

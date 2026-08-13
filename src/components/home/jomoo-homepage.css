@@ -158,18 +158,35 @@ img {
   z-index: 1;
 }
 
-@media (max-width: 700px) {
-  .hero__slide--wide-only {
-    display: none !important;
-  }
-}
-
 .hero__slide img,
 .hero__slide video {
   width: 100%;
   height: 100%;
   object-fit: cover;
   display: block;
+}
+
+/* The scene behind the GLOBAL No.1 lockup — cropped to fill, like any slide. */
+.hero__slide .hero__slide-bg {
+  position: absolute;
+  inset: 0;
+}
+
+/* The lockup itself. Full width and auto height, so it scales with the window
+   at every size rather than being cropped by cover — which is what kept this
+   slide off narrow screens while it was one flattened image. Centred on the
+   frame; the artwork's transparent margins are what the hero trims. */
+/* Descendant selector on purpose: `.hero__slide img` above is more specific
+   than a lone class, so a plain .hero__slide-fg lost and the lockup was
+   cropped by cover exactly like the flattened image it replaced. */
+.hero__slide .hero__slide-fg {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+  transform: translateY(-50%);
 }
 
 .hero__content {
