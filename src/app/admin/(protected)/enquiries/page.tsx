@@ -22,7 +22,7 @@ export default async function EnquiriesPage() {
         <DownloadButton href="/api/admin/export/contact" label="Download CSV" />
       </div>
 
-      <div style={{ background: 'var(--paper)', border: '1px solid var(--line)', borderRadius: 10, overflow: 'hidden' }}>
+      <div style={{ background: 'var(--paper)', border: '1px solid var(--line)', borderRadius: 10, overflowX: 'auto' }}>
         <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
           <thead>
             <tr style={{ borderBottom: '1px solid var(--line)', background: 'var(--bg-soft)' }}>

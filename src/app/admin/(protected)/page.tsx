@@ -90,7 +90,7 @@ export default async function AdminDashboard() {
         background: 'var(--paper)',
         border: '1px solid var(--line)',
         borderRadius: 10,
-        overflow: 'hidden',
+        overflowX: 'auto',
       }}>
         <div style={{ padding: '18px 24px', borderBottom: '1px solid var(--line)' }}>
           <h2 style={{ fontSize: 15, fontWeight: 600, color: 'var(--ink)', margin: 0 }}>Recent Registrations</h2>

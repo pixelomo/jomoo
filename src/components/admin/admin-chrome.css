@@ -1,0 +1,198 @@
+/* Admin portal shell.
+   In CSS rather than inline styles because the whole point is the breakpoint —
+   a 220px sidebar beside a 390px phone leaves ~90px for the page, which is what
+   made every table in the portal overflow. */
+
+.admin-shell {
+  display: flex;
+  min-height: 100vh;
+  background: var(--bg-soft);
+  font-family: var(--font-poppins, sans-serif);
+}
+
+.admin-main {
+  flex: 1;
+  min-width: 0;
+  padding: 32px 40px;
+}
+
+.admin-sidebar {
+  width: 220px;
+  flex-shrink: 0;
+  min-height: 100vh;
+  background: var(--ink);
+  display: flex;
+  flex-direction: column;
+}
+
+.admin-sidebar__brand {
+  padding: 28px 24px 24px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.admin-sidebar__nav {
+  flex: 1;
+  padding: 16px 12px;
+}
+
+.admin-sidebar__link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 12px;
+  border-radius: 6px;
+  margin-bottom: 2px;
+  font-size: 14px;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.55);
+  background: transparent;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: all 0.15s;
+}
+
+.admin-sidebar__link:hover {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.admin-sidebar__link.is-active {
+  font-weight: 600;
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.admin-sidebar__icon {
+  font-size: 16px;
+  opacity: 0.6;
+}
+
+.admin-sidebar__link.is-active .admin-sidebar__icon {
+  opacity: 1;
+}
+
+.admin-sidebar__foot {
+  padding: 16px 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.admin-sidebar__who {
+  padding: 0 12px 12px;
+}
+
+.admin-sidebar__name {
+  display: block;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.admin-sidebar__role {
+  display: block;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.4);
+  margin-top: 2px;
+}
+
+.admin-signout {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 12px;
+  border-radius: 6px;
+  border: 0;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.45);
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+  white-space: nowrap;
+  transition: color 0.15s;
+}
+
+.admin-signout:hover {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+/* ── narrow screens ─────────────────────────────────────
+   The sidebar becomes a top bar and the nav scrolls sideways on its own, so
+   the page below gets the full width instead of a 90px column. */
+@media (max-width: 900px) {
+  .admin-shell {
+    flex-direction: column;
+  }
+
+  .admin-sidebar {
+    width: 100%;
+    min-height: 0;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+    padding-right: 8px;
+  }
+
+  .admin-sidebar__brand {
+    flex-shrink: 0;
+    padding: 12px 16px;
+    border-bottom: 0;
+    border-right: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .admin-sidebar__brand p {
+    display: none;
+  }
+
+  .admin-sidebar__nav {
+    display: flex;
+    gap: 4px;
+    padding: 8px 0;
+    overflow-x: auto;
+    /* The bar is the only thing that scrolls sideways; the page must not. */
+    scrollbar-width: none;
+  }
+
+  .admin-sidebar__nav::-webkit-scrollbar {
+    display: none;
+  }
+
+  .admin-sidebar__link {
+    margin-bottom: 0;
+  }
+
+  .admin-sidebar__foot {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 0 8px 8px;
+    border-top: 0;
+    border-left: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  /* Who is signed in matters less than room for the nav on a phone. */
+  .admin-sidebar__who {
+    display: none;
+  }
+
+  .admin-signout {
+    width: auto;
+  }
+
+  .admin-main {
+    padding: 20px 16px 48px;
+  }
+}
+
+@media (max-width: 560px) {
+  /* Labels go, icons stay — six destinations still reachable without scrolling. */
+  .admin-sidebar__link span:not(.admin-sidebar__icon) {
+    display: none;
+  }
+
+  .admin-sidebar__icon {
+    font-size: 18px;
+  }
+
+  .admin-signout span:not(:first-child) {
+    display: none;
+  }
+}

@@ -149,7 +149,7 @@ export default async function AdminRegistrationDetailPage({
 
       {/* Ownership transfers */}
       {transfers.length > 0 && (
-        <div style={{ background: 'var(--paper)', border: '1px solid var(--line)', borderRadius: 10, overflow: 'hidden', marginTop: 24 }}>
+        <div style={{ background: 'var(--paper)', border: '1px solid var(--line)', borderRadius: 10, overflowX: 'auto', marginTop: 24 }}>
           <div style={{ padding: '16px 24px', borderBottom: '1px solid var(--line)' }}>
             <h2 style={{ fontSize: 15, fontWeight: 600, color: 'var(--ink)', margin: 0 }}>Ownership Transfers ({transfers.length})</h2>
           </div>

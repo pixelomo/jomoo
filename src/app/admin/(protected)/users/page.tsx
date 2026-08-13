@@ -62,7 +62,7 @@ export default async function AdminUsersPage({
         background: 'var(--paper)',
         border: '1px solid var(--line)',
         borderRadius: 10,
-        overflow: 'hidden',
+        overflowX: 'auto',
         marginTop: 16,
       }}>
         <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>

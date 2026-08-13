@@ -76,7 +76,7 @@ export default async function AdminUserDetailPage({
         background: 'var(--paper)',
         border: '1px solid var(--line)',
         borderRadius: 10,
-        overflow: 'hidden',
+        overflowX: 'auto',
         marginTop: 24,
       }}>
         <div style={{ padding: '16px 24px', borderBottom: '1px solid var(--line)' }}>
