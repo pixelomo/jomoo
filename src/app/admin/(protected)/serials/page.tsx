@@ -90,11 +90,12 @@ export default async function SerialLibraryPage({
 
   return (
     <div>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16, marginBottom: 8 }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16, marginBottom: 8, flexWrap: 'wrap' }}>
         <h1 style={{ fontSize: 22, fontWeight: 700, color: 'var(--ink)', margin: 0 }}>
           Serial Numbers
         </h1>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+        {/* Three actions do not fit beside the heading on a phone. */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
           <SerialAddButton />
           <SerialImportButton />
           {permissions.export ? (
