@@ -359,6 +359,39 @@ export async function importSerials(
 // Binding to registrations
 // ─────────────────────────────────────────────
 
+/** Statuses the library refuses to let a member register against. */
+const BLOCKED_STATUSES = new Set<SerialStatus>(['REVOKED', 'ABNORMAL'])
+
+/**
+ * Why the library will not accept this serial, or null if it has no objection.
+ *
+ * Returns null for a serial the library has never heard of: until the factory's
+ * numbers are imported the library is empty, and an unknown serial is still
+ * accepted on format alone. Only a number that is *in* the library and marked
+ * REVOKED or ABNORMAL is refused — that flag was put there by a person, and
+ * letting a warranty through on it would erase their decision.
+ *
+ * Never throws. A database failure must not block a member from registering a
+ * perfectly good product, so it falls through to "no objection" and logs.
+ */
+export async function serialLibraryObjection(
+  serialNumber: string
+): Promise<'revoked' | 'abnormal' | null> {
+  try {
+    const [row] = await db
+      .select({ status: serialNumberEntry.status })
+      .from(serialNumberEntry)
+      .where(eq(serialNumberEntry.serialNumber, normaliseSerialNumber(serialNumber)))
+      .limit(1)
+
+    if (!row || !isSerialStatus(row.status) || !BLOCKED_STATUSES.has(row.status)) return null
+    return row.status === 'REVOKED' ? 'revoked' : 'abnormal'
+  } catch (err) {
+    console.error('[serial-library] could not check the serial, allowing it through', err)
+    return null
+  }
+}
+
 /**
  * Marks a serial as bound when a member registers it.
  *

@@ -6,7 +6,8 @@ import { eq } from 'drizzle-orm'
 import { RegistrationSchema } from '@/types/registration'
 import { validateSerialNumber } from '@/lib/serialValidation'
 import { findRegistrationBySerial, isDuplicateSerialError } from '@/lib/serialRegistry'
-import { bindSerialToRegistration } from '@/lib/serialLibrary'
+import { bindSerialToRegistration, serialLibraryObjection } from '@/lib/serialLibrary'
+import { warrantyExpiryFrom } from '@/lib/warranty'
 import { getProductSeriesById } from '@/lib/sanity'
 import { sendRegistrationConfirmation, sendWarrantyIssuedEmail } from '@/lib/resend'
 
@@ -46,6 +47,16 @@ export async function POST(req: Request) {
   // One physical product, one registration — by anyone, not just per member.
   if (await findRegistrationBySerial(data.serialNumber)) {
     return NextResponse.json({ error: 'SERIAL_ALREADY_REGISTERED' }, { status: 409 })
+  }
+
+  // Re-checked here and not only at step 2: the status can change between the
+  // two, and the browser's answer is never the one that decides.
+  const objection = await serialLibraryObjection(data.serialNumber)
+  if (objection) {
+    return NextResponse.json(
+      { error: objection === 'revoked' ? 'SERIAL_REVOKED' : 'SERIAL_ABNORMAL' },
+      { status: 409 }
+    )
   }
 
   // The lookup above is the friendly path; this catches the narrow window where
@@ -90,10 +101,7 @@ export async function POST(req: Request) {
   let finalStatus = 'PENDING'
 
   if (serialCheck.valid) {
-    const baseDate = data.installationDate ? new Date(data.installationDate) : new Date()
-    const expiryDate = new Date(baseDate)
-    expiryDate.setFullYear(expiryDate.getFullYear() + 2)
-    const expiryStr = expiryDate.toISOString().split('T')[0]
+    const expiryStr = warrantyExpiryFrom(data.installationDate)
 
     await Promise.all([
       db.update(productRegistration)
@@ -110,15 +118,12 @@ export async function POST(req: Request) {
 
   // Send appropriate email non-blocking
   if (finalStatus === 'REGISTERED_WITH_WARRANTY') {
-    const installDate = data.installationDate ? new Date(data.installationDate) : new Date()
-    const expiry = new Date(installDate)
-    expiry.setFullYear(expiry.getFullYear() + 2)
     sendWarrantyIssuedEmail({
       to: sessionUser.email,
       name: sessionUser.name,
       modelName: data.modelName,
       registrationId: id,
-      expiryDate: expiry.toISOString().split('T')[0],
+      expiryDate: warrantyExpiryFrom(data.installationDate),
     }).catch(err => console.error('Warranty email error:', err))
   } else {
     sendRegistrationConfirmation({

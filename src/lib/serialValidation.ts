@@ -66,6 +66,10 @@ export type SerialValidationReason =
   | 'not_found'
   /** Someone — not necessarily this member — has already registered it. */
   | 'already_registered'
+  /** Withdrawn in the serial library: scrapped, recalled, or issued in error. */
+  | 'revoked'
+  /** Flagged in the serial library for investigation. */
+  | 'abnormal'
   | 'service_unavailable'
 
 export interface SerialValidationResult {

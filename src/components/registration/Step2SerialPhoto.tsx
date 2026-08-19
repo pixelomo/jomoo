@@ -15,7 +15,7 @@ interface Props {
 }
 
 type Phase = 'capture' | 'reading' | 'confirm'
-type ValidationState = 'idle' | 'validating' | 'valid' | 'invalid' | 'duplicate'
+type ValidationState = 'idle' | 'validating' | 'valid' | 'invalid' | 'duplicate' | 'blocked'
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024
 
@@ -130,7 +130,13 @@ export default function Step2SerialPhoto({ defaultValues, onSubmit, onBack }: Pr
       })
       const data: { valid: boolean; reason?: string } = await res.json()
       setValidationState(
-        data.valid ? 'valid' : data.reason === 'already_registered' ? 'duplicate' : 'invalid'
+        data.valid
+          ? 'valid'
+          : data.reason === 'already_registered'
+            ? 'duplicate'
+            : data.reason === 'revoked' || data.reason === 'abnormal'
+              ? 'blocked'
+              : 'invalid'
       )
     } catch {
       setValidationState('invalid')
@@ -286,6 +292,11 @@ export default function Step2SerialPhoto({ defaultValues, onSubmit, onBack }: Pr
       {validationState === 'duplicate' && (
         <p className="rounded-md bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">
           {t('duplicate')}
+        </p>
+      )}
+      {validationState === 'blocked' && (
+        <p className="rounded-md bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">
+          {t('blocked')}
         </p>
       )}
       {error && (

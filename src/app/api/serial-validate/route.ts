@@ -3,6 +3,7 @@ import { auth } from '@/lib/auth'
 import { z } from 'zod'
 import { validateSerialNumber } from '@/lib/serialValidation'
 import { findRegistrationBySerial } from '@/lib/serialRegistry'
+import { serialLibraryObjection } from '@/lib/serialLibrary'
 
 const RequestSchema = z.object({
   serialNumber: z.string().min(1),
@@ -40,6 +41,13 @@ export async function POST(req: Request) {
   // deliberately skips this — it would let anyone probe which serials exist.
   if (result.valid && (await findRegistrationBySerial(parsed.data.serialNumber))) {
     return NextResponse.json({ valid: false, reason: 'already_registered' })
+  }
+
+  // A serial staff have marked REVOKED or ABNORMAL is refused here rather than
+  // at submit, so the member finds out at the field they can still correct.
+  if (result.valid) {
+    const objection = await serialLibraryObjection(parsed.data.serialNumber)
+    if (objection) return NextResponse.json({ valid: false, reason: objection })
   }
 
   return NextResponse.json(result)

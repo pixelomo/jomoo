@@ -14,7 +14,7 @@ interface Props {
   onBack: () => void
 }
 
-type ValidationState = 'idle' | 'validating' | 'valid' | 'invalid' | 'duplicate'
+type ValidationState = 'idle' | 'validating' | 'valid' | 'invalid' | 'duplicate' | 'blocked'
 
 export default function Step2SerialNumber({ defaultValues, onSubmit, onBack }: Props) {
   const series = defaultValues?.modelSeries
@@ -58,7 +58,13 @@ export default function Step2SerialNumber({ defaultValues, onSubmit, onBack }: P
         setValidationState('valid')
         setValue('serialNumberValid', true)
       } else {
-        setValidationState(data.reason === 'already_registered' ? 'duplicate' : 'invalid')
+        setValidationState(
+          data.reason === 'already_registered'
+            ? 'duplicate'
+            : data.reason === 'revoked' || data.reason === 'abnormal'
+              ? 'blocked'
+              : 'invalid'
+        )
         setValue('serialNumberValid', false)
       }
     } catch {
@@ -128,6 +134,14 @@ export default function Step2SerialNumber({ defaultValues, onSubmit, onBack }: P
       {validationState === 'duplicate' && (
         <div className="rounded-md bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">
           {t('duplicate')}
+        </div>
+      )}
+
+      {/* Withdrawn or flagged in the serial library. Not something the member
+          can fix by retyping, so it sends them to the service line. */}
+      {validationState === 'blocked' && (
+        <div className="rounded-md bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">
+          {t('blocked')}
         </div>
       )}
 
