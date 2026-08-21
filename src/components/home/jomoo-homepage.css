@@ -344,10 +344,11 @@ img {
   z-index: 1;
 }
 
+/* 38rem hero + 3rem gap + the 560px shower + 3rem below it. */
 .world__upper {
   position: relative;
   width: 100%;
-  min-height: 48rem;
+  min-height: calc(38rem + 3rem + 560px + 3rem);
   z-index: 2;
 }
 
@@ -395,12 +396,41 @@ img {
   font-size: 1.5rem;
 }
 
+/* Source notes under the awards on slide 1. Quiet — they are a citation, not
+   part of the pitch. */
+.hero__footnotes {
+  margin: 1.25rem 0 0;
+  font-family: var(--font-jp);
+  font-size: 0.8rem;
+  line-height: 1.9;
+  color: rgba(10, 10, 10, 0.62);
+}
+
+/* The same citation on slide 2, where the artwork is dark and the note belongs
+   at the foot of the frame rather than beside the copy. */
+.hero__slide-note {
+  position: absolute;
+  left: 50%;
+  bottom: 4.25rem;
+  transform: translateX(-50%);
+  z-index: 3;
+  margin: 0;
+  width: min(100% - 2rem, 60rem);
+  font-family: var(--font-jp);
+  font-size: 0.8rem;
+  line-height: 1.8;
+  color: rgba(255, 255, 255, 0.82);
+  text-align: center;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.45);
+  pointer-events: none;
+}
+
 .world__photos {
   position: absolute;
   inset: 0;
   left: 0;
   right: 0;
-  min-height: 48rem;
+  min-height: calc(38rem + 3rem + 560px + 3rem);
   overflow: visible;
   pointer-events: none;
 }
@@ -444,28 +474,35 @@ img {
   z-index: 1;
 }
 
-/* Forest and shower sit side by side directly under the hero, 1rem below it
-   and 1rem apart, both cropped to the same landscape tile. */
+/* Forest and shower sit side by side under the hero, 3rem below it and 3rem
+   apart, and now span the container rather than only its right half — at these
+   sizes, starting at the midpoint would have pushed the shower 288px off the
+   side of a 1440px screen.
+   
+   Each tile matches the proportions of its own photograph — 530x390 against a
+   724x543 source, 430x560 against 755x973 — so neither is cropped in any way a
+   viewer would notice. The pair is centred because the two fixed widths do not
+   quite fill the container; splitting the remainder evenly reads as deliberate
+   where hanging it all on one side would not. */
+.world__photos {
+  --tile-gap: 3rem;
+  --tile-pair: calc(530px + var(--tile-gap) + 430px);
+}
+
 .world__photo--forest {
-  top: calc(38rem + 1rem);
-  left: 50%;
-  width: 310px;
-  height: 265px;
+  top: calc(38rem + var(--tile-gap));
+  left: calc(50% - var(--tile-pair) / 2);
+  width: 530px;
+  height: 390px;
   z-index: 3;
 }
 
 .world__photo--shower {
-  top: calc(38rem + 1rem);
-  left: calc(50% + 310px + 1rem);
-  width: 310px;
-  height: 265px;
+  top: calc(38rem + var(--tile-gap));
+  left: calc(50% - var(--tile-pair) / 2 + 530px + var(--tile-gap));
+  width: 430px;
+  height: 560px;
   z-index: 4;
-}
-
-/* Portrait original in a landscape tile — anchor to the top so it reads as the
-   top half of the shot rather than a centre crop. */
-.world__photo--shower img {
-  object-position: top;
 }
 
 .world__lower {
@@ -504,6 +541,10 @@ img {
   padding-left: 4rem;
   font-size: 1.5rem;
   text-align: left;
+}
+
+.world__body p + p {
+  margin-top: 1.6em;
 }
 
 .world__body--secondary-intro {
@@ -559,7 +600,7 @@ img {
     inset: auto;
     display: flex;
     flex-wrap: wrap;
-    align-items: stretch;
+    align-items: flex-start;
     gap: 1rem;
     min-height: 0;
     overflow: visible;
@@ -585,16 +626,23 @@ img {
     aspect-ratio: 75 / 38;
   }
 
-  /* Share the row evenly and shrink with it — the fixed 310x265 tile becomes a
-     ratio so the pair never wraps onto separate lines, however narrow it gets.
-     min-width: 0 stops the image's intrinsic size holding the item open. */
+  /* Share the row evenly and shrink with it, each keeping its own proportions
+     so neither is cropped. min-width: 0 stops the image's intrinsic size
+     holding the item open, and flex-start lets the two differ in height. */
   .world__photo--forest,
   .world__photo--shower {
     flex: 1 1 0;
     min-width: 0;
     width: auto;
     height: auto;
-    aspect-ratio: 310 / 265;
+  }
+
+  .world__photo--forest {
+    aspect-ratio: 530 / 390;
+  }
+
+  .world__photo--shower {
+    aspect-ratio: 430 / 560;
   }
 
   .world__lower {

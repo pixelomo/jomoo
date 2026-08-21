@@ -182,8 +182,11 @@ export default function JomooHomepage() {
                 ease: 'power1.out',
                 scrollTrigger: {
                   trigger: el,
-                  start: 'top 92%',
-                  end: 'top 58%',
+                  // The bathroom figure is tall and sits low in the section, so
+                  // 'top 92%' left it still fading in well after it had arrived.
+                  // It starts the moment it enters the viewport instead.
+                  start: fromLeft ? 'top bottom' : 'top 92%',
+                  end: fromLeft ? 'top 72%' : 'top 58%',
                   scrub: 0.8,
                 },
               }
@@ -455,6 +458,11 @@ export default function JomooHomepage() {
                     alt="iF デザインアワード / バスルーム業界受賞数 世界NO.1"
                   />
                 </div>
+                <p className="hero__footnotes">
+                  ※フロスト＆サリバンが調査した2024年の世界販売台数に基づく（2025年8月に調査完了）
+                  <br />
+                  ※iF デザインアワードのバス会社カテゴリーのiFデザインランキング 2022–2026年より
+                </p>
               </>
             )}
 
@@ -474,6 +482,12 @@ export default function JomooHomepage() {
             )}
           </div>
         </div>
+
+        {heroSlide === 1 && (
+          <p className="hero__slide-note">
+            ※フロスト＆サリバンが調査した2024年の世界販売台数に基づく（2025年8月に調査完了）
+          </p>
+        )}
 
         <div className="hero__pagination" role="tablist" aria-label="ヒーロースライド">
           {Array.from({ length: heroSlideCount }, (_, index) => (
@@ -504,16 +518,19 @@ export default function JomooHomepage() {
                 <div className="world__rule" aria-hidden="true" />
                 <div className="world__body">
                   <p>
-                    JOMOOは、世界で培った<br />
-                    テクノロジーとデザインで、<br />
-                    心地よいバスルーム空間を<br />
-                    創造します。
+                    世界で磨いてきたテクノロジーとデザインを、<br />
+                    一人ひとりの暮らしにふさわしい形へ。
+                  </p>
+                  <p>
+                    静けさも、清潔さも、使いやすさも。<br />
+                    意識することなく、自然に満たされていく。
                   </p>
                 </div>
                 <p className="world__body world__body--secondary world__body--secondary-intro">
-                  スマートトイレから広がる、<br />
-                  新しい暮らしの体験を<br />
-                  お届けします。
+                  JOMOOは、<br />
+                  スマートトイレから、<br />
+                  新しい水まわりの<br />
+                  心地よさを提案します。
                 </p>
               </div>
 
@@ -535,9 +552,10 @@ export default function JomooHomepage() {
                 <img src="/images/world4.jpg" alt="" />
               </figure>
               <p className="world__body world__body--secondary world__body--secondary-lower">
-                スマートトイレから広がる、<br />
-                新しい暮らしの体験を<br />
-                お届けします。
+                JOMOOは、<br />
+                スマートトイレから、<br />
+                新しい水まわりの<br />
+                心地よさを提案します。
               </p>
             </div>
           </div>
