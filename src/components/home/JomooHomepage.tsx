@@ -169,24 +169,23 @@ export default function JomooHomepage() {
           )
 
           worldImages.forEach((el) => {
-            // The bathroom figure drifts in from the left as well as up; the
-            // matching start state is in .world--animate in the stylesheet.
-            const fromLeft = el.classList.contains('world__figure--bathroom')
+            // The bathroom figure is tall and sits low in the section, so it
+            // reaches any threshold measured from the top of the viewport late.
+            // It gets the same rise-and-fade as everything else, started the
+            // moment its top crosses the bottom of the screen and finished
+            // quickly after.
+            const isBathroom = el.classList.contains('world__figure--bathroom')
             const tween = gsap.fromTo(
               el,
-              { opacity: 0, y: 48, x: fromLeft ? -80 : 0 },
+              { opacity: 0, y: 48 },
               {
                 opacity: 1,
                 y: 0,
-                x: 0,
                 ease: 'power1.out',
                 scrollTrigger: {
                   trigger: el,
-                  // The bathroom figure is tall and sits low in the section, so
-                  // 'top 92%' left it still fading in well after it had arrived.
-                  // It starts the moment it enters the viewport instead.
-                  start: fromLeft ? 'top bottom' : 'top 92%',
-                  end: fromLeft ? 'top 72%' : 'top 58%',
+                  start: isBathroom ? 'top bottom' : 'top 92%',
+                  end: isBathroom ? 'top 80%' : 'top 58%',
                   scrub: 0.8,
                 },
               }
@@ -483,7 +482,7 @@ export default function JomooHomepage() {
           </div>
         </div>
 
-        {heroSlide === 1 && (
+        {heroSlide === 2 && (
           <p className="hero__slide-note">
             ※フロスト＆サリバンが調査した2024年の世界販売台数に基づく（2025年8月に調査完了）
           </p>

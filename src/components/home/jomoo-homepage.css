@@ -411,7 +411,7 @@ img {
 .hero__slide-note {
   position: absolute;
   left: 50%;
-  bottom: 4.25rem;
+  bottom: 3.25rem;
   transform: translateX(-50%);
   z-index: 3;
   margin: 0;
@@ -451,10 +451,11 @@ img {
   transform: translateY(3rem);
 }
 
-/* Also drifts in from the left; the matching GSAP tween is in JomooHomepage. */
+/* Same start state as the photos above it — the matching GSAP tween is in
+   JomooHomepage. */
 .world--animate .world__figure--bathroom {
   opacity: 0;
-  transform: translate(-80px, 48px);
+  transform: translateY(3rem);
 }
 
 .world__photo img,
@@ -485,12 +486,15 @@ img {
    quite fill the container; splitting the remainder evenly reads as deliberate
    where hanging it all on one side would not. */
 .world__photos {
-  --tile-gap: 3rem;
+  --tile-gap: 4rem;
   --tile-pair: calc(530px + var(--tile-gap) + 430px);
 }
 
+/* Dropped so its foot lands level with the shower's rather than its head —
+   38rem + the gap puts the taller tile's top, and 560 - 390 makes up the
+   difference. */
 .world__photo--forest {
-  top: calc(38rem + var(--tile-gap));
+  top: calc(38rem + var(--tile-gap) + 170px);
   left: calc(50% - var(--tile-pair) / 2);
   width: 530px;
   height: 390px;
@@ -509,7 +513,9 @@ img {
   display: grid;
   grid-template-columns: 55fr 45fr;
   column-gap: 2rem;
-  align-items: end;
+  /* Centred against the photograph beside it; 'end' pinned it to the very
+     bottom of a 30rem-tall image, far below anything to align with. */
+  align-items: center;
   width: 100%;
   position: relative;
   z-index: 1;
@@ -535,7 +541,10 @@ img {
 .world__body--secondary {
   grid-column: 2;
   justify-self: start;
-  align-self: end;
+  /* This is what actually decides — align-items on .world__lower is overridden
+     by any align-self the child sets, which is why the paragraph stayed pinned
+     to the foot of the image. */
+  align-self: center;
   max-width: none;
   margin: 0;
   padding-left: 4rem;
