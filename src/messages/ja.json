@@ -140,6 +140,9 @@
     "welcome": "おかえりなさい",
     "myProducts": "登録済み製品",
     "serialNumber": "製造番号",
+    "registeredAt": "登録日",
+    "warrantyPeriod": "保証期間",
+    "warrantyNotIssued": "未発行",
     "noProducts": "まだ製品が登録されていません",
     "registerFirst": "製品を登録する",
     "status": {

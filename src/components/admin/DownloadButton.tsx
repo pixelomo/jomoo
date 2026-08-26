@@ -1,7 +1,23 @@
 'use client'
 
-/** Plain anchor with a download hint — the endpoint sets the filename. */
-export default function DownloadButton({ href, label }: { href: string; label: string }) {
+/**
+ * Plain anchor with a download hint — the endpoint sets the filename.
+ *
+ * A real navigation, not next/link: the href is a route handler that answers
+ * with a file, and a client-side transition has nothing to render.
+ *
+ * `outline` is for a download that sits beside the page's primary action, so
+ * the toolbar does not end up with two filled buttons competing.
+ */
+export default function DownloadButton({
+  href,
+  label,
+  variant = 'solid',
+}: {
+  href: string
+  label: string
+  variant?: 'solid' | 'outline'
+}) {
   return (
     <a
       href={href}
@@ -11,8 +27,9 @@ export default function DownloadButton({ href, label }: { href: string; label: s
         gap: 8,
         padding: '9px 16px',
         borderRadius: 8,
-        background: 'var(--ink)',
-        color: '#fff',
+        border: variant === 'outline' ? '1px solid var(--line)' : '0',
+        background: variant === 'outline' ? 'var(--paper)' : 'var(--ink)',
+        color: variant === 'outline' ? 'var(--ink-2)' : '#fff',
         fontSize: 13,
         fontWeight: 600,
         textDecoration: 'none',

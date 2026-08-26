@@ -2,6 +2,7 @@
 
 import { useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import DownloadButton from '@/components/admin/DownloadButton'
 
 interface Rejected {
   line: number
@@ -50,7 +51,7 @@ export default function SerialImportButton() {
       if (!res.ok) {
         setError(
           res.status === 422
-            ? 'そのファイルを読み取れませんでした。CSV または製造番号の一覧をご確認ください。'
+            ? 'そのファイルを読み取れませんでした。「Template」からテンプレートを取得し、形式をご確認ください。'
             : 'インポートに失敗しました。'
         )
         return
@@ -80,21 +81,18 @@ export default function SerialImportButton() {
         }}
       />
 
+      {/* Next to Import rather than tucked into a help page — the moment
+          staff need the blank form is the moment they reach for Import. */}
+      <DownloadButton href="/api/admin/serials/template" label="Template" variant="outline" />
+
       <button
         type="button"
         onClick={() => input.current?.click()}
         disabled={busy}
         style={{
-          padding: '9px 16px',
-          borderRadius: 8,
-          border: '1px solid var(--line)',
-          background: 'var(--paper)',
-          color: 'var(--ink-2)',
-          fontSize: 13,
-          fontWeight: 600,
+          ...outlineButton,
           cursor: busy ? 'not-allowed' : 'pointer',
           opacity: busy ? 0.6 : 1,
-          whiteSpace: 'nowrap',
         }}
       >
         {busy ? 'Importing…' : 'Import'}
@@ -175,6 +173,20 @@ export default function SerialImportButton() {
       )}
     </>
   )
+}
+
+const outlineButton: React.CSSProperties = {
+  display: 'inline-flex',
+  alignItems: 'center',
+  padding: '9px 16px',
+  borderRadius: 8,
+  border: '1px solid var(--line)',
+  background: 'var(--paper)',
+  color: 'var(--ink-2)',
+  fontSize: 13,
+  fontWeight: 600,
+  cursor: 'pointer',
+  whiteSpace: 'nowrap',
 }
 
 const overlay: React.CSSProperties = {

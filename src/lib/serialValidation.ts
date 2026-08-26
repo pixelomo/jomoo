@@ -51,6 +51,50 @@ export function serialLengthFor(series?: string | null): number {
 export const MAX_SERIAL_LENGTH =
   Math.max(...Object.values(SERIAL_DIGITS_BY_SERIES), DEFAULT_SERIAL_DIGITS) + 1
 
+/**
+ * Every digit count the catalogue uses, shortest first.
+ *
+ * A factory list is one file per delivery, not one per product line, so a
+ * 20-digit shower-set serial routinely sits between two 19-digit toilets. When
+ * a serial arrives without its series named, these are the lengths it is
+ * allowed to have.
+ */
+export const KNOWN_SERIAL_DIGITS: number[] = [
+  ...new Set([...Object.values(SERIAL_DIGITS_BY_SERIES), DEFAULT_SERIAL_DIGITS]),
+].sort((a, b) => a - b)
+
+/** "19 or 20" — how the digit counts are named in a message to a human. */
+export const KNOWN_SERIAL_DIGITS_LABEL =
+  KNOWN_SERIAL_DIGITS.length === 1
+    ? String(KNOWN_SERIAL_DIGITS[0])
+    : `${KNOWN_SERIAL_DIGITS.slice(0, -1).join(', ')} or ${KNOWN_SERIAL_DIGITS.at(-1)}`
+
+/**
+ * Matches a serial of any length the catalogue uses. Longest alternative first
+ * so the widest form wins rather than a shorter one matching a prefix.
+ */
+export const ANY_SERIAL_PATTERN = new RegExp(
+  `^J(?:${[...KNOWN_SERIAL_DIGITS].reverse().map((n) => `\\d{${n}}`).join('|')})$`
+)
+
+/** True when the serial fits some product's format, without saying which. */
+export function hasKnownSerialFormat(input: string): boolean {
+  return ANY_SERIAL_PATTERN.test(normaliseSerialNumber(input))
+}
+
+/**
+ * The series a serial's own length identifies, or null when several share it.
+ *
+ * Three of the four lines are 19 digits, so only the 20-digit shower-set
+ * numbers name themselves. Guessing at an ambiguous one would put a wrong
+ * series on the row, which is worse than leaving it blank for staff to fill.
+ */
+export function seriesFromSerialLength(input: string): string | null {
+  const digits = normaliseSerialNumber(input).length - 1
+  const matches = Object.entries(SERIAL_DIGITS_BY_SERIES).filter(([, n]) => n === digits)
+  return matches.length === 1 ? matches[0][0] : null
+}
+
 /** @deprecated prefer serialPatternFor(series) */
 export const SERIAL_NUMBER_PATTERN = serialPatternFor()
 

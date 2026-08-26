@@ -36,11 +36,19 @@ export default async function DashboardPage() {
       .orderBy(desc(warrantyRecord.createdAt)),
   ])
 
+  // One lookup for the card's 保証期間 row, rather than a second query per
+  // registration — the warranties are already in hand.
+  const expiryByRegistration = new Map(warranties.map((w) => [w.registrationId, w.expiryDate]))
+
   return (
     <MemberTabs
       productCount={registrations.length}
       products={registrations.map((reg) => (
-        <RegistrationCard key={reg.id} registration={reg as unknown as DbProductRegistration} />
+        <RegistrationCard
+          key={reg.id}
+          registration={reg as unknown as DbProductRegistration}
+          warrantyExpiry={expiryByRegistration.get(reg.id) ?? null}
+        />
       ))}
       contract={<WarrantySummary warranties={warranties} />}
       profile={

@@ -13,6 +13,28 @@ import './member-portal.css'
 
 interface Props {
   registration: DbProductRegistration
+  /** From warranty_records; absent until the registration has been approved. */
+  warrantyExpiry?: string | null
+}
+
+/**
+ * Dates come off two different column types: a date column arrives as a plain
+ * YYYY-MM-DD string, a timestamp as a Date. The string form is read part by
+ * part rather than through Date, or a render on a UTC host shows the day
+ * before; the Date form is stated in JST, the only clock this site keeps.
+ */
+const JP_DATE = new Intl.DateTimeFormat('ja-JP', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric',
+  timeZone: 'Asia/Tokyo',
+})
+
+function formatDate(value: string | Date | null | undefined): string | null {
+  if (!value) return null
+  if (value instanceof Date) return JP_DATE.format(value)
+  const [y, m, d] = value.split('T')[0].split('-').map(Number)
+  return y && m && d ? `${y}年${m}月${d}日` : value
 }
 
 const MUTABLE_STATUSES = ['PENDING', 'RETURNED']
@@ -24,7 +46,7 @@ const STATUS_MODIFIER: Record<string, string> = {
   REGISTERED_WITH_WARRANTY: 'warranty',
 }
 
-export default function RegistrationCard({ registration: initial }: Props) {
+export default function RegistrationCard({ registration: initial, warrantyExpiry }: Props) {
   const t = useTranslations('dashboard')
   const tr = useTranslations('registration.step1')
   const tc = useTranslations('common')
@@ -67,8 +89,24 @@ export default function RegistrationCard({ registration: initial }: Props) {
           </div>
 
           <dl className="member-product__meta">
+            <dt>{t('registeredAt')}</dt>
+            <dd>{formatDate(reg.submittedAt) ?? '—'}</dd>
+
+            <dt>{t('warrantyPeriod')}</dt>
+            <dd>
+              {warrantyExpiry && reg.installationDate
+                ? `${formatDate(reg.installationDate)} 〜 ${formatDate(warrantyExpiry)}`
+                : t('warrantyNotIssued')}
+            </dd>
+
+            <dt>{tr('purchaseDate')}</dt>
+            <dd>{formatDate(reg.purchaseDate) ?? '—'}</dd>
+
             <dt>{tr('installationDate')}</dt>
-            <dd>{reg.installationDate || '—'}</dd>
+            <dd>{formatDate(reg.installationDate) ?? '—'}</dd>
+
+            <dt>{tr('dealerName')}</dt>
+            <dd>{reg.dealerName || '—'}</dd>
 
             <dt>{tr('installationAddressState')}</dt>
             <dd>

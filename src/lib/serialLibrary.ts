@@ -2,7 +2,14 @@ import 'server-only'
 import { and, eq, ilike, inArray, isNull, or, type SQL } from 'drizzle-orm'
 import { db } from '@/lib/db'
 import { serialAuditLog, serialNumberEntry } from '@/lib/db/schema'
-import { normaliseSerialNumber, serialDigitsFor, serialPatternFor } from '@/lib/serialValidation'
+import {
+  KNOWN_SERIAL_DIGITS_LABEL,
+  hasKnownSerialFormat,
+  normaliseSerialNumber,
+  serialDigitsFor,
+  serialPatternFor,
+  seriesFromSerialLength,
+} from '@/lib/serialValidation'
 import { isSerialStatus, type SerialStatus, type AuditAction } from '@/lib/serialStatus'
 import type { AdminSession } from '@/lib/admin-auth'
 
@@ -191,14 +198,21 @@ function splitCsvLine(line: string): string[] {
  * row naming the columns. The factory sends both, and asking staff to reshape
  * a delivery note before importing it is how serials end up being retyped.
  *
- * Format is checked per row against the series' own digit count, so a
- * shower-set serial is not rejected for being one digit longer than a toilet's.
+ * A row that names its series is checked against that product's digit count.
+ * One that does not — the usual case for a plain list — is accepted at any
+ * length the catalogue uses, so serials for different products of different
+ * lengths import together from a single file, and the series is inferred from
+ * the length wherever only one product has it.
  */
 export function parseSerialImport(
   input: string,
   defaults: { series?: string | null; modelName?: string | null; status?: SerialStatus } = {}
 ): ParseResult {
-  const lines = input.split(/\r?\n/)
+  // Excel writes a byte order mark when it saves "CSV UTF-8", and so does this
+  // app's own export. It is invisible in the file but it sticks to the first
+  // header cell, which would stop the header being recognised as one — and the
+  // whole header line would then be read as a serial and rejected.
+  const lines = input.replace(/^\uFEFF/, '').split(/\r?\n/)
   const rows: ParsedSerialRow[] = []
   const rejected: ParseResult['rejected'] = []
   const duplicatesInFile: string[] = []
@@ -249,17 +263,32 @@ export function parseSerialImport(
       rejected.push({ line: index + 1, value: line, reason: 'No serial number in this row' })
       return
     }
-    if (!serialPatternFor(row.series).test(serial)) {
-      rejected.push({
-        line: index + 1,
-        // What is actually in the file, not the normalised form — "NOTASERIAL"
-        // is not something anyone can search their spreadsheet for.
-        value: row.serialNumber || line,
-        reason: `Expected J followed by ${serialDigitsFor(row.series)} digits${
-          row.series ? ` (${row.series})` : ''
-        }`,
-      })
-      return
+    // With a series named — by the row's own column or by the import form — the
+    // serial has to match that product's length exactly. Without one, any
+    // length the catalogue uses is accepted, so a delivery note holding a
+    // 20-digit shower set and a 19-digit toilet imports in a single pass; the
+    // series is then filled in from the length where that is unambiguous.
+    if (row.series) {
+      if (!serialPatternFor(row.series).test(serial)) {
+        rejected.push({
+          line: index + 1,
+          // What is actually in the file, not the normalised form — "NOTASERIAL"
+          // is not something anyone can search their spreadsheet for.
+          value: row.serialNumber || line,
+          reason: `Expected J followed by ${serialDigitsFor(row.series)} digits (${row.series})`,
+        })
+        return
+      }
+    } else {
+      if (!hasKnownSerialFormat(serial)) {
+        rejected.push({
+          line: index + 1,
+          value: row.serialNumber || line,
+          reason: `Expected J followed by ${KNOWN_SERIAL_DIGITS_LABEL} digits`,
+        })
+        return
+      }
+      row.series = seriesFromSerialLength(serial)
     }
     if (seen.has(serial)) {
       duplicatesInFile.push(serial)
