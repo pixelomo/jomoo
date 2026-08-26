@@ -3,6 +3,7 @@ import { auth } from '@/lib/auth'
 import { z } from 'zod'
 import { findRegistrationBySerial } from '@/lib/serialRegistry'
 import { validateSerialNumber } from '@/lib/serialLibrary'
+import { callerKey, rateLimit, tooManyRequests } from '@/lib/rateLimit'
 
 const RequestSchema = z.object({
   serialNumber: z.string().min(1),
@@ -10,8 +11,24 @@ const RequestSchema = z.object({
   modelSeries: z.string().optional(),
 })
 
+/**
+ * How many serials one caller may check per minute.
+ *
+ * This endpoint answers "is this a real serial number", which is exactly what
+ * /verify is for and exactly what makes it worth abusing: left open it is a
+ * way to walk the serial library one guess at a time. A customer holding a
+ * product in their hand checks one number, or a few if they mistype — well
+ * inside this. A script working through the space is not.
+ */
+const PUBLIC_LIMIT = 10
+const SIGNED_IN_LIMIT = 30
+const WINDOW_MS = 60_000
+
 // Public endpoint — used by the /verify page (no auth required)
 export async function GET(req: Request) {
+  const limit = rateLimit(callerKey(req, 'serial-verify'), PUBLIC_LIMIT, WINDOW_MS)
+  if (!limit.ok) return tooManyRequests(limit.retryAfter)
+
   const { searchParams } = new URL(req.url)
   const sn = searchParams.get('sn') ?? ''
   if (!sn.trim()) return NextResponse.json({ error: 'Missing serial number' }, { status: 400 })
@@ -23,6 +40,12 @@ export async function GET(req: Request) {
 export async function POST(req: Request) {
   const session = await auth.api.getSession({ headers: req.headers })
   if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+
+  // Looser than the public check: this one is behind an account, and a member
+  // correcting a mistyped serial should never meet a wall. Keyed by the member
+  // rather than the address, so an office behind one IP is not one bucket.
+  const limit = rateLimit(`serial-validate:${session.user.id}`, SIGNED_IN_LIMIT, WINDOW_MS)
+  if (!limit.ok) return tooManyRequests(limit.retryAfter)
 
   let body: unknown
   try { body = await req.json() } catch {

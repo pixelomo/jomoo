@@ -15,7 +15,7 @@ interface Props {
 }
 
 type Phase = 'capture' | 'reading' | 'confirm'
-type ValidationState = 'idle' | 'validating' | 'valid' | 'invalid' | 'duplicate' | 'blocked'
+type ValidationState = 'idle' | 'validating' | 'valid' | 'invalid' | 'duplicate' | 'blocked' | 'rateLimited'
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024
 
@@ -128,6 +128,12 @@ export default function Step2SerialPhoto({ defaultValues, onSubmit, onBack }: Pr
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ serialNumber: serial, modelSeries: series }),
       })
+      // Without this a 429 reads as {} and the member is told their serial is
+      // not registered, which is both wrong and the one message they cannot act on.
+      if (res.status === 429) {
+        setValidationState('rateLimited')
+        return
+      }
       const data: { valid: boolean; reason?: string } = await res.json()
       setValidationState(
         data.valid
@@ -297,6 +303,11 @@ export default function Step2SerialPhoto({ defaultValues, onSubmit, onBack }: Pr
       {validationState === 'blocked' && (
         <p className="rounded-md bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">
           {t('blocked')}
+        </p>
+      )}
+      {validationState === 'rateLimited' && (
+        <p className="rounded-md bg-amber-50 border border-amber-200 px-4 py-3 text-sm text-amber-800">
+          {t('rateLimited')}
         </p>
       )}
       {error && (

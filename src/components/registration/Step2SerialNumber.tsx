@@ -14,7 +14,7 @@ interface Props {
   onBack: () => void
 }
 
-type ValidationState = 'idle' | 'validating' | 'valid' | 'invalid' | 'duplicate' | 'blocked'
+type ValidationState = 'idle' | 'validating' | 'valid' | 'invalid' | 'duplicate' | 'blocked' | 'rateLimited'
 
 export default function Step2SerialNumber({ defaultValues, onSubmit, onBack }: Props) {
   const series = defaultValues?.modelSeries
@@ -51,6 +51,12 @@ export default function Step2SerialNumber({ defaultValues, onSubmit, onBack }: P
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ serialNumber, modelSeries: series }),
       })
+      // Without this a 429 reads as {} and the member is told their serial is
+      // not registered, which is both wrong and the one message they cannot act on.
+      if (res.status === 429) {
+        setValidationState('rateLimited')
+        return
+      }
       const data: { valid: boolean; reason?: string } = await res.json()
 
       if (data.valid) {
@@ -133,6 +139,14 @@ export default function Step2SerialNumber({ defaultValues, onSubmit, onBack }: P
       {validationState === 'duplicate' && (
         <div className="rounded-md bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">
           {t('duplicate')}
+        </div>
+      )}
+
+      {/* Too many checks in a minute. Amber, not red: nothing is wrong with the
+          number and waiting is all that is being asked. */}
+      {validationState === 'rateLimited' && (
+        <div className="rounded-md bg-amber-50 border border-amber-200 px-4 py-3 text-sm text-amber-800">
+          {t('rateLimited')}
         </div>
       )}
 

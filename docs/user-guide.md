@@ -261,7 +261,11 @@ Search by number, model, batch or note. Filter by status; each filter shows its 
 
 **Importing from the factory / 导入工厂清单.** Press **Import**; the file window opens straight away and the file is imported as soon as it is chosen.
 点击 **Import**，系统立即打开文件选择窗口，选定文件后随即导入。
-- Accepts a plain list, one serial per line, **or** a CSV. If the first row names its columns (`serial_number`, `series`, `model_name`, `status`, `note`) those are used; otherwise the first column is taken as the serial. / 支持每行一个编号的纯文本清单，**或** CSV 文件。若首行为列名（`serial_number`、`series`、`model_name`、`status`、`note`）则按列名解析，否则将第一列视为编号。
+- **Template** downloads the blank form to send the factory. Its column names and guidance are generated from the live settings, so it cannot go out of date. / **Template** 可下载空白模板发给工厂。其列名与说明由系统实时生成，不会过期。
+- **Sample data** downloads a ready-made test file — four series and four different serial lengths (19 / 20 / 21 / 22) in one list, including a Revoked and an Abnormal row. Import it to see the whole flow before a real delivery note goes through it. / **Sample data** 可下载测试用文件：一个清单内含 4 个系列、4 种编号长度（19 / 20 / 21 / 22），并包含「已取消」与「异常」各一行。可先用它完整演练导入流程。
+- **Removing the test data:** every sample serial contains the word `SAMPLE` — search for it, tick the header checkbox, and delete. They also share one batch, so filtering by the batch does the same job. / **清除测试数据：** 每个示例编号都包含 `SAMPLE`，搜索该词后勾选全选并删除即可；这些编号同属一个批次，按批次筛选亦可。
+- Accepts a plain list, one serial per line, **or** a CSV. Column names may sit in any position, and are recognised in English, Japanese or Chinese — including a bilingual header such as `制造番号Product number`. Columns the system does not recognise are ignored, so the factory's own sheet usually imports unchanged. / 支持每行一个编号的纯文本清单，**或** CSV 文件。列名可位于任意位置，支持中英日三种语言，包括 `制造番号Product number` 这类双语表头；无法识别的列会被忽略，因此工厂原始表格通常无需修改即可导入。
+- **Products of different lengths can sit in the same list.** Nothing is rejected for its length or its prefix. / **不同长度的编号可以混在同一份清单中**，系统不会因长度或前缀而拒绝任何编号。
 - The batch label is taken from the file name — so name the file after the delivery note. / 批次名称取自文件名，建议以送货单号命名文件。
 - **Re-importing the same file is safe.** Serials already present are reported as skipped and never overwritten, so a registration already attached to one cannot be lost. / **重复导入同一文件是安全的。** 已存在的编号会被计为「跳过」且不会被覆盖，已绑定的登记不会丢失。
 - A summary reports how many were added, how many were already there, and lists rejected rows with line numbers and reasons. / 导入后显示汇总：新增数量、已存在数量，以及被拒绝的行号与原因。
@@ -485,6 +489,7 @@ State these plainly in the delivered document. / 请在交付文档中如实说�
 | Item / 项目 | Status / 状态 |
 |---|---|
 | **Real serial number validation / 真实编号校验** | Live. A serial is checked against the numbers imported into the serial library. Whether it is a *complete* check depends on the factory's lists being imported in full. / 已启用。编号将与导入编号库中的编号进行核对。校验是否*完整*，取决于工厂清单是否全部导入。 |
+| **Public serial check rate limit / 公开编号查询频率限制** | `/verify` answers "is this a real serial", so it is capped at 10 checks per minute per address. The cap is held in each server instance's memory, so with several instances running the real ceiling is higher — it thins bulk guessing rather than stopping it exactly. An exact cap needs a shared store (Redis). / `/verify` 会回答「该编号是否真实」，因此限制为每个地址每分钟 10 次。该限制保存在各服务器实例的内存中，多实例运行时实际上限更高：可削弱批量试探，但无法精确封顶。如需精确限制，需引入共享存储（Redis）。 |
 | **Photo-assisted serial entry / 拍照识别编号** | Built at `/register?auto=true`, but the text-recognition add-on is not subscribed. Falls back to typing. / 已开发，但文字识别服务尚未订阅，目前回退为手动输入。 |
 | **Two-factor authentication / 双重验证** | Built and working, switched off at the client's request. / 已开发可用，应客户要求关闭。 |
 | **Email address confirmation / 邮箱验证** | Built and working, switched off at the client's request. / 已开发可用，应客户要求关闭。 |

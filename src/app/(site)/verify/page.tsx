@@ -11,7 +11,7 @@ export default function VerifyPage() {
   const [serialNumber, setSerialNumber] = useState('')
   const [checking, setChecking] = useState(false)
   const [result, setResult] = useState<{ valid: boolean; reason?: string } | null>(null)
-  const [error, setError] = useState<string | null>(null)
+  const [error, setError] = useState<'error' | 'rateLimited' | null>(null)
 
   const handleVerify = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -24,6 +24,12 @@ export default function VerifyPage() {
 
     try {
       const res = await fetch(`/api/serial-validate?sn=${encodeURIComponent(sn)}`)
+      // 429 is the only failure worth its own wording — "try again later" is
+      // something the visitor can act on, where a generic error is not.
+      if (res.status === 429) {
+        setError('rateLimited')
+        return
+      }
       if (!res.ok) throw new Error('Request failed')
       const data: { valid: boolean; reason?: string } = await res.json()
       setResult(data)
@@ -69,17 +75,26 @@ export default function VerifyPage() {
         </button>
       </form>
 
-      {error && (
+      {error === 'rateLimited' && (
+        <div className="mt-6 rounded-lg border border-amber-200 bg-amber-50 px-5 py-4">
+          <p className="font-semibold text-sm text-amber-900">{t('rateLimitedTitle')}</p>
+          <p className="mt-1 text-sm text-amber-800">{t('rateLimitedDesc')}</p>
+        </div>
+      )}
+
+      {error === 'error' && (
         <div className="mt-6 rounded-lg border border-red-200 bg-red-50 px-5 py-4">
           <p className="text-sm text-red-700">{tc('error')}</p>
         </div>
       )}
 
       {result !== null && (() => {
-        // Without a serial database we can only confirm the number is the right
-        // shape — saying "this is genuine" on that basis would not be true.
+        // 'verified' is the only answer that means the number was found in the
+        // serial library. 'library_empty' means there is nothing to check it
+        // against yet — saying "this is genuine" on that basis would not be true.
         const confirmed = result.valid && result.reason === 'verified'
         const formatOnly = result.valid && !confirmed
+        const badFormat = !result.valid && result.reason === 'invalid_format'
         const tone = confirmed
           ? { border: 'border-green-200', bg: 'bg-green-50', dot: 'bg-green-100', icon: 'text-green-600', title: 'text-green-800', body: 'text-green-700' }
           : formatOnly
@@ -101,10 +116,22 @@ export default function VerifyPage() {
             </div>
             <div>
               <p className={`font-semibold text-sm ${tone.title}`}>
-                {confirmed ? t('validTitle') : formatOnly ? t('formatOnlyTitle') : t('invalidTitle')}
+                {confirmed
+                  ? t('validTitle')
+                  : formatOnly
+                    ? t('formatOnlyTitle')
+                    : badFormat
+                      ? t('formatErrorTitle')
+                      : t('invalidTitle')}
               </p>
               <p className={`mt-1 text-sm ${tone.body}`}>
-                {confirmed ? t('validDesc') : formatOnly ? t('formatOnlyDesc') : t('invalidDesc')}
+                {confirmed
+                  ? t('validDesc')
+                  : formatOnly
+                    ? t('formatOnlyDesc')
+                    : badFormat
+                      ? t('formatErrorDesc')
+                      : t('invalidDesc')}
               </p>
             </div>
           </div>

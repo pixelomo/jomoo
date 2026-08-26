@@ -84,6 +84,9 @@ export default function SerialImportButton() {
       {/* Next to Import rather than tucked into a help page — the moment
           staff need the blank form is the moment they reach for Import. */}
       <DownloadButton href="/api/admin/serials/template" label="Template" variant="outline" />
+      {/* Test data, so the import can be tried before a real delivery note is
+          put through it. Every serial in it says SAMPLE. */}
+      <DownloadButton href="/api/admin/serials/sample" label="Sample data" variant="outline" />
 
       <button
         type="button"
