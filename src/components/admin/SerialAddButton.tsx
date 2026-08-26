@@ -3,9 +3,9 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { SERIAL_STATUSES, SERIAL_STATUS_META, type SerialStatus } from '@/lib/serialStatus'
-import { SERIAL_DIGITS_BY_SERIES, maskSerialInput } from '@/lib/serialValidation'
+import { MAX_SERIAL_LENGTH, MIN_SERIAL_LENGTH, SERIAL_SERIES, maskSerialInput } from '@/lib/serialValidation'
 
-const SERIES = Object.keys(SERIAL_DIGITS_BY_SERIES)
+const SERIES = SERIAL_SERIES
 
 /** Adds one serial by hand — for the ones that arrive by phone, not by file. */
 export default function SerialAddButton() {
@@ -51,9 +51,7 @@ export default function SerialAddButton() {
           body.error === 'SERIAL_EXISTS'
             ? 'That serial number is already in the library.'
             : body.error === 'INVALID_FORMAT'
-              ? `Not a valid serial for that series — expected J followed by ${
-                  SERIAL_DIGITS_BY_SERIES[series] ?? 19
-                } digits.`
+              ? `That does not look like a serial number — expected ${MIN_SERIAL_LENGTH}–${MAX_SERIAL_LENGTH} letters and digits.`
               : 'Could not add it. Please check the details and try again.'
         )
         return
@@ -88,7 +86,7 @@ export default function SerialAddButton() {
                   value={serialNumber}
                   // Masked as it is typed so a symbol or a 21st character simply
                   // cannot be entered, rather than failing on submit.
-                  onChange={(e) => setSerialNumber(maskSerialInput(e.target.value, series || null))}
+                  onChange={(e) => setSerialNumber(maskSerialInput(e.target.value))}
                   placeholder="J0000000000000000000"
                   required
                   autoFocus
@@ -102,7 +100,7 @@ export default function SerialAddButton() {
                     <option value="">— Not specified —</option>
                     {SERIES.map((s) => (
                       <option key={s} value={s}>
-                        {s} ({SERIAL_DIGITS_BY_SERIES[s]} digits)
+                        {s}
                       </option>
                     ))}
                   </select>

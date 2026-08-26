@@ -4,11 +4,9 @@ import { db } from '@/lib/db'
 import { productRegistration, warrantyRecord, user } from '@/lib/db/schema'
 import { eq } from 'drizzle-orm'
 import { RegistrationSchema } from '@/types/registration'
-import { validateSerialNumber } from '@/lib/serialValidation'
 import { findRegistrationBySerial, isDuplicateSerialError } from '@/lib/serialRegistry'
-import { bindSerialToRegistration, serialLibraryObjection } from '@/lib/serialLibrary'
+import { bindSerialToRegistration, validateSerialNumber } from '@/lib/serialLibrary'
 import { warrantyExpiryFrom } from '@/lib/warranty'
-import { getProductSeriesById } from '@/lib/sanity'
 import { sendRegistrationConfirmation, sendWarrantyIssuedEmail } from '@/lib/resend'
 
 async function getAuthenticatedUser(req: Request) {
@@ -37,11 +35,10 @@ export async function POST(req: Request) {
   // Validate server-side and ignore whatever the browser claimed. The request
   // body carries a `serialNumberValid` flag for the form's own UI; trusting it
   // here would let anyone with an account issue themselves a warranty.
-  // `data.serialNumber` is already normalised by the schema.
-  // Look the series up rather than trusting data.modelSeries — a shorter serial
-  // could otherwise be waved through by claiming the wrong product line.
-  const series = await getProductSeriesById(data.modelId)
-  const serialCheck = await validateSerialNumber(data.serialNumber, series)
+  // `data.serialNumber` is already normalised by the schema. Run again here
+  // rather than relying on step 2 — a serial's status in the library can change
+  // between the two, and the browser's answer is never the one that decides.
+  const serialCheck = await validateSerialNumber(data.serialNumber)
   const flagged = !serialCheck.valid
 
   // One physical product, one registration — by anyone, not just per member.
@@ -49,12 +46,13 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'SERIAL_ALREADY_REGISTERED' }, { status: 409 })
   }
 
-  // Re-checked here and not only at step 2: the status can change between the
-  // two, and the browser's answer is never the one that decides.
-  const objection = await serialLibraryObjection(data.serialNumber)
-  if (objection) {
+  // A serial a person withdrew or flagged is refused outright. Everything else
+  // the library will not confirm — not on the list, or the list is unreachable
+  // — is accepted and flagged instead, so a member is never turned away over a
+  // batch that has not been imported yet.
+  if (serialCheck.reason === 'revoked' || serialCheck.reason === 'abnormal') {
     return NextResponse.json(
-      { error: objection === 'revoked' ? 'SERIAL_REVOKED' : 'SERIAL_ABNORMAL' },
+      { error: serialCheck.reason === 'revoked' ? 'SERIAL_REVOKED' : 'SERIAL_ABNORMAL' },
       { status: 409 }
     )
   }

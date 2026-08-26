@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useTranslations } from 'next-intl'
 import { Step2Schema, type Step2Data } from '@/types/registration'
-import { maskSerialInput, serialLengthFor } from '@/lib/serialValidation'
+import { MAX_SERIAL_LENGTH, maskSerialInput } from '@/lib/serialValidation'
 import FormField, { inputClass } from '@/components/ui/FormField'
 
 interface Props {
@@ -18,7 +18,6 @@ type ValidationState = 'idle' | 'validating' | 'valid' | 'invalid' | 'duplicate'
 
 export default function Step2SerialNumber({ defaultValues, onSubmit, onBack }: Props) {
   const series = defaultValues?.modelSeries
-  const maxLength = serialLengthFor(series)
   const t = useTranslations('registration.step2')
   const tc = useTranslations('common')
   const tv = useTranslations('validation')
@@ -73,9 +72,9 @@ export default function Step2SerialNumber({ defaultValues, onSubmit, onBack }: P
     }
   }
 
-  // The format itself is enforced by the schema, so 'invalid' here only happens
-  // once a real serial database is connected and it reports the number as
-  // unknown. Those may still be submitted — they are flagged for staff instead.
+  // 'invalid' means the imported library does not have this number. Those may
+  // still be submitted — they are flagged for staff instead, because a serial
+  // can be genuine and simply belong to a batch nobody has imported yet.
   // A duplicate is a hard stop: that product already has a registration.
   const canProceed = validationState === 'valid' || validationState === 'invalid'
 
@@ -96,10 +95,10 @@ export default function Step2SerialNumber({ defaultValues, onSubmit, onBack }: P
             placeholder={t('serialNumberPlaceholder')}
             autoComplete="off"
             spellCheck={false}
-            maxLength={maxLength}
+            maxLength={MAX_SERIAL_LENGTH}
             {...register('serialNumber', {
               onChange: (e) => {
-                const masked = maskSerialInput(e.target.value, series)
+                const masked = maskSerialInput(e.target.value)
                 if (masked !== e.target.value) setValue('serialNumber', masked)
                 setValidationState('idle')
               },

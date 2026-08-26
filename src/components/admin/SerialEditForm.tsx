@@ -3,9 +3,9 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { SERIAL_STATUSES, SERIAL_STATUS_META, type SerialStatus } from '@/lib/serialStatus'
-import { SERIAL_DIGITS_BY_SERIES } from '@/lib/serialValidation'
+import { SERIAL_SERIES } from '@/lib/serialValidation'
 
-const SERIES = Object.keys(SERIAL_DIGITS_BY_SERIES)
+const SERIES = SERIAL_SERIES
 
 interface Props {
   id: string
@@ -134,7 +134,7 @@ export default function SerialEditForm({ id, serialNumber, initial, permissions 
           <select value={series} onChange={(e) => setSeries(e.target.value)} style={input}>
             <option value="">— Not specified —</option>
             {SERIES.map((s) => (
-              <option key={s} value={s}>{s} ({SERIAL_DIGITS_BY_SERIES[s]} digits)</option>
+              <option key={s} value={s}>{s}</option>
             ))}
           </select>
         </Field>

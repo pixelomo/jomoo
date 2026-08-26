@@ -2,17 +2,20 @@ import { NextResponse } from 'next/server'
 import { z } from 'zod'
 import { auth } from '@/lib/auth'
 import { readTextFromImage } from '@/lib/cloudinary'
-import { extractSerialCandidates } from '@/lib/serialOcr'
-import { hasValidSerialFormat } from '@/lib/serialValidation'
+import { extractSerialCandidates, type SerialCandidate } from '@/lib/serialOcr'
+import { findKnownSerials } from '@/lib/serialLibrary'
 
 const RequestSchema = z.object({
   publicId: z.string().min(1).max(300),
-  /** Sanity series of the chosen model; picks the expected digit count. */
+  /** Recorded by the form; the read no longer depends on the product line. */
   modelSeries: z.string().max(64).nullish(),
 })
 
 /** Uploads land here; anything else is not ours to read. */
 const ALLOWED_PREFIX = 'jomoo/serial-numbers/'
+
+/** Enough for a chooser; the rest are noise off the label. */
+const MAX_CANDIDATES = 5
 
 export async function POST(req: Request) {
   const session = await auth.api.getSession({ headers: req.headers })
@@ -28,7 +31,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'Invalid request' }, { status: 422 })
   }
 
-  const { publicId, modelSeries } = parsed.data
+  const { publicId } = parsed.data
 
   // Without this, any signed-in member could bill us for OCR on arbitrary
   // assets in the account by passing someone else's public id.
@@ -48,15 +51,18 @@ export async function POST(req: Request) {
     return NextResponse.json({ status: 'no_text', candidates: [] })
   }
 
-  const candidates = extractSerialCandidates(outcome.text, modelSeries).filter((c) =>
-    // Belt and braces — the extractor builds to the series' length, and this
-    // re-checks against the same rule the registration itself will apply.
-    hasValidSerialFormat(c.serialNumber, modelSeries)
-  )
+  const read = extractSerialCandidates(outcome.text)
+
+  // The shape of a run only says which readings are worth offering. Whether one
+  // is a real serial is a question for the library, and a confirmed hit goes to
+  // the top — that is the number the member should be shown first.
+  const known = await findKnownSerials(read.map((c) => c.serialNumber))
+  const candidates: SerialCandidate[] = read
+    .map((c) => (known.has(c.serialNumber) ? { ...c, confidence: 'known' as const } : c))
+    .sort((a, b) => Number(b.confidence === 'known') - Number(a.confidence === 'known'))
 
   return NextResponse.json({
     status: candidates.length ? 'ok' : 'no_serial',
-    // A handful is plenty for a chooser; the rest are noise from the label.
-    candidates: candidates.slice(0, 5),
+    candidates: candidates.slice(0, MAX_CANDIDATES),
   })
 }

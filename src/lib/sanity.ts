@@ -59,23 +59,6 @@ export async function getProductModels(): Promise<ProductModel[]> {
   }
 }
 
-/**
- * Series for one product, looked up server-side. The registration API must not
- * take the client's word for which product line a serial belongs to — that
- * would let a shorter serial through by claiming the wrong category.
- */
-export async function getProductSeriesById(modelId: string): Promise<string | null> {
-  try {
-    const result = await getSanityClient().fetch<string | null>(
-      `*[_type == "product" && _id == $modelId][0].series`,
-      { modelId }
-    )
-    return result ?? null
-  } catch {
-    return null
-  }
-}
-
 /** A Sanity image/file reference resolved to a URL by the query. */
 export interface AssetRef {
   _ref: string

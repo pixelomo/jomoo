@@ -4,7 +4,7 @@ import { useRef, useState } from 'react'
 import Image from 'next/image'
 import { useTranslations } from 'next-intl'
 import { Step2Schema, type Step2Data } from '@/types/registration'
-import { maskSerialInput, serialLengthFor } from '@/lib/serialValidation'
+import { MAX_SERIAL_LENGTH, maskSerialInput } from '@/lib/serialValidation'
 import FormField, { inputClass } from '@/components/ui/FormField'
 import type { SerialCandidate } from '@/lib/serialOcr'
 
@@ -107,7 +107,7 @@ export default function Step2SerialPhoto({ defaultValues, onSubmit, onBack }: Pr
       setCandidates(data.candidates ?? [])
       if (data.candidates?.length) {
         setSerial(data.candidates[0].serialNumber)
-        setNotice(data.candidates[0].confidence === 'exact' ? ta('readClean') : ta('readCorrected'))
+        setNotice(data.candidates[0].confidence === 'known' ? ta('readClean') : ta('readCorrected'))
       } else {
         setNotice(data.status === 'unavailable' ? ta('readUnavailable') : ta('readNothing'))
       }
@@ -238,10 +238,10 @@ export default function Step2SerialPhoto({ defaultValues, onSubmit, onBack }: Pr
             placeholder={t('serialNumberPlaceholder')}
             autoComplete="off"
             spellCheck={false}
-            maxLength={serialLengthFor(series)}
+            maxLength={MAX_SERIAL_LENGTH}
             value={serial}
             onChange={(e) => {
-              setSerial(maskSerialInput(e.target.value, series))
+              setSerial(maskSerialInput(e.target.value))
               setValidationState('idle')
             }}
           />

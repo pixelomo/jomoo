@@ -3,12 +3,11 @@ import { and, eq, ilike, inArray, isNull, or, type SQL } from 'drizzle-orm'
 import { db } from '@/lib/db'
 import { serialAuditLog, serialNumberEntry } from '@/lib/db/schema'
 import {
-  KNOWN_SERIAL_DIGITS_LABEL,
-  hasKnownSerialFormat,
+  MAX_SERIAL_LENGTH,
+  MIN_SERIAL_LENGTH,
+  hasValidSerialFormat,
   normaliseSerialNumber,
-  serialDigitsFor,
-  serialPatternFor,
-  seriesFromSerialLength,
+  type SerialValidationResult,
 } from '@/lib/serialValidation'
 import { isSerialStatus, type SerialStatus, type AuditAction } from '@/lib/serialStatus'
 import type { AdminSession } from '@/lib/admin-auth'
@@ -148,19 +147,44 @@ const COLUMN_ALIASES: Record<string, keyof ParsedSerialRow> = {
   serialnumber: 'serialNumber',
   serial_number: 'serialNumber',
   'serial number': 'serialNumber',
+  'product number': 'serialNumber',
   製造番号: 'serialNumber',
+  // The factory's own spreadsheets come in simplified Chinese.
+  制造番号: 'serialNumber',
+  产品编号: 'serialNumber',
+  编号: 'serialNumber',
   series: 'series',
   シリーズ: 'series',
+  系列: 'series',
   model: 'modelName',
   modelname: 'modelName',
   model_name: 'modelName',
   'model name': 'modelName',
   型番: 'modelName',
+  型号: 'modelName',
   status: 'status',
   ステータス: 'status',
+  状态: 'status',
   note: 'note',
   notes: 'note',
   備考: 'note',
+  备注: 'note',
+}
+
+/**
+ * The column a header cell names, or null.
+ *
+ * The factory writes its headers in two languages at once — "型番Model",
+ * "制造番号Product number" — which matches no alias as a whole. Each half is
+ * tried on its own before giving up, so those sheets import as they arrive.
+ */
+function columnFor(cell: string): keyof ParsedSerialRow | null {
+  const direct = COLUMN_ALIASES[cell.toLowerCase()]
+  if (direct) return direct
+
+  const cjk = cell.replace(/[\x00-\x7F]/g, '').trim()
+  const ascii = cell.replace(/[^\x00-\x7F]/g, '').trim().toLowerCase()
+  return COLUMN_ALIASES[cjk] ?? COLUMN_ALIASES[ascii] ?? null
 }
 
 /**
@@ -198,11 +222,10 @@ function splitCsvLine(line: string): string[] {
  * row naming the columns. The factory sends both, and asking staff to reshape
  * a delivery note before importing it is how serials end up being retyped.
  *
- * A row that names its series is checked against that product's digit count.
- * One that does not — the usual case for a plain list — is accepted at any
- * length the catalogue uses, so serials for different products of different
- * lengths import together from a single file, and the series is inferred from
- * the length wherever only one product has it.
+ * Serials of any length and any mixture of letters and digits are accepted, so
+ * a single file can hold every product in a delivery — a 19-character X40
+ * beside a 20-character cabinet — without anyone sorting it first. This file is
+ * what defines a valid serial; nothing here second-guesses the factory.
  */
 export function parseSerialImport(
   input: string,
@@ -218,14 +241,21 @@ export function parseSerialImport(
   const duplicatesInFile: string[] = []
   const seen = new Set<string>()
 
-  // A header is only a header if its first cell names a serial column — a file
-  // that starts straight in on data must not lose its first serial.
+  // A header is any first row with a cell that names the serial column —
+  // wherever it sits. The factory's sheets lead with 品类 or a model, so
+  // insisting the serial come first meant reading their category column as a
+  // list of serial numbers. Columns we do not recognise are ignored, so the
+  // extra ones those sheets carry cost nothing.
+  //
+  // A file that starts straight in on data keeps its first row: that row would
+  // have to contain a cell reading exactly "serial", "製造番号" or the like
+  // before it could be mistaken for a header.
   let columns: (keyof ParsedSerialRow | null)[] | null = null
   const firstFilled = lines.findIndex((l) => l.trim())
   if (firstFilled >= 0) {
     const cells = splitCsvLine(lines[firstFilled])
-    const mapped = cells.map((c) => COLUMN_ALIASES[c.toLowerCase()] ?? null)
-    if (mapped[0] === 'serialNumber') columns = mapped
+    const mapped = cells.map(columnFor)
+    if (mapped.includes('serialNumber')) columns = mapped
   }
 
   lines.forEach((rawLine, index) => {
@@ -263,32 +293,19 @@ export function parseSerialImport(
       rejected.push({ line: index + 1, value: line, reason: 'No serial number in this row' })
       return
     }
-    // With a series named — by the row's own column or by the import form — the
-    // serial has to match that product's length exactly. Without one, any
-    // length the catalogue uses is accepted, so a delivery note holding a
-    // 20-digit shower set and a 19-digit toilet imports in a single pass; the
-    // series is then filled in from the length where that is unambiguous.
-    if (row.series) {
-      if (!serialPatternFor(row.series).test(serial)) {
-        rejected.push({
-          line: index + 1,
-          // What is actually in the file, not the normalised form — "NOTASERIAL"
-          // is not something anyone can search their spreadsheet for.
-          value: row.serialNumber || line,
-          reason: `Expected J followed by ${serialDigitsFor(row.series)} digits (${row.series})`,
-        })
-        return
-      }
-    } else {
-      if (!hasKnownSerialFormat(serial)) {
-        rejected.push({
-          line: index + 1,
-          value: row.serialNumber || line,
-          reason: `Expected J followed by ${KNOWN_SERIAL_DIGITS_LABEL} digits`,
-        })
-        return
-      }
-      row.series = seriesFromSerialLength(serial)
+    // No length or prefix rule: this file is the definition of what a valid
+    // serial is, so anything the factory sends is taken as issued. The only
+    // rows turned away are ones that could not be a serial at all — a stray
+    // note in the margin, a merged cell, a column of dates.
+    if (!hasValidSerialFormat(serial)) {
+      rejected.push({
+        line: index + 1,
+        // What is actually in the file, not the normalised form — "NOT A
+        // SERIAL" is not something anyone can search their spreadsheet for.
+        value: row.serialNumber || line,
+        reason: `Not a serial number — expected ${MIN_SERIAL_LENGTH}–${MAX_SERIAL_LENGTH} letters and digits`,
+      })
+      return
     }
     if (seen.has(serial)) {
       duplicatesInFile.push(serial)
@@ -392,32 +409,81 @@ export async function importSerials(
 const BLOCKED_STATUSES = new Set<SerialStatus>(['REVOKED', 'ABNORMAL'])
 
 /**
- * Why the library will not accept this serial, or null if it has no objection.
+ * Whether this serial is one the factory actually issued.
  *
- * Returns null for a serial the library has never heard of: until the factory's
- * numbers are imported the library is empty, and an unknown serial is still
- * accepted on format alone. Only a number that is *in* the library and marked
- * REVOKED or ABNORMAL is refused — that flag was put there by a person, and
- * letting a warranty through on it would erase their decision.
+ * This is the check the whole registration turns on, and it is a lookup, not a
+ * pattern: the imported library is the list of real numbers, so a serial is
+ * valid when it is in there and refused when it is not.
  *
- * Never throws. A database failure must not block a member from registering a
- * perfectly good product, so it falls through to "no objection" and logs.
+ * The empty library is the one case that has to stay open. Until the first
+ * batch is imported there is nothing to check against, and refusing every
+ * member until then would close registration entirely — so an empty library
+ * accepts, and the moment a single serial is imported the check has teeth.
+ * That flip is deliberate and it is worth knowing about before the first
+ * import: half a batch in the library means the other half is refused.
+ *
+ * Never throws. A database failure must not decide that a good serial is fake,
+ * so it reports service_unavailable and the registration is flagged for a
+ * person rather than being auto-approved or auto-rejected.
  */
-export async function serialLibraryObjection(
+export async function validateSerialNumber(
   serialNumber: string
-): Promise<'revoked' | 'abnormal' | null> {
+): Promise<SerialValidationResult> {
+  const serial = normaliseSerialNumber(serialNumber)
+
+  if (!hasValidSerialFormat(serial)) {
+    return { valid: false, reason: 'invalid_format' }
+  }
+
   try {
     const [row] = await db
       .select({ status: serialNumberEntry.status })
       .from(serialNumberEntry)
-      .where(eq(serialNumberEntry.serialNumber, normaliseSerialNumber(serialNumber)))
+      .where(eq(serialNumberEntry.serialNumber, serial))
       .limit(1)
 
-    if (!row || !isSerialStatus(row.status) || !BLOCKED_STATUSES.has(row.status)) return null
-    return row.status === 'REVOKED' ? 'revoked' : 'abnormal'
+    if (row) {
+      if (isSerialStatus(row.status) && BLOCKED_STATUSES.has(row.status)) {
+        return { valid: false, reason: row.status === 'REVOKED' ? 'revoked' : 'abnormal' }
+      }
+      return { valid: true, reason: 'verified' }
+    }
+
+    // Only the miss pays for this second query, and only to tell "we have no
+    // list yet" apart from "this is not on the list".
+    const [any] = await db
+      .select({ id: serialNumberEntry.id })
+      .from(serialNumberEntry)
+      .limit(1)
+
+    return any ? { valid: false, reason: 'not_found' } : { valid: true, reason: 'library_empty' }
   } catch (err) {
-    console.error('[serial-library] could not check the serial, allowing it through', err)
-    return null
+    console.error('[serial-library] could not check the serial', serial, err)
+    return { valid: false, reason: 'service_unavailable' }
+  }
+}
+
+/**
+ * Which of these serials the library has heard of.
+ *
+ * One query for the whole set — an OCR read offers a handful of candidates and
+ * asking about each in turn would be a round trip per guess. Returns an empty
+ * set on failure: not knowing is the same as no confirmation, and OCR ranking
+ * is a convenience that must never take the page down with it.
+ */
+export async function findKnownSerials(serialNumbers: string[]): Promise<Set<string>> {
+  const serials = [...new Set(serialNumbers.map(normaliseSerialNumber).filter(Boolean))]
+  if (!serials.length) return new Set()
+
+  try {
+    const rows = await db
+      .select({ serialNumber: serialNumberEntry.serialNumber })
+      .from(serialNumberEntry)
+      .where(inArray(serialNumberEntry.serialNumber, serials))
+    return new Set(rows.map((r) => r.serialNumber))
+  } catch (err) {
+    console.error('[serial-library] could not look up OCR candidates', err)
+    return new Set()
   }
 }
 
@@ -425,8 +491,8 @@ export async function serialLibraryObjection(
  * Marks a serial as bound when a member registers it.
  *
  * Best effort by design: the library may be empty (nothing has been imported
- * yet) and a member registering an unknown serial is still allowed through on
- * format alone. Nothing here may fail a registration that already succeeded, so
+ * yet), and a member whose serial is not in it is still allowed through and
+ * flagged. Nothing here may fail a registration that already succeeded, so
  * every path swallows its errors after logging them.
  *
  * Only UNUSED serials are claimed. A REVOKED or ABNORMAL one keeps its status

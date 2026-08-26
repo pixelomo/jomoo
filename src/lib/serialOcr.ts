@@ -1,169 +1,103 @@
 /**
  * Turning OCR output into serial number candidates.
  *
- * The format does the heavy lifting: a JOMOO serial is "J" followed by 19 or 20
- * digits and nothing else, so the alphabet is eleven characters. That means a
- * read only has to be *close* — the corrections below recover the handful of
- * shapes an OCR engine reliably confuses, and serialValidation.ts then decides
- * whether the result is actually a serial.
+ * This used to lean on the format: a serial was "J" followed by digits, so an
+ * eleven-character alphabet made a near-miss recoverable — an O could only ever
+ * have been a 0. That is gone. Serials carry letters part way through
+ * (J2339391200000HE1110), so there is no position where a letter is certainly
+ * a misread digit, and "correcting" one now destroys a good read.
+ *
+ * What replaces it is the imported serial library. This module pulls every run
+ * of letters and digits that could be a serial out of the text and ranks them
+ * on shape alone; the route then asks the library which of them actually exist
+ * and puts those first. A confirmed hit is worth more than any amount of
+ * guessing at character shapes.
  *
  * Pure, and free of the Cloudinary client, so the ranking can be tested against
  * real misreads without a network call.
  */
 
-import { normaliseSerialNumber, serialDigitsFor } from '@/lib/serialValidation'
-
-/**
- * Letters an OCR engine returns where a digit was printed. Only the tail of the
- * serial is corrected — the leading J is the one position that is genuinely a
- * letter, so rewriting it would turn a good read into a bad one.
- */
-const LOOKALIKE_DIGITS: Record<string, string> = {
-  O: '0', Q: '0', D: '0',
-  I: '1', L: '1', '|': '1', '!': '1',
-  Z: '2',
-  E: '3',
-  A: '4',
-  S: '5',
-  G: '6',
-  T: '7',
-  B: '8',
-}
-
-/** Characters that could be a misread leading J. */
-const LOOKALIKE_J = new Set(['J', ']', '}', ')', '1', '7', 'I', 'T'])
+import { hasValidSerialFormat, normaliseSerialNumber } from '@/lib/serialValidation'
 
 export interface SerialCandidate {
   serialNumber: string
   /**
-   * 'exact'      — read as J + digits with nothing corrected.
-   * 'corrected'  — one or more lookalike letters mapped to digits.
-   * 'prefixed'   — the digits were right but the leading J had to be assumed.
+   * 'known'    — this exact number is in the imported serial library. Only the
+   *              route can set this; the text alone cannot say it.
+   * 'likely'   — shaped like a serial: opens with a letter, carries digits, and
+   *              is long enough not to be the model number on the same label.
+   * 'possible' — in range, but nothing else recommends it.
    */
-  confidence: 'exact' | 'corrected' | 'prefixed'
-  /** How many characters had to be changed to reach a valid serial. */
-  corrections: number
+  confidence: 'known' | 'likely' | 'possible'
 }
 
 const RANK: Record<SerialCandidate['confidence'], number> = {
-  exact: 0,
-  corrected: 1,
-  prefixed: 2,
+  known: 0,
+  likely: 1,
+  possible: 2,
 }
 
-function correctTail(tail: string): { digits: string; corrections: number } | null {
-  let corrections = 0
-  let digits = ''
-  for (const char of tail) {
-    if (char >= '0' && char <= '9') {
-      digits += char
-      continue
-    }
-    const mapped = LOOKALIKE_DIGITS[char]
-    if (!mapped) return null
-    digits += mapped
-    corrections++
-  }
-  return { digits, corrections }
+/**
+ * Shortest run still taken as a serial rather than as the model number beside
+ * it — "760001-TH-1CAB" reads as twelve characters and would otherwise outrank
+ * the number we are after. Only affects the order candidates are offered in;
+ * nothing in range is discarded.
+ */
+const LIKELY_MIN_LENGTH = 15
+
+function shapeOf(run: string): SerialCandidate['confidence'] {
+  const opensWithLetter = run[0] >= 'A' && run[0] <= 'Z'
+  const carriesDigits = /\d/.test(run)
+  return opensWithLetter && carriesDigits && run.length >= LIKELY_MIN_LENGTH ? 'likely' : 'possible'
 }
 
 /**
  * Every serial the text could be, best first.
  *
- * `series` picks the expected digit count; without it both known lengths are
- * tried, because at capture time the member has already chosen their model but
- * a caller may not have it to hand.
+ * Nothing is corrected and nothing is assumed — a candidate is a run of
+ * characters that was actually read. The member confirms it, and 照合 decides.
  */
-export function extractSerialCandidates(
-  text: string,
-  series?: string | null
-): SerialCandidate[] {
+export function extractSerialCandidates(text: string): SerialCandidate[] {
   if (!text) return []
 
-  const lengths = series
-    ? [serialDigitsFor(series)]
-    : [...new Set([serialDigitsFor(null), 19, 20])]
-
-  // Normalise per token, then also as one run: a serial is routinely broken
-  // across lines by the label's width, and joining recovers it.
   const tokens = text
     .split(/[\s\n\r]+/)
     .map((t) => normaliseSerialNumber(t))
     .filter(Boolean)
 
-  const haystacks = new Set<string>(tokens)
-  for (let i = 0; i < tokens.length - 1; i++) {
-    haystacks.add(tokens[i] + tokens[i + 1])
-  }
-  haystacks.add(tokens.join(''))
+  /** Whether the run was read as one piece, or only appeared once two were glued. */
+  const found = new Map<string, { candidate: SerialCandidate; joined: boolean }>()
 
-  const found = new Map<string, SerialCandidate>()
-
-  const record = (candidate: SerialCandidate) => {
-    const existing = found.get(candidate.serialNumber)
-    // Keep the cleanest reading of any given serial.
-    if (
-      !existing ||
-      RANK[candidate.confidence] < RANK[existing.confidence] ||
-      (candidate.confidence === existing.confidence &&
-        candidate.corrections < existing.corrections)
-    ) {
-      found.set(candidate.serialNumber, candidate)
+  const collect = (haystack: string, joined: boolean) => {
+    for (const run of haystack.match(/[0-9A-Z]+/g) ?? []) {
+      if (!hasValidSerialFormat(run)) continue
+      const entry = { candidate: { serialNumber: run, confidence: shapeOf(run) }, joined }
+      const existing = found.get(run)
+      // Seen as one piece anywhere beats seen only across a join.
+      if (!existing || (existing.joined && !joined)) found.set(run, entry)
     }
   }
 
-  for (const haystack of haystacks) {
-    for (const length of lengths) {
-      const window = length + 1
-      for (let i = 0; i + window <= haystack.length; i++) {
-        const slice = haystack.slice(i, i + window)
-        const head = slice[0]
-        const tail = slice.slice(1)
+  for (const token of tokens) collect(token, false)
+  // Adjacent pairs as well: a serial is routinely broken across lines by the
+  // label's width, and gluing the two halves is the only way to recover it.
+  for (let i = 0; i < tokens.length - 1; i++) collect(tokens[i] + tokens[i + 1], true)
 
-        if (LOOKALIKE_J.has(head)) {
-          const corrected = correctTail(tail)
-          if (corrected && corrected.digits.length === length) {
-            const isExactHead = head === 'J'
-            record({
-              serialNumber: `J${corrected.digits}`,
-              confidence:
-                isExactHead && corrected.corrections === 0
-                  ? 'exact'
-                  : isExactHead
-                    ? 'corrected'
-                    : 'prefixed',
-              corrections: corrected.corrections + (isExactHead ? 0 : 1),
-            })
-          }
-        }
-      }
-
-      // A run of exactly the right length with no J in front at all — the
-      // prefix is often stamped separately and missed entirely.
-      for (let i = 0; i + length <= haystack.length; i++) {
-        const before = i === 0 ? '' : haystack[i - 1]
-        if (before === 'J') continue // already covered above
-        const corrected = correctTail(haystack.slice(i, i + length))
-        if (corrected && corrected.digits.length === length) {
-          record({
-            serialNumber: `J${corrected.digits}`,
-            confidence: 'prefixed',
-            corrections: corrected.corrections + 1,
-          })
-        }
-      }
-    }
-  }
-
-  return [...found.values()].sort(
-    (a, b) => RANK[a.confidence] - RANK[b.confidence] || a.corrections - b.corrections
-  )
+  return [...found.values()]
+    .sort(
+      (a, b) =>
+        RANK[a.candidate.confidence] - RANK[b.candidate.confidence] ||
+        // A run that was printed as one piece before anything glued a
+        // neighbouring word or date onto it.
+        Number(a.joined) - Number(b.joined) ||
+        // Then the longer, as more likely to be the whole number than a piece.
+        b.candidate.serialNumber.length - a.candidate.serialNumber.length ||
+        a.candidate.serialNumber.localeCompare(b.candidate.serialNumber)
+    )
+    .map((e) => e.candidate)
 }
 
 /** The single best reading, or null when nothing in the text could be a serial. */
-export function bestSerialCandidate(
-  text: string,
-  series?: string | null
-): SerialCandidate | null {
-  return extractSerialCandidates(text, series)[0] ?? null
+export function bestSerialCandidate(text: string): SerialCandidate | null {
+  return extractSerialCandidates(text)[0] ?? null
 }

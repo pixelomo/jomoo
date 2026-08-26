@@ -4,7 +4,7 @@
 **Status / 状态:** Phase 1, delivered. Live at `https://jomoo-ashy.vercel.app` pending the cutover to the client's own domain.
 第一阶段已交付。当前运行于 `https://jomoo-ashy.vercel.app`，等待切换至客户自有域名。
 
-**Last updated / 更新日期:** 19 August 2026
+**Last updated / 更新日期:** 26 August 2026
 
 **Site language / 网站语言:** Japanese only. There is no language switcher and no locale routing — all customer-facing text lives in one translation file.
 网站仅提供日语。没有语言切换功能，也没有多语言路由；所有面向客户的文字均集中于一个翻译文件中。
@@ -144,8 +144,9 @@ Email address and password. On success the member lands on `/dashboard`. / 输�
 **Step 1 — basic information / 第一步：基本信息.** Product model, installation date, installation address, contact name, and optionally purchase date and dealer name. / 产品型号、安装日期、安装地址、联系人姓名，以及选填的购买日期与经销商名称。
 
 **Step 2 — serial number / 第二步：产品编号（製造番号）.** Type the number from the product label and press 製造番号を照合する to check it. / 输入产品标签上的编号，点击「製造番号を照合する」进行校验。
-- A serial is the letter **J** followed by digits — 19 for most products, 20 for shower sets. / 编号为字母 **J** 加数字：多数产品 19 位，淋浴花洒 20 位。
-- The field cleans input as it is typed: spaces and dashes are removed, full-width digits are converted, and characters that could never be part of a serial cannot be entered. / 输入时自动处理：去除空格与连字符，全角数字自动转半角，不可能出现在编号中的字符无法输入。
+- **The number is checked against the serial library**, not against a pattern. Length, prefix and any letters inside the number vary by product and by production run, so the only question asked is whether the number is one the factory issued. / **系统以编号库进行核对**，而非按格式校验。编号长度、前缀及中间的字母因产品与批次而异，因此只判断该编号是否为工厂已发出的编号。
+- A number that is not in the library is **not refused** — the customer may continue, and the registration is flagged for staff to check. A batch that has not been imported yet must not turn a genuine customer away. / 若编号不在库中，**不会被拒绝**：客户可继续提交，该登记会被标记以供员工核实。尚未导入的批次不应把真实客户挡在门外。
+- The field cleans input as it is typed: spaces and dashes are removed, full-width characters are converted, and anything that is neither a letter nor a digit cannot be entered. / 输入时自动处理：去除空格与连字符，全角字符自动转半角，非字母数字的字符无法输入。
 - **A serial number can only be registered once, by anyone.** / **每个产品编号全系统仅可登记一次。**
 - **A serial that staff have marked 取消済み (Revoked) or 要確認 (Abnormal) is refused.** The customer is told to contact the service line — this is not something they can fix by retyping. / **被员工标记为「取消済み」或「要確認」的编号将被拒绝登记**，并提示客户联系服务热线；重新输入无法解决。
 
@@ -284,8 +285,8 @@ Who did what, and when. Every import, addition, edit, status change, deletion, b
 **The log is read-only by design** — there is no way to edit or delete an entry from the portal. A record that staff can tidy up is not evidence. Deletion entries deliberately survive the serial they describe, so "who deleted it" always has an answer.
 **操作日志为只读设计**，后台无法编辑或删除条目。可被随意修改的记录不具备凭证价值。删除操作的日志会在对应编号被删除后继续保留，以确保「是谁删除的」始终可查。
 
-> **Important / 重要:** until serial numbers are imported, the system accepts any correctly-formatted number. Importing the factory's list is what turns the check into a real one.
-> 在导入产品编号之前，系统会接受任何格式正确的编号。只有导入工厂清单后，校验才成为真正的校验。
+> **Important / 重要:** the library *is* the definition of a valid serial number. While it is empty every number is accepted; from the first import onwards, a number that is not in it is flagged for review. Import a whole batch rather than part of one — half a delivery in the library means the other half arrives flagged.
+> 编号库即「有效编号」的定义。库为空时接受任何编号；一旦导入首批编号，不在库中的编号将被标记待核。请整批导入，若只导入半批，另一半在登记时会被标记。
 
 ## B6. Warranties / 保修管理
 
@@ -449,7 +450,6 @@ There is no migrations folder — `drizzle-kit push` compares the whole schema a
 | `CONTACT_TO_EMAIL`, `CONTACT_TO_<CATEGORY>` | Override a contact category's address without a deploy / 无需重新部署即可修改咨询类别的收件地址 |
 | `NEXT_PUBLIC_SANITY_PROJECT_ID` / `_DATASET` / `SANITY_API_TOKEN` | Content / 内容管理 |
 | `NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY` / `_API_SECRET` | Image uploads / 图片上传 |
-| `SERIAL_VALIDATION_ENDPOINT` / `_API_KEY` | Optional external serial database (D7) / 可选的外部编号校验接口 |
 | `NEXT_PUBLIC_AUTH_TWO_FACTOR` | `true` switches TOTP on / 设为 `true` 启用双重验证 |
 | `NEXT_PUBLIC_AUTH_EMAIL_VERIFICATION` | `true` requires email confirmation before first sign-in / 设为 `true` 则首次登录前须验证邮箱 |
 | `CRON_SECRET` | Protects the scheduled keep-alive route / 保护定时保活接口 |
@@ -484,7 +484,7 @@ State these plainly in the delivered document. / 请在交付文档中如实说�
 
 | Item / 项目 | Status / 状态 |
 |---|---|
-| **Real serial number validation / 真实编号校验** | Serials are checked for *format only*. The factory has not supplied a database of issued numbers. Two routes are ready: import the numbers into the serial library, or set `SERIAL_VALIDATION_ENDPOINT` to check against a factory API. Until one is done, any correctly-formatted number is accepted. / 目前仅校验*格式*。工厂尚未提供已发出编号的数据。两条路径均已就绪：将编号导入编号库，或设置 `SERIAL_VALIDATION_ENDPOINT` 对接工厂接口。在此之前，任何格式正确的编号都会被接受。 |
+| **Real serial number validation / 真实编号校验** | Live. A serial is checked against the numbers imported into the serial library. Whether it is a *complete* check depends on the factory's lists being imported in full. / 已启用。编号将与导入编号库中的编号进行核对。校验是否*完整*，取决于工厂清单是否全部导入。 |
 | **Photo-assisted serial entry / 拍照识别编号** | Built at `/register?auto=true`, but the text-recognition add-on is not subscribed. Falls back to typing. / 已开发，但文字识别服务尚未订阅，目前回退为手动输入。 |
 | **Two-factor authentication / 双重验证** | Built and working, switched off at the client's request. / 已开发可用，应客户要求关闭。 |
 | **Email address confirmation / 邮箱验证** | Built and working, switched off at the client's request. / 已开发可用，应客户要求关闭。 |
@@ -511,14 +511,15 @@ State these plainly in the delivered document. / 请在交付文档中如实说�
 
 ## Appendix 2 — Serial number format / 附录二 — 编号格式
 
-`J` followed by digits. The digit count varies by series: / `J` 加数字，位数因系列而异：
+**There is no fixed format.** Length, prefix and the position of any letters vary by product and by production run — `J2339391200000HE1110` (20) and `J1234567890123456789` (19) are both real. The system therefore does not pattern-match a serial; it looks it up in the imported library.
+**编号没有固定格式。** 长度、前缀及字母所在位置因产品与批次而异，`J2339391200000HE1110`（20 位）与 `J1234567890123456789`（19 位）均为真实编号。因此系统不按格式匹配，而是在导入的编号库中查找。
 
-| Series / 系列 | Digits after J / J 之后的位数 |
+The only things assumed of any serial: / 对编号仅有的两项假设：
+
+| Assumption / 假设 | Why / 原因 |
 |---|---|
-| smart-toilet / 智能马桶 | 19 |
-| shower-set / 淋浴花洒 | 20 |
-| washstand / 洗面台 | 19 |
-| faucets / 水龙头 | 19 |
+| Letters and digits only, 6–40 characters / 仅含字母与数字，6–40 个字符 | Catches an empty field or a pasted sentence. No product is anywhere near these limits. / 用于识别空白输入或误粘贴的文字，实际产品编号远在此范围之内。 |
+| Contains at least one digit / 至少包含一个数字 | Stops a note typed into a spreadsheet cell — "spare", "見本" — importing as a serial number. / 避免表格中随手写下的备注（如「spare」「見本」）被当作编号导入。 |
 
-Stored uppercase with spaces and dashes removed, so the same number typed differently still matches. Full-width digits from a Japanese keyboard are converted automatically.
-存储时统一转为大写并去除空格与连字符，因此同一编号的不同输入方式仍能匹配。日文键盘输入的全角数字会自动转换。
+Stored uppercase with spaces and dashes removed, so the same number typed differently still matches. Full-width characters from a Japanese keyboard are converted automatically.
+存储时统一转为大写并去除空格与连字符，因此同一编号的不同输入方式仍能匹配。日文键盘输入的全角字符会自动转换。

@@ -1,10 +1,10 @@
 import { z } from 'zod'
-import { serialPatternFor, normaliseSerialNumber } from '@/lib/serialValidation'
+import { hasValidSerialFormat, normaliseSerialNumber } from '@/lib/serialValidation'
 
 export const Step1Schema = z.object({
   modelId: z.string().min(1, 'validation.required'),
   modelName: z.string().min(1, 'validation.required'),
-  /** Set from the chosen model; picks the serial length in step 2. */
+  /** Set from the chosen model; recorded with the registration. */
   modelSeries: z.string().optional(),
   installationDate: z.string().min(1, 'validation.required'),
   installationAddressState: z.string().min(1, 'validation.required'),
@@ -30,23 +30,19 @@ const Step2Fields = z.object({
 })
 
 /**
- * Serial length differs by product line, so the rule needs the series alongside
- * the number rather than being fixed on the field.
- *
- * On the server this only catches obvious junk: modelSeries arrives from the
- * browser, so the authoritative check re-derives the series from Sanity in
- * /api/registrations before deciding whether a warranty is issued.
+ * Catches an empty or obviously-junk field so the member is told at the input
+ * rather than after a round trip. It says nothing about whether the serial is
+ * real — lengths and prefixes vary by product and letters appear mid-number, so
+ * the only answer that counts comes from the imported serial library, which
+ * /api/registrations consults before deciding whether a warranty is issued.
  */
-const checkSerialAgainstSeries = (
-  data: { serialNumber: string; modelSeries?: string },
-  ctx: z.RefinementCtx
-) => {
-  if (!serialPatternFor(data.modelSeries).test(data.serialNumber)) {
+const checkSerialFormat = (data: { serialNumber: string }, ctx: z.RefinementCtx) => {
+  if (!hasValidSerialFormat(data.serialNumber)) {
     ctx.addIssue({ code: 'custom', path: ['serialNumber'], message: 'validation.serialFormat' })
   }
 }
 
-export const Step2Schema = Step2Fields.superRefine(checkSerialAgainstSeries)
+export const Step2Schema = Step2Fields.superRefine(checkSerialFormat)
 
 export const Step3Schema = z.object({
   warrantyCardUrl: z.string().min(1, 'validation.required'),
@@ -55,7 +51,7 @@ export const Step3Schema = z.object({
 
 export const RegistrationSchema = Step1Schema.merge(Step2Fields)
   .merge(Step3Schema)
-  .superRefine(checkSerialAgainstSeries)
+  .superRefine(checkSerialFormat)
 
 export type Step1Data = z.infer<typeof Step1Schema>
 export type Step2Data = z.infer<typeof Step2Schema>

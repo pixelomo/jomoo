@@ -1,112 +1,50 @@
 /**
- * Serial number validation.
+ * Serial number handling that both the browser and the server can run.
  *
- * Two stages, in order:
+ * There is deliberately no rule here about how long a serial is or what it
+ * starts with. The factory's numbers vary by product line and by production
+ * run — X40 toilets are 19 characters, the toilets, shower heads and bathroom
+ * cabinets shipped since are 20, and letters appear part way through the number
+ * as well as at the front (J2339391200000HE1110). Every pattern we invented for
+ * that was wrong within a batch, so the only question worth asking is whether
+ * the number is one of the ones actually issued — which is a lookup against the
+ * imported serial library, in serialLibrary.ts, not something this module can
+ * answer.
  *
- *   1. Format — every JOMOO serial is "J" followed by 19 digits. This is the
- *      only check available today: the products have not been manufactured, so
- *      no list of issued serial numbers exists yet. Confirmed with the client
- *      that a correctly formatted number is accepted on that basis.
+ * What is left here is the shape of the field: normalise what was typed, strip
+ * what could never be part of a serial, and reject the obviously-not-a-serial.
+ * It stays free of the database client so the registration form can import it.
  *
- *   2. Lookup — once the factory can supply a serial database, set
- *      SERIAL_VALIDATION_ENDPOINT and every serial is checked against it as
- *      well. Nothing else in the app needs to change.
- *
- * Callers must treat this as the only source of truth: never accept a
- * client-supplied "this serial is valid" flag, or a member can issue
+ * Callers must treat the library check as the only source of truth: never
+ * accept a client-supplied "this serial is valid" flag, or a member can issue
  * themselves a warranty.
  */
 
 /**
- * Digits after the "J" — the length differs by product line, so the rule is
- * keyed on the Sanity series rather than being one pattern for everything.
- *
- * washstand and faucets are the client's defaults until they confirm their own
- * lengths; change the two numbers here and nothing else needs touching.
+ * The product lines, for the admin dropdowns. Purely a label on the row now —
+ * the series says which catalogue a serial belongs to, and no longer implies
+ * anything about its shape.
  */
-export const SERIAL_DIGITS_BY_SERIES: Record<string, number> = {
-  'smart-toilet': 19,
-  'shower-set': 20,
-  washstand: 19,
-  faucets: 19,
-}
-
-/** Used when a serial is checked without knowing which product it belongs to. */
-export const DEFAULT_SERIAL_DIGITS = 19
-
-export function serialDigitsFor(series?: string | null): number {
-  return (series && SERIAL_DIGITS_BY_SERIES[series]) || DEFAULT_SERIAL_DIGITS
-}
-
-export function serialPatternFor(series?: string | null): RegExp {
-  return new RegExp(`^J\\d{${serialDigitsFor(series)}}$`)
-}
-
-/** Total characters including the leading J. */
-export function serialLengthFor(series?: string | null): number {
-  return serialDigitsFor(series) + 1
-}
-
-/** Widest form any product uses — the input cap must not cut a longer serial short. */
-export const MAX_SERIAL_LENGTH =
-  Math.max(...Object.values(SERIAL_DIGITS_BY_SERIES), DEFAULT_SERIAL_DIGITS) + 1
+export const SERIAL_SERIES = ['smart-toilet', 'shower-set', 'washstand', 'faucets'] as const
 
 /**
- * Every digit count the catalogue uses, shortest first.
- *
- * A factory list is one file per delivery, not one per product line, so a
- * 20-digit shower-set serial routinely sits between two 19-digit toilets. When
- * a serial arrives without its series named, these are the lengths it is
- * allowed to have.
+ * Bounds wide enough to hold anything the factory has sent or plausibly will.
+ * They exist to catch an empty field or a pasted sentence, not to describe a
+ * product — nothing should ever be rejected for its length alone.
  */
-export const KNOWN_SERIAL_DIGITS: number[] = [
-  ...new Set([...Object.values(SERIAL_DIGITS_BY_SERIES), DEFAULT_SERIAL_DIGITS]),
-].sort((a, b) => a - b)
+export const MIN_SERIAL_LENGTH = 6
+export const MAX_SERIAL_LENGTH = 40
 
-/** "19 or 20" — how the digit counts are named in a message to a human. */
-export const KNOWN_SERIAL_DIGITS_LABEL =
-  KNOWN_SERIAL_DIGITS.length === 1
-    ? String(KNOWN_SERIAL_DIGITS[0])
-    : `${KNOWN_SERIAL_DIGITS.slice(0, -1).join(', ')} or ${KNOWN_SERIAL_DIGITS.at(-1)}`
-
-/**
- * Matches a serial of any length the catalogue uses. Longest alternative first
- * so the widest form wins rather than a shorter one matching a prefix.
- */
-export const ANY_SERIAL_PATTERN = new RegExp(
-  `^J(?:${[...KNOWN_SERIAL_DIGITS].reverse().map((n) => `\\d{${n}}`).join('|')})$`
-)
-
-/** True when the serial fits some product's format, without saying which. */
-export function hasKnownSerialFormat(input: string): boolean {
-  return ANY_SERIAL_PATTERN.test(normaliseSerialNumber(input))
-}
-
-/**
- * The series a serial's own length identifies, or null when several share it.
- *
- * Three of the four lines are 19 digits, so only the 20-digit shower-set
- * numbers name themselves. Guessing at an ambiguous one would put a wrong
- * series on the row, which is worse than leaving it blank for staff to fill.
- */
-export function seriesFromSerialLength(input: string): string | null {
-  const digits = normaliseSerialNumber(input).length - 1
-  const matches = Object.entries(SERIAL_DIGITS_BY_SERIES).filter(([, n]) => n === digits)
-  return matches.length === 1 ? matches[0][0] : null
-}
-
-/** @deprecated prefer serialPatternFor(series) */
-export const SERIAL_NUMBER_PATTERN = serialPatternFor()
-
-/** @deprecated prefer serialLengthFor(series) */
-export const SERIAL_NUMBER_LENGTH = MAX_SERIAL_LENGTH
+/** Uppercase letters and digits, in any arrangement. */
+export const SERIAL_PATTERN = new RegExp(`^[0-9A-Z]{${MIN_SERIAL_LENGTH},${MAX_SERIAL_LENGTH}}$`)
 
 export type SerialValidationReason =
-  /** Format is correct; there is no serial database to check it against yet. */
-  | 'format_only'
-  /** Confirmed against the client's serial database. */
+  /** Confirmed against the imported serial library. */
   | 'verified'
+  /** Nothing has been imported yet, so there is nothing to check it against. */
+  | 'library_empty'
   | 'invalid_format'
+  /** Serials have been imported and this is not one of them. */
   | 'not_found'
   /** Someone — not necessarily this member — has already registered it. */
   | 'already_registered'
@@ -132,68 +70,39 @@ const SEPARATORS = /[\s\u002D\u2010-\u2015\u2212\uFF0D]/g
 /**
  * Uppercases and removes the spaces and dashes people type when copying a
  * number off a product label. The normalised form is what gets stored, so that
- * two members entering the same serial differently still collide.
+ * two members entering the same serial differently still collide, and so that
+ * an imported serial and a typed one meet in the same shape.
  *
- * NFKC first: a Japanese IME produces full-width digits (Ｊ１２３…), which
- * would otherwise fail the pattern for no reason the member can see.
+ * NFKC first: a Japanese IME produces full-width characters (Ｊ１２３…), which
+ * would otherwise never match the number that was imported.
  */
 export function normaliseSerialNumber(input: string): string {
   return input.normalize('NFKC').replace(SEPARATORS, '').toUpperCase()
 }
 
 /**
- * Constrains the field as it is typed: one prefix character followed by digits,
- * capped at the full length. Deliberately does not force the prefix to "J" —
- * rewriting someone's first keystroke is more confusing than letting the format
- * error explain it. Everything that could never be part of a serial (symbols,
- * kana, emoji, a second letter, a 21st character) simply cannot be entered.
+ * Constrains the field as it is typed: letters and digits only, capped at the
+ * longest serial we could receive. Deliberately says nothing about where the
+ * letters may fall — they turn up mid-number as often as at the front — so the
+ * only characters it removes are ones no serial has ever contained.
  */
-export function maskSerialInput(raw: string, series?: string | null): string {
-  const cleaned = normaliseSerialNumber(raw).replace(/[^A-Z0-9]/g, '')
-  if (!cleaned) return ''
-  return (cleaned[0] + cleaned.slice(1).replace(/\D/g, '')).slice(0, serialLengthFor(series))
+export function maskSerialInput(raw: string): string {
+  return normaliseSerialNumber(raw).replace(/[^0-9A-Z]/g, '').slice(0, MAX_SERIAL_LENGTH)
 }
 
-export function hasValidSerialFormat(input: string, series?: string | null): boolean {
-  return serialPatternFor(series).test(normaliseSerialNumber(input))
-}
-
-export async function validateSerialNumber(
-  serialNumber: string,
-  /** Sanity series of the product being registered; picks the digit count. */
-  series?: string | null
-): Promise<SerialValidationResult> {
-  const serial = normaliseSerialNumber(serialNumber)
-
-  if (!serialPatternFor(series).test(serial)) {
-    return { valid: false, reason: 'invalid_format' }
-  }
-
-  const endpoint = process.env.SERIAL_VALIDATION_ENDPOINT
-  if (!endpoint) return { valid: true, reason: 'format_only' }
-
-  try {
-    const response = await fetch(endpoint, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${process.env.SERIAL_VALIDATION_API_KEY}`,
-      },
-      body: JSON.stringify({ serialNumber: serial }),
-      signal: AbortSignal.timeout(10_000),
-    })
-
-    if (!response.ok) {
-      console.error(`[serial] validation API error: ${response.status}`)
-      return { valid: false, reason: 'service_unavailable' }
-    }
-
-    const data = await response.json()
-    return data.valid
-      ? { valid: true, reason: 'verified' }
-      : { valid: false, reason: 'not_found' }
-  } catch (error) {
-    console.error('[serial] validation request failed', error)
-    return { valid: false, reason: 'service_unavailable' }
-  }
+/**
+ * Whether this could be a serial at all.
+ *
+ * A weak check on purpose: it filters junk out of the field, out of an OCR read
+ * and out of a spreadsheet's margins, and decides nothing else. Whether the
+ * number is real is settled by validateSerialNumber in serialLibrary.ts.
+ *
+ * The one thing asserted beyond the alphabet is that a serial carries a digit
+ * somewhere. Without it a note typed into a spreadsheet cell — "not a serial",
+ * "spare", "見本" — normalises to a run of letters that would import as a
+ * perfectly good serial number and then match nothing for the rest of its life.
+ */
+export function hasValidSerialFormat(input: string): boolean {
+  const serial = normaliseSerialNumber(input)
+  return SERIAL_PATTERN.test(serial) && /\d/.test(serial)
 }

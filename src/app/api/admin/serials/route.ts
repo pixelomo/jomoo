@@ -4,7 +4,7 @@ import { desc, eq, sql } from 'drizzle-orm'
 import { getAdminSession } from '@/lib/admin-auth'
 import { db } from '@/lib/db'
 import { serialNumberEntry, user } from '@/lib/db/schema'
-import { normaliseSerialNumber, serialPatternFor } from '@/lib/serialValidation'
+import { hasValidSerialFormat, normaliseSerialNumber } from '@/lib/serialValidation'
 import { SERIAL_STATUSES, recordAudit, serialFilters } from '@/lib/serialLibrary'
 
 const CreateSchema = z.object({
@@ -72,7 +72,10 @@ export async function POST(req: Request) {
 
   const data = parsed.data
   const serial = normaliseSerialNumber(data.serialNumber)
-  if (!serialPatternFor(data.series).test(serial)) {
+  // Adding a serial by hand is the same act as importing one: this is the
+  // library saying which numbers exist, so nothing is turned away for its
+  // length or its prefix — only for not being a serial at all.
+  if (!hasValidSerialFormat(serial)) {
     return NextResponse.json({ error: 'INVALID_FORMAT' }, { status: 422 })
   }
 
