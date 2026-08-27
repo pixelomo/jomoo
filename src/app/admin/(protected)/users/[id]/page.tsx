@@ -1,9 +1,10 @@
 import { db } from '@/lib/db'
-import { user, productRegistration, warrantyRecord } from '@/lib/db/schema'
+import { user, productRegistration, warrantyRecord, dealerBranch } from '@/lib/db/schema'
 import { eq, desc } from 'drizzle-orm'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import AdminUserEditForm from '@/components/admin/AdminUserEditForm'
+import MemberTypeBadge from '@/components/admin/MemberTypeBadge'
 
 export default async function AdminUserDetailPage({
   params,
@@ -14,6 +15,10 @@ export default async function AdminUserDetailPage({
 
   const [u] = await db.select().from(user).where(eq(user.id, id)).limit(1)
   if (!u) notFound()
+
+  const [branch] = u.branchId
+    ? await db.select().from(dealerBranch).where(eq(dealerBranch.id, u.branchId)).limit(1)
+    : []
 
   const registrations = await db
     .select({
@@ -58,10 +63,21 @@ export default async function AdminUserDetailPage({
           <dl style={{ margin: 0, display: 'flex', flexDirection: 'column', gap: 10 }}>
             {[
               { label: 'User ID', value: u.id },
+              { label: 'Member type', value: <MemberTypeBadge type={u.memberType} /> },
+              {
+                label: 'Dealer',
+                value: branch ? (
+                  <Link href={`/admin/dealers/${branch.id}`} style={{ color: 'var(--accent)', textDecoration: 'none' }}>
+                    {branch.name} →
+                  </Link>
+                ) : (
+                  '—'
+                ),
+              },
               { label: 'Joined', value: new Date(u.createdAt).toLocaleDateString('en-AU') },
               { label: 'Email verified', value: u.emailVerified ? 'Yes' : 'No' },
               { label: '2FA', value: (u as { twoFactorEnabled?: boolean | null }).twoFactorEnabled ? 'Enabled' : 'Disabled' },
-            ].map(({ label, value }) => (
+            ].map(({ label, value }: { label: string; value: React.ReactNode }) => (
               <div key={label} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13 }}>
                 <dt style={{ color: 'var(--ink-3)', fontWeight: 500 }}>{label}</dt>
                 <dd style={{ margin: 0, color: 'var(--ink-2)', textAlign: 'right', maxWidth: '55%', wordBreak: 'break-all' }}>{value}</dd>

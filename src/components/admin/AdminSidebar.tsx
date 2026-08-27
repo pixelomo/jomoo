@@ -7,6 +7,7 @@ import './admin-chrome.css'
 const NAV = [
   { href: '/admin', label: 'Dashboard', icon: '⊞' },
   { href: '/admin/users', label: 'Users', icon: '⊙' },
+  { href: '/admin/dealers', label: 'Dealers', icon: '⌂' },
   { href: '/admin/registrations', label: 'Registrations', icon: '≡' },
   { href: '/admin/serials', label: 'Serial Numbers', icon: '⌗' },
   { href: '/admin/warranties', label: 'Warranties', icon: '◈' },

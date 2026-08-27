@@ -1,7 +1,7 @@
 import { desc, eq, sql } from 'drizzle-orm'
 import { can, getAdminSession } from '@/lib/admin-auth'
 import { db } from '@/lib/db'
-import { user, productRegistration } from '@/lib/db/schema'
+import { user, productRegistration, dealerBranch } from '@/lib/db/schema'
 import { csvResponse, toCsv } from '@/lib/csv'
 
 /** Every member with their profile and registration count, as a spreadsheet. */
@@ -18,6 +18,8 @@ export async function GET() {
       name: user.name,
       email: user.email,
       emailVerified: user.emailVerified,
+      memberType: user.memberType,
+      branchName: dealerBranch.name,
       companyName: user.companyName,
       companyNameKana: user.companyNameKana,
       lastName: user.lastName,
@@ -37,18 +39,21 @@ export async function GET() {
     })
     .from(user)
     .leftJoin(productRegistration, eq(productRegistration.userId, user.id))
-    .groupBy(user.id)
+    .leftJoin(dealerBranch, eq(dealerBranch.id, user.branchId))
+    .groupBy(user.id, dealerBranch.name)
     .orderBy(desc(user.createdAt))
 
   const csv = toCsv(
     [
-      '会員ID', '氏名', 'メールアドレス', 'メール認証済み',
+      '会員ID', '氏名', 'メールアドレス', 'メール認証済み', '会員種別', '販売店',
       '会社名', '会社名フリガナ', '姓', '名', 'セイ', 'メイ',
       '性別', '生年月日', '電話番号', '郵便番号', '都道府県', '市区町村', '番地', '建物名',
       '登録日', '製品登録数',
     ],
     rows.map((r) => [
       r.id, r.name, r.email, r.emailVerified ? 'はい' : 'いいえ',
+      r.memberType === 'corporate' ? '法人' : r.memberType === 'individual' ? '個人' : '',
+      r.branchName,
       r.companyName, r.companyNameKana, r.lastName, r.firstName, r.lastNameKana, r.firstNameKana,
       r.gender, r.dateOfBirth, r.phoneNumber, r.postalCode, r.prefecture, r.city, r.streetAddress, r.building,
       r.createdAt, r.registrations,

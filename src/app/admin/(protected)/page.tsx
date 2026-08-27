@@ -1,5 +1,5 @@
 import { db } from '@/lib/db'
-import { user, productRegistration } from '@/lib/db/schema'
+import { user, productRegistration, dealerBranch } from '@/lib/db/schema'
 import { eq, desc, sql } from 'drizzle-orm'
 import Link from 'next/link'
 
@@ -35,6 +35,7 @@ export default async function AdminDashboard() {
     db
       .select({
         users: sql<number>`(select count(*) from ${user})::int`,
+        dealers: sql<number>`(select count(*) from ${dealerBranch})::int`,
         withWarranty: sql<number>`count(*) filter (where ${productRegistration.status} = 'REGISTERED_WITH_WARRANTY')::int`,
         noWarranty: sql<number>`count(*) filter (where ${productRegistration.status} = 'REGISTERED_NO_WARRANTY')::int`,
       })
@@ -58,6 +59,7 @@ export default async function AdminDashboard() {
 
   const stats = [
     { label: 'Total Users', value: counts.users, href: '/admin/users' },
+    { label: 'Dealers', value: counts.dealers, href: '/admin/dealers' },
     { label: 'With Warranty', value: counts.withWarranty, href: '/admin/registrations?filter=warranty' },
     { label: 'No Warranty', value: counts.noWarranty, href: '/admin/registrations?filter=no_warranty' },
   ]
@@ -67,7 +69,7 @@ export default async function AdminDashboard() {
       <h1 style={{ fontSize: 22, fontWeight: 700, color: 'var(--ink)', margin: '0 0 28px' }}>Dashboard</h1>
 
       {/* Stat cards */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16, marginBottom: 36 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 16, marginBottom: 36 }}>
         {stats.map(s => (
           <Link key={s.label} href={s.href} style={{ textDecoration: 'none' }}>
             <div style={{
