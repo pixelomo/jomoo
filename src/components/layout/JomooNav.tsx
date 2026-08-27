@@ -6,7 +6,6 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import { useRouter } from 'next/navigation'
 import { authClient } from '@/lib/auth-client'
 
 interface Props {
@@ -46,7 +45,6 @@ function AuthGlyph({ direction }: { direction: 'in' | 'out' }) {
 }
 
 export default function JomooNav({ isSignedIn }: Props) {
-  const router = useRouter()
   const navRef = useRef<HTMLElement>(null)
   const [menuOpen, setMenuOpen] = useState(false)
 
@@ -142,8 +140,7 @@ export default function JomooNav({ isSignedIn }: Props) {
                 className="nav__auth-icon nav__auth-icon--signout"
                 onClick={async () => {
                   await authClient.signOut()
-                  router.push('/')
-                  router.refresh()
+                  window.location.assign('/')
                 }}
               >
                 <AuthGlyph direction="out" />
@@ -156,7 +153,7 @@ export default function JomooNav({ isSignedIn }: Props) {
                 href="/sign-up"
                 className="nav__btn nav__btn--black nav__btn--signup"
               >
-                パートナー登録
+                会員登録
               </a>
               <a href="/sign-in" className="nav__auth-icon nav__auth-icon--signin">
                 <AuthGlyph direction="in" />
@@ -208,7 +205,7 @@ export default function JomooNav({ isSignedIn }: Props) {
               className="nav__drawer-btn nav__drawer-btn--signup"
               onClick={closeMenu}
             >
-              パートナー登録
+              会員登録
             </a>
           ) : (
             <a

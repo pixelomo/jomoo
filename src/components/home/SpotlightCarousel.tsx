@@ -2,12 +2,11 @@
 'use client'
 
 import { useCallback, useEffect, useRef, useState } from 'react'
-import SpotlightModelViewer from './SpotlightModelViewer'
 
 type SlideMedia =
   | { type: 'video'; src: string; background?: string }
   | { type: 'image'; src: string; background?: string }
-  | { type: 'model'; src: string; background?: string; activeBackground?: string }
+  | { type: 'loop'; srcs: readonly string[] }
 
 type SpotlightSlide = {
   index: string
@@ -16,6 +15,41 @@ type SpotlightSlide = {
   media: SlideMedia
   playLabel?: string
   playTheme?: 'light' | 'dark'
+}
+
+const X40_LOOP = [
+  '/images/x40loop1.png',
+  '/images/x40loop2.png',
+  '/images/x40loop3.png',
+] as const
+
+function SpotlightLoop({ srcs, alt }: { srcs: readonly string[]; alt: string }) {
+  const [active, setActive] = useState(0)
+
+  useEffect(() => {
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    if (reduced) return
+
+    const timer = window.setInterval(() => {
+      setActive((index) => (index + 1) % srcs.length)
+    }, 1500)
+
+    return () => window.clearInterval(timer)
+  }, [srcs.length])
+
+  return (
+    <div className="spotlight__loop">
+      {srcs.map((src, index) => (
+        <img
+          key={src}
+          className={`spotlight__loop-img${index === active ? ' is-active' : ''}`}
+          src={src}
+          alt={index === active ? alt : ''}
+          aria-hidden={index === active ? undefined : true}
+        />
+      ))}
+    </div>
+  )
 }
 
 const SLIDES: SpotlightSlide[] = [
@@ -29,14 +63,7 @@ const SLIDES: SpotlightSlide[] = [
       '機能だけではなく、',
       '心地よく穏やかな毎日を支えます。',
     ],
-    media: {
-      type: 'model',
-      src: '/glb/x40.glb',
-      background: '/images/3Dplaceholder.jpg',
-      activeBackground: '/images/blue-gradient.png',
-    },
-    playLabel: '3D VIEW',
-    playTheme: 'light',
+    media: { type: 'loop', srcs: X40_LOOP },
   },
   {
     index: '01',
@@ -54,20 +81,20 @@ const SLIDES: SpotlightSlide[] = [
   },
   {
     index: '02',
-    title: ['360度旋回', '泡クッション'],
+    title: ['クリーンボットアーム泡洗浄'],
     body: [
       'ロボットアームが作動し、',
       '360°さまざまな角度から',
       'きめ細やかな泡を噴射することにより',
       'トイレを清潔に保ちます',
     ],
-    media: { type: 'image', src: '/images/slide3.jpeg' },
+    media: { type: 'image', src: '/images/feature1.jpg' },
   },
   {
     index: '03',
-    title: ['フットセンサー', '洗浄'],
+    title: ['足元センサー', '洗浄'],
     body: [
-      'フットセンサーによる',
+      '足元センサーによる',
       '便蓋・便座の自動開閉はもちろん、',
       'トイレ使用後の自動洗浄にも',
       '対応しており、快適な暮らしを支えます',
@@ -76,13 +103,10 @@ const SLIDES: SpotlightSlide[] = [
   },
   {
     index: '04',
-    title: ['ノズル', '自動垢除去'],
+    title: ['ノズルUV除菌'],
     body: [
-      '革新的なノズル洗浄ニードルを',
-      '採用しており使用前後に',
-      '自動でスケールを除去。',
-      '汚れずに詰まりや水流の乱れを防ぎ、',
-      '快適な洗浄体験を実現',
+      '除菌率99％の長期的な効果で交差感染を防ぎ、',
+      '家族全員が安全・安心に使用できます',
     ],
     media: { type: 'image', src: '/images/slide5.jpeg' },
   },
@@ -222,17 +246,6 @@ export default function SpotlightCarousel() {
     const slide = SLIDES[index]
     if (slide.media.type === 'video') {
       toggleVideo(index)
-      return
-    }
-
-    if (slide.media.type === 'model') {
-      if (playingIndex === index) {
-        setPlayingIndex(null)
-        return
-      }
-
-      setActiveIndex(index)
-      setPlayingIndex(index)
     }
   }
 
@@ -280,29 +293,16 @@ export default function SpotlightCarousel() {
                 aria-hidden={index !== activeIndex}
               >
                 <div className="spotlight__media">
-                  {slide.media.background && (
+                  {'background' in slide.media && slide.media.background && (
                     <img
                       className="spotlight__media-bg"
-                      src={
-                        slide.media.type === 'model' &&
-                        playingIndex === index &&
-                        slide.media.activeBackground
-                          ? slide.media.activeBackground
-                          : slide.media.background
-                      }
+                      src={slide.media.background}
                       alt=""
                     />
                   )}
 
-                  {slide.media.type === 'model' ? (
-                    <SpotlightModelViewer
-                      src={slide.media.src}
-                      active={playingIndex === index}
-                      playLabel={slide.playLabel ?? '3D VIEW'}
-                      playTheme={slide.playTheme}
-                      onActivate={() => toggleMedia(index)}
-                      onDeactivate={() => setPlayingIndex(null)}
-                    />
+                  {slide.media.type === 'loop' ? (
+                    <SpotlightLoop srcs={slide.media.srcs} alt="" />
                   ) : slide.media.type === 'video' ? (
                     <video
                       ref={(el) => {

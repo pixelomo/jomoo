@@ -2,7 +2,6 @@
 'use client'
 
 import { Fragment, useEffect, useState } from 'react'
-import SpotlightModelViewer from '@/components/home/SpotlightModelViewer'
 
 export interface FeatureCardView {
   /** One entry per rendered line. */
@@ -55,10 +54,6 @@ export interface TypeCardView {
   /** Full model code. */
   modelCode: string
   price: string
-  /** glTF source for the 3D viewer. */
-  model?: string
-  /** Product still shown until the 3D viewer is opened. */
-  still?: string
 }
 
 interface Props {
@@ -82,6 +77,41 @@ const SECTIONS = [
 
 type SectionId = (typeof SECTIONS)[number]['id']
 
+const TYPE_LOOP = [
+  '/images/x40loop1.png',
+  '/images/x40loop2.png',
+  '/images/x40loop3.png',
+] as const
+
+function TypeLoop({ alt }: { alt: string }) {
+  const [active, setActive] = useState(0)
+
+  useEffect(() => {
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    if (reduced) return
+
+    const timer = window.setInterval(() => {
+      setActive((index) => (index + 1) % TYPE_LOOP.length)
+    }, 1500)
+
+    return () => window.clearInterval(timer)
+  }, [])
+
+  return (
+    <div className="pdp-type__loop">
+      {TYPE_LOOP.map((src, index) => (
+        <img
+          key={src}
+          className={`pdp-type__loop-img${index === active ? ' is-active' : ''}`}
+          src={src}
+          alt={index === active ? alt : ''}
+          aria-hidden={index === active ? undefined : true}
+        />
+      ))}
+    </div>
+  )
+}
+
 export default function ProductTabs({
   features,
   standard,
@@ -92,7 +122,6 @@ export default function ProductTabs({
   type,
 }: Props) {
   const [active, setActive] = useState<SectionId>('features')
-  const [modelOn, setModelOn] = useState(false)
 
   // Highlight whichever section the reader is currently in
   useEffect(() => {
@@ -194,17 +223,27 @@ export default function ProductTabs({
             <section className="pdp-std">
               <h3 className="pdp-title pdp-title--center">標準機能</h3>
               <div className="pdp-rule pdp-rule--center" aria-hidden="true" />
-              <div className="pdp-std__grid">
-                {standard.map(group => (
-                  <div key={group.title} className="pdp-std__card">
-                    <h4 className="pdp-std__title">{group.title}</h4>
-                    <ul className="pdp-std__list">
-                      {group.items.map(item => (
-                        <li key={item}>{item}</li>
-                      ))}
-                    </ul>
-                  </div>
-                ))}
+              <div className="pdp-std__list">
+                {standard.map((group, i) => {
+                  const mid = Math.ceil(group.items.length / 2)
+                  const cols = [group.items.slice(0, mid), group.items.slice(mid)]
+
+                  return (
+                    <Fragment key={group.title}>
+                      {i > 0 && <hr className="pdp-std__rule" />}
+                      <div className="pdp-std__row">
+                        <h4 className="pdp-std__title">{group.title}</h4>
+                        {cols.map((items, col) => (
+                          <ul key={col} className="pdp-std__col">
+                            {items.map(item => (
+                              <li key={item}>{item}</li>
+                            ))}
+                          </ul>
+                        ))}
+                      </div>
+                    </Fragment>
+                  )
+                })}
               </div>
             </section>
           )}
@@ -264,19 +303,7 @@ export default function ProductTabs({
 
           <article className="pdp-type">
             <div className="pdp-type__media">
-              {!modelOn && type.still && (
-                <img className="pdp-type__still" src={type.still} alt={type.name} />
-              )}
-              {type.model && (
-                <SpotlightModelViewer
-                  src={type.model}
-                  active={modelOn}
-                  playLabel="3D VIEW"
-                  playTheme="light"
-                  onActivate={() => setModelOn(true)}
-                  onDeactivate={() => setModelOn(false)}
-                />
-              )}
+              <TypeLoop alt={type.name} />
             </div>
 
             <div className="pdp-type__content">

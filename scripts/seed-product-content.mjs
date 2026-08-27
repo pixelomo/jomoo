@@ -75,95 +75,48 @@ const fileRef = (id) => (id ? { _type: 'file', asset: { _type: 'reference', _ref
 
 const X40_FEATURE_CARDS = [
   {
-    title: '自動洗浄ロボット',
+    title: 'クリーンボットアーム泡洗浄',
     body: [
       '使用前にロボットアームが作動して、',
       '360°全方位からきめ細やかな泡を噴射し、',
       'ボウル面を包み込みます。除菌・防菌・防臭・飛散を',
       '防止し、トイレがいつでも清潔に保たれます。',
     ].join('\n'),
-    image: '/images/slide3.jpeg',
+    image: '/images/feature1.jpg',
   },
   {
-    title: 'フットセンサーによる\n便蓋・便座自動開閉',
-    body: [
-      'フットセンサーにより、便蓋・便座が自動開閉します。',
-      'ご高齢の方、身体が不自由な方など、',
-      'すべてのユーザーに対して快適な使い心地を提供します。',
-      '接触操作を少なくし、より衛生的な使用方法が可能です。',
-    ].join('\n'),
-    image: '/images/feature-2.jpeg',
+    title: '足元センサーによる\n便ふた・便座自動開閉',
+    body: '足元センサーにより、便ふた・便座が自動開閉します。',
+    image: '/images/feature2.jpg',
   },
   {
-    title: 'UVノズルによる除菌',
+    title: 'ノズルUV除菌',
     body: [
-      'UVノズルが伸び出す前に細菌を殺菌します。',
+      'ノズルが伸び出す前に細菌を殺菌します。',
       '紫外線を直接見る必要がないため、',
       '除菌率 99%の長期的な効果で交差感染を防ぎ、',
       '家族全員が安全・安心に使用できます。',
     ].join('\n'),
-    image: '/images/feature-3.jpg',
+    image: '/images/feature3.jpg',
   },
   {
-    title: '季節に応じた温度調節',
+    title: 'トラップ反転洗浄システム',
     body: [
-      '便座に内蔵されたスマート温度センサーにより、',
-      '季節ごとに室温をリアルタイムで感知。',
-      'AIが座面温度を自動調節し、冷たさを感じることなく',
-      '着座した瞬間から、心地の良い温かさを感じられます。',
+      '『押し流す』から『引き込む』方式へと進化させました。',
+      '低騒音設計により、わずか38dBという限界レベルの',
+      '静かな動作音を実現しました。また、徹底した洗浄性能を維持します。',
     ].join('\n'),
-    image: '/images/feature-4.jpg',
+    image: '/images/feature4.jpg',
   },
   {
-    title: 'リモコン式\n便蓋・便座自動開閉',
+    title: 'リモコン式',
     body: [
-      'フットセンサーに加えて、リモコンでも、',
-      '便蓋・便座自動開閉の操作が可能です。',
-      'ユーザーが求める快適な暮らしを選択できるように、',
-      'リモコン式の機能も備えています。',
+      '新開発のレアアース抗菌コート仕上げを採用。',
+      '細菌に持続的に作用し、細胞壁を破壊することで、',
+      '細菌の繁殖を効果的に抑制し、99.9％の抗菌率を実現。',
+      '長期間にわたる抗菌作用で、安心のトイレ空間を提供します。',
     ].join('\n'),
-    image: '/images/feature-5.jpg',
-  },
-]
-
-/**
- * X40-C's own features. The client's comparison sheet marks every one of the
- * X40-B 独自の機能 (self-cleaning arm, UV nozzle, foot-sensor lid, seasonal
- * temperature, remote lid) as not applicable to the C model, so it must not
- * advertise them. These six are the ones the sheet marks ● for X40-C, and match
- * the copy that was already on the product in Sanity before the migration.
- * Images reuse the assets uploaded with the original product photography.
- */
-const X40C_FEATURE_CARDS = [
-  {
-    title: '白金脱臭',
-    body: '白金触媒脱臭剤が使用中の空気を継続的に浄化します。',
-    assetId: 'image-2ebb1155bf469ac6ead1965b8cbd6581876620af-1920x1080-png',
-  },
-  {
-    title: '気泡ミックス洗浄',
-    body: '水と空気が混合して細かい泡を形成し、やさしくしっかりと洗浄します。',
-    assetId: 'image-bb9e82bfca33216edb96254fdcc9dd274d391d71-2480x3508-jpg',
-  },
-  {
-    title: '抗菌釉薬',
-    body: '陶磁器釉薬に抗菌成分を配合し、細菌の繁殖を抑えてお手入れを簡単にします。',
-    assetId: 'image-b39ad39b0c8f50a0aa25a6bc3d00f22d50206223-5430x4032-jpg',
-  },
-  {
-    title: '超静音旋風フラッシュ',
-    body: '38dBの超低騒音フラッシュ—いつでも周りへの配慮を忘れません。',
-    assetId: 'image-7476421009f254a3ce43259c3918f3eec2c1cff3-739x868-jpg',
-  },
-  {
-    title: '離席自動フラッシュ',
-    body: '離席時に大・小フラッシュを自動選択—楽に節水できます。',
-    assetId: 'image-6371b6e8ec4259d8ba52742d6e60f409d23bdd7d-738x893-jpg',
-  },
-  {
-    title: 'フットセンサーフラッシュ',
-    body: '本体底部のセンサーに足で触れるだけでフラッシュ—完全ハンズフリーです。',
-    assetId: 'image-35f8045432b2b62c46e7f16ed153463314ee9574-737x563-png',
+    image: '/images/feature5.jpg',
   },
 ]
 
@@ -210,7 +163,7 @@ const PRODUCTS = {
     heroTitle: 'X40-B',
     featureCards: X40_FEATURE_CARDS,
     standardGroups: X40_STANDARD_GROUPS,
-    specImage: '/images/x40-diagram.jpg',
+    specImage: '/images/x40-diagram.png',
     model3d: '/glb/x40.glb',
     card: {
       image: '/images/X-40-B.jpeg',
@@ -223,9 +176,9 @@ const PRODUCTS = {
     slug: 'x40-c',
     seriesDoc: 'series-smart-toilet',
     heroTitle: 'X40-C',
-    featureCards: X40C_FEATURE_CARDS,
+    featureCards: X40_FEATURE_CARDS,
     standardGroups: X40_STANDARD_GROUPS,
-    specImage: '/images/x40-diagram.jpg',
+    specImage: '/images/x40-diagram.png',
     model3d: '/glb/x40.glb',
     card: {
       image: '/images/X-40-C.jpeg',

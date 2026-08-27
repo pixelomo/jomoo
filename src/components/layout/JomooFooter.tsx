@@ -12,10 +12,13 @@ import {
   SiYoutube,
 } from 'react-icons/si'
 
+// '#' means the client has not given us that account yet — those icons stay
+// put rather than disappearing, so the row keeps its shape as the real links
+// arrive one at a time.
 const SOCIAL_LINKS = [
   { label: 'Facebook', href: '#', Icon: SiFacebook },
   { label: 'Instagram', href: '#', Icon: SiInstagram },
-  { label: 'YouTube', href: '#', Icon: SiYoutube },
+  { label: 'YouTube', href: 'https://www.youtube.com/@JOMOOJapan', Icon: SiYoutube },
   { label: 'WeChat', href: '#', Icon: SiWechat },
   { label: 'LinkedIn', href: '#', Icon: FaLinkedinIn },
   { label: 'X', href: '#', Icon: SiX },
@@ -32,11 +35,19 @@ export default function JomooFooter() {
             <img src="/logo.svg" alt="JOMOO" />
           </div>
           <div className="footer__social">
-            {SOCIAL_LINKS.map(({ label, href, Icon }) => (
-              <a key={label} href={href} aria-label={label}>
-                <Icon aria-hidden="true" />
-              </a>
-            ))}
+            {SOCIAL_LINKS.map(({ label, href, Icon }) => {
+              const external = href.startsWith('http')
+              return (
+                <a
+                  key={label}
+                  href={href}
+                  aria-label={label}
+                  {...(external && { target: '_blank', rel: 'noopener noreferrer' })}
+                >
+                  <Icon aria-hidden="true" />
+                </a>
+              )
+            })}
           </div>
         </div>
 
@@ -81,11 +92,6 @@ export default function JomooFooter() {
               <li className="footer__li--gap">
                 <a href="/register" className="footer__link--bold">
                   製品登録
-                </a>
-              </li>
-              <li className="footer__li--gap">
-                <a href="#" className="footer__link--bold">
-                  コスト計算
                 </a>
               </li>
             </ul>

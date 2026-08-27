@@ -4,7 +4,12 @@ export default function FooterCtaSection() {
   return (
     <section className="footer-cta" data-nav="light" aria-label="Catalog and contact">
       <div className="footer-cta__inner">
-        <a className="footer-cta__card footer-cta__card--catalog" href="/products/smart-toilet">
+        <a
+          className="footer-cta__card footer-cta__card--catalog"
+          href="/images/brochure.pdf"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
           <div
             className="footer-cta__media"
             style={{ backgroundImage: 'url(/images/footer-catalog.jpeg)' }}

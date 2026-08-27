@@ -26,13 +26,6 @@ interface Props {
 
 const FALLBACK_HERO = '/images/placeholder-hero-scene.jpg'
 
-/**
- * Poster frame behind the 3D viewer until it loads. Shared by every product:
- * it stands in for the model, so it is interface chrome rather than the
- * product photography that lives in Sanity.
- */
-const MODEL_PLACEHOLDER = '/images/3Dplaceholder.jpg'
-
 function url(asset?: AssetRef, width = 900): string | undefined {
   return asset ? imgUrl(asset, width) : undefined
 }
@@ -159,8 +152,6 @@ export default async function ProductDetailTemplate({ product }: Props) {
           name: hero.title,
           modelCode: product.modelCode,
           price: product.price ?? '',
-          model: product.model3dUrl,
-          still: MODEL_PLACEHOLDER,
         }}
       />
 

@@ -1,7 +1,6 @@
 'use client'
 
 import { authClient } from '@/lib/auth-client'
-import { useRouter } from 'next/navigation'
 
 interface Props {
   children: React.ReactNode
@@ -10,7 +9,6 @@ interface Props {
 }
 
 export default function SignOutBtn({ children, style, className }: Props) {
-  const router = useRouter()
   return (
     <button
       type="button"
@@ -18,8 +16,7 @@ export default function SignOutBtn({ children, style, className }: Props) {
       className={className}
       onClick={async () => {
         await authClient.signOut()
-        router.push('/')
-        router.refresh()
+        window.location.assign('/')
       }}
     >
       {children}

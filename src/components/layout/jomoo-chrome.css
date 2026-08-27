@@ -197,16 +197,7 @@
 }
 
 .nav__search {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 29px;
-  height: 29px;
-  padding: 0;
-  border: 0;
-  background: transparent;
-  cursor: pointer;
-  flex-shrink: 0;
+  display: none;
 }
 
 .nav__search img {
@@ -492,10 +483,6 @@
     display: inline-flex;
   }
 
-  .nav__search {
-    display: none;
-  }
-
   .footer__cols {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -560,15 +547,9 @@
 
 @media (min-width: 1300px) {
   .nav {
-    display: grid;
-    grid-template-columns: auto minmax(0, 1fr) auto;
+    display: flex;
     align-items: center;
-    column-gap: 1.25rem;
-  }
-
-  .nav__logo {
-    grid-column: 1;
-    justify-self: start;
+    column-gap: 2.5rem;
   }
 
   .nav__drawer {
@@ -578,21 +559,15 @@
   .nav__menu {
     position: static;
     transform: none;
-    grid-column: 2;
-    /* Sits against the actions rather than centred — with 会社情報 and
-       インスピレーション hidden there is only one link, and centring one item
-       in the middle column leaves it stranded. */
-    justify-self: end;
-    margin-right: 28px;
+    justify-self: auto;
+    margin-right: 0;
     gap: clamp(1rem, 2.2vw, 36px);
     font-size: 1.2rem;
     white-space: nowrap;
   }
 
   .nav__end {
-    grid-column: 3;
-    justify-self: end;
-    margin-left: 0;
+    margin-left: auto;
     flex-shrink: 0;
   }
 }

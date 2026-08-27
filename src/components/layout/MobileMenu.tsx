@@ -3,7 +3,6 @@
 import { useState } from 'react'
 import { authClient } from '@/lib/auth-client'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
 
 interface Props {
   isSignedIn: boolean
@@ -39,7 +38,6 @@ export default function MobileMenu({
   consultationLabel,
 }: Props) {
   const [open, setOpen] = useState(false)
-  const router = useRouter()
   const close = () => setOpen(false)
 
   const navItems = [
@@ -55,8 +53,7 @@ export default function MobileMenu({
   const handleSignOut = async () => {
     await authClient.signOut()
     close()
-    router.push('/')
-    router.refresh()
+    window.location.assign('/')
   }
 
   return (
