@@ -1,6 +1,6 @@
 import { db } from '@/lib/db'
 import { user, productRegistration, warrantyRecord, dealerBranch } from '@/lib/db/schema'
-import { eq, desc } from 'drizzle-orm'
+import { eq, desc, asc } from 'drizzle-orm'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import AdminUserEditForm from '@/components/admin/AdminUserEditForm'
@@ -16,9 +16,14 @@ export default async function AdminUserDetailPage({
   const [u] = await db.select().from(user).where(eq(user.id, id)).limit(1)
   if (!u) notFound()
 
-  const [branch] = u.branchId
-    ? await db.select().from(dealerBranch).where(eq(dealerBranch.id, u.branchId)).limit(1)
-    : []
+  // The whole list, not just this member's: the form has to offer somewhere to
+  // move them to.
+  const branches = await db
+    .select({ id: dealerBranch.id, name: dealerBranch.name, city: dealerBranch.city })
+    .from(dealerBranch)
+    .orderBy(asc(dealerBranch.name))
+
+  const branch = branches.find((b) => b.id === u.branchId) ?? null
 
   const registrations = await db
     .select({
@@ -50,7 +55,9 @@ export default async function AdminUserDetailPage({
           email: u.email,
           gender: (u as { gender?: string | null }).gender ?? null,
           dateOfBirth: (u as { dateOfBirth?: string | null }).dateOfBirth ?? null,
-        }} />
+          memberType: u.memberType,
+          branchId: u.branchId,
+        }} branches={branches} />
 
         {/* Meta */}
         <div style={{

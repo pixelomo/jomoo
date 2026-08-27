@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 import { can, getAdminSession } from '@/lib/admin-auth'
 import { releaseSerialsForUsers } from '@/lib/serialLibrary'
 import { db } from '@/lib/db'
-import { user, productRegistration, warrantyRecord } from '@/lib/db/schema'
+import { user, productRegistration, warrantyRecord, dealerBranch } from '@/lib/db/schema'
 import { eq, desc } from 'drizzle-orm'
 import { z } from 'zod'
 
@@ -11,6 +11,8 @@ const UpdateSchema = z.object({
   email: z.string().email().optional(),
   gender: z.enum(['male', 'female', 'other', 'prefer_not_to_say']).nullable().optional(),
   dateOfBirth: z.string().nullable().optional(),
+  memberType: z.enum(['corporate', 'individual']).nullable().optional(),
+  branchId: z.string().nullable().optional(),
 })
 
 export async function GET(_req: Request, { params }: { params: Promise<{ id: string }> }) {
@@ -57,12 +59,30 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
   }
 
   const d = parsed.data
+
+  // A branch id is checked rather than trusted: it decides whose registrations
+  // this account can read on their マイページ, and a typo would either point at
+  // nothing or hand someone another dealer's customers.
+  if (d.branchId) {
+    const [branch] = await db
+      .select({ id: dealerBranch.id })
+      .from(dealerBranch)
+      .where(eq(dealerBranch.id, d.branchId))
+      .limit(1)
+    if (!branch) return NextResponse.json({ error: 'NO_SUCH_BRANCH' }, { status: 422 })
+  }
+
   await db.update(user).set({
     ...(d.name !== undefined && { name: d.name }),
     ...(d.email !== undefined && { email: d.email }),
     ...(d.gender !== undefined && { gender: d.gender }),
     ...(d.dateOfBirth !== undefined && { dateOfBirth: d.dateOfBirth }),
-    updatedAt: new Date(),
+    ...(d.memberType !== undefined && { memberType: d.memberType }),
+    // The branch is only meaningful on a 法人 account, so switching an account
+    // to 個人 lets it go rather than leaving a link nothing reads.
+    ...(d.memberType === 'individual'
+      ? { branchId: null }
+      : d.branchId !== undefined && { branchId: d.branchId }),
   }).where(eq(user.id, id))
 
   return NextResponse.json({ success: true })

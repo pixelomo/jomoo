@@ -10,15 +10,21 @@ interface Props {
     email: string
     gender: string | null
     dateOfBirth: string | null
+    memberType: string | null
+    branchId: string | null
   }
+  /** Every registered dealer branch, for the 法人 assignment select. */
+  branches: { id: string; name: string; city: string | null }[]
 }
 
-export default function AdminUserEditForm({ userId, initial }: Props) {
+export default function AdminUserEditForm({ userId, initial, branches }: Props) {
   const router = useRouter()
   const [name, setName] = useState(initial.name)
   const [email, setEmail] = useState(initial.email)
   const [gender, setGender] = useState(initial.gender ?? '')
   const [dob, setDob] = useState(initial.dateOfBirth ?? '')
+  const [memberType, setMemberType] = useState(initial.memberType ?? '')
+  const [branchId, setBranchId] = useState(initial.branchId ?? '')
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
   const [error, setError] = useState('')
@@ -39,6 +45,10 @@ export default function AdminUserEditForm({ userId, initial }: Props) {
           email: email || undefined,
           gender: gender || null,
           dateOfBirth: dob || null,
+          memberType: memberType || null,
+          // Sent as null on a 個人 account so the server does not have to infer
+          // it from a select the form has already hidden.
+          branchId: memberType === 'corporate' ? branchId || null : null,
         }),
       })
       if (!res.ok) { setError('Failed to save.'); return }
@@ -109,6 +119,35 @@ export default function AdminUserEditForm({ userId, initial }: Props) {
           <label style={labelStyle}>Date of Birth</label>
           <input type="date" value={dob} onChange={e => setDob(e.target.value)} style={inputStyle} />
         </div>
+        <div>
+          <label style={labelStyle}>Member type</label>
+          <select value={memberType} onChange={e => setMemberType(e.target.value)} style={inputStyle}>
+            <option value="">— Not set —</option>
+            <option value="corporate">法人 · Dealer</option>
+            <option value="individual">個人 · Customer</option>
+          </select>
+        </div>
+        {/* Only a 法人 account reads a branch, so the select is not offered to
+            anyone else — an individual with a dealer attached would be shown
+            other people's registrations. */}
+        {memberType === 'corporate' && (
+          <div>
+            <label style={labelStyle}>Dealer branch</label>
+            <select value={branchId} onChange={e => setBranchId(e.target.value)} style={inputStyle}>
+              <option value="">— None —</option>
+              {branches.map(b => (
+                <option key={b.id} value={b.id}>
+                  {b.city ? `${b.name}（${b.city}）` : b.name}
+                </option>
+              ))}
+            </select>
+            {branches.length === 0 && (
+              <p style={{ fontSize: 12, color: 'var(--ink-3)', margin: '6px 0 0' }}>
+                No branches yet — one is created when a 法人 member signs up.
+              </p>
+            )}
+          </div>
+        )}
 
         {error && <p style={{ fontSize: 13, color: 'var(--warn)', margin: 0 }}>{error}</p>}
         {saved && <p style={{ fontSize: 13, color: '#2e7d32', margin: 0 }}>Saved successfully.</p>}
