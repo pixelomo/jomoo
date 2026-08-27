@@ -12,9 +12,11 @@ The schema lives in `src/lib/db/schema.ts` and is applied with `npm run db:push`
 DATABASE_URL=$(grep '^DATABASE_URL=' .env.local | cut -d= -f2-) npx drizzle-kit push
 ```
 
-The tables `serial_numbers`, `serial_audit_logs` and `email_templates` exist on the Railway database that `.env.local` points at. **If you are on a machine whose `DATABASE_URL` points somewhere else, run `db:push` before using the serial library or the email-template editor** — those pages query tables that will not be there.
+The tables `serial_numbers`, `serial_audit_logs`, `email_templates` and `dealer_branches` exist on the Railway database that `.env.local` points at. **If you are on a machine whose `DATABASE_URL` points somewhere else, run `db:push` before using the serial library or the email-template editor** — those pages query tables that will not be there.
 
-`push` compares the whole schema and can propose destructive statements, so check what it plans before applying it to a database holding real data.
+`push` compares the whole schema and can propose destructive statements, so check what it plans before applying it to a database holding real data. Purely additive changes are easier to ship as a re-runnable script instead — `scripts/add-dealer-branches.mjs` is the pattern.
+
+Dealer branches (`dealer_branches`, `user.member_type`, `user.branch_id`, `product_registrations.branch_id`) are applied with `node scripts/add-dealer-branches.mjs`, then `node scripts/backfill-dealer-branches.mjs --apply` gives accounts created before the feature a member type and a branch.
 
 # Deploying
 

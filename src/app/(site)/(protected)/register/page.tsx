@@ -3,6 +3,7 @@ import { headers } from 'next/headers'
 import { getTranslations } from 'next-intl/server'
 import { auth } from '@/lib/auth'
 import { getProductModels } from '@/lib/sanity'
+import { listBranchOptions } from '@/lib/dealerBranches'
 import RegistrationForm from '@/components/registration/RegistrationForm'
 
 export default async function RegisterPage({
@@ -15,7 +16,7 @@ export default async function RegisterPage({
   if (!session) redirect('/sign-in')
 
   const t = await getTranslations('registration')
-  const models = await getProductModels()
+  const [models, dealers] = await Promise.all([getProductModels(), listBranchOptions()])
 
   // The hero in the shared layout already says マイページ, so this page leads
   // with what it is for rather than repeating it.
@@ -30,7 +31,7 @@ export default async function RegisterPage({
           </p>
         )}
       </div>
-      <RegistrationForm models={models} auto={auto === 'true'} />
+      <RegistrationForm models={models} dealers={dealers} auto={auto === 'true'} />
     </main>
   )
 }

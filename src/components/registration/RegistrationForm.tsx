@@ -9,9 +9,12 @@ import Step2SerialNumber from './Step2SerialNumber'
 import Step2SerialPhoto from './Step2SerialPhoto'
 import Step3Attachments from './Step3Attachments'
 import type { Step1Data, Step2Data, Step3Data } from '@/types/registration'
+import type { BranchOption } from '@/lib/dealerBranches'
 
 interface Props {
   models: { _id: string; name: string; modelCode: string; series: string }[]
+  /** Registered dealer branches for the 販売店 select. */
+  dealers?: BranchOption[]
   /**
    * Photograph-first serial entry, from /register?auto=true. Off by default —
    * the typed flow stays exactly as it was.
@@ -21,7 +24,7 @@ interface Props {
 
 type FormState = Partial<Step1Data & Step2Data & Step3Data>
 
-export default function RegistrationForm({ models, auto = false }: Props) {
+export default function RegistrationForm({ models, dealers = [], auto = false }: Props) {
   const t = useTranslations('registration')
   const tc = useTranslations('common')
   const router = useRouter()
@@ -128,6 +131,7 @@ export default function RegistrationForm({ models, auto = false }: Props) {
         <Step1BasicInfo
           defaultValues={formData}
           models={models}
+          dealers={dealers}
           onSubmit={handleStep1}
         />
       )}

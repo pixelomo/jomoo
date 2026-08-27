@@ -51,6 +51,24 @@ export const auth = betterAuth({
         // Never let a mail failure fail the sign-up: the account is already
         // written, and the member can use it whether or not the mail lands.
         after: async (createdUser) => {
+          // A 法人 sign-up is how a dealer branch gets on the list customers
+          // pick from, so this runs whether or not verification is on.
+          const member = createdUser as typeof createdUser & {
+            memberType?: string | null
+            companyName?: string | null
+            companyNameKana?: string | null
+            postalCode?: string | null
+            prefecture?: string | null
+            city?: string | null
+            streetAddress?: string | null
+            building?: string | null
+          }
+
+          if (member.memberType === 'corporate') {
+            const { linkMemberToBranch } = await import('./dealerBranches')
+            await linkMemberToBranch(createdUser.id, member)
+          }
+
           if (EMAIL_VERIFICATION_REQUIRED) return
           try {
             const { sendMemberWelcome } = await import('./resend')
@@ -144,6 +162,22 @@ export const auth = betterAuth({
         nullable: true,
         required: false,
         input: true,
+      },
+      // 'corporate' or 'individual'. Written at sign-up because nothing else
+      // records it — a company name is a hint, not an answer.
+      memberType: {
+        type: 'string',
+        nullable: true,
+        required: false,
+        input: true,
+      },
+      // Assigned by the create hook below, never by the browser: this is what
+      // decides whose registrations an account may read.
+      branchId: {
+        type: 'string',
+        nullable: true,
+        required: false,
+        input: false,
       },
       companyNameKana: {
         type: 'string',

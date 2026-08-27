@@ -1492,3 +1492,59 @@
     width: 100%;
   }
 }
+
+/* ─── 支店の登録製品 (法人 members only) ─────────────────────────────────────── */
+
+.member-branch__name {
+  margin: -0.5rem 0 0;
+  font-family: var(--font-jp);
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--member-primary);
+}
+
+.member-branch__summary {
+  margin: 0;
+  font-family: var(--font-jp);
+  font-size: 0.875rem;
+  color: var(--member-ink-soft);
+}
+
+.member-branch__groups {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+/* The customer's name is the divider — a dealer scrolling this list is looking
+   for a person, not a product. */
+.member-branch__customer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.25rem 0.75rem;
+  padding-bottom: 0.5rem;
+  margin-bottom: 0.875rem;
+  border-bottom: 1px solid #e4e4e7;
+}
+
+.member-branch__customer-name {
+  margin: 0;
+  font-family: var(--font-jp);
+  font-size: 1.0625rem;
+  font-weight: 700;
+  color: var(--member-ink);
+}
+
+.member-branch__customer-meta {
+  font-family: var(--font-jp);
+  font-size: 0.8125rem;
+  color: var(--member-ink-soft);
+}
+
+@media (max-width: 767px) {
+  .member-branch__customer {
+    flex-direction: column;
+    gap: 0.125rem;
+  }
+}

@@ -193,7 +193,14 @@
       "phoneNumber": "電話番号",
       "postalCode": "郵便番号",
       "address": "住所"
-    }
+    },
+    "branchTab": "支店の登録製品",
+    "branchTitle": "支店のご登録製品",
+    "branchEmpty": "この支店で登録された製品はまだありません",
+    "branchNoBranch": "アカウントに販売店が紐づいていません。お手数ですがJOMOOサービスホットラインまでお問い合わせください。",
+    "branchCount": "{count}件",
+    "branchCustomerCount": "お客様 {customers}名 ・ 登録製品 {products}件",
+    "branchUnnamedCustomer": "お名前未登録のお客様"
   },
   "registration": {
     "title": "製品登録",
@@ -218,7 +225,9 @@
       "phoneNumberPlaceholder": "電話番号を入力してください（任意）",
       "purchaseDate": "購入日",
       "dealerName": "販売店",
-      "dealerNamePlaceholder": "販売店名を入力してください（任意）"
+      "dealerNamePlaceholder": "販売店名を入力してください（任意）",
+      "dealerSelectPlaceholder": "販売店を選択してください（任意）",
+      "dealerOther": "リストにない／直接入力する"
     },
     "step2": {
       "title": "製造番号の確認",

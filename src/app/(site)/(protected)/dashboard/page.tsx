@@ -2,9 +2,12 @@ import { redirect } from 'next/navigation'
 import { headers } from 'next/headers'
 import { auth } from '@/lib/auth'
 import { db } from '@/lib/db'
-import { productRegistration, warrantyRecord } from '@/lib/db/schema'
+import { productRegistration, user as userTable, warrantyRecord } from '@/lib/db/schema'
 import { eq, desc } from 'drizzle-orm'
+import { getBranch } from '@/lib/dealerBranches'
+import { getBranchRegistrations } from '@/lib/branchRegistrations'
 import MemberTabs from '@/components/dashboard/MemberTabs'
+import BranchRegistrations from '@/components/dashboard/BranchRegistrations'
 import UserProfileSection from '@/components/dashboard/UserProfileSection'
 import RegistrationCard from '@/components/dashboard/RegistrationCard'
 import WarrantySummary from '@/components/dashboard/WarrantySummary'
@@ -15,6 +18,17 @@ export default async function DashboardPage() {
   if (!session) redirect('/sign-in')
 
   const u = session.user
+
+  // Read the membership from the row rather than the session: branch_id is
+  // written by the sign-up hook after the session was minted, so a session
+  // issued at sign-up still carries none.
+  const [member] = await db
+    .select({ memberType: userTable.memberType, branchId: userTable.branchId })
+    .from(userTable)
+    .where(eq(userTable.id, u.id))
+    .limit(1)
+
+  const isCorporate = member?.memberType === 'corporate'
 
   const [registrations, warranties] = await Promise.all([
     db
@@ -40,6 +54,14 @@ export default async function DashboardPage() {
   // registration — the warranties are already in hand.
   const expiryByRegistration = new Map(warranties.map((w) => [w.registrationId, w.expiryDate]))
 
+  // Only fetched for a dealer, and only once their account has a branch — the
+  // tab is what carries the whole feature, so it is absent rather than empty
+  // for everybody else.
+  const [branch, branchGroups] =
+    isCorporate && member?.branchId
+      ? await Promise.all([getBranch(member.branchId), getBranchRegistrations(member.branchId)])
+      : [null, null]
+
   return (
     <MemberTabs
       productCount={registrations.length}
@@ -50,6 +72,15 @@ export default async function DashboardPage() {
           warrantyExpiry={expiryByRegistration.get(reg.id) ?? null}
         />
       ))}
+      branch={
+        isCorporate ? (
+          <BranchRegistrations
+            branchName={branch?.name ?? null}
+            hasBranch={Boolean(member?.branchId)}
+            groups={branchGroups ?? []}
+          />
+        ) : undefined
+      }
       contract={<WarrantySummary warranties={warranties} />}
       profile={
         <UserProfileSection

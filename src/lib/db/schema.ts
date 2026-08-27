@@ -19,6 +19,11 @@ export const user = pgTable('user', {
   postalCode: text('postal_code'),
   companyName: text('company_name'),
   companyNameKana: text('company_name_kana'),
+  /** 'corporate' (法人) or 'individual' (個人), chosen at step 1 of sign-up.
+   *  Null on accounts created before the two were told apart. */
+  memberType: text('member_type'),
+  /** Corporate members only: the branch whose registrations they may read. */
+  branchId: text('branch_id').references(() => dealerBranch.id, { onDelete: 'set null' }),
   lastName: text('last_name'),
   firstName: text('first_name'),
   lastNameKana: text('last_name_kana'),
@@ -75,6 +80,34 @@ export const twoFactor = pgTable('two_factor', {
 
 // ─── Application tables ───────────────────────────────────────────────────────
 
+/**
+ * The dealers, one row per branch.
+ *
+ * JOMOO has no list of its dealers to import, so the list builds itself: a
+ * 法人 sign-up creates the branch it names, and from then on customers pick it
+ * from a select when registering a product. That is what ties a customer's
+ * registration to the branch that sold it — the free-text 販売店 field never
+ * could.
+ */
+export const dealerBranch = pgTable('dealer_branches', {
+  id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
+  name: text('name').notNull(),
+  nameKana: text('name_kana'),
+  postalCode: text('postal_code'),
+  prefecture: text('prefecture'),
+  city: text('city'),
+  streetAddress: text('street_address'),
+  building: text('building'),
+  /** Normalised name + postal code. Two colleagues signing up separately must
+   *  land on one branch, not two — see lib/dealerBranches.ts. */
+  matchKey: text('match_key').notNull(),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+}, (t) => [
+  uniqueIndex('idx_branch_match_key').on(t.matchKey),
+  index('idx_branch_name').on(t.name),
+])
+
 export const productRegistration = pgTable('product_registrations', {
   id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
   userId: text('user_id').notNull().references(() => user.id, { onDelete: 'cascade' }),
@@ -87,6 +120,9 @@ export const productRegistration = pgTable('product_registrations', {
   phoneNumber: text('phone_number'),
   purchaseDate: date('purchase_date'),
   dealerName: text('dealer_name'),
+  /** Set when the member picked the dealer from the list rather than typing
+   *  one. This, not dealerName, is what a dealer's branch view reads. */
+  branchId: text('branch_id').references(() => dealerBranch.id, { onDelete: 'set null' }),
   serialNumber: text('serial_number').notNull(),
   serialNumberValid: boolean('serial_number_valid'),
   warrantyCardUrl: text('warranty_card_url'),
@@ -102,6 +138,7 @@ export const productRegistration = pgTable('product_registrations', {
 }, (t) => [
   index('idx_reg_user_id').on(t.userId),
   index('idx_reg_status').on(t.status),
+  index('idx_reg_branch_id').on(t.branchId),
   // One physical product, one registration. Declared here so `db:push` keeps it
   // — the app check in serialRegistry.ts cannot survive two racing submissions.
   uniqueIndex('idx_reg_serial_unique').on(t.serialNumber),

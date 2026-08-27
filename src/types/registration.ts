@@ -13,6 +13,10 @@ export const Step1Schema = z.object({
   phoneNumber: z.string().optional(),
   purchaseDate: z.string().optional(),
   dealerName: z.string().optional(),
+  /** Set when 販売店 was picked from the list of registered dealers. The name
+   *  is still stored alongside it, so a branch that is later renamed does not
+   *  rewrite the warranty cards already issued. */
+  branchId: z.string().optional(),
 })
 
 /**

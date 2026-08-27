@@ -14,6 +14,8 @@ export interface DbUser {
   emailVerified: boolean
   gender: Gender | null
   dateOfBirth: string | null
+  memberType: 'corporate' | 'individual' | null
+  branchId: string | null
   twoFactorEnabled: boolean | null
   createdAt: string
   updatedAt: string
@@ -31,6 +33,8 @@ export interface DbProductRegistration {
   phoneNumber: string | null
   purchaseDate: string | null
   dealerName: string | null
+  /** The registered dealer branch, when 販売店 was picked from the list. */
+  branchId: string | null
   serialNumber: string
   serialNumberValid: boolean | null
   warrantyCardUrl: string | null

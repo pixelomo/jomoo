@@ -15,6 +15,12 @@ interface Props {
   registration: DbProductRegistration
   /** From warranty_records; absent until the registration has been approved. */
   warrantyExpiry?: string | null
+  /**
+   * Someone else's registration, seen through the dealer's branch view. The
+   * edit and delete APIs already refuse it — this stops the buttons offering
+   * something that would only fail.
+   */
+  readOnly?: boolean
 }
 
 /**
@@ -46,7 +52,11 @@ const STATUS_MODIFIER: Record<string, string> = {
   REGISTERED_WITH_WARRANTY: 'warranty',
 }
 
-export default function RegistrationCard({ registration: initial, warrantyExpiry }: Props) {
+export default function RegistrationCard({
+  registration: initial,
+  warrantyExpiry,
+  readOnly = false,
+}: Props) {
   const t = useTranslations('dashboard')
   const tr = useTranslations('registration.step1')
   const tc = useTranslations('common')
@@ -54,7 +64,7 @@ export default function RegistrationCard({ registration: initial, warrantyExpiry
   const [, startTransition] = useTransition()
 
   const reg = initial
-  const canMutate = MUTABLE_STATUSES.includes(reg.status)
+  const canMutate = !readOnly && MUTABLE_STATUSES.includes(reg.status)
 
   const [showEdit, setShowEdit] = useState(false)
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
@@ -138,31 +148,33 @@ export default function RegistrationCard({ registration: initial, warrantyExpiry
             </div>
           )}
 
-          <div className="member-product__actions">
-            {reg.status === 'REGISTERED_WITH_WARRANTY' && (
-              <Link href={`/warranty/${reg.id}`} className="member-product__action">
-                {t('viewWarranty')}
-              </Link>
-            )}
-            {canMutate && (
-              <>
-                <button
-                  type="button"
-                  onClick={() => setShowEdit(true)}
-                  className="member-product__action member-product__action--ghost"
-                >
-                  {t('editRegistration')}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setShowDeleteConfirm(true)}
-                  className="member-product__action member-product__action--danger"
-                >
-                  {t('deleteRegistration')}
-                </button>
-              </>
-            )}
-          </div>
+          {!readOnly && (
+            <div className="member-product__actions">
+              {reg.status === 'REGISTERED_WITH_WARRANTY' && (
+                <Link href={`/warranty/${reg.id}`} className="member-product__action">
+                  {t('viewWarranty')}
+                </Link>
+              )}
+              {canMutate && (
+                <>
+                  <button
+                    type="button"
+                    onClick={() => setShowEdit(true)}
+                    className="member-product__action member-product__action--ghost"
+                  >
+                    {t('editRegistration')}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setShowDeleteConfirm(true)}
+                    className="member-product__action member-product__action--danger"
+                  >
+                    {t('deleteRegistration')}
+                  </button>
+                </>
+              )}
+            </div>
+          )}
         </div>
       </article>
 

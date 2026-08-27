@@ -5,17 +5,21 @@ import { useId, useState, type ReactNode } from 'react'
 import Link from 'next/link'
 import './member-portal.css'
 
-export type MemberTabId = 'products' | 'contract' | 'profile'
+export type MemberTabId = 'products' | 'branch' | 'contract' | 'profile'
 
-const TABS: { id: MemberTabId; label: string }[] = [
-  { id: 'products', label: 'ご登録製品' },
-  { id: 'contract', label: 'ご契約情報' },
-  { id: 'profile', label: 'お客様情報' },
-]
+const TAB_LABELS: Record<MemberTabId, string> = {
+  products: 'ご登録製品',
+  branch: '支店の登録製品',
+  contract: 'ご契約情報',
+  profile: 'お客様情報',
+}
 
 interface Props {
   /** Rendered inside the ご登録製品 panel, above the 保証延長 card. */
   products?: ReactNode
+  /** 法人 members only — every registration filed against their branch. The
+   *  tab is absent entirely for everyone else. */
+  branch?: ReactNode
   contract?: ReactNode
   profile?: ReactNode
   /** Drives both the heading's count and the empty state. */
@@ -27,18 +31,22 @@ interface Props {
  * anchors — so they are buttons in a tablist, not links, and the inactive
  * panels leave the document entirely.
  */
-export default function MemberTabs({ products, contract, profile, productCount }: Props) {
+export default function MemberTabs({ products, branch, contract, profile, productCount }: Props) {
   const [active, setActive] = useState<MemberTabId>('products')
   const base = useId()
   const isEmpty = productCount === 0
 
+  const tabs = (['products', 'branch', 'contract', 'profile'] as MemberTabId[])
+    .filter((id) => id !== 'branch' || branch)
+    .map((id) => ({ id, label: TAB_LABELS[id] }))
+
   const panelFor = (id: MemberTabId) =>
-    id === 'products' ? products : id === 'contract' ? contract : profile
+    id === 'branch' ? branch : id === 'contract' ? contract : profile
 
   return (
     <>
       <div className="member-tabs" role="tablist" aria-label="マイページ">
-        {TABS.map((tab) => (
+        {tabs.map((tab) => (
           <button
             key={tab.id}
             type="button"
@@ -54,7 +62,7 @@ export default function MemberTabs({ products, contract, profile, productCount }
         ))}
       </div>
 
-      {TABS.map((tab) => (
+      {tabs.map((tab) => (
         <div
           key={tab.id}
           role="tabpanel"

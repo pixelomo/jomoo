@@ -1,19 +1,29 @@
 'use client'
 
+import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useTranslations } from 'next-intl'
 import { Step1Schema, type Step1Data } from '@/types/registration'
 import { JP_PREFECTURES } from '@/data/jp-prefectures'
 import FormField, { inputClass } from '@/components/ui/FormField'
+import type { BranchOption } from '@/lib/dealerBranches'
+
+/** Chosen from the select when the member's dealer is not on the list yet —
+ *  the list only holds dealers who have registered as 法人 members, so typing
+ *  one in has to stay possible. */
+const OTHER_DEALER = '__other__'
 
 interface Props {
   defaultValues?: Partial<Step1Data>
   models: { _id: string; name: string; modelCode: string; series: string }[]
+  /** Registered dealer branches. Empty until the first 法人 signs up, in which
+   *  case the field falls back to the free-text box it has always been. */
+  dealers?: BranchOption[]
   onSubmit: (data: Step1Data) => void
 }
 
-export default function Step1BasicInfo({ defaultValues, models, onSubmit }: Props) {
+export default function Step1BasicInfo({ defaultValues, models, dealers = [], onSubmit }: Props) {
   const t = useTranslations('registration.step1')
   const tc = useTranslations('common')
 
@@ -27,6 +37,29 @@ export default function Step1BasicInfo({ defaultValues, models, onSubmit }: Prop
     resolver: zodResolver(Step1Schema),
     defaultValues,
   })
+
+  // Coming back from step 2 with a name but no branch means it was typed, so
+  // the box stays open rather than silently dropping what was entered.
+  const [dealerChoice, setDealerChoice] = useState<string>(() => {
+    if (defaultValues?.branchId) return defaultValues.branchId
+    if (defaultValues?.dealerName) return OTHER_DEALER
+    return ''
+  })
+
+  const handleDealerChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const choice = e.target.value
+    setDealerChoice(choice)
+
+    if (choice === OTHER_DEALER) {
+      setValue('branchId', undefined)
+      return
+    }
+
+    setValue('branchId', choice || undefined)
+    // The name is stored alongside the id so the warranty card and the admin
+    // export keep reading a name rather than a UUID.
+    setValue('dealerName', dealers.find((d) => d.id === choice)?.name ?? '')
+  }
 
   const handleModelChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const modelId = e.target.value
@@ -158,15 +191,47 @@ export default function Step1BasicInfo({ defaultValues, models, onSubmit }: Prop
 
       <FormField
         label={t('dealerName')}
-        htmlFor="dealerName"
+        htmlFor={dealers.length > 0 ? 'dealerBranch' : 'dealerName'}
       >
-        <input
-          id="dealerName"
-          type="text"
-          className={inputClass}
-          placeholder={t('dealerNamePlaceholder')}
-          {...register('dealerName')}
-        />
+        {dealers.length > 0 ? (
+          <div className="space-y-2">
+            <select
+              id="dealerBranch"
+              className={inputClass}
+              value={dealerChoice}
+              onChange={handleDealerChange}
+            >
+              <option value="">{t('dealerSelectPlaceholder')}</option>
+              {dealers.map((d) => (
+                <option key={d.id} value={d.id}>
+                  {d.locality ? `${d.name}（${d.locality}）` : d.name}
+                </option>
+              ))}
+              <option value={OTHER_DEALER}>{t('dealerOther')}</option>
+            </select>
+            {dealerChoice === OTHER_DEALER && (
+              <input
+                id="dealerName"
+                type="text"
+                className={inputClass}
+                placeholder={t('dealerNamePlaceholder')}
+                {...register('dealerName')}
+              />
+            )}
+            {/* Keeps the chosen branch in the form state while the visible
+                control is the select above. */}
+            <input type="hidden" {...register('branchId')} />
+            {dealerChoice !== OTHER_DEALER && <input type="hidden" {...register('dealerName')} />}
+          </div>
+        ) : (
+          <input
+            id="dealerName"
+            type="text"
+            className={inputClass}
+            placeholder={t('dealerNamePlaceholder')}
+            {...register('dealerName')}
+          />
+        )}
       </FormField>
 
       <div className="pt-2">

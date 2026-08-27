@@ -54,6 +54,9 @@ export default function SignUpForm() {
         name: buildDisplayName(membershipType, data),
         email: data.email,
         password: data.password,
+        // Recorded rather than inferred: a dealer's branch view is gated on
+        // this, and an individual may well have typed a company name.
+        memberType: membershipType,
         gender: optional(data.gender),
         dateOfBirth: buildDateOfBirth(data),
         phoneNumber: optional(

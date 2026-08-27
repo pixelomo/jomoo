@@ -7,6 +7,7 @@ import { RegistrationSchema } from '@/types/registration'
 import { findRegistrationBySerial, isDuplicateSerialError } from '@/lib/serialRegistry'
 import { bindSerialToRegistration, validateSerialNumber } from '@/lib/serialLibrary'
 import { warrantyExpiryFrom } from '@/lib/warranty'
+import { getBranch } from '@/lib/dealerBranches'
 import { sendRegistrationConfirmation, sendWarrantyIssuedEmail } from '@/lib/resend'
 
 async function getAuthenticatedUser(req: Request) {
@@ -31,6 +32,13 @@ export async function POST(req: Request) {
 
   const data = parsed.data
   const id = crypto.randomUUID()
+
+  // A branch id is only honoured if it names a real branch — it is what decides
+  // which dealer gets to read this registration, so an id invented by the
+  // browser must not put a customer's details in front of a stranger. The name
+  // is taken from the branch rather than from the body for the same reason.
+  const branch = data.branchId ? await getBranch(data.branchId) : null
+  const dealerName = branch?.name ?? data.dealerName ?? null
 
   // Validate server-side and ignore whatever the browser claimed. The request
   // body carries a `serialNumberValid` flag for the form's own UI; trusting it
@@ -72,7 +80,8 @@ export async function POST(req: Request) {
       contactPerson: data.contactPerson,
       phoneNumber: data.phoneNumber ?? null,
       purchaseDate: data.purchaseDate ?? null,
-      dealerName: data.dealerName ?? null,
+      dealerName,
+      branchId: branch?.id ?? null,
       serialNumber: data.serialNumber,
       serialNumberValid: serialCheck.valid,
       warrantyCardUrl: data.warrantyCardUrl ?? null,
