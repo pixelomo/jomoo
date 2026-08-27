@@ -2,6 +2,7 @@
 'use client'
 
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { useFullyInView } from './useFullyInView'
 
 type SlideMedia =
   | { type: 'video'; src: string; background?: string }
@@ -123,6 +124,7 @@ export default function SpotlightCarousel() {
   /** Set while the reader is hovering or tabbing through the carousel. */
   const [paused, setPaused] = useState(false)
 
+  const sectionRef = useRef<HTMLElement>(null)
   const viewportRef = useRef<HTMLDivElement>(null)
   const trackRef = useRef<HTMLDivElement>(null)
   const videoRefs = useRef<(HTMLVideoElement | null)[]>([])
@@ -132,6 +134,10 @@ export default function SpotlightCarousel() {
   const [layoutVersion, setLayoutVersion] = useState(0)
 
   const slideCount = SLIDES.length
+
+  // Autoplay used to start the moment the component mounted, so the carousel
+  // had run to the last slide before anyone scrolled far enough to see it.
+  const { inView } = useFullyInView(sectionRef)
 
   const measureLayout = useCallback(() => {
     const viewport = viewportRef.current
@@ -170,7 +176,7 @@ export default function SpotlightCarousel() {
   // remainder of the previous one.
   useEffect(() => {
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
-    if (isDragging || paused || playingIndex !== null) return
+    if (!inView || isDragging || paused || playingIndex !== null) return
 
     const timer = window.setInterval(() => {
       setActiveIndex((index) => (index + 1) % slideCount)
@@ -178,7 +184,7 @@ export default function SpotlightCarousel() {
     }, AUTOPLAY_MS)
 
     return () => window.clearInterval(timer)
-  }, [isDragging, paused, playingIndex, slideCount, activeIndex])
+  }, [inView, isDragging, paused, playingIndex, slideCount, activeIndex])
 
   const goTo = useCallback(
     (index: number) => {
@@ -254,7 +260,7 @@ export default function SpotlightCarousel() {
   void layoutVersion
 
   return (
-    <section className="spotlight" data-nav="light" aria-label="Smart toilet features">
+    <section ref={sectionRef} className="spotlight" data-nav="light" aria-label="Smart toilet features">
       <div className="site-container spotlight__frame">
         <div className="spotlight__stage">
           <button

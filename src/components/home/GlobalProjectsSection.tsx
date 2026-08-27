@@ -2,6 +2,7 @@
 'use client'
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useFullyInView } from './useFullyInView'
 
 type GlobalSlide = {
   image: string
@@ -77,6 +78,7 @@ export default function GlobalProjectsSection() {
   const [isDragging, setIsDragging] = useState(false)
   const [isSnapping, setIsSnapping] = useState(false)
 
+  const sectionRef = useRef<HTMLElement>(null)
   const viewportRef = useRef<HTMLDivElement>(null)
   const trackRef = useRef<HTMLDivElement>(null)
   const trackIndexRef = useRef(trackIndex)
@@ -88,6 +90,10 @@ export default function GlobalProjectsSection() {
   const stepRef = useRef(0)
   const centerOffsetRef = useRef(0)
   const [layoutVersion, setLayoutVersion] = useState(0)
+
+  // Same story as the spotlight carousel: this used to start advancing at mount,
+  // so the strip had already cycled by the time anyone scrolled down to it.
+  const { inView, inViewRef } = useFullyInView(sectionRef)
 
   trackIndexRef.current = trackIndex
   isDraggingRef.current = isDragging
@@ -164,7 +170,10 @@ export default function GlobalProjectsSection() {
   const scheduleAutoplay = useCallback(() => {
     clearAutoplay()
     autoplayTimeoutRef.current = setTimeout(() => {
-      if (isDraggingRef.current) {
+      // Waits rather than stops, the way a drag does — finishSnap and the
+      // manual arrows both re-arm this, and one of those firing off-screen
+      // must not start the strip moving where nobody is looking.
+      if (!inViewRef.current || isDraggingRef.current) {
         scheduleAutoplay()
         return
       }
@@ -177,15 +186,16 @@ export default function GlobalProjectsSection() {
       next()
       scheduleAutoplay()
     }, AUTOPLAY_MS)
-  }, [clearAutoplay, next])
+  }, [clearAutoplay, next, inViewRef])
 
   useEffect(() => {
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     if (prefersReducedMotion) return
+    if (!inView) return
 
     scheduleAutoplay()
     return clearAutoplay
-  }, [scheduleAutoplay, clearAutoplay])
+  }, [inView, scheduleAutoplay, clearAutoplay])
 
   const handleManualNav = useCallback(
     (action: () => void) => {
@@ -287,7 +297,7 @@ export default function GlobalProjectsSection() {
   void layoutVersion
 
   return (
-    <section className="global-projects" data-nav="light" aria-label="Global projects">
+    <section ref={sectionRef} className="global-projects" data-nav="light" aria-label="Global projects">
       <div className="global-projects__header">
         <div className="feature__head reveal">
           <div className="feature__eyebrow">GLOBAL PROJECTS</div>
