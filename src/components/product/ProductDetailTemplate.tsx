@@ -1,6 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 import Link from 'next/link'
 import { PortableText } from '@portabletext/react'
+import ConsentedVideo from '@/components/consent/ConsentedVideo'
 import {
   getProductsInSeries,
   getSeriesPage,
@@ -187,12 +188,7 @@ export default async function ProductDetailTemplate({ product }: Props) {
                 <div key={i} className="pdp-card">
                   <div className="pdp-video__frame">
                     {v.embedUrl ? (
-                      <iframe
-                        src={v.embedUrl}
-                        title={v.title}
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                        allowFullScreen
-                      />
+                      <ConsentedVideo src={v.embedUrl} title={v.title} />
                     ) : (
                       <div className="pdp-video__empty">
                         <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" aria-hidden="true">

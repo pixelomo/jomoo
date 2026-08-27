@@ -18,6 +18,23 @@ The tables `serial_numbers`, `serial_audit_logs`, `email_templates` and `dealer_
 
 Dealer branches (`dealer_branches`, `user.member_type`, `user.branch_id`, `product_registrations.branch_id`) are applied with `node scripts/add-dealer-branches.mjs`, then `node scripts/backfill-dealer-branches.mjs --apply` gives accounts created before the feature a member type and a branch.
 
+# Cookie consent
+
+The banner in `src/components/consent/` stores one cookie, `jomoo_consent`, holding
+a version and one bit per optional category (`v1.10` — analytics yes, external
+media no). `src/lib/cookieConsent.ts` is the shared model, read on the server in
+`(site)/layout.tsx` so the bar never flashes, and written in the browser.
+
+**Bump `CONSENT_VERSION` whenever the categories change**, or whenever what sits
+behind them does: an older value parses as "no answer yet", so everyone is asked
+again rather than being held to a choice about a different set of cookies.
+
+Nothing optional runs without consent. YouTube embeds go through
+`ConsentedVideo`, which does not request the frame at all until 外部メディア is
+allowed. Google Analytics loads only when `NEXT_PUBLIC_GA_ID` is set **and**
+分析Cookie is agreed to — with no id the analytics row is hidden entirely, since
+a category that gates nothing should not be offered.
+
 # Deploying
 
 Vercel is connected to this repo, so `git push` to `main` deploys. `vercel --prod` also deploys, but it uploads the working directory rather than a commit — **commit and push before deploying**, or the next person's push will silently revert your work.

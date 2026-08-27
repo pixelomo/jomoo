@@ -1,11 +1,14 @@
 import { NextIntlClientProvider } from 'next-intl'
 import { getMessages } from 'next-intl/server'
-import { headers } from 'next/headers'
+import { cookies, headers } from 'next/headers'
 import { Poppins } from 'next/font/google'
 import type { Metadata } from 'next'
 import JomooNav from '@/components/layout/JomooNav'
 import JomooFooter from '@/components/layout/JomooFooter'
+import CookieConsent from '@/components/consent/CookieConsent'
+import Analytics from '@/components/consent/Analytics'
 import { auth } from '@/lib/auth'
+import { CONSENT_COOKIE, parseConsent } from '@/lib/cookieConsent'
 import '../globals.css'
 import '@/components/layout/jomoo-chrome.css'
 
@@ -41,10 +44,16 @@ export const metadata: Metadata = {
 // owns <html>/<body> for the whole public tree. /studio and /admin sit outside
 // it and provide their own document shell.
 export default async function SiteLayout({ children }: { children: React.ReactNode }) {
-  const [session, messages] = await Promise.all([
+  const [session, messages, cookieStore] = await Promise.all([
     auth.api.getSession({ headers: await headers() }),
     getMessages(),
+    cookies(),
   ])
+
+  // Read here rather than in the banner: this layout is already dynamic, and a
+  // server-rendered answer means the bar is either there from the first paint
+  // or never appears — no flash of it on every navigation.
+  const consent = parseConsent(cookieStore.get(CONSENT_COOKIE)?.value)
 
   return (
     <html lang="ja" className={`${poppins.variable} h-full antialiased`}>
@@ -55,6 +64,8 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
             {children}
           </div>
           <JomooFooter />
+          <CookieConsent initial={consent} />
+          <Analytics />
         </NextIntlClientProvider>
       </body>
     </html>

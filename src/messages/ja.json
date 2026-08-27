@@ -547,5 +547,24 @@
     "heading": "ページが見つかりません",
     "body": "お探しのページは存在しないか、移動された可能性があります。",
     "cta": "ホームへ戻る"
+  },
+  "cookies": {
+    "title": "Cookieの使用について",
+    "body": "当サイトでは、サイトの動作に必要なCookieのほか、外部メディア（YouTubeなど）の表示やサイトの改善のためにCookieを使用することがあります。「必須のみ」を選んだ場合は、必要なCookieだけを使用します。設定はフッターの「Cookie設定」からいつでも変更できます。",
+    "acceptAll": "すべて許可",
+    "necessaryOnly": "必須のみ",
+    "settings": "詳細設定",
+    "save": "この設定を保存",
+    "alwaysOn": "常時有効",
+    "necessaryTitle": "必須Cookie",
+    "necessaryDesc": "ログイン状態の保持や、このCookie設定の記録など、サイトの利用に欠かせないCookieです。無効にすることはできません。",
+    "analyticsTitle": "分析Cookie",
+    "analyticsDesc": "どのページがどのように見られているかを集計し、サイトの改善に役立てるためのCookieです。個人を特定する目的では使用しません。",
+    "mediaTitle": "外部メディアCookie",
+    "mediaDesc": "製品ページのYouTube動画など、外部サービスの埋め込みコンテンツを表示するためのCookieです。許可しない場合、動画は再生前に確認を表示します。",
+    "footerLink": "Cookie設定",
+    "videoBlocked": "この動画はYouTubeから配信され、再生にあたりYouTubeのCookieが使用されます。",
+    "videoLoadOnce": "この動画を読み込む",
+    "videoOpenSettings": "Cookie設定を開く"
   }
 }

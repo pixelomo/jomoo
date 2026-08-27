@@ -4,6 +4,7 @@
 'use client'
 
 import { FaLinkedinIn } from 'react-icons/fa6'
+import { openConsentSettings } from '@/components/consent/useConsent'
 import {
   SiFacebook,
   SiInstagram,
@@ -106,6 +107,11 @@ export default function JomooFooter() {
         <span className="footer__legal">
           <a href="#">プライバシーポリシー</a>
           <a href="#">利用規約</a>
+          {/* Withdrawing consent has to be as easy as giving it, so the banner
+              is reachable from every page rather than only on the first visit. */}
+          <button type="button" className="footer__legal-btn" onClick={openConsentSettings}>
+            Cookie設定
+          </button>
           <a href="#">サイトマップ</a>
         </span>
       </div>

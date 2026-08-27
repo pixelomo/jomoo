@@ -2,6 +2,7 @@
 'use client'
 
 import { Fragment, useEffect, useState } from 'react'
+import ConsentedVideo from '@/components/consent/ConsentedVideo'
 
 export interface FeatureCardView {
   /** One entry per rendered line. */
@@ -168,13 +169,7 @@ export default function ProductTabs({
           {introVideoUrl && (
             <div className="pdp-tabs__intro-video">
               <div className="pdp-video__frame">
-                <iframe
-                  src={introVideoUrl}
-                  title="製品紹介動画"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                  referrerPolicy="strict-origin-when-cross-origin"
-                  allowFullScreen
-                />
+                <ConsentedVideo src={introVideoUrl} title="製品紹介動画" />
               </div>
             </div>
           )}
