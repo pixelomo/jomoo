@@ -328,6 +328,13 @@ img {
   --world-hero-show: 890px;
   --world-hero-h: 700px;
   --world-hero-w: calc(var(--world-hero-h) * 1536 / 1024);
+  /* How close the copy is allowed to come to the hero. */
+  --world-copy-gap: 96px;
+  /* The distance from this section's own left edge to the left edge of the
+     1200px column every other section centres its content in. Written against
+     the row's width rather than 100vw so it agrees with the hero's placement
+     and is not thrown off by a classic scrollbar. */
+  --world-shift: max(0px, calc(50% - var(--container) / 2));
 
   position: relative;
   background: #ffffff;
@@ -370,15 +377,20 @@ img {
   z-index: 2;
 }
 
-/* Holds the first row open to the hero's full height, so the tile row below
-   clears it by exactly one gap. The width gives way to the hero rather than
-   running under it: 45% where there is room, otherwise whatever is left once
-   the hero's 890px and a gap are taken, down to a floor. */
+/* Pinned between two edges rather than set to a share of the row: the left one
+   is the 1200px column the rest of the site aligns to, the right one is 96px
+   off the hero. On a wide screen a percentage width left the copy stranded
+   further and further from the photograph; holding both edges keeps it where
+   it was drawn, and the column simply takes the width between them. */
 .world__intro {
   position: relative;
+  margin-left: var(--world-shift);
   width: max(
     18rem,
-    min(45%, calc(100% + var(--gutter) - var(--world-hero-show) - var(--world-gap)))
+    calc(
+      100% + var(--gutter) - var(--world-hero-show) - var(--world-copy-gap) -
+        var(--world-shift)
+    )
   );
   /* Fixed, not a minimum: the gap below has to be measured from the hero, so
      the row is the hero's height whether the copy runs a little short of it or
@@ -420,13 +432,14 @@ img {
   word-break: keep-all;
 }
 
-/* keep-all is inherited from .world__body, and with no punctuation to break at
-   the first line simply ran past any max-width it was given. These paragraphs
-   wrap normally so the 300px is the column it says it is. */
+/* The column above is the measure now — capping the paragraph itself is what
+   let it sit 370px off the hero on a wide screen while the column stayed put.
+   keep-all is inherited from .world__body and, with no punctuation to break at,
+   left the first line running past whatever width it was given. */
 .world__body p {
   margin: 0;
   font-size: 1.5rem;
-  max-width: 300px;
+  max-width: none;
   word-break: normal;
 }
 
@@ -468,6 +481,7 @@ img {
      row above it, so it has to resolve against .world__upper. Out-of-flow
      children take no part in the flex row either way. */
   position: static;
+  margin-left: var(--world-shift);
   display: flex;
   align-items: flex-end;
   gap: var(--world-gap);
@@ -530,15 +544,22 @@ img {
   height: auto;
 }
 
+/* The ratios still decide how a narrow row is split; the caps decide where each
+   stops growing. Past roughly 1440 both are at their cap and the pair holds at
+   605 + 115 + 492. */
 .world__photo--forest {
   flex: 530 1 0;
   aspect-ratio: 724 / 543;
+  max-width: 605px;
+  max-height: 460px;
   z-index: 3;
 }
 
 .world__photo--shower {
   flex: 430 1 0;
   aspect-ratio: 755 / 973;
+  max-width: 492px;
+  max-height: 640px;
   z-index: 4;
 }
 
@@ -625,6 +646,7 @@ img {
   .world__intro {
     width: 100%;
     height: auto;
+    margin-left: 0;
     position: relative;
     z-index: 1;
   }
@@ -653,6 +675,7 @@ img {
   .world__photos {
     position: relative;
     inset: auto;
+    margin-left: 0;
     display: flex;
     flex-wrap: wrap;
     align-items: flex-end;
@@ -696,10 +719,14 @@ img {
 
   .world__photo--forest {
     aspect-ratio: 724 / 543;
+    max-width: none;
+    max-height: none;
   }
 
   .world__photo--shower {
     aspect-ratio: 755 / 973;
+    max-width: none;
+    max-height: none;
   }
 
   .world__lower {
