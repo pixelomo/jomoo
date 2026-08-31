@@ -304,6 +304,14 @@
   color: #a0a0a8;
 }
 
+/* type="search" grows WebKit's own clear glyph as soon as there is text in it,
+   which lands as a second x just inside our close button. One x, ours. */
+.nav__searchpanel-form input::-webkit-search-cancel-button,
+.nav__searchpanel-form input::-webkit-search-decoration {
+  -webkit-appearance: none;
+  appearance: none;
+}
+
 .nav__searchpanel-close {
   display: inline-flex;
   align-items: center;

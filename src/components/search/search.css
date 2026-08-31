@@ -64,6 +64,13 @@
   border-color: #302d2c;
 }
 
+/* Same as the nav panel: no WebKit clear glyph riding inside the field. */
+.searchpage__form input::-webkit-search-cancel-button,
+.searchpage__form input::-webkit-search-decoration {
+  -webkit-appearance: none;
+  appearance: none;
+}
+
 .searchpage__form button {
   padding: 0.9rem 2rem;
   border: 0;
