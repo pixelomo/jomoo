@@ -61,10 +61,14 @@ export default async function SearchPage({
                   {results.products.map((hit) => (
                     <li key={hit.id}>
                       <Link href={hit.href} className="searchpage__hit">
-                        <span className="searchpage__thumb">
+                        <span
+                          className={`searchpage__thumb${
+                            hit.thumbnail ? ' has-image' : ''
+                          }`}
+                        >
                           {hit.thumbnail && (
                             /* eslint-disable-next-line @next/next/no-img-element */
-                            <img src={imgUrl(hit.thumbnail, 240)} alt="" />
+                            <img src={imgUrl(hit.thumbnail, 480)} alt="" />
                           )}
                         </span>
                         <span className="searchpage__hit-body">
@@ -89,7 +93,9 @@ export default async function SearchPage({
                   {results.posts.map((hit) => (
                     <li key={hit.id}>
                       <Link href={hit.href} className="searchpage__hit">
-                        <span className="searchpage__thumb">
+                        <span
+                          className={`searchpage__thumb${hit.cover ? ' has-image' : ''}`}
+                        >
                           {hit.cover && (
                             /* eslint-disable-next-line @next/next/no-img-element */
                             <img src={hit.cover} alt="" />

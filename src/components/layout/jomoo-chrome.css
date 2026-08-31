@@ -381,6 +381,8 @@
   background: #f2f2f6;
 }
 
+/* Small and grey when there is nothing to show, so the rows still line up;
+   the picture itself is worth real estate, a placeholder is not. */
 .nav__searchpanel-thumb {
   flex-shrink: 0;
   width: 48px;
@@ -388,6 +390,12 @@
   border-radius: 6px;
   overflow: hidden;
   background: #ececf1;
+}
+
+.nav__searchpanel-thumb.has-image {
+  width: 88px;
+  height: 66px;
+  border-radius: 8px;
 }
 
 .nav__searchpanel-thumb img {

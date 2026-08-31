@@ -17,7 +17,7 @@ export async function GET(request: Request) {
       title: hit.title,
       subtitle: hit.subtitle,
       href: hit.href,
-      image: hit.thumbnail ? imgUrl(hit.thumbnail, 160) : null,
+      image: hit.thumbnail ? imgUrl(hit.thumbnail, 260) : null,
     })),
     posts: results.posts.map((hit) => ({
       id: hit.id,

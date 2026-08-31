@@ -134,6 +134,8 @@
   background: #ececf1;
 }
 
+/* An empty thumb stays small — it is only there to keep the rows aligned.
+   A real image gets the room to actually read as one. */
 .searchpage__thumb {
   flex-shrink: 0;
   display: block;
@@ -142,6 +144,12 @@
   border-radius: 8px;
   overflow: hidden;
   background: #e4e4e9;
+}
+
+.searchpage__thumb.has-image {
+  width: 200px;
+  height: 140px;
+  border-radius: 10px;
 }
 
 .searchpage__thumb img {
@@ -193,5 +201,10 @@
   .searchpage__thumb {
     width: 72px;
     height: 56px;
+  }
+
+  .searchpage__thumb.has-image {
+    width: 116px;
+    height: 84px;
   }
 }

@@ -34,22 +34,17 @@ interface Props {
 export default function NavSearchPanel({ open, onClose }: Props) {
   const [query, setQuery] = useState('')
   const [results, setResults] = useState<Results>(EMPTY)
-  const [loading, setLoading] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     if (open) inputRef.current?.focus()
   }, [open])
 
-  useEffect(() => {
-    const term = query.trim()
-    if (!term) {
-      setResults(EMPTY)
-      setLoading(false)
-      return
-    }
+  const term = query.trim()
 
-    setLoading(true)
+  useEffect(() => {
+    if (!term) return
+
     const controller = new AbortController()
     const timer = setTimeout(async () => {
       try {
@@ -59,9 +54,9 @@ export default function NavSearchPanel({ open, onClose }: Props) {
         if (!res.ok) throw new Error('search failed')
         setResults(await res.json())
       } catch (error) {
+        // A failed lookup is reported as "no hits" rather than an error of its
+        // own — stamping the term makes it count as an answer to this query.
         if ((error as Error).name !== 'AbortError') setResults({ ...EMPTY, query: term })
-      } finally {
-        if (!controller.signal.aborted) setLoading(false)
       }
     }, 220)
 
@@ -69,9 +64,12 @@ export default function NavSearchPanel({ open, onClose }: Props) {
       controller.abort()
       clearTimeout(timer)
     }
-  }, [query])
+  }, [term])
 
-  const term = query.trim()
+  // What is on screen belongs to whichever term it was fetched for; anything
+  // else means the answer for what is typed now is still on its way. Cheaper
+  // than a loading flag, and it cannot fall out of step with the results.
+  const pending = results.query !== term
   const hasHits = results.products.length > 0 || results.posts.length > 0
 
   return (
@@ -119,7 +117,7 @@ export default function NavSearchPanel({ open, onClose }: Props) {
             <p className="nav__searchpanel-hint">
               商品情報やブログ記事を検索できます。
             </p>
-          ) : loading ? (
+          ) : pending ? (
             <p className="nav__searchpanel-hint">検索中…</p>
           ) : !hasHits ? (
             <p className="nav__searchpanel-hint">
@@ -134,7 +132,11 @@ export default function NavSearchPanel({ open, onClose }: Props) {
                     {results.products.map((hit) => (
                       <li key={hit.id}>
                         <a href={hit.href}>
-                          <span className="nav__searchpanel-thumb">
+                          <span
+                            className={`nav__searchpanel-thumb${
+                              hit.image ? ' has-image' : ''
+                            }`}
+                          >
                             {hit.image && <img src={hit.image} alt="" />}
                           </span>
                           <span className="nav__searchpanel-text">
@@ -155,7 +157,11 @@ export default function NavSearchPanel({ open, onClose }: Props) {
                     {results.posts.map((hit) => (
                       <li key={hit.id}>
                         <a href={hit.href}>
-                          <span className="nav__searchpanel-thumb">
+                          <span
+                            className={`nav__searchpanel-thumb${
+                              hit.image ? ' has-image' : ''
+                            }`}
+                          >
                             {hit.image && <img src={hit.image} alt="" />}
                           </span>
                           <span className="nav__searchpanel-text">
@@ -172,7 +178,7 @@ export default function NavSearchPanel({ open, onClose }: Props) {
           )}
         </div>
 
-        {term !== '' && hasHits && (
+        {term !== '' && !pending && hasHits && (
           <a
             className="nav__searchpanel-all"
             href={`/search?q=${encodeURIComponent(term)}`}
