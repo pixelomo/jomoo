@@ -320,13 +320,14 @@ img {
      the bathroom photo and the copy beside it. Everything below reads from it,
      so the rhythm cannot drift the way it did when each rule carried its own
      number. */
-  --world-gap: 4rem;
-  /* Every tile is shown at its file's own proportions, so nothing is cropped.
-     The hero keeps its designed width and its bleed off the right; only its
-     height now follows from the picture rather than from a chosen box. */
-  --world-hero-w: 75rem;
+  --world-gap: 115px;
+  /* The hero shows 890x700 and runs off the right of the screen. Its width is
+     that height at the photograph's own 3:2, so the 1050px element is uncropped
+     and the 160px past 890 is what leaves the frame. */
   --world-hero-ratio: 1536 / 1024;
-  --world-hero-h: calc(var(--world-hero-w) * 1024 / 1536);
+  --world-hero-show: 890px;
+  --world-hero-h: 700px;
+  --world-hero-w: calc(var(--world-hero-h) * 1536 / 1024);
 
   position: relative;
   background: #ffffff;
@@ -370,11 +371,19 @@ img {
 }
 
 /* Holds the first row open to the hero's full height, so the tile row below
-   clears it by exactly one gap. */
+   clears it by exactly one gap. The width gives way to the hero rather than
+   running under it: 45% where there is room, otherwise whatever is left once
+   the hero's 890px and a gap are taken, down to a floor. */
 .world__intro {
   position: relative;
-  width: 45%;
-  min-height: var(--world-hero-h);
+  width: max(
+    18rem,
+    min(45%, calc(100% + var(--gutter) - var(--world-hero-show) - var(--world-gap)))
+  );
+  /* Fixed, not a minimum: the gap below has to be measured from the hero, so
+     the row is the hero's height whether the copy runs a little short of it or
+     a little past. */
+  height: var(--world-hero-h);
   z-index: 2;
 }
 
@@ -411,9 +420,14 @@ img {
   word-break: keep-all;
 }
 
+/* keep-all is inherited from .world__body, and with no punctuation to break at
+   the first line simply ran past any max-width it was given. These paragraphs
+   wrap normally so the 300px is the column it says it is. */
 .world__body p {
   margin: 0;
   font-size: 1.5rem;
+  max-width: 300px;
+  word-break: normal;
 }
 
 /* Source notes under the awards on slide 1. Quiet — they are a citation, not
@@ -492,13 +506,16 @@ img {
   display: block;
 }
 
+/* Placed from the right: 100% + the gutter is the right edge of the screen, so
+   backing 890px off it puts exactly that much of the photograph in frame and
+   the remainder past the edge, where .world's overflow-x: clip cuts it. */
 .world__photo--hero {
   position: absolute;
   top: 0;
-  left: 50%;
+  left: calc(100% + var(--gutter) - var(--world-hero-show));
   width: var(--world-hero-w);
-  aspect-ratio: var(--world-hero-ratio);
-  height: auto;
+  height: var(--world-hero-h);
+  aspect-ratio: auto;
   max-width: none;
   z-index: 1;
 }
@@ -525,13 +542,12 @@ img {
   z-index: 4;
 }
 
-/* The same two columns and the same gap as the tile row above, so the bathroom
-   photo starts on the forest tile's left edge and the copy beside it starts on
-   the shower's. */
+/* The bathroom photo is pinned to a fixed size and hung past the left edge of
+   the screen, so this row cannot use the tile row's columns — the photo takes
+   the width it needs and the copy takes what is left. */
 .world__lower {
-  display: grid;
-  grid-template-columns: 530fr 430fr;
-  column-gap: var(--world-gap);
+  display: flex;
+  gap: var(--world-gap);
   /* Centred against the photograph beside it; 'end' pinned it to the very
      bottom of the image, far below anything to align with. */
   align-items: center;
@@ -548,11 +564,16 @@ img {
   flex-shrink: 0;
 }
 
+/* Shows at 920x530. The element is 100px wider than that and pulled left by
+   the gutter plus those 100px, which puts its left edge 100px past the side of
+   the screen — .world has overflow-x: clip, so that is where it is cut. The
+   mirror of the hero's bleed off the right. */
 .world__figure--bathroom {
-  grid-column: 1;
-  width: 100%;
-  height: auto;
-  aspect-ratio: 1774 / 887;
+  flex: 0 0 auto;
+  width: calc(920px + 100px);
+  height: 530px;
+  aspect-ratio: auto;
+  margin-left: calc(-1 * var(--gutter) - 100px);
 }
 
 .world__body--secondary {
@@ -562,6 +583,7 @@ img {
      by any align-self the child sets, which is why the paragraph stayed pinned
      to the foot of the image. */
   align-self: center;
+  flex: 1 1 auto;
   max-width: none;
   margin: 0;
   padding-left: 0;
@@ -602,7 +624,7 @@ img {
 
   .world__intro {
     width: 100%;
-    min-height: 0;
+    height: auto;
     position: relative;
     z-index: 1;
   }
@@ -619,6 +641,11 @@ img {
 
   .world__body--secondary-lower {
     display: none;
+  }
+
+  .world__body p {
+    max-width: none;
+    word-break: keep-all;
   }
 
   /* Wraps rather than stacks, so the hero takes a row of its own and the forest
@@ -650,6 +677,7 @@ img {
   .world__photo--hero {
     position: relative;
     flex: 0 0 100%;
+    left: auto;
     width: 100%;
     height: auto;
     aspect-ratio: var(--world-hero-ratio);
@@ -679,7 +707,7 @@ img {
     inset: auto;
     padding: 0;
     margin: 0;
-    grid-template-columns: 1fr;
+    flex-direction: column;
     pointer-events: auto;
     z-index: 1;
   }
@@ -692,6 +720,7 @@ img {
     width: 100%;
     height: auto;
     min-height: 0;
+    margin-left: 0;
     aspect-ratio: 1774 / 887;
     pointer-events: auto;
   }
