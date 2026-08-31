@@ -197,36 +197,33 @@
 }
 
 /* Globe (the client's English site) and search, sitting left of お問い合わせ.
-   Both source SVGs are white-filled, which is what this always-dark bar wants. */
+   Both source SVGs are white-filled, which is what this always-dark bar wants.
+   Sized to match jomoo.com's own header icons: a bare 22px box the glyph fills
+   edge to edge, with no disc behind it and no hover state — the client's site
+   gives these two nothing on hover, so neither do we. */
 .nav__icon-link {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 36px;
-  height: 36px;
+  display: flex;
+  width: 22px;
+  height: 22px;
   padding: 0;
   border: 0;
-  border-radius: 50%;
   background: transparent;
   color: inherit;
   cursor: pointer;
   flex-shrink: 0;
   text-decoration: none;
-  transition: background 0.2s ease, opacity 0.2s ease;
-}
-
-.nav__icon-link:hover {
-  background: rgba(255, 255, 255, 0.12);
 }
 
 .nav__icon-link img {
-  width: 20px;
-  height: 20px;
+  width: 100%;
+  height: 100%;
   display: block;
 }
 
-.nav.is-search-open .nav__search {
-  background: rgba(255, 255, 255, 0.18);
+/* Keyboard users still need to see where they are; this is focus, not hover. */
+.nav__icon-link:focus-visible {
+  outline: 2px solid #ffffff;
+  outline-offset: 4px;
 }
 
 /* SEARCH PANEL — drops out from under the bar, full width, 20rem tall. */
