@@ -325,16 +325,44 @@ img {
      that height at the photograph's own 3:2, so the 1050px element is uncropped
      and the 160px past 890 is what leaves the frame. */
   --world-hero-ratio: 1536 / 1024;
-  --world-hero-show: 890px;
-  --world-hero-h: 700px;
-  --world-hero-w: calc(var(--world-hero-h) * 1536 / 1024);
-  /* How close the copy is allowed to come to the hero. */
+  /* How close the copy may come to the hero, and how narrow the copy may get
+     before the hero has to give way instead. */
   --world-copy-gap: 96px;
-  /* The distance from this section's own left edge to the left edge of the
-     1200px column every other section centres its content in. Written against
-     the row's width rather than 100vw so it agrees with the hero's placement
-     and is not thrown off by a classic scrollbar. */
-  --world-shift: max(0px, calc(50% - var(--container) / 2));
+  --world-copy-min: 300px;
+
+  /* cqw, not %, throughout: these feed a height as well as a width, and a
+     percentage in a height resolves against the containing block's height. The
+     query container is .world__upper, so 100cqw is that row's width — the same
+     figure % would give, and equally safe from a classic scrollbar.
+
+     The distance from this section's left edge to the left edge of the 1200px
+     column every other section centres its content in. */
+  --world-shift: max(0px, calc(50cqw - var(--container) / 2));
+
+  /* 890px of hero wherever there is room for it beside a full copy column.
+     Below roughly 1390px there is not, and the hero gives back what the copy
+     and its 96px need rather than running underneath the text. */
+  --world-hero-show: min(
+    890px,
+    calc(
+      100cqw + var(--gutter) - var(--world-shift) - var(--world-copy-min) -
+        var(--world-copy-gap)
+    )
+  );
+  /* At 890 the hero is 700 tall; narrower, it scales whole rather than simply
+     hiding more of itself past the edge. */
+  --world-hero-h: calc(var(--world-hero-show) * 700 / 890);
+  --world-hero-w: calc(var(--world-hero-h) * 1536 / 1024);
+
+  /* The bathroom photo gives way on the same terms — 920px of it wherever its
+     copy still gets a full column beside it, less where it does not. Left to a
+     flat 920 it pushed that copy clean off the right of a 1200px screen. */
+  --world-bath-show: min(
+    920px,
+    calc(100cqw + var(--gutter) - var(--world-gap) - var(--world-copy-min))
+  );
+  --world-bath-w: calc(var(--world-bath-show) * 1020 / 920);
+  --world-bath-h: calc(var(--world-bath-show) * 530 / 920);
 
   position: relative;
   background: #ffffff;
@@ -367,8 +395,10 @@ img {
 
 /* Two rows: the copy (with the hero laid over it) and the tile pair. Both
    measure themselves, so there is no hand-totalled min-height left to fall out
-   of step with the gap the way the old one had. */
+   of step with the gap the way the old one had. Also the query container the
+   hero and the copy size themselves against. */
 .world__upper {
+  container-type: inline-size;
   position: relative;
   width: 100%;
   display: grid;
@@ -386,17 +416,29 @@ img {
   position: relative;
   margin-left: var(--world-shift);
   width: max(
-    18rem,
+    var(--world-copy-min),
     calc(
-      100% + var(--gutter) - var(--world-hero-show) - var(--world-copy-gap) -
+      100cqw + var(--gutter) - var(--world-hero-show) - var(--world-copy-gap) -
         var(--world-shift)
     )
   );
   /* Fixed, not a minimum: the gap below has to be measured from the hero, so
      the row is the hero's height whether the copy runs a little short of it or
-     a little past. */
+     a little past. Wide enough for that to hold, the copy overruns by 44px at
+     most and still clears the tiles by 71. */
   height: var(--world-hero-h);
   z-index: 2;
+}
+
+/* Narrower than this the hero is shrinking while the copy is not, so the copy
+   becomes the taller of the two by more than the gap can absorb — 189px at
+   1024, which would put text over the forest tile. Here the row follows the
+   copy and the 115px is measured from whichever is lower. */
+@media (max-width: 1399px) {
+  .world__intro {
+    height: auto;
+    min-height: var(--world-hero-h);
+  }
 }
 
 .world__eyebrow {
@@ -526,7 +568,7 @@ img {
 .world__photo--hero {
   position: absolute;
   top: 0;
-  left: calc(100% + var(--gutter) - var(--world-hero-show));
+  left: calc(100cqw + var(--gutter) - var(--world-hero-show));
   width: var(--world-hero-w);
   height: var(--world-hero-h);
   aspect-ratio: auto;
@@ -567,6 +609,7 @@ img {
    the screen, so this row cannot use the tile row's columns — the photo takes
    the width it needs and the copy takes what is left. */
 .world__lower {
+  container-type: inline-size;
   display: flex;
   gap: var(--world-gap);
   /* Centred against the photograph beside it; 'end' pinned it to the very
@@ -585,16 +628,18 @@ img {
   flex-shrink: 0;
 }
 
-/* Shows at 920x530. The element is 100px wider than that and pulled left by
-   the gutter plus those 100px, which puts its left edge 100px past the side of
-   the screen — .world has overflow-x: clip, so that is where it is cut. The
-   mirror of the hero's bleed off the right. */
+/* Shows at 920x530, and is pulled left by the gutter plus the part that is not
+   showing, which puts that part past the side of the screen — .world has
+   overflow-x: clip, so that is where it is cut. The mirror of the hero's bleed
+   off the right, and it scales the same way when it has to. */
 .world__figure--bathroom {
   flex: 0 0 auto;
-  width: calc(920px + 100px);
-  height: 530px;
+  width: var(--world-bath-w);
+  height: var(--world-bath-h);
   aspect-ratio: auto;
-  margin-left: calc(-1 * var(--gutter) - 100px);
+  margin-left: calc(
+    -1 * var(--gutter) - (var(--world-bath-w) - var(--world-bath-show))
+  );
 }
 
 .world__body--secondary {
@@ -620,7 +665,7 @@ img {
   display: none;
 }
 
-@media (max-width: 979px) {
+@media (max-width: 1023px) {
   .world::before {
     width: 100%;
   }
@@ -646,6 +691,7 @@ img {
   .world__intro {
     width: 100%;
     height: auto;
+    min-height: 0;
     margin-left: 0;
     position: relative;
     z-index: 1;
