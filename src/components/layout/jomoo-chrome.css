@@ -196,14 +196,248 @@
   font-size: 20px;
 }
 
-.nav__search {
-  display: none;
+/* Globe (the client's English site) and search, sitting left of お問い合わせ.
+   Both source SVGs are white-filled, which is what this always-dark bar wants. */
+.nav__icon-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  flex-shrink: 0;
+  text-decoration: none;
+  transition: background 0.2s ease, opacity 0.2s ease;
 }
 
-.nav__search img {
+.nav__icon-link:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.nav__icon-link img {
+  width: 20px;
+  height: 20px;
+  display: block;
+}
+
+.nav.is-search-open .nav__search {
+  background: rgba(255, 255, 255, 0.18);
+}
+
+/* SEARCH PANEL — drops out from under the bar, full width, 20rem tall. */
+.nav__searchpanel {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  height: 20rem;
+  background: #ffffff;
+  color: #111111;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.18);
+  overflow: hidden;
+  transform: translateY(-100%);
+  opacity: 0;
+  pointer-events: none;
+  transition: transform 0.35s cubic-bezier(0.22, 0.61, 0.36, 1),
+    opacity 0.25s ease, visibility 0s linear 0.35s;
+}
+
+/* `hidden` marks the closed state, but the class drives the slide, so the
+   attribute has to lose the display fight to it — visibility is what actually
+   takes the field and its links out of the tab order while it is tucked away. */
+.nav__searchpanel[hidden] {
+  display: block;
+  visibility: hidden;
+}
+
+.nav.is-search-open .nav__searchpanel {
+  transform: translateY(0);
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transition-delay: 0s;
+}
+
+.nav__searchpanel-inner {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 1.5rem var(--gutter) 1.25rem;
+}
+
+.nav__searchpanel-form {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #e2e2e6;
+  flex-shrink: 0;
+}
+
+.nav__searchpanel-icon {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  /* The asset is white for the dark bar; invert it for this white panel. */
+  filter: invert(1);
+  opacity: 0.55;
+}
+
+.nav__searchpanel-form input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  outline: none;
+  background: transparent;
+  font: inherit;
+  font-size: 1.25rem;
+  color: #111111;
+  letter-spacing: 0.04em;
+}
+
+.nav__searchpanel-form input::placeholder {
+  color: #a0a0a8;
+}
+
+.nav__searchpanel-close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: #444;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.2s;
+}
+
+.nav__searchpanel-close:hover {
+  background: #f0f0f4;
+}
+
+.nav__searchpanel-close svg {
   width: 18px;
   height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+}
+
+.nav__searchpanel-results {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding-top: 1rem;
+}
+
+.nav__searchpanel-hint {
+  margin: 0;
+  font-size: 0.9rem;
+  color: #7a7a82;
+}
+
+.nav__searchpanel-cols {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.5rem 2.5rem;
+}
+
+.nav__searchpanel-cols h3 {
+  margin: 0 0 0.5rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  color: #8a8a92;
+}
+
+.nav__searchpanel-cols ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.nav__searchpanel-cols a {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  padding: 0.5rem;
+  margin-left: -0.5rem;
+  border-radius: 8px;
+  color: inherit;
+  text-decoration: none;
+  transition: background 0.15s;
+}
+
+.nav__searchpanel-cols a:hover {
+  background: #f2f2f6;
+}
+
+.nav__searchpanel-thumb {
+  flex-shrink: 0;
+  width: 48px;
+  height: 40px;
+  border-radius: 6px;
+  overflow: hidden;
+  background: #ececf1;
+}
+
+.nav__searchpanel-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
   display: block;
+}
+
+.nav__searchpanel-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 0;
+}
+
+.nav__searchpanel-text strong {
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: #111;
+  line-height: 1.4;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.nav__searchpanel-text em {
+  font-style: normal;
+  font-size: 0.78rem;
+  color: #77777f;
+  line-height: 1.4;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.nav__searchpanel-all {
+  flex-shrink: 0;
+  margin-top: 0.75rem;
+  padding-top: 0.85rem;
+  border-top: 1px solid #e2e2e6;
+  font-size: 0.85rem;
+  letter-spacing: 0.06em;
+  color: #302d2c;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.nav__searchpanel-all:hover {
+  text-decoration: underline;
 }
 
 .nav__auth-icon {
@@ -522,6 +756,15 @@
   .nav__actions {
     gap: 10px;
     font-size: 16px;
+  }
+
+  .nav__searchpanel-cols {
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+  }
+
+  .nav__searchpanel-form input {
+    font-size: 1rem;
   }
 
   .footer__inner {

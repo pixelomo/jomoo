@@ -7,6 +7,10 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { authClient } from '@/lib/auth-client'
+import NavSearchPanel from '@/components/search/NavSearchPanel'
+
+/** The client's global site — the language switch beside the search glyph. */
+const GLOBAL_SITE = 'https://jomoo.com/'
 
 interface Props {
   isSignedIn: boolean
@@ -48,6 +52,7 @@ function AuthGlyph({ direction }: { direction: 'in' | 'out' }) {
 export default function JomooNav({ isSignedIn }: Props) {
   const navRef = useRef<HTMLElement>(null)
   const [menuOpen, setMenuOpen] = useState(false)
+  const [searchOpen, setSearchOpen] = useState(false)
 
   useEffect(() => {
     const nav = navRef.current
@@ -96,13 +101,35 @@ export default function JomooNav({ isSignedIn }: Props) {
     }
   }, [menuOpen])
 
+  useEffect(() => {
+    if (!searchOpen) return
+
+    function onKeyDown(event: KeyboardEvent) {
+      if (event.key === 'Escape') setSearchOpen(false)
+    }
+
+    function onPointerDown(event: MouseEvent) {
+      if (!navRef.current?.contains(event.target as Node)) setSearchOpen(false)
+    }
+
+    document.addEventListener('keydown', onKeyDown)
+    document.addEventListener('mousedown', onPointerDown)
+
+    return () => {
+      document.removeEventListener('keydown', onKeyDown)
+      document.removeEventListener('mousedown', onPointerDown)
+    }
+  }, [searchOpen])
+
   function closeMenu() {
     setMenuOpen(false)
   }
 
   return (
     <nav
-      className={`nav${menuOpen ? ' is-menu-open' : ''}`}
+      className={`nav${menuOpen ? ' is-menu-open' : ''}${
+        searchOpen ? ' is-search-open' : ''
+      }`}
       ref={navRef}
     >
       <a href="/" className="nav__logo">
@@ -119,7 +146,27 @@ export default function JomooNav({ isSignedIn }: Props) {
 
       <div className="nav__end">
         <div className="nav__actions">
-          <button type="button" className="nav__search" aria-label="検索">
+          <a
+            href={GLOBAL_SITE}
+            className="nav__icon-link"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="JOMOO グローバルサイト（英語）"
+            title="Global site (English)"
+          >
+            <img src="/images/globe.svg" alt="" />
+          </a>
+          <button
+            type="button"
+            className="nav__icon-link nav__search"
+            aria-label={searchOpen ? '検索を閉じる' : '検索'}
+            aria-expanded={searchOpen}
+            aria-controls="nav-search"
+            onClick={() => {
+              setSearchOpen((open) => !open)
+              setMenuOpen(false)
+            }}
+          >
             <img src="/images/search.svg" alt="" />
           </button>
           <a
@@ -181,6 +228,8 @@ export default function JomooNav({ isSignedIn }: Props) {
           </svg>
         </button>
       </div>
+
+      <NavSearchPanel open={searchOpen} onClose={() => setSearchOpen(false)} />
 
       <div className="nav__drawer" id="nav-drawer">
         <ul className="nav__drawer-menu">

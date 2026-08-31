@@ -15,7 +15,7 @@ function createSanityClient(): SanityClient {
 }
 
 let _client: SanityClient | null = null
-function getSanityClient(): SanityClient {
+export function getSanityClient(): SanityClient {
   if (!_client) _client = createSanityClient()
   return _client
 }
