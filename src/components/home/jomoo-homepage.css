@@ -315,10 +315,23 @@ img {
    WORLD OF JOMOO — static layout
    ============================================ */
 .world {
+  /* One gap for the whole section: between the hero and the tiles under it,
+     between the tiles, between the tile row and the bathroom row, and between
+     the bathroom photo and the copy beside it. Everything below reads from it,
+     so the rhythm cannot drift the way it did when each rule carried its own
+     number. */
+  --world-gap: 4rem;
+  /* Every tile is shown at its file's own proportions, so nothing is cropped.
+     The hero keeps its designed width and its bleed off the right; only its
+     height now follows from the picture rather than from a chosen box. */
+  --world-hero-w: 75rem;
+  --world-hero-ratio: 1536 / 1024;
+  --world-hero-h: calc(var(--world-hero-w) * 1024 / 1536);
+
   position: relative;
   background: #ffffff;
   color: var(--jomoo-black);
-  padding: 8rem 0 12rem;
+  padding: 8rem 0;
   overflow-x: clip;
   overflow-y: visible;
 }
@@ -340,21 +353,28 @@ img {
   width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 6rem;
+  gap: var(--world-gap);
   z-index: 1;
 }
 
-/* 38rem hero + 3rem gap + the 560px shower + 3rem below it. */
+/* Two rows: the copy (with the hero laid over it) and the tile pair. Both
+   measure themselves, so there is no hand-totalled min-height left to fall out
+   of step with the gap the way the old one had. */
 .world__upper {
   position: relative;
   width: 100%;
-  min-height: calc(38rem + 3rem + 560px + 3rem);
+  display: grid;
+  grid-template-columns: 100%;
+  row-gap: var(--world-gap);
   z-index: 2;
 }
 
+/* Holds the first row open to the hero's full height, so the tile row below
+   clears it by exactly one gap. */
 .world__intro {
   position: relative;
   width: 45%;
+  min-height: var(--world-hero-h);
   z-index: 2;
 }
 
@@ -425,18 +445,24 @@ img {
   pointer-events: none;
 }
 
+/* The pair spans the container edge to edge — the forest's left edge on the
+   same line as the copy above it and the bathroom photo below, the shower's
+   right edge on the container's. Bottom-aligned, so the two feet stay level
+   however the widths land. */
 .world__photos {
-  position: absolute;
-  inset: 0;
-  left: 0;
-  right: 0;
-  min-height: calc(38rem + 3rem + 560px + 3rem);
+  /* Static on purpose: the hero is a child of this row but is laid over the
+     row above it, so it has to resolve against .world__upper. Out-of-flow
+     children take no part in the flex row either way. */
+  position: static;
+  display: flex;
+  align-items: flex-end;
+  gap: var(--world-gap);
+  width: 100%;
   overflow: visible;
-  pointer-events: none;
 }
 
 .world__photo {
-  position: absolute;
+  position: relative;
   margin: 0;
   border-radius: 3rem;
   overflow: hidden;
@@ -467,59 +493,51 @@ img {
 }
 
 .world__photo--hero {
+  position: absolute;
   top: 0;
   left: 50%;
-  width: 75rem;
-  height: 38rem;
+  width: var(--world-hero-w);
+  aspect-ratio: var(--world-hero-ratio);
+  height: auto;
   max-width: none;
   z-index: 1;
 }
 
-/* Forest and shower sit side by side under the hero, 3rem below it and 3rem
-   apart, and now span the container rather than only its right half — at these
-   sizes, starting at the midpoint would have pushed the shower 288px off the
-   side of a 1440px screen.
-   
-   Each tile matches the proportions of its own photograph — 530x390 against a
-   724x543 source, 430x560 against 755x973 — so neither is cropped in any way a
-   viewer would notice. The pair is centred because the two fixed widths do not
-   quite fill the container; splitting the remainder evenly reads as deliberate
-   where hanging it all on one side would not. */
-.world__photos {
-  --tile-gap: 4rem;
-  --tile-pair: calc(530px + var(--tile-gap) + 430px);
+/* The two share the row in the proportion the design drew them at (530 to
+   430), rather than at two fixed pixel widths that left a different remainder
+   on every screen. min-width: 0 stops each photograph's intrinsic size holding
+   its item open. */
+.world__photo--forest,
+.world__photo--shower {
+  min-width: 0;
+  height: auto;
 }
 
-/* Dropped so its foot lands level with the shower's rather than its head —
-   38rem + the gap puts the taller tile's top, and 560 - 390 makes up the
-   difference. */
 .world__photo--forest {
-  top: calc(38rem + var(--tile-gap) + 170px);
-  left: calc(50% - var(--tile-pair) / 2);
-  width: 530px;
-  height: 390px;
+  flex: 530 1 0;
+  aspect-ratio: 724 / 543;
   z-index: 3;
 }
 
 .world__photo--shower {
-  top: calc(38rem + var(--tile-gap));
-  left: calc(50% - var(--tile-pair) / 2 + 530px + var(--tile-gap));
-  width: 430px;
-  height: 560px;
+  flex: 430 1 0;
+  aspect-ratio: 755 / 973;
   z-index: 4;
 }
 
+/* The same two columns and the same gap as the tile row above, so the bathroom
+   photo starts on the forest tile's left edge and the copy beside it starts on
+   the shower's. */
 .world__lower {
   display: grid;
-  grid-template-columns: 55fr 45fr;
-  column-gap: 2rem;
+  grid-template-columns: 530fr 430fr;
+  column-gap: var(--world-gap);
   /* Centred against the photograph beside it; 'end' pinned it to the very
-     bottom of a 30rem-tall image, far below anything to align with. */
+     bottom of the image, far below anything to align with. */
   align-items: center;
   width: 100%;
   position: relative;
   z-index: 1;
-  padding-top: 4rem;
 }
 
 .world__figure {
@@ -533,9 +551,8 @@ img {
 .world__figure--bathroom {
   grid-column: 1;
   width: 100%;
-  height: 100%;
-  min-height: 30rem;
-  align-self: stretch;
+  height: auto;
+  aspect-ratio: 1774 / 887;
 }
 
 .world__body--secondary {
@@ -547,7 +564,7 @@ img {
   align-self: center;
   max-width: none;
   margin: 0;
-  padding-left: 4rem;
+  padding-left: 0;
   font-size: 1.5rem;
   text-align: left;
 }
@@ -566,12 +583,13 @@ img {
   }
 
   .world {
-    padding: 4.5rem 0 5rem;
+    --world-gap: 1.5rem;
+    padding: 4.5rem 0;
     overflow-x: clip;
   }
 
   .world__stage {
-    gap: 2.5rem;
+    gap: var(--world-gap);
   }
 
   .world__upper {
@@ -579,11 +597,12 @@ img {
     min-height: 0;
     display: flex;
     flex-direction: column;
-    gap: 2.5rem;
+    gap: var(--world-gap);
   }
 
   .world__intro {
     width: 100%;
+    min-height: 0;
     position: relative;
     z-index: 1;
   }
@@ -609,8 +628,8 @@ img {
     inset: auto;
     display: flex;
     flex-wrap: wrap;
-    align-items: flex-start;
-    gap: 1rem;
+    align-items: flex-end;
+    gap: var(--world-gap);
     min-height: 0;
     overflow: visible;
     pointer-events: auto;
@@ -629,29 +648,30 @@ img {
   }
 
   .world__photo--hero {
+    position: relative;
     flex: 0 0 100%;
     width: 100%;
     height: auto;
-    aspect-ratio: 75 / 38;
+    aspect-ratio: var(--world-hero-ratio);
   }
 
-  /* Share the row evenly and shrink with it, each keeping its own proportions
-     so neither is cropped. min-width: 0 stops the image's intrinsic size
-     holding the item open, and flex-start lets the two differ in height. */
+  /* Keep the desktop's 530-to-430 split rather than halving the row: at 1:1 the
+     portrait shower towers over the landscape forest, and the two feet are
+     bottom-aligned here as they are above. The flex ratios come from the base
+     rules; only the pixel widths need clearing. */
   .world__photo--forest,
   .world__photo--shower {
-    flex: 1 1 0;
     min-width: 0;
     width: auto;
     height: auto;
   }
 
   .world__photo--forest {
-    aspect-ratio: 530 / 390;
+    aspect-ratio: 724 / 543;
   }
 
   .world__photo--shower {
-    aspect-ratio: 430 / 560;
+    aspect-ratio: 755 / 973;
   }
 
   .world__lower {
@@ -672,8 +692,7 @@ img {
     width: 100%;
     height: auto;
     min-height: 0;
-    aspect-ratio: 16 / 10;
-    max-height: 20rem;
+    aspect-ratio: 1774 / 887;
     pointer-events: auto;
   }
 }
@@ -2284,7 +2303,7 @@ img {
   }
 
   .world {
-    padding: 5rem 0 7rem;
+    padding: 5rem 0;
   }
 
   .world__title,
@@ -2460,11 +2479,12 @@ img {
   }
 
   .world {
-    padding: 4rem 0 5rem;
+    --world-gap: 1.25rem;
+    padding: 4rem 0;
   }
 
   .world__stage {
-    gap: 2rem;
+    gap: var(--world-gap);
   }
 
   .world__title,
