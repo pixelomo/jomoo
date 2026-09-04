@@ -245,3 +245,63 @@ export async function getProductsInSeries(series: string): Promise<ProductSummar
     return []
   }
 }
+
+/* ── Legal documents ─────────────────────────────────────────
+   The privacy policy and the ご利用条件, edited by the client in the Studio.
+   Seeded by scripts/seed-legal-documents.mjs. */
+
+/** One row of a 事業者情報 / お問い合わせ窓口 table. */
+export interface DefinitionRow {
+  label: string
+  value: string
+}
+
+export interface LegalDocument {
+  slug: string
+  title: string
+  /** Footer link text; falls back to the title when the client leaves it blank. */
+  navLabel?: string
+  description?: string
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  body?: any[]
+  established?: string
+  operator?: string
+  copyright?: string
+}
+
+const LEGAL_FIELDS = `
+  slug,
+  title,
+  navLabel,
+  description,
+  body,
+  established,
+  operator,
+  copyright
+`
+
+export async function getLegalDocument(slug: string): Promise<LegalDocument | null> {
+  try {
+    const result = await getSanityClient().fetch<LegalDocument | null>(
+      `*[_type == "legalDocument" && slug == $slug][0] { ${LEGAL_FIELDS} }`,
+      { slug }
+    )
+    return result ?? null
+  } catch {
+    return null
+  }
+}
+
+/** Just the slug and label, for the footer's legal row. */
+export async function getLegalLinks(): Promise<{ slug: string; label: string }[]> {
+  try {
+    return await getSanityClient().fetch(
+      `*[_type == "legalDocument" && defined(slug)] {
+        slug,
+        "label": coalesce(navLabel, title)
+      }`
+    )
+  } catch {
+    return []
+  }
+}

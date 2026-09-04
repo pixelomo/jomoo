@@ -17,8 +17,27 @@ const SOCIAL_LINKS = [
   { label: 'X', href: 'https://x.com/Jomoointer', Icon: SiX },
 ] as const
 
-export default function JomooFooter() {
+/* The legal row's wording comes from Sanity, so renaming a document in the
+   Studio renames the link to it. These are the labels the documents shipped
+   with, used in slug order — and used verbatim if Sanity cannot be reached,
+   since a footer that quietly loses its policy links is worse than a stale
+   label. */
+const LEGAL_FALLBACK = [
+  { slug: 'privacy-policy', label: 'プライバシーポリシー' },
+  { slug: 'terms-of-use', label: 'ご利用条件' },
+] as const
+
+export type LegalLink = { slug: string; label: string }
+
+function orderLegalLinks(links: LegalLink[]): LegalLink[] {
+  return LEGAL_FALLBACK.map(
+    (fallback) => links.find((link) => link.slug === fallback.slug) ?? fallback
+  )
+}
+
+export default function JomooFooter({ legalLinks = [] }: { legalLinks?: LegalLink[] }) {
   const year = new Date().getFullYear()
+  const legal = orderLegalLinks(legalLinks)
 
   return (
     <footer className="footer">
@@ -96,8 +115,11 @@ export default function JomooFooter() {
       <div className="footer__bottom">
         <span>© {year} JOMOO KITCHEN &amp; BATH CO., LTD. All Rights Reserved.</span>
         <span className="footer__legal">
-          <a href="/privacy-policy">プライバシーポリシー</a>
-          <a href="/terms-of-use">利用規約</a>
+          {legal.map((link) => (
+            <a href={`/${link.slug}`} key={link.slug}>
+              {link.label}
+            </a>
+          ))}
           {/* Withdrawing consent has to be as easy as giving it, so the banner
               is reachable from every page rather than only on the first visit. */}
           <button type="button" className="footer__legal-btn" onClick={openConsentSettings}>

@@ -8,6 +8,7 @@ import JomooFooter from '@/components/layout/JomooFooter'
 import CookieConsent from '@/components/consent/CookieConsent'
 import Analytics from '@/components/consent/Analytics'
 import { auth } from '@/lib/auth'
+import { getLegalLinks } from '@/lib/sanity'
 import { CONSENT_COOKIE, parseConsent } from '@/lib/cookieConsent'
 import '../globals.css'
 import '@/components/layout/jomoo-chrome.css'
@@ -44,10 +45,13 @@ export const metadata: Metadata = {
 // owns <html>/<body> for the whole public tree. /studio and /admin sit outside
 // it and provide their own document shell.
 export default async function SiteLayout({ children }: { children: React.ReactNode }) {
-  const [session, messages, cookieStore] = await Promise.all([
+  const [session, messages, cookieStore, legalLinks] = await Promise.all([
     auth.api.getSession({ headers: await headers() }),
     getMessages(),
     cookies(),
+    // The footer's policy links are named by the client in Sanity; the footer
+    // falls back to the shipped labels if this comes back empty.
+    getLegalLinks(),
   ])
 
   // Read here rather than in the banner: this layout is already dynamic, and a
@@ -63,7 +67,7 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
           <div className="site-main">
             {children}
           </div>
-          <JomooFooter />
+          <JomooFooter legalLinks={legalLinks} />
           <CookieConsent initial={consent} />
           <Analytics />
         </NextIntlClientProvider>

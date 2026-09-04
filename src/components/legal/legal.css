@@ -82,9 +82,12 @@
   margin-top: 18px;
 }
 
-/* Numbered clauses hang their (1) in the margin so the text stays flush. */
+/* Numbered clauses hang their (1) in the margin so the text stays flush. The
+   number is a counter rather than typed into the copy, so the client can add or
+   remove a clause in Sanity without renumbering the rest by hand. */
 .legal__list {
   list-style: none;
+  counter-reset: clause;
   padding: 0;
   margin: 18px 0 0;
   color: #333;
@@ -93,18 +96,20 @@
 }
 
 .legal__list li {
+  counter-increment: clause;
   padding-left: 44px;
   position: relative;
 }
 
-.legal__list li + li {
-  margin-top: 10px;
-}
-
-.legal__marker {
+.legal__list li::before {
+  content: '(' counter(clause) ')';
   position: absolute;
   left: 0;
   color: #000;
+}
+
+.legal__list li + li {
+  margin-top: 10px;
 }
 
 /* 事業者情報 and the contact window: label in one column, value in the next. */

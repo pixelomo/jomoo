@@ -1,0 +1,1610 @@
+[
+  {
+    "_id": "legal-privacy-policy",
+    "_type": "legalDocument",
+    "slug": "privacy-policy",
+    "title": "JOMOO プライバシーポリシー",
+    "navLabel": "プライバシーポリシー",
+    "description": "JOMOO が本サービスで取得する個人情報の利用目的、第三者提供、安全管理措置および開示等の請求方法について定めたプライバシーポリシーです。",
+    "body": [
+      {
+        "_type": "block",
+        "_key": "09e8fbc30d9d",
+        "style": "normal",
+        "markDefs": [],
+        "children": [
+          {
+            "_type": "span",
+            "_key": "09e8fbc30d9ds",
+            "text": "【運営会社名を記入】（以下「当社」といいます）は、当社が運営するウェブサイトおよびサービス（以下「本サービス」といいます）をご利用いただくお客様の個人情報の重要性を認識し、個人情報の保護に関する法律（以下「個人情報保護法」といいます）その他の関係法令およびガイドラインを遵守するとともに、以下のプライバシーポリシー（以下「本ポリシー」といいます）に従い、個人情報を適切に取り扱います。",
+            "marks": []
+          }
+        ]
+      },
+      {
+        "_type": "block",
+        "_key": "ec488bda2ae7",
+        "style": "h2",
+        "markDefs": [],
+        "children": [
+          {
+            "_type": "span",
+            "_key": "ec488bda2ae7s",
+            "text": "第1条　事業者情報",
+            "marks": []
+          }
+        ]
+      },
+      {
+        "_type": "block",
+        "_key": "11c112b2b551",
+        "style": "normal",
+        "markDefs": [],
+        "children": [
+          {
+            "_type": "span",
+            "_key": "11c112b2b551s",
+            "text": "本サービスにおける個人情報の取扱事業者は、以下のとおりです。",
+            "marks": []
+          }
+        ]
+      },
+      {
+        "_type": "definitionList",
+        "_key": "d14b65630b09",
+        "rows": [
+          {
+            "_type": "definitionRow",
+            "_key": "3fe6071dec48",
+            "label": "事業者名称",
+            "value": "【JOMOO 運営会社の正式名称を記入】"
+          },
+          {
+            "_type": "definitionRow",
+            "_key": "cec6d93d12b4",
+            "label": "所在地",
+            "value": "【本店所在地・住所を記入】"
+          },
+          {
+            "_type": "definitionRow",
+            "_key": "634bc97b42b1",
+            "label": "代表者",
+            "value": "【代表者氏名を記入】"
+          },
+          {
+            "_type": "definitionRow",
+            "_key": "73b6e542a0a2",
+            "label": "個人情報保護管理者",
+            "value": "【管理責任者の役職・氏名を記入】"
+          }
+        ]
+      },
+      {
+        "_type": "block",
+        "_key": "b68f105c126d",
+        "style": "h2",
+        "markDefs": [],
+        "children": [
+          {
+            "_type": "span",
+            "_key": "b68f105c126ds",
+            "text": "第2条　個人情報の定義",
+            "marks": []
+          }
+        ]
+      },
+      {
+        "_type": "block",
+        "_key": "3d81ef438071",
+        "style": "normal",
+        "markDefs": [],
+        "children": [
+          {
+            "_type": "span",
+            "_key": "3d81ef438071s",
+            "text": "本ポリシーにおいて「個人情報」とは、個人情報保護法第2条第1項に定める個人情報、すなわち生存する個人に関する情報であって、氏名、生年月日その他の記述等により特定の個人を識別することができるもの（他の情報と容易に照合することができ、それにより特定の個人を識別することができるものを含みます）、または個人識別符号が含まれるものをいいます。",
+            "marks": []
+          }
+        ]
+      },
+      {
+        "_type": "block",
+        "_key": "31fb2d5f2a21",
+        "style": "h2",
+        "markDefs": [],
+        "children": [
+          {
+            "_type": "span",
+            "_key": "31fb2d5f2a21s",
+            "text": "第3条　取得する個人情報",
+            "marks": []
+          }
+        ]
+      },
+      {
+        "_type": "block",
+        "_key": "d735f65976ce",
+        "style": "normal",
+        "markDefs": [],
+        "children": [
+          {
+            "_type": "span",
+            "_key": "d735f65976ces",
+            "text": "当社は、本サービスの提供にあたり、以下の個人情報を取得する場合があります。",
+            "marks": []
+          }
+        ]
+      },
+      {
+        "_type": "block",
+        "_key": "7e57314101fa",
+        "style": "normal",
+        "markDefs": [],
+        "children": [
+          {
+            "_type": "span",
+            "_key": "7e57314101fas",
+            "text": "氏名、フリガナ",
+            "marks": []
+          }
+        ],
+        "listItem": "number",
+        "level": 1
+      },
+      {
+        "_type": "block",
+        "_key": "7a3b0bb9105b",
+        "style": "normal",
+        "markDefs": [],
+        "children": [
+          {
+            "_type": "span",
+            "_key": "7a3b0bb9105bs",
+            "text": "住所、郵便番号",
+            "marks": []
+          }
+        ],
+        "listItem": "number",
+        "level": 1
+      },
+      {
+        "_type": "block",
+        "_key": "89729bca6315",
+        "style": "normal",
+        "markDefs": [],
+        "children": [
+          {
+            "_type": "span",
+            "_key": "89729bca6315s",
+            "text": "電話番号、メールアドレス",
+            "marks": []
+          }
+        ],
+        "listItem": "number",
+        "level": 1
+      },
+      {
+        "_type": "block",
+        "_key": "a6abc94d4b3b",
+        "style": "normal",
+        "markDefs": [],
+        "children": [
+          {
+            "_type": "span",
+            "_key": "a6abc94d4b3bs",
+            "text": "会社名、部署名、役職",
+            "marks": []
+          }
+        ],
+        "listItem": "number",
+        "level": 1
+      },
+      {
+        "_type": "block",
+        "_key": "fc7e8023d054",
+        "style": "normal",
+        "markDefs": [],
+        "children": [
+          {
+            "_type": "span",
+            "_key": "fc7e8023d054s",
+            "text": "会員登録に係る情報（ID、パスワード等）",
+            "marks": []
+          }
+        ],
+        "listItem": "number",
+        "level": 1
+      },
+      {
+        "_type": "block",
+        "_key": "5307eb1e4161",
+        "style": "normal",
+        "markDefs": [],
+        "children": [
+          {
+            "_type": "span",
+            "_key": "5307eb1e4161s",
+            "text": "お問い合わせ、ショールーム予約、資料請求等の内容",
+            "marks": []
+          }
+        ],
+        "listItem": "number",
+        "level": 1
+      },
+      {
+        "_type": "block",
+        "_key": "0f13e0580851",
+        "style": "normal",
+        "markDefs": [],
+        "children": [
+          {
+            "_type": "span",
+            "_key": "0f13e0580851s",
+            "text": "商品の購入・修理・アフターサービスに関する情報",
+            "marks": []
+          }
+        ],
+        "listItem": "number",
+        "level": 1
+      },
+      {
+        "_type": "block",
+        "_key": "32d07cc4c6fd",
+        "style": "normal",
+        "markDefs": [],
+        "children": [
+          {
+            "_type": "span",
+            "_key": "32d07cc4c6fds",
+            "text": "本サービスの利用履歴、アクセスログ、Cookie情報、端末情報、IPアドレス等",
+            "marks": []
+          }
+        ],
+        "listItem": "number",
+        "level": 1
+      },
+      {
+        "_type": "block",
+        "_key": "fca7070726ac",
+        "style": "h2",
+        "markDefs": [],
+        "children": [
+          {
+            "_type": "span",
+            "_key": "fca7070726acs",
+            "text": "第4条　個人情報の利用目的",
+            "marks": []
+          }
+        ]
+      },
+      {
+        "_type": "block",
+        "_key": "ec8b268cd85e",
+        "style": "normal",
+        "markDefs": [],
+        "children": [
+          {
+            "_type": "span",
+            "_key": "ec8b268cd85es",
+            "text": "当社は、取得した個人情報を以下の目的の範囲内で利用します。",
+            "marks": []
+          }
+        ]
+      },
+      {
+        "_type": "block",
+        "_key": "a238387697e5",
+        "style": "normal",
+        "markDefs": [],
+        "children": [
+          {
+            "_type": "span",
+            "_key": "a238387697e5s",
+            "text": "本サービスの提供、運営および本人確認のため",
+            "marks": []
+          }
+        ],
+        "listItem": "number",
+        "level": 1
+      },
+      {
+        "_type": "block",
+        "_key": "c605c9bd4174",
+        "style": "normal",
+        "markDefs": [],
+        "children": [
+          {
+            "_type": "span",
+            "_key": "c605c9bd4174s",
+            "text": "商品・サービスに関するお問い合わせ、資料請求、ショールーム予約等への対応のため",
+            "marks": []
+          }
+        ],
+        "listItem": "number",
+        "level": 1
+      },
+      {
+        "_type": "block",
+        "_key": "a40baf7c6809",
+        "style": "normal",
+        "markDefs": [],
+        "children": [
+          {
+            "_type": "span",
+            "_key": "a40baf7c6809s",
+            "text": "商品の販売、配送、設置、修理およびアフターサービスの提供のため",
+            "marks": []
+          }
+        ],
+        "listItem": "number",
+        "level": 1
+      },
+      {
+        "_type": "block",
+        "_key": "83216444a28b",
+        "style": "normal",
+        "markDefs": [],
+        "children": [
+          {
+            "_type": "span",
+            "_key": "83216444a28bs",
+            "text": "当社の商品・サービスに関する情報提供、案内および広告配信のため",
+            "marks": []
+          }
+        ],
+        "listItem": "number",
+        "level": 1
+      },
+      {
+        "_type": "block",
+        "_key": "f6778188508d",
+        "style": "normal",
+        "markDefs": [],
+        "children": [
+          {
+            "_type": "span",
+            "_key": "f6778188508ds",
+            "text": "アンケートの実施、キャンペーンの案内および商品・サービスの改善・開発のため",
+            "marks": []
+          }
+        ],
+        "listItem": "number",
+        "level": 1
+      },
+      {
+        "_type": "block",
+        "_key": "a5cb3a85c844",
+        "style": "normal",
+        "markDefs": [],
+        "children": [
+          {
+            "_type": "span",
+            "_key": "a5cb3a85c844s",
+            "text": "本サービスの利用状況の分析および品質向上のため",
+            "marks": []
+          }
+        ],
+        "listItem": "number",
+        "level": 1
+      },
+      {
+        "_type": "block",
+        "_key": "e2db93eac504",
+        "style": "normal",
+        "markDefs": [],
+        "children": [
+          {
+            "_type": "span",
+            "_key": "e2db93eac504s",
+            "text": "利用規約等に違反する行為への対応のため",
+            "marks": []
+          }
+        ],
+        "listItem": "number",
+        "level": 1
+      },
+      {
+        "_type": "block",
+        "_key": "bff158d61279",
+        "style": "normal",
+        "markDefs": [],
+        "children": [
+          {
+            "_type": "span",
+            "_key": "bff158d61279s",
+            "text": "上記の利用目的に付随する目的のため",
+            "marks": []
+          }
+        ],
+        "listItem": "number",
+        "level": 1
+      },
+      {
+        "_type": "block",
+        "_key": "722685c6c45e",
+        "style": "h2",
+        "markDefs": [],
+        "children": [
+          {
+            "_type": "span",
+            "_key": "722685c6c45es",
+            "text": "第5条　個人情報の取得方法",
+            "marks": []
+          }
+        ]
+      },
+      {
+        "_type": "block",
+        "_key": "c768b94e8d15",
+        "style": "normal",
+        "markDefs": [],
+        "children": [
+          {
+            "_type": "span",
+            "_key": "c768b94e8d15s",
+            "text": "当社は、適法かつ公正な手段により個人情報を取得します。お客様が入力フォーム等を通じてご自身の個人情報をご提供いただく場合のほか、本サービスのご利用に伴い、Cookieその他の技術により自動的に取得する場合があります。",
+            "marks": []
+          }
+        ]
+      },
+      {
+        "_type": "block",
+        "_key": "37f21e8a683f",
+        "style": "h2",
+        "markDefs": [],
+        "children": [
+          {
+            "_type": "span",
+            "_key": "37f21e8a683fs",
+            "text": "第6条　Cookie等の利用",
+            "marks": []
+          }
+        ]
+      },
+      {
+        "_type": "block",
+        "_key": "e393b9318b72",
+        "style": "normal",
+        "markDefs": [],
+        "children": [
+          {
+            "_type": "span",
+            "_key": "e393b9318b72s",
+            "text": "本サービスでは、お客様の利便性向上、利用状況の分析および広告配信等を目的として、Cookie、アクセス解析ツールおよび類似の技術を使用する場合があります。お客様は、ブラウザの設定によりCookieの受け入れを拒否することができますが、その場合、本サービスの一部機能をご利用いただけないことがあります。",
+            "marks": []
+          }
+        ]
+      },
+      {
+        "_type": "block",
+        "_key": "ae141fd594d9",
+        "style": "h2",
+        "markDefs": [],
+        "children": [
+          {
+            "_type": "span",
+            "_key": "ae141fd594d9s",
+            "text": "第7条　個人データの第三者提供",
+            "marks": []
+          }
+        ]
+      },
+      {
+        "_type": "block",
+        "_key": "8bc2a9d25a20",
+        "style": "normal",
+        "markDefs": [],
+        "children": [
+          {
+            "_type": "span",
+            "_key": "8bc2a9d25a20s",
+            "text": "当社は、個人情報保護法その他の法令に定める場合を除き、あらかじめお客様の同意を得ることなく、個人データを第三者に提供しません。ただし、次の各号のいずれかに該当する場合はこの限りではありません。",
+            "marks": []
+          }
+        ]
+      },
+      {
+        "_type": "block",
+        "_key": "771dee4930d6",
+        "style": "normal",
+        "markDefs": [],
+        "children": [
+          {
+            "_type": "span",
+            "_key": "771dee4930d6s",
+            "text": "法令に基づく場合",
+            "marks": []
+          }
+        ],
+        "listItem": "number",
+        "level": 1
+      },
+      {
+        "_type": "block",
+        "_key": "6f16e39b2254",
+        "style": "normal",
+        "markDefs": [],
+        "children": [
+          {
+            "_type": "span",
+            "_key": "6f16e39b2254s",
+            "text": "人の生命、身体または財産の保護のために必要があり、本人の同意を得ることが困難な場合",
+            "marks": []
+          }
+        ],
+        "listItem": "number",
+        "level": 1
+      },
+      {
+        "_type": "block",
+        "_key": "7c8a39dfe62c",
+        "style": "normal",
+        "markDefs": [],
+        "children": [
+          {
+            "_type": "span",
+            "_key": "7c8a39dfe62cs",
+            "text": "公衆衛生の向上または児童の健全な育成の推進のために特に必要があり、本人の同意を得ることが困難な場合",
+            "marks": []
+          }
+        ],
+        "listItem": "number",
+        "level": 1
+      },
+      {
+        "_type": "block",
+        "_key": "39ed267338d6",
+        "style": "normal",
+        "markDefs": [],
+        "children": [
+          {
+            "_type": "span",
+            "_key": "39ed267338d6s",
+            "text": "国の機関等が法令の定める事務を遂行することに協力する必要がある場合",
+            "marks": []
+          }
+        ],
+        "listItem": "number",
+        "level": 1
+      },
+      {
+        "_type": "block",
+        "_key": "95b7359b1924",
+        "style": "h2",
+        "markDefs": [],
+        "children": [
+          {
+            "_type": "span",
+            "_key": "95b7359b1924s",
+            "text": "第8条　個人データの取扱いの委託",
+            "marks": []
+          }
+        ]
+      },
+      {
+        "_type": "block",
+        "_key": "78612235d818",
+        "style": "normal",
+        "markDefs": [],
+        "children": [
+          {
+            "_type": "span",
+            "_key": "78612235d818s",
+            "text": "当社は、利用目的の達成に必要な範囲において、個人データの取扱いの全部または一部を業務委託先に委託する場合があります。この場合、当社は、委託先について適切な監督を行います。",
+            "marks": []
+          }
+        ]
+      },
+      {
+        "_type": "block",
+        "_key": "a59475664a07",
+        "style": "h2",
+        "markDefs": [],
+        "children": [
+          {
+            "_type": "span",
+            "_key": "a59475664a07s",
+            "text": "第9条　外国にある第三者への提供",
+            "marks": []
+          }
+        ]
+      },
+      {
+        "_type": "block",
+        "_key": "4b62bae51895",
+        "style": "normal",
+        "markDefs": [],
+        "children": [
+          {
+            "_type": "span",
+            "_key": "4b62bae51895s",
+            "text": "当社は、利用目的の達成に必要な範囲において、外国にある第三者（当社の親会社・グループ会社を含みます）に対し、個人データを提供する場合があります。この場合、当社は、個人情報保護法に従い、提供先の外国の名称、当該外国における個人情報の保護に関する制度、および提供先が講ずる個人情報保護のための措置等について、あらかじめお客様に情報提供を行い、必要な場合には同意を取得します。",
+            "marks": []
+          }
+        ]
+      },
+      {
+        "_type": "definitionList",
+        "_key": "c88dc52c1f21",
+        "rows": [
+          {
+            "_type": "definitionRow",
+            "_key": "c8fc3c663c4f",
+            "label": "提供先の外国",
+            "value": "【中国その他、実際にデータを移転する国名を記入】"
+          }
+        ]
+      },
+      {
+        "_type": "block",
+        "_key": "2dc20a8ce3c7",
+        "style": "h2",
+        "markDefs": [],
+        "children": [
+          {
+            "_type": "span",
+            "_key": "2dc20a8ce3c7s",
+            "text": "第10条　安全管理措置",
+            "marks": []
+          }
+        ]
+      },
+      {
+        "_type": "block",
+        "_key": "5238be62b2f5",
+        "style": "normal",
+        "markDefs": [],
+        "children": [
+          {
+            "_type": "span",
+            "_key": "5238be62b2f5s",
+            "text": "当社は、取り扱う個人データの漏えい、滅失または毀損の防止その他の個人データの安全管理のために、必要かつ適切な組織的・人的・物理的・技術的措置を講じます。",
+            "marks": []
+          }
+        ]
+      },
+      {
+        "_type": "block",
+        "_key": "c9131b72e1b5",
+        "style": "h2",
+        "markDefs": [],
+        "children": [
+          {
+            "_type": "span",
+            "_key": "c9131b72e1b5s",
+            "text": "第11条　開示・訂正・利用停止等の請求",
+            "marks": []
+          }
+        ]
+      },
+      {
+        "_type": "block",
+        "_key": "3e21d53a2abe",
+        "style": "normal",
+        "markDefs": [],
+        "children": [
+          {
+            "_type": "span",
+            "_key": "3e21d53a2abes",
+            "text": "お客様は、当社に対し、個人情報保護法に基づき、保有個人データの開示、内容の訂正・追加・削除、利用停止・消去、第三者への提供の停止等を請求することができます。ご請求の際は、第13条のお問い合わせ窓口までご連絡ください。当社は、ご本人であることを確認のうえ、法令に従い遅滞なく対応いたします。",
+            "marks": []
+          }
+        ]
+      },
+      {
+        "_type": "block",
+        "_key": "f057c10c45f5",
+        "style": "h2",
+        "markDefs": [],
+        "children": [
+          {
+            "_type": "span",
+            "_key": "f057c10c45f5s",
+            "text": "第12条　個人データの保管期間",
+            "marks": []
+          }
+        ]
+      },
+      {
+        "_type": "block",
+        "_key": "a6cd6af723d9",
+        "style": "normal",
+        "markDefs": [],
+        "children": [
+          {
+            "_type": "span",
+            "_key": "a6cd6af723d9s",
+            "text": "当社は、利用目的の達成に必要な期間に限り個人データを保管し、当該期間経過後または利用目的を達成した後は、法令に定める場合を除き、遅滞なく当該個人データを消去または匿名化します。",
+            "marks": []
+          }
+        ]
+      },
+      {
+        "_type": "block",
+        "_key": "2168b61e3d15",
+        "style": "h2",
+        "markDefs": [],
+        "children": [
+          {
+            "_type": "span",
+            "_key": "2168b61e3d15s",
+            "text": "第13条　お問い合わせ窓口",
+            "marks": []
+          }
+        ]
+      },
+      {
+        "_type": "block",
+        "_key": "2f083dbb293c",
+        "style": "normal",
+        "markDefs": [],
+        "children": [
+          {
+            "_type": "span",
+            "_key": "2f083dbb293cs",
+            "text": "個人情報の取扱いに関するお問い合わせ、ご相談および前条の請求は、以下の窓口までご連絡ください。",
+            "marks": []
+          }
+        ]
+      },
+      {
+        "_type": "definitionList",
+        "_key": "1d8bdbe7a55b",
+        "rows": [
+          {
+            "_type": "definitionRow",
+            "_key": "a0ef80f3c3b3",
+            "label": "窓口名称",
+            "value": "【個人情報お問い合わせ窓口／お客様相談室等を記入】"
+          },
+          {
+            "_type": "definitionRow",
+            "_key": "9f5f3c120641",
+            "label": "メールアドレス",
+            "value": "【問い合わせ用メールアドレスを記入】"
+          },
+          {
+            "_type": "definitionRow",
+            "_key": "92a9e9a542f8",
+            "label": "電話番号",
+            "value": "【問い合わせ用電話番号を記入】"
+          }
+        ]
+      },
+      {
+        "_type": "block",
+        "_key": "75dfac21c814",
+        "style": "h2",
+        "markDefs": [],
+        "children": [
+          {
+            "_type": "span",
+            "_key": "75dfac21c814s",
+            "text": "第14条　本ポリシーの変更",
+            "marks": []
+          }
+        ]
+      },
+      {
+        "_type": "block",
+        "_key": "2d8e1e833966",
+        "style": "normal",
+        "markDefs": [],
+        "children": [
+          {
+            "_type": "span",
+            "_key": "2d8e1e833966s",
+            "text": "当社は、法令の変更または事業内容の変更等に応じて、本ポリシーを変更することがあります。変更後の本ポリシーは、本サービス上に掲載された時点から効力を生じるものとします。重要な変更を行う場合には、当社所定の方法によりお知らせします。",
+            "marks": []
+          }
+        ]
+      }
+    ],
+    "established": "【　　　年　　月　　日】",
+    "operator": "【JOMOO 運営会社の正式名称・住所を記入】",
+    "copyright": "© JOMOO. All rights reserved."
+  },
+  {
+    "_id": "legal-terms-of-use",
+    "_type": "legalDocument",
+    "slug": "terms-of-use",
+    "title": "JOMOO ウェブサイト ご利用条件",
+    "navLabel": "ご利用条件",
+    "description": "JOMOO ウェブサイトのご利用にあたっての範囲、禁止事項、リンク、商標および著作権、免責事項等を定めたご利用条件です。",
+    "body": [
+      {
+        "_type": "block",
+        "_key": "61af177da3a9",
+        "style": "normal",
+        "markDefs": [],
+        "children": [
+          {
+            "_type": "span",
+            "_key": "61af177da3a9s",
+            "text": "本ウェブサイト（以下「本サイト」といいます）は、【運営会社名を記入】（以下「当社」といいます）が運営・管理しています。本サイトをご利用になる前に、以下のご利用条件（以下「本条件」といいます）を必ずお読みいただき、その内容にご同意いただいた場合に限りご利用ください。本サイトをご利用いただいた時点で、本条件にご同意いただいたものとみなします。",
+            "marks": []
+          }
+        ]
+      },
+      {
+        "_type": "block",
+        "_key": "e2ce8f743860",
+        "style": "normal",
+        "markDefs": [],
+        "children": [
+          {
+            "_type": "span",
+            "_key": "e2ce8f743860s",
+            "text": "本サイト内の個別のコンテンツまたはサービスについて別途の利用条件が定められている場合には、当該個別の利用条件もあわせて適用されます。個別の利用条件と本条件の内容が異なる場合には、当該個別の利用条件が優先します。",
+            "marks": []
+          }
+        ]
+      },
+      {
+        "_type": "block",
+        "_key": "53f573df7e0d",
+        "style": "normal",
+        "markDefs": [],
+        "children": [
+          {
+            "_type": "span",
+            "_key": "53f573df7e0ds",
+            "text": "また、本サイトは当社または当社の関連会社が運営する他のウェブサイトへリンクされている場合があります。それらのサイトをご利用の際は、各サイトに掲げられた利用条件にもご同意いただく必要があります。",
+            "marks": []
+          }
+        ]
+      },
+      {
+        "_type": "block",
+        "_key": "f148dd3568b8",
+        "style": "normal",
+        "markDefs": [],
+        "children": [
+          {
+            "_type": "span",
+            "_key": "f148dd3568b8s",
+            "text": "本条件における「コンテンツ」とは、本サイトに掲載されるすべての情報（文章、キャッチコピー、ロゴ、商標、商号、デザイン、写真、イラスト、図表、図面、映像、動画、静止画、音声、音楽、ソフトウェア、コンピュータプログラム、データベース、データ等を含みます）をいいます。",
+            "marks": []
+          }
+        ]
+      },
+      {
+        "_type": "block",
+        "_key": "3da9acd8241f",
+        "style": "h2",
+        "markDefs": [],
+        "children": [
+          {
+            "_type": "span",
+            "_key": "3da9acd8241fs",
+            "text": "第1条　ご利用可能な範囲",
+            "marks": []
+          }
+        ]
+      },
+      {
+        "_type": "block",
+        "_key": "0252211a3c77",
+        "style": "normal",
+        "markDefs": [],
+        "children": [
+          {
+            "_type": "span",
+            "_key": "0252211a3c77s",
+            "text": "本サイトで提供するコンテンツは、お客様がご自身のコンピュータ等の端末で閲覧し、または個人的な範囲でご利用いただくために印刷することができます。なお、コンテンツによっては印刷できない場合があります。",
+            "marks": []
+          }
+        ],
+        "listItem": "number",
+        "level": 1
+      },
+      {
+        "_type": "block",
+        "_key": "e3c5f9d1f5fc",
+        "style": "normal",
+        "markDefs": [],
+        "children": [
+          {
+            "_type": "span",
+            "_key": "e3c5f9d1f5fcs",
+            "text": "本サイトで提供するダウンロード可能なコンテンツは、お客様ご自身の端末上でのみ、ダウンロードして個人的な範囲でご利用いただけます。当該コンテンツに個別の利用条件が付されている場合は、当該個別の利用条件に従うものとします。",
+            "marks": []
+          }
+        ],
+        "listItem": "number",
+        "level": 1
+      },
+      {
+        "_type": "block",
+        "_key": "23b3a1548317",
+        "style": "normal",
+        "markDefs": [],
+        "children": [
+          {
+            "_type": "span",
+            "_key": "23b3a1548317s",
+            "text": "私的使用その他法律により明示的に認められる範囲を超えて、本サイトのコンテンツを使用し、またはその他の行為（複製、改変、解析、アップロード、掲示、送信、頒布、譲渡、貸与、使用許諾、販売、出版、輸出、および営業活動または営利を目的とする使用等を含みます）を行うことは、事前に当社の書面による許諾がない限り、これを禁止します。",
+            "marks": []
+          }
+        ],
+        "listItem": "number",
+        "level": 1
+      },
+      {
+        "_type": "block",
+        "_key": "184441571307",
+        "style": "h2",
+        "markDefs": [],
+        "children": [
+          {
+            "_type": "span",
+            "_key": "184441571307s",
+            "text": "第2条　禁止事項",
+            "marks": []
+          }
+        ]
+      },
+      {
+        "_type": "block",
+        "_key": "0c7bf2077211",
+        "style": "normal",
+        "markDefs": [],
+        "children": [
+          {
+            "_type": "span",
+            "_key": "0c7bf2077211s",
+            "text": "お客様は、本サイトのご利用にあたり、以下の行為またはそのおそれのある行為を行ってはならないものとします。",
+            "marks": []
+          }
+        ]
+      },
+      {
+        "_type": "block",
+        "_key": "8ef981140469",
+        "style": "normal",
+        "markDefs": [],
+        "children": [
+          {
+            "_type": "span",
+            "_key": "8ef981140469s",
+            "text": "第三者または当社の財産、プライバシー等を侵害する行為。",
+            "marks": []
+          }
+        ],
+        "listItem": "number",
+        "level": 1
+      },
+      {
+        "_type": "block",
+        "_key": "78a97bcf37b7",
+        "style": "normal",
+        "markDefs": [],
+        "children": [
+          {
+            "_type": "span",
+            "_key": "78a97bcf37b7s",
+            "text": "第三者または当社に不利益もしくは損害を与える行為。",
+            "marks": []
+          }
+        ],
+        "listItem": "number",
+        "level": 1
+      },
+      {
+        "_type": "block",
+        "_key": "4f51c36184f4",
+        "style": "normal",
+        "markDefs": [],
+        "children": [
+          {
+            "_type": "span",
+            "_key": "4f51c36184f4s",
+            "text": "公序良俗に反する行為。",
+            "marks": []
+          }
+        ],
+        "listItem": "number",
+        "level": 1
+      },
+      {
+        "_type": "block",
+        "_key": "54bd45b373a5",
+        "style": "normal",
+        "markDefs": [],
+        "children": [
+          {
+            "_type": "span",
+            "_key": "54bd45b373a5s",
+            "text": "犯罪行為または犯罪行為に結びつく行為。",
+            "marks": []
+          }
+        ],
+        "listItem": "number",
+        "level": 1
+      },
+      {
+        "_type": "block",
+        "_key": "bf99794e4a74",
+        "style": "normal",
+        "markDefs": [],
+        "children": [
+          {
+            "_type": "span",
+            "_key": "bf99794e4a74s",
+            "text": "他人のメールアドレスを登録する等、虚偽の申告または届出を行う行為。",
+            "marks": []
+          }
+        ],
+        "listItem": "number",
+        "level": 1
+      },
+      {
+        "_type": "block",
+        "_key": "93f2516d4c0b",
+        "style": "normal",
+        "markDefs": [],
+        "children": [
+          {
+            "_type": "span",
+            "_key": "93f2516d4c0bs",
+            "text": "当社の事前の許諾なく、営業活動もしくは営利を目的とする行為、またはその準備を目的とする行為。",
+            "marks": []
+          }
+        ],
+        "listItem": "number",
+        "level": 1
+      },
+      {
+        "_type": "block",
+        "_key": "3626169e730b",
+        "style": "normal",
+        "markDefs": [],
+        "children": [
+          {
+            "_type": "span",
+            "_key": "3626169e730bs",
+            "text": "第三者または当社の名誉もしくは信用を毀損する行為。",
+            "marks": []
+          }
+        ],
+        "listItem": "number",
+        "level": 1
+      },
+      {
+        "_type": "block",
+        "_key": "431c21254b37",
+        "style": "normal",
+        "markDefs": [],
+        "children": [
+          {
+            "_type": "span",
+            "_key": "431c21254b37s",
+            "text": "コンピュータウイルス等の有害なプログラムを使用または提供する行為。",
+            "marks": []
+          }
+        ],
+        "listItem": "number",
+        "level": 1
+      },
+      {
+        "_type": "block",
+        "_key": "dfc2c88cb621",
+        "style": "normal",
+        "markDefs": [],
+        "children": [
+          {
+            "_type": "span",
+            "_key": "dfc2c88cb621s",
+            "text": "法令または条例に違反する行為。",
+            "marks": []
+          }
+        ],
+        "listItem": "number",
+        "level": 1
+      },
+      {
+        "_type": "block",
+        "_key": "a8281efb1aa5",
+        "style": "normal",
+        "markDefs": [],
+        "children": [
+          {
+            "_type": "span",
+            "_key": "a8281efb1aa5s",
+            "text": "その他、当社が不適切と判断する行為。",
+            "marks": []
+          }
+        ],
+        "listItem": "number",
+        "level": 1
+      },
+      {
+        "_type": "block",
+        "_key": "9ef813feb38a",
+        "style": "h2",
+        "markDefs": [],
+        "children": [
+          {
+            "_type": "span",
+            "_key": "9ef813feb38as",
+            "text": "第3条　本サイトへのリンク",
+            "marks": []
+          }
+        ]
+      },
+      {
+        "_type": "block",
+        "_key": "6379174922dc",
+        "style": "normal",
+        "markDefs": [],
+        "children": [
+          {
+            "_type": "span",
+            "_key": "6379174922dcs",
+            "text": "本サイトへのリンクをご希望の場合は、事前に本サイトの「お問い合わせ」窓口までご連絡ください。内容を確認のうえ回答いたします。ただし、当社から回答がない場合であっても、当社が当該リンクを許諾したことを意味するものではありません。",
+            "marks": []
+          }
+        ],
+        "listItem": "number",
+        "level": 1
+      },
+      {
+        "_type": "block",
+        "_key": "0c87afa78bb4",
+        "style": "normal",
+        "markDefs": [],
+        "children": [
+          {
+            "_type": "span",
+            "_key": "0c87afa78bb4s",
+            "text": "リンク先は、原則として本サイトのトップページ（【https://（JOMOO日本サイトURL）を記入】）に設定してください。個別のコンテンツや画像等への直接リンクは、リンク切れ等の可能性があるため、お断りする場合があります。",
+            "marks": []
+          }
+        ],
+        "listItem": "number",
+        "level": 1
+      },
+      {
+        "_type": "block",
+        "_key": "4105ff02518b",
+        "style": "normal",
+        "markDefs": [],
+        "children": [
+          {
+            "_type": "span",
+            "_key": "4105ff02518bs",
+            "text": "社名の表記は「【JOMOOの正式社名を記入】」または「JOMOO」を用い、テキストとして正しく表記してください。当社の許諾なくロゴその他の商標等を使用したリンクはお断りいたします。",
+            "marks": []
+          }
+        ],
+        "listItem": "number",
+        "level": 1
+      },
+      {
+        "_type": "block",
+        "_key": "7786bdc78825",
+        "style": "normal",
+        "markDefs": [],
+        "children": [
+          {
+            "_type": "span",
+            "_key": "7786bdc78825s",
+            "text": "以下のようなリンクはお断りいたします。当社、当社の関連会社、それらの役員もしくは従業員、またはそれらの商品もしくはサービスを誹謗中傷し、もしくは信用を毀損する内容を含むサイトからのリンク、違法なコンテンツを掲載しもしくは違法な活動に関与するサイトからのリンク、フレーム等を使用し本サイトのコンテンツであることが不明となるリンク、その他当社が不適切と判断するリンク。",
+            "marks": []
+          }
+        ],
+        "listItem": "number",
+        "level": 1
+      },
+      {
+        "_type": "block",
+        "_key": "de8eef4831e4",
+        "style": "normal",
+        "markDefs": [],
+        "children": [
+          {
+            "_type": "span",
+            "_key": "de8eef4831e4s",
+            "text": "理由の如何を問わず、本条件に従うことができない場合または従う意思がない場合は、直ちにリンクの使用を中止してください。",
+            "marks": []
+          }
+        ],
+        "listItem": "number",
+        "level": 1
+      },
+      {
+        "_type": "block",
+        "_key": "8a17dc035557",
+        "style": "h2",
+        "markDefs": [],
+        "children": [
+          {
+            "_type": "span",
+            "_key": "8a17dc035557s",
+            "text": "第4条　リンク先サイトについて",
+            "marks": []
+          }
+        ]
+      },
+      {
+        "_type": "block",
+        "_key": "414ee59a74a5",
+        "style": "normal",
+        "markDefs": [],
+        "children": [
+          {
+            "_type": "span",
+            "_key": "414ee59a74a5s",
+            "text": "本サイトからリンクされている当社以外の第三者のウェブサイト（以下「リンク先サイト」といいます）の内容は、当該第三者の責任において管理されるものであり、当社の管理下にあるものではありません。当社は、リンク先サイトの内容および正確性、ならびにそれらの利用によって生じたいかなる損害についても責任を負いません。リンク先サイトへのリンクが存在することは、当社が当該サイトまたはそこに掲載された商品・サービス・会社等を推奨すること、あるいは当社と当該サイトとの間に提携等の特別な関係があることを意味するものではありません。",
+            "marks": []
+          }
+        ]
+      },
+      {
+        "_type": "block",
+        "_key": "c29a439c64da",
+        "style": "h2",
+        "markDefs": [],
+        "children": [
+          {
+            "_type": "span",
+            "_key": "c29a439c64das",
+            "text": "第5条　個人情報の取扱い",
+            "marks": []
+          }
+        ]
+      },
+      {
+        "_type": "block",
+        "_key": "76fc8fee5937",
+        "style": "normal",
+        "markDefs": [],
+        "children": [
+          {
+            "_type": "span",
+            "_key": "76fc8fee5937s",
+            "text": "お客様の個人情報の取扱いについては、別途定める「プライバシーポリシー」をご覧ください。",
+            "marks": []
+          }
+        ]
+      },
+      {
+        "_type": "block",
+        "_key": "606ce144c97a",
+        "style": "h2",
+        "markDefs": [],
+        "children": [
+          {
+            "_type": "span",
+            "_key": "606ce144c97as",
+            "text": "第6条　商標および著作権等",
+            "marks": []
+          }
+        ]
+      },
+      {
+        "_type": "block",
+        "_key": "0762aca44e85",
+        "style": "normal",
+        "markDefs": [],
+        "children": [
+          {
+            "_type": "span",
+            "_key": "0762aca44e85s",
+            "text": "本サイトに掲載される名称、商標、ロゴ、サービスマーク等（以下「商標類」といいます）は、原則として当社または当社の関連会社が所有し、もしくはライセンスに基づき使用しているものです。本サイトに掲載される第三者の会社名・製品名等には、各社の商標等が含まれる場合があります。",
+            "marks": []
+          }
+        ]
+      },
+      {
+        "_type": "block",
+        "_key": "b1182baba8ca",
+        "style": "normal",
+        "markDefs": [],
+        "children": [
+          {
+            "_type": "span",
+            "_key": "b1182baba8cas",
+            "text": "本サイトに掲載される情報は、著作権法その他の法令および条約により保護されています。特に許諾された場合を除き、私的使用その他法律により明示的に認められる範囲を超えて本サイトの情報を使用（複製、改変、アップロード、掲示、送信、頒布、販売等）する行為は、著作権侵害等の違法行為となります。",
+            "marks": []
+          }
+        ]
+      },
+      {
+        "_type": "block",
+        "_key": "5c1840a2de86",
+        "style": "normal",
+        "markDefs": [],
+        "children": [
+          {
+            "_type": "span",
+            "_key": "5c1840a2de86s",
+            "text": "本サイトには、お客様がデータをダウンロードできるコンテンツが含まれる場合がありますが、当社は、当該データに関する権利を譲渡するものではなく、また当社もしくは第三者の著作権、特許権、商標権その他の知的財産権に基づくいかなる権利も許諾するものではありません。当社または許諾者の事前の書面による許諾がない限り、本条件で明確に認められる場合を除き、商標類その他のコンテンツの無断使用を固く禁止します。",
+            "marks": []
+          }
+        ]
+      },
+      {
+        "_type": "block",
+        "_key": "e4d18bcbdf69",
+        "style": "h2",
+        "markDefs": [],
+        "children": [
+          {
+            "_type": "span",
+            "_key": "e4d18bcbdf69s",
+            "text": "第7条　商品情報について",
+            "marks": []
+          }
+        ]
+      },
+      {
+        "_type": "block",
+        "_key": "c7339115a2c1",
+        "style": "normal",
+        "markDefs": [],
+        "children": [
+          {
+            "_type": "span",
+            "_key": "c7339115a2c1s",
+            "text": "本サイトに掲載する商品の表示価格は、特段の表記がある場合を除き、メーカー希望小売価格であり、消費税および地方消費税、ならびに組立費、設置費、工事費、搬入費、使用済み商品の引取り費等は含まれません。",
+            "marks": []
+          }
+        ],
+        "listItem": "number",
+        "level": 1
+      },
+      {
+        "_type": "block",
+        "_key": "37b4288f9eda",
+        "style": "normal",
+        "markDefs": [],
+        "children": [
+          {
+            "_type": "span",
+            "_key": "37b4288f9edas",
+            "text": "本サイトに掲載する価格および仕様は、予告なく改定または変更する場合があります。",
+            "marks": []
+          }
+        ],
+        "listItem": "number",
+        "level": 1
+      },
+      {
+        "_type": "block",
+        "_key": "24b00b726643",
+        "style": "normal",
+        "markDefs": [],
+        "children": [
+          {
+            "_type": "span",
+            "_key": "24b00b726643s",
+            "text": "寒冷地仕様品等については、別価格となる場合があります。",
+            "marks": []
+          }
+        ],
+        "listItem": "number",
+        "level": 1
+      },
+      {
+        "_type": "block",
+        "_key": "6c5c7d3dc4d5",
+        "style": "normal",
+        "markDefs": [],
+        "children": [
+          {
+            "_type": "span",
+            "_key": "6c5c7d3dc4d5s",
+            "text": "本サイトでご覧いただく商品の色や質感は、実際の商品と多少異なる場合があります。ご購入の際は、お近くのショールーム等で実物のご確認をお勧めします。",
+            "marks": []
+          }
+        ],
+        "listItem": "number",
+        "level": 1
+      },
+      {
+        "_type": "block",
+        "_key": "4c891b5d67c0",
+        "style": "normal",
+        "markDefs": [],
+        "children": [
+          {
+            "_type": "span",
+            "_key": "4c891b5d67c0s",
+            "text": "本サイトに掲載する商品の写真・イラスト・画像等には、演出等のため、当該商品に含まれない小物・設備・背景等が表示されている場合があります。",
+            "marks": []
+          }
+        ],
+        "listItem": "number",
+        "level": 1
+      },
+      {
+        "_type": "block",
+        "_key": "5cf5b9b0c04f",
+        "style": "normal",
+        "markDefs": [],
+        "children": [
+          {
+            "_type": "span",
+            "_key": "5cf5b9b0c04fs",
+            "text": "本サイトに表記する納期は目安であり、当該期間内の納入を保証するものではありません。",
+            "marks": []
+          }
+        ],
+        "listItem": "number",
+        "level": 1
+      },
+      {
+        "_type": "block",
+        "_key": "2fdb2a956905",
+        "style": "h2",
+        "markDefs": [],
+        "children": [
+          {
+            "_type": "span",
+            "_key": "2fdb2a956905s",
+            "text": "第8条　アイデア等のご提案について",
+            "marks": []
+          }
+        ]
+      },
+      {
+        "_type": "block",
+        "_key": "02fc6e5880f5",
+        "style": "normal",
+        "markDefs": [],
+        "children": [
+          {
+            "_type": "span",
+            "_key": "02fc6e5880f5s",
+            "text": "当社は、日頃より各分野で独自の研究開発を行っており、お客様からお寄せいただいたアイデア等が、当社が独自に考案した未発表のものと偶然に類似する可能性があります。こうした不測の事態を避けるため、本サイト上での商品・技術・デザイン・広告・マーケティング・商品名称等に関するご提案は、原則としてお受けしておりません。",
+            "marks": []
+          }
+        ]
+      },
+      {
+        "_type": "block",
+        "_key": "3d7c3e0f66b7",
+        "style": "normal",
+        "markDefs": [],
+        "children": [
+          {
+            "_type": "span",
+            "_key": "3d7c3e0f66b7s",
+            "text": "万一ご提案をお送りいただいた場合には、以下の各点にご同意のうえお送りいただいたものとみなします。すなわち、当社は当該提案を秘密として取り扱う義務を負わないこと、当該提案を検討・評価・採用する義務を負わないこと、および当社が当該提案と同一もしくは類似する案を採用した場合であっても、提供者に対して代償の支払いを含むいかなる責任も負わないこと。",
+            "marks": []
+          }
+        ]
+      },
+      {
+        "_type": "block",
+        "_key": "c67932f89fb1",
+        "style": "h2",
+        "markDefs": [],
+        "children": [
+          {
+            "_type": "span",
+            "_key": "c67932f89fb1s",
+            "text": "第9条　免責事項",
+            "marks": []
+          }
+        ]
+      },
+      {
+        "_type": "block",
+        "_key": "76bd9e2a4dae",
+        "style": "normal",
+        "markDefs": [],
+        "children": [
+          {
+            "_type": "span",
+            "_key": "76bd9e2a4daes",
+            "text": "当社は、本サイトへの情報掲載にあたり細心の注意を払いますが、情報の正確性・有用性・確実性・安全性（機能が中断しないこと、エラーが生じないこと、本サイトおよびサーバーにコンピュータウイルス等の有害物が存在しないこと等を含みます）、およびお客様の利用目的への適合性等について、明示・黙示を問わず、いかなる保証も行いません。",
+            "marks": []
+          }
+        ]
+      },
+      {
+        "_type": "block",
+        "_key": "68279fcd346b",
+        "style": "normal",
+        "markDefs": [],
+        "children": [
+          {
+            "_type": "span",
+            "_key": "68279fcd346bs",
+            "text": "当社は、お客様が本サイトの情報を利用したことまたは利用できなかったこと、および本サイトのご利用により生じたいかなる損害についても、責任を負いません。当社は、予告なく本サイト上の情報を変更し、また本サイトの運営を中断もしくは中止することがあります。理由の如何を問わず、これらにより生じたいかなる損害についても、当社は責任を負いません。",
+            "marks": []
+          }
+        ]
+      },
+      {
+        "_type": "block",
+        "_key": "d4dc140e4703",
+        "style": "h2",
+        "markDefs": [],
+        "children": [
+          {
+            "_type": "span",
+            "_key": "d4dc140e4703s",
+            "text": "第10条　本条件の変更",
+            "marks": []
+          }
+        ]
+      },
+      {
+        "_type": "block",
+        "_key": "0ef66e3f757d",
+        "style": "normal",
+        "markDefs": [],
+        "children": [
+          {
+            "_type": "span",
+            "_key": "0ef66e3f757ds",
+            "text": "当社は、本条件を変更することがあります。変更後の本条件は、本サイトに掲載された時点から効力を生じるものとし、お客様が変更後に本サイトをご利用いただいた場合には、変更後の本条件に同意いただいたものとみなします。本サイトのご利用にあたっては、適宜最新の本条件をご確認ください。",
+            "marks": []
+          }
+        ]
+      },
+      {
+        "_type": "block",
+        "_key": "540075541c18",
+        "style": "h2",
+        "markDefs": [],
+        "children": [
+          {
+            "_type": "span",
+            "_key": "540075541c18s",
+            "text": "第11条　準拠法および管轄裁判所",
+            "marks": []
+          }
+        ]
+      },
+      {
+        "_type": "block",
+        "_key": "5002e59810cd",
+        "style": "normal",
+        "markDefs": [],
+        "children": [
+          {
+            "_type": "span",
+            "_key": "5002e59810cds",
+            "text": "本サイトのご利用ならびに本条件の解釈および適用は、別段の定めのない限り、日本国法に準拠します。本サイトのご利用に関して生じる一切の紛争については、別段の定めのない限り、【東京地方裁判所】を第一審の専属的合意管轄裁判所とします。",
+            "marks": []
+          }
+        ]
+      },
+      {
+        "_type": "block",
+        "_key": "b98f60a55f2e",
+        "style": "h2",
+        "markDefs": [],
+        "children": [
+          {
+            "_type": "span",
+            "_key": "b98f60a55f2es",
+            "text": "第12条　お問い合わせ",
+            "marks": []
+          }
+        ]
+      },
+      {
+        "_type": "block",
+        "_key": "fc30c378076e",
+        "style": "normal",
+        "markDefs": [],
+        "children": [
+          {
+            "_type": "span",
+            "_key": "fc30c378076es",
+            "text": "本条件に関するご質問等は、本サイトの「お問い合わせ」窓口までご連絡ください。",
+            "marks": []
+          }
+        ]
+      }
+    ],
+    "established": "【　　　年　　月　　日】",
+    "operator": "【JOMOO 運営会社の正式名称・住所を記入】",
+    "copyright": "© JOMOO. All rights reserved."
+  }
+]
