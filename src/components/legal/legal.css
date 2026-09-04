@@ -1,0 +1,181 @@
+/* Type and rhythm follow the blog's article pages — the same black-on-white
+   and the same 1400px container — but a legal document is read in one column
+   rather than scanned, so the measure is tighter and the headings smaller. */
+
+.legal {
+  background: #fff;
+  color: #000;
+  padding-top: 40px;
+}
+
+.legal__container {
+  width: 1400px;
+  max-width: 90%;
+  margin: 0 auto 130px;
+}
+
+/* Breadcrumb */
+.legal__crumbs {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-size: 14px;
+  color: #888;
+}
+
+.legal__crumbs a {
+  color: #888;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.legal__crumbs a:hover {
+  color: #000;
+}
+
+.legal__crumbs-sep {
+  color: #c9c9c9;
+}
+
+.legal__crumbs-current {
+  color: #000;
+}
+
+.legal__title {
+  color: #000;
+  font-size: 44px;
+  line-height: 60px;
+  font-weight: 500;
+  margin: 90px 0 40px;
+}
+
+.legal__rule {
+  border-top: 1px solid #000;
+  margin-bottom: 60px;
+}
+
+/* One column, held to a comfortable reading measure. */
+.legal__body {
+  max-width: 860px;
+}
+
+.legal__section + .legal__section {
+  margin-top: 50px;
+}
+
+.legal__heading {
+  color: #000;
+  font-size: 20px;
+  line-height: 32px;
+  font-weight: 600;
+  margin-bottom: 18px;
+}
+
+.legal__text {
+  color: #333;
+  font-size: 16px;
+  line-height: 32px;
+}
+
+.legal__text + .legal__text {
+  margin-top: 18px;
+}
+
+/* Numbered clauses hang their (1) in the margin so the text stays flush. */
+.legal__list {
+  list-style: none;
+  padding: 0;
+  margin: 18px 0 0;
+  color: #333;
+  font-size: 16px;
+  line-height: 32px;
+}
+
+.legal__list li {
+  padding-left: 44px;
+  position: relative;
+}
+
+.legal__list li + li {
+  margin-top: 10px;
+}
+
+.legal__marker {
+  position: absolute;
+  left: 0;
+  color: #000;
+}
+
+/* 事業者情報 and the contact window: label in one column, value in the next. */
+.legal__fields {
+  margin: 22px 0 0;
+  border-top: 1px solid #e6e6e6;
+}
+
+.legal__field {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 24px;
+  border-bottom: 1px solid #e6e6e6;
+  padding: 14px 0;
+  font-size: 16px;
+  line-height: 28px;
+}
+
+.legal__field dt {
+  flex: none;
+  width: 200px;
+  color: #000;
+  font-weight: 500;
+}
+
+.legal__field dd {
+  flex: 1 1 240px;
+  margin: 0;
+  color: #333;
+}
+
+/* A detail the client has yet to supply. Marked rather than dressed up as
+   finished copy, so it reads as a blank on the page. */
+.legal__blank {
+  color: #8a8a8a;
+  background: #f4f4f4;
+  border-bottom: 1px dashed #c4c4c4;
+  padding: 0 2px;
+}
+
+.legal__colophon {
+  max-width: 860px;
+  margin-top: 70px;
+  padding-top: 34px;
+  border-top: 1px solid #000;
+  color: #333;
+  font-size: 15px;
+  line-height: 30px;
+}
+
+.legal__copyright {
+  margin-top: 18px;
+  color: #888;
+}
+
+@media (max-width: 767px) {
+  .legal__title {
+    font-size: 30px;
+    line-height: 44px;
+    margin: 50px 0 28px;
+  }
+
+  .legal__rule {
+    margin-bottom: 40px;
+  }
+
+  .legal__container {
+    margin-bottom: 80px;
+  }
+
+  .legal__field dt {
+    width: 100%;
+  }
+}

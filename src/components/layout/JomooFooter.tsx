@@ -96,8 +96,8 @@ export default function JomooFooter() {
       <div className="footer__bottom">
         <span>© {year} JOMOO KITCHEN &amp; BATH CO., LTD. All Rights Reserved.</span>
         <span className="footer__legal">
-          <a href="#">プライバシーポリシー</a>
-          <a href="#">利用規約</a>
+          <a href="/privacy-policy">プライバシーポリシー</a>
+          <a href="/terms-of-use">利用規約</a>
           {/* Withdrawing consent has to be as easy as giving it, so the banner
               is reachable from every page rather than only on the first visit. */}
           <button type="button" className="footer__legal-btn" onClick={openConsentSettings}>
