@@ -67,16 +67,27 @@ function Block({ block }: { block: BlogBlock }) {
           ))}
         </ul>
       )
-    case 'img':
+    case 'img': {
+      // Landscape pictures run full-bleed in a fixed band, as they do on the
+      // global site. A picture that is square or taller loses most of itself to
+      // that crop, so it keeps its own proportions and stands taller instead.
+      const portrait = block.height >= block.width
       return (
-        <figure className="blog-post__figure">
+        <figure className={`blog-post__figure${portrait ? ' blog-post__figure--portrait' : ''}`}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={block.src} alt={block.alt} loading="lazy" />
+          <img
+            src={block.src}
+            width={block.width}
+            height={block.height}
+            alt={block.alt}
+            loading="lazy"
+          />
           {block.caption && (
             <figcaption className="blog-post__caption">{block.caption}</figcaption>
           )}
         </figure>
       )
+    }
     default:
       return <p className="blog-post__text">{block.text}</p>
   }

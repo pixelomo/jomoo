@@ -9,7 +9,16 @@ export type BlogBlock =
   | { type: 'h2'; text: string }
   | { type: 'quote'; text: string }
   | { type: 'list'; items: string[] }
-  | { type: 'img'; src: string; alt: string; caption?: string }
+  /** width/height are the file's intrinsic pixel size, stamped in by
+   *  scripts/add-blog-image-sizes.mjs — run it after adding an image. */
+  | {
+      type: 'img'
+      src: string
+      width: number
+      height: number
+      alt: string
+      caption?: string
+    }
 
 export type BlogPost = {
   slug: string
@@ -53,6 +62,8 @@ export const BLOG_POSTS: BlogPost[] = [
       {
         type: 'img',
         src: '/images/blog/jd-public-restroom-01.jpg',
+        width: 2000,
+        height: 2000,
         alt: '草原に建つ「天山の下の一つの石」の外観',
       },
       { type: 'h2', text: '自然を招き入れる設計' },
@@ -67,6 +78,8 @@ export const BLOG_POSTS: BlogPost[] = [
       {
         type: 'img',
         src: '/images/blog/jd-public-restroom-02.jpg',
+        width: 1600,
+        height: 2000,
         alt: 'ガラス越しに草原と山並みを望む内部空間',
       },
       { type: 'h2', text: '内も外もサステナブルに' },
@@ -81,6 +94,8 @@ export const BLOG_POSTS: BlogPost[] = [
       {
         type: 'img',
         src: '/images/blog/jd-public-restroom-03.jpg',
+        width: 2000,
+        height: 2000,
         alt: '廃棄された陶器の破片を再利用したフィーチャーウォール',
       },
       { type: 'h2', text: '快適さは譲らない' },
@@ -91,6 +106,8 @@ export const BLOG_POSTS: BlogPost[] = [
       {
         type: 'img',
         src: '/images/blog/jd-public-restroom-04.jpg',
+        width: 2000,
+        height: 2000,
         alt: 'JOMOO のスマートサニタリー製品を備えた内部',
       },
       { type: 'h2', text: '単独の設備から、旅の体験の一部へ' },
@@ -109,6 +126,8 @@ export const BLOG_POSTS: BlogPost[] = [
       {
         type: 'img',
         src: '/images/blog/jd-public-restroom-05.jpg',
+        width: 1600,
+        height: 2000,
         alt: '夕暮れの草原に佇む「天山の下の一つの石」',
       },
     ],
@@ -125,6 +144,8 @@ export const BLOG_POSTS: BlogPost[] = [
       {
         type: 'img',
         src: '/images/blog/restrooms-healthcare-01.jpg',
+        width: 2000,
+        height: 1125,
         alt: '医療施設のトイレ空間',
       },
       {
@@ -188,6 +209,8 @@ export const BLOG_POSTS: BlogPost[] = [
       {
         type: 'img',
         src: '/images/blog/restrooms-healthcare-02.jpg',
+        width: 2000,
+        height: 1125,
         alt: 'スマートフィルム交換トイレ',
         caption: 'スマートフィルム交換トイレ',
       },
@@ -215,6 +238,8 @@ export const BLOG_POSTS: BlogPost[] = [
       {
         type: 'img',
         src: '/images/blog/restrooms-healthcare-03.jpg',
+        width: 2000,
+        height: 1125,
         alt: 'スマート尿検査小便器',
         caption: 'スマート尿検査小便器',
       },
@@ -234,6 +259,8 @@ export const BLOG_POSTS: BlogPost[] = [
       {
         type: 'img',
         src: '/images/blog/restrooms-healthcare-04.jpg',
+        width: 2000,
+        height: 1125,
         alt: 'JOMOO の統合的な医療環境ソリューション',
         caption: 'JOMOO の統合的な医療環境ソリューション',
       },
@@ -264,6 +291,8 @@ export const BLOG_POSTS: BlogPost[] = [
       {
         type: 'img',
         src: '/images/blog/z1-pro-power-storage-01.jpg',
+        width: 2000,
+        height: 848,
         alt: 'JOMOO Z1 Pro 蓄電式スマートトイレ',
       },
       {
@@ -311,6 +340,8 @@ export const BLOG_POSTS: BlogPost[] = [
       {
         type: 'img',
         src: '/images/blog/z1-pro-power-storage-02.gif',
+        width: 1138,
+        height: 640,
         alt: 'Z1 Pro の洗浄システムの動作',
       },
       { type: 'h2', text: '見えない仕組み、確かな安心' },
@@ -325,6 +356,8 @@ export const BLOG_POSTS: BlogPost[] = [
       {
         type: 'img',
         src: '/images/blog/z1-pro-power-storage-03.gif',
+        width: 1138,
+        height: 640,
         alt: 'Z1 Pro の防水・安全設計',
       },
       {
@@ -334,6 +367,8 @@ export const BLOG_POSTS: BlogPost[] = [
       {
         type: 'img',
         src: '/images/blog/z1-pro-power-storage-04.gif',
+        width: 568,
+        height: 320,
         alt: 'プリウェット機能の動作',
       },
       { type: 'h2', text: '製品から、可能性へ' },
@@ -363,6 +398,8 @@ export const BLOG_POSTS: BlogPost[] = [
       {
         type: 'img',
         src: '/images/blog/flip-flush-technology-01.jpg',
+        width: 2000,
+        height: 823,
         alt: 'JOMOO X シリーズのスマートトイレ',
       },
       {
@@ -376,6 +413,8 @@ export const BLOG_POSTS: BlogPost[] = [
       {
         type: 'img',
         src: '/images/blog/flip-flush-technology-02.jpg',
+        width: 1774,
+        height: 730,
         alt: 'iResearch による「世界初」認定',
       },
       { type: 'h2', text: '厳密な調査に裏づけられた国際認定' },
@@ -387,6 +426,8 @@ export const BLOG_POSTS: BlogPost[] = [
       {
         type: 'img',
         src: '/images/blog/flip-flush-technology-03.gif',
+        width: 582,
+        height: 240,
         alt: '反転洗浄機構の動作',
       },
       {
@@ -412,6 +453,8 @@ export const BLOG_POSTS: BlogPost[] = [
       {
         type: 'img',
         src: '/images/blog/flip-flush-technology-04.jpg',
+        width: 2000,
+        height: 823,
         alt: '65 mm の大口径排水路',
       },
       { type: 'h2', text: '実際の空間のための設計' },
@@ -426,6 +469,8 @@ export const BLOG_POSTS: BlogPost[] = [
       {
         type: 'img',
         src: '/images/blog/flip-flush-technology-05.jpg',
+        width: 1178,
+        height: 484,
         alt: 'JOMOO X70 の内部機構',
       },
       { type: 'h2', text: '日常を組み替える「世界初」' },
@@ -451,6 +496,8 @@ export const BLOG_POSTS: BlogPost[] = [
       {
         type: 'img',
         src: '/images/blog/public-restrooms-redefined-01.jpg',
+        width: 1333,
+        height: 444,
         alt: '「敦煌浄土」スマートトイレの外観',
       },
       {
@@ -464,11 +511,15 @@ export const BLOG_POSTS: BlogPost[] = [
       {
         type: 'img',
         src: '/images/blog/public-restrooms-redefined-02.jpg',
+        width: 1080,
+        height: 1442,
         alt: '敦煌の文化的モチーフを取り入れた内装',
       },
       {
         type: 'img',
         src: '/images/blog/public-restrooms-redefined-03.jpg',
+        width: 2000,
+        height: 823,
         alt: '「敦煌浄土」の内部空間',
       },
       { type: 'h2', text: '機能から体験へ — 公共空間の価値を定義し直す' },
@@ -487,6 +538,8 @@ export const BLOG_POSTS: BlogPost[] = [
       {
         type: 'img',
         src: '/images/blog/public-restrooms-redefined-04.jpg',
+        width: 2000,
+        height: 823,
         alt: '八つのスマートシステムを備えた設備',
       },
       { type: 'h2', text: '業界のトレンドを牽引する' },
@@ -501,6 +554,8 @@ export const BLOG_POSTS: BlogPost[] = [
       {
         type: 'img',
         src: '/images/blog/public-restrooms-redefined-05.jpg',
+        width: 2000,
+        height: 1000,
         alt: '文化と技術が交差する公共空間',
       },
       { type: 'h2', text: '技術が文化を支え、未来を照らす' },
@@ -526,6 +581,8 @@ export const BLOG_POSTS: BlogPost[] = [
       {
         type: 'img',
         src: '/images/blog/ai-bath-01.jpg',
+        width: 1920,
+        height: 925,
         alt: 'AI BATH のスマートバスルーム空間',
       },
       {
@@ -539,6 +596,8 @@ export const BLOG_POSTS: BlogPost[] = [
       {
         type: 'img',
         src: '/images/blog/ai-bath-02.jpg',
+        width: 1638,
+        height: 922,
         alt: 'AI 受動認識センサーによる検知',
       },
       { type: 'h2', text: '感知から対話へ — バスルームが先にあなたを知る' },
@@ -553,6 +612,8 @@ export const BLOG_POSTS: BlogPost[] = [
       {
         type: 'img',
         src: '/images/blog/ai-bath-03.jpg',
+        width: 1920,
+        height: 1080,
         alt: '健康管理を日常に組み込む設計',
       },
       { type: 'h2', text: '健康と快適さを、日常に自然に織り込む' },
@@ -567,6 +628,8 @@ export const BLOG_POSTS: BlogPost[] = [
       {
         type: 'img',
         src: '/images/blog/ai-bath-04.jpg',
+        width: 1920,
+        height: 1080,
         alt: 'DeepSeek を搭載した音声アシスタント',
       },
       { type: 'h2', text: 'バスルームを超えて — 暮らしのコンシェルジュへ' },
@@ -581,6 +644,8 @@ export const BLOG_POSTS: BlogPost[] = [
       {
         type: 'img',
         src: '/images/blog/ai-bath-05.jpg',
+        width: 1920,
+        height: 825,
         alt: '暮らしに寄り添う AI BATH',
       },
       {
@@ -605,6 +670,8 @@ export const BLOG_POSTS: BlogPost[] = [
       {
         type: 'img',
         src: '/images/blog/x70-ultra-quiet-01.jpg',
+        width: 1400,
+        height: 555,
         alt: 'JOMOO X70 超静音スマートトイレ',
       },
       {
@@ -626,6 +693,8 @@ export const BLOG_POSTS: BlogPost[] = [
       {
         type: 'img',
         src: '/images/blog/x70-ultra-quiet-02.jpg',
+        width: 2000,
+        height: 823,
         alt: '非接触での自動開閉',
       },
       { type: 'h2', text: '自動で保たれる衛生、手を触れない快適さ' },
@@ -636,6 +705,8 @@ export const BLOG_POSTS: BlogPost[] = [
       {
         type: 'img',
         src: '/images/blog/x70-ultra-quiet-03.jpg',
+        width: 2000,
+        height: 823,
         alt: '38 dB の超静音洗浄',
       },
       { type: 'h2', text: '静かな力、比類のない清潔さ' },
@@ -646,6 +717,8 @@ export const BLOG_POSTS: BlogPost[] = [
       {
         type: 'img',
         src: '/images/blog/x70-ultra-quiet-04.jpg',
+        width: 2000,
+        height: 823,
         alt: 'プラチナ脱臭システム',
       },
       { type: 'h2', text: 'いつでも新鮮な空気 — 高度な脱臭' },
@@ -656,6 +729,8 @@ export const BLOG_POSTS: BlogPost[] = [
       {
         type: 'img',
         src: '/images/blog/x70-ultra-quiet-05.jpg',
+        width: 2000,
+        height: 823,
         alt: 'UVC による全経路除菌',
       },
       { type: 'h2', text: '全経路の除菌が支える、より健やかな暮らし' },
@@ -666,6 +741,8 @@ export const BLOG_POSTS: BlogPost[] = [
       {
         type: 'img',
         src: '/images/blog/x70-ultra-quiet-06.jpg',
+        width: 2000,
+        height: 823,
         alt: '誰にとっても使いやすい設計',
       },
       { type: 'h2', text: '誰にとっても、毎日のために' },

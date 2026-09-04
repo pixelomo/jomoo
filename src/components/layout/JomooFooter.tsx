@@ -5,24 +5,16 @@
 
 import { FaLinkedinIn } from 'react-icons/fa6'
 import { openConsentSettings } from '@/components/consent/useConsent'
-import {
-  SiFacebook,
-  SiInstagram,
-  SiWechat,
-  SiX,
-  SiYoutube,
-} from 'react-icons/si'
+import { SiFacebook, SiInstagram, SiX, SiYoutube } from 'react-icons/si'
 
-// '#' means the client has not given us that account yet — those icons stay
-// put rather than disappearing, so the row keeps its shape as the real links
-// arrive one at a time.
+// The group's international accounts. WeChat is deliberately absent: the client
+// asked for it to come off the Japanese site.
 const SOCIAL_LINKS = [
-  { label: 'Facebook', href: '#', Icon: SiFacebook },
-  { label: 'Instagram', href: '#', Icon: SiInstagram },
+  { label: 'Facebook', href: 'https://www.facebook.com/jomoointernational', Icon: SiFacebook },
+  { label: 'Instagram', href: 'https://www.instagram.com/jomoointer/', Icon: SiInstagram },
   { label: 'YouTube', href: 'https://www.youtube.com/@JOMOOJapan', Icon: SiYoutube },
-  { label: 'WeChat', href: '#', Icon: SiWechat },
-  { label: 'LinkedIn', href: '#', Icon: FaLinkedinIn },
-  { label: 'X', href: '#', Icon: SiX },
+  { label: 'LinkedIn', href: 'https://www.linkedin.com/company/jomoo-group/', Icon: FaLinkedinIn },
+  { label: 'X', href: 'https://x.com/Jomoointer', Icon: SiX },
 ] as const
 
 export default function JomooFooter() {
@@ -69,7 +61,6 @@ export default function JomooFooter() {
               <li><a href="/contact-us">お客様相談窓口</a></li>
               <li><a href="#">アフターサービス</a></li>
               <li><a href="#">Q&amp;A</a></li>
-              <li><a href="#">施工動画&amp;チュートリアル</a></li>
             </ul>
           </div>
 
@@ -89,7 +80,7 @@ export default function JomooFooter() {
               {/* Hidden until /company-information is built.
               <li><a href="/company-information">会社紹介</a></li>
               */}
-              <li><a href="#">ニュース＆ブログ</a></li>
+              <li><a href="/blog">ニュース＆ブログ</a></li>
               <li className="footer__li--gap">
                 <a href="/register" className="footer__link--bold">
                   製品登録

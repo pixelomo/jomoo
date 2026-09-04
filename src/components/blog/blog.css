@@ -365,6 +365,18 @@
   display: block;
 }
 
+/* The band above is cut for landscape pictures. A square or portrait one would
+   lose more than half of itself to it, so it keeps its own proportions and is
+   set to roughly the text measure — taller than it is wide, never cropped. */
+.blog-post__figure--portrait img {
+  width: auto;
+  height: auto;
+  max-width: min(50vw, 90%);
+  max-height: 1000px;
+  margin: 0 auto;
+  object-fit: fill;
+}
+
 .blog-post__caption {
   width: 50vw;
   margin: 20px auto 0;
@@ -512,6 +524,11 @@
 
   .blog-post__figure img {
     height: 380px;
+  }
+
+  .blog-post__figure--portrait img {
+    max-width: 90%;
+    max-height: 70vh;
   }
 
   .blog-post__related {
