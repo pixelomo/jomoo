@@ -1,0 +1,278 @@
+/* ============================================
+   FOOTER CTA — catalog and contact cards
+   ============================================
+   Lifted out of jomoo-homepage.css unchanged, so the component carries its own
+   styles: the company profile shows the same two cards, and importing the
+   homepage's whole stylesheet to get them would drag its :root overrides along
+   with it. --font-en is the one variable that lived there, so it falls back to
+   the font itself here. */
+
+
+/* ============================================
+   FOOTER CTA — catalog & contact cards
+   ============================================ */
+.footer-cta {
+  background: #f4f4f7;
+  padding: 0 var(--gutter) 5rem;
+}
+
+.footer-cta__inner {
+  display: flex;
+  width: 100%;
+  max-width: 1240px;
+  margin: 0 auto;
+  gap: 1.5rem;
+}
+
+.footer-cta__card {
+  position: relative;
+  flex: 1 1 calc(50% - 0.75rem);
+  width: calc(50% - 0.75rem);
+  max-width: 620px;
+  height: 275px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  box-sizing: border-box;
+  border-radius: 20px;
+}
+
+.footer-cta__media {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 58%;
+  height: 100%;
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center right;
+  z-index: 0;
+}
+
+.footer-cta__shade {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.footer-cta__card--catalog {
+  background: #ffffff;
+}
+
+.footer-cta__card--catalog .footer-cta__shade {
+  background: linear-gradient(
+    to right,
+    #ffffff 0%,
+    #ffffff 42%,
+    rgba(255, 255, 255, 0.72) 52%,
+    rgba(255, 255, 255, 0) 68%
+  );
+}
+
+.footer-cta__card--contact {
+  background: #73a4c7;
+}
+
+.footer-cta__card--contact .footer-cta__shade {
+  background: linear-gradient(
+    to right,
+    #73a4c7 0%,
+    #73a4c7 42%,
+    rgba(115, 164, 199, 0.72) 52%,
+    rgba(115, 164, 199, 0) 68%
+  );
+}
+
+.footer-cta__content {
+  position: relative;
+  z-index: 2;
+  padding: 2rem 2.25rem;
+  max-width: 72%;
+}
+
+.footer-cta__eyebrow {
+  font-family: var(--font-en, var(--font-poppins), sans-serif);
+  letter-spacing: 0;
+  text-transform: uppercase;
+  margin-bottom: 0.65rem;
+  font-size: 1.3rem;
+  font-weight: 400;
+}
+
+.footer-cta__card--catalog .footer-cta__eyebrow {
+  color: #73a4c7;
+}
+
+.footer-cta__card--contact .footer-cta__eyebrow {
+  color: #ffffff;
+}
+
+.footer-cta__title {
+  letter-spacing: 0;
+  word-break: keep-all;
+  margin: 0 0 1.15rem;
+  font-size: 1.85rem;
+  font-weight: 700;
+  line-height: 1.45;
+}
+
+.footer-cta__card--catalog .footer-cta__title {
+  color: #000000;
+}
+
+.footer-cta__card--contact .footer-cta__title {
+  color: #ffffff;
+}
+
+.footer-cta__btn {
+  letter-spacing: 0;
+  white-space: nowrap;
+  border-radius: 999px;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.55rem 2rem;
+  font-size: 1.6rem;
+  font-weight: 600;
+  line-height: 1.2;
+  display: inline-flex;
+  transition: background 0.25s ease, color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.footer-cta__card--catalog .footer-cta__btn {
+  background: #73a4c7;
+  color: #ffffff;
+}
+
+.footer-cta__card--catalog:hover .footer-cta__btn,
+.footer-cta__card--catalog:focus-visible .footer-cta__btn {
+  background: #ffffff;
+  color: #73a4c7;
+  box-shadow: inset 0 0 0 1px #73a4c7;
+}
+
+.footer-cta__card--contact .footer-cta__btn {
+  background: #ffffff;
+  color: #73a4c7;
+}
+
+.footer-cta__card--contact:hover .footer-cta__btn,
+.footer-cta__card--contact:focus-visible .footer-cta__btn {
+  background: #73a4c7;
+  color: #ffffff;
+  box-shadow: inset 0 0 0 1px #ffffff;
+}
+
+.footer-cta__caret {
+  display: inline-block;
+  font-weight: 600;
+  line-height: 1;
+}
+
+@media (max-width: 1023px) {
+  .footer-cta__inner {
+      flex-direction: column;
+      max-width: 620px;
+      gap: 1.5rem;
+    }
+  
+  .footer-cta__card {
+      width: 100%;
+      max-width: none;
+      flex: none;
+    }
+}
+
+@media (max-width: 1299px) and (min-width: 1024px) {
+  .footer-cta__title {
+      font-size: 1.65rem;
+    }
+  
+  .footer-cta__btn {
+      font-size: 1.4rem;
+    }
+}
+
+@media (max-width: 1023px) {
+  .footer-cta {
+      padding-bottom: 4rem;
+    }
+  
+  .footer-cta__content {
+      padding: 1.5rem 1.75rem;
+      max-width: 78%;
+    }
+  
+  .footer-cta__eyebrow {
+      font-size: 1.15rem;
+    }
+  
+  .footer-cta__title {
+      font-size: 1.5rem;
+    }
+  
+  .footer-cta__btn {
+      font-size: 1.25rem;
+      padding: 0.5rem 1.5rem;
+    }
+}
+
+@media (max-width: 767px) {
+  .footer-cta__inner {
+      max-width: none;
+    }
+  
+  .footer-cta__card {
+      height: auto;
+      min-height: 220px;
+    }
+  
+  .footer-cta__content {
+      max-width: 100%;
+      padding: 1.35rem 1.25rem 1.5rem;
+    }
+  
+  .footer-cta__eyebrow {
+      font-size: 1rem;
+    }
+  
+  .footer-cta__title {
+      font-size: 1.25rem;
+      margin-bottom: 1rem;
+    }
+  
+  .footer-cta__btn {
+      font-size: 1rem;
+      padding: 0.45rem 1.25rem;
+      white-space: normal;
+    }
+  
+  .footer-cta__media {
+      width: 100%;
+      height: 42%;
+      top: auto;
+      bottom: 0;
+      opacity: 0.35;
+    }
+  
+  .footer-cta__card--catalog .footer-cta__shade {
+      background: linear-gradient(
+        to bottom,
+        #ffffff 0%,
+        #ffffff 58%,
+        rgba(255, 255, 255, 0.82) 72%,
+        rgba(255, 255, 255, 0.35) 100%
+      );
+    }
+  
+  .footer-cta__card--contact .footer-cta__shade {
+      background: linear-gradient(
+        to bottom,
+        #73a4c7 0%,
+        #73a4c7 58%,
+        rgba(115, 164, 199, 0.82) 72%,
+        rgba(115, 164, 199, 0.35) 100%
+      );
+    }
+}

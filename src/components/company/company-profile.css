@@ -788,6 +788,15 @@
   }
 }
 
+/* ---- The catalog and contact cards ----------------------------------------
+   The homepage's own component. There it runs straight on from a section that
+   shares its ground, so the band carries no top padding; here it follows white,
+   and without this the grey would start hard against the top of the cards. */
+
+.cp .footer-cta {
+  padding-top: 5rem;
+}
+
 /* The blur, the moving dot and a looping backdrop are all motion. With it
    turned down the video holds on its poster (BrandStage never starts playback)
    and the rest simply stops moving. */

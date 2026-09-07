@@ -1,5 +1,7 @@
 'use client'
 
+import './footer-cta.css'
+
 export default function FooterCtaSection() {
   return (
     <section className="footer-cta" data-nav="light" aria-label="Catalog and contact">
