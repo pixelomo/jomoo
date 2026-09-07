@@ -97,8 +97,8 @@ export default function BrandFamilySection() {
         <h2 className="cp-section-title" id="cp-brands-title">
           ブランドファミリー
         </h2>
-        <span className="cp-brands__rule" aria-hidden="true" />
-        <div className="cp-brands__intro">
+        <span className="cp-rule" aria-hidden="true" />
+        <div className="cp-lede">
           {INTRO.map((line) => (
             <p key={line}>{line}</p>
           ))}
