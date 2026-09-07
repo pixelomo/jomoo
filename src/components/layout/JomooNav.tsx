@@ -18,10 +18,10 @@ interface Props {
 
 const NAV_LINKS = [
   { href: '/products/smart-toilet', label: '商品情報' },
+  { href: '/company-information', label: '会社情報' },
   { href: '/blog', label: 'ブログ' },
-  // Hidden until those pages are built — restore both when they ship.
+  // Hidden until that page is built — restore it when it ships.
   // { href: '/inspiration', label: 'インスピレーション' },
-  // { href: '/company-information', label: '会社情報' },
 ] as const
 
 /**

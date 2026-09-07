@@ -1,0 +1,165 @@
+/* ============================================
+   COMPANY PROFILE — 会社情報
+   ============================================ */
+
+.cp {
+  --cp-accent: #73a4c7;
+  /* The nav is fixed and opaque, and .site-main already pads the page down by
+     its height — so a "full screen" panel here is the viewport minus the nav,
+     not the whole viewport. svh keeps mobile browser chrome from cropping it. */
+  --cp-panel-h: calc(100svh - var(--nav-height));
+  background: #000;
+  color: #fff;
+  font-family: var(--font-poppins), sans-serif;
+}
+
+/* ---- The fixed-video stage -------------------------------------------------
+   One video carries both the hero and the about panel: the media layer sticks
+   under the nav while the panels scroll across it.
+
+   The panels are pulled back over the media by exactly one panel height rather
+   than the media being given a negative margin of its own. That distinction
+   matters — a negative margin on the sticky box collapses its margin box to
+   nothing, and sticky is bounded by the margin box, so it would stay pinned
+   past the end of the stage and ride up over the footer. Pulling the panels
+   instead leaves the media a real 1-panel margin box inside a 2-panel stage,
+   which is precisely the travel it should have: pinned through both panels,
+   released as the second one leaves. */
+
+.cp-stage {
+  position: relative;
+}
+
+.cp-stage__media {
+  position: sticky;
+  top: var(--nav-height);
+  height: var(--cp-panel-h);
+  z-index: 0;
+  overflow: hidden;
+  background: #000;
+}
+
+.cp-stage__panels {
+  position: relative;
+  z-index: 1;
+  margin-top: calc(var(--cp-panel-h) * -1);
+}
+
+.cp-stage__video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Darkens the footage enough for white type to hold contrast, weighted to the
+   centre where the copy sits rather than flattening the whole frame. */
+.cp-stage__scrim {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at center, rgba(0, 0, 0, 0.58) 0%, rgba(0, 0, 0, 0.34) 55%, rgba(0, 0, 0, 0.46) 100%),
+    linear-gradient(to bottom, rgba(0, 0, 0, 0.35) 0%, rgba(0, 0, 0, 0) 30%);
+  pointer-events: none;
+}
+
+.cp-panel {
+  position: relative;
+  min-height: var(--cp-panel-h);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 5rem max(var(--gutter), 1.75rem);
+}
+
+/* ---- Panel 1 — World of JOMOO ---- */
+
+.cp-hero__title {
+  margin: 0;
+  font-size: clamp(2.75rem, 9.5vw, 10rem);
+  font-weight: 400;
+  line-height: 0.95;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+  text-shadow: 0 2px 40px rgba(0, 0, 0, 0.45);
+}
+
+.cp-hero__cue {
+  position: absolute;
+  left: 50%;
+  bottom: 3rem;
+  transform: translateX(-50%);
+  width: 1px;
+  height: 3.5rem;
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.8));
+}
+
+/* ---- Panel 2 — JOMOOについて ---- */
+
+.cp-about {
+  max-width: 54rem;
+  /* The copy sits on moving footage, so the scrim alone cannot be trusted for
+     contrast — a soft shadow keeps it readable over the bright frames too. */
+  text-shadow: 0 1px 22px rgba(0, 0, 0, 0.55);
+}
+
+.cp-about__eyebrow {
+  margin: 0 0 1.5rem;
+  font-size: clamp(0.9rem, 1.4vw, 1.15rem);
+  font-weight: 400;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--cp-accent);
+}
+
+.cp-about__title {
+  margin: 0 0 2.5rem;
+  font-size: clamp(2rem, 4.4vw, 3.6rem);
+  font-weight: 700;
+  line-height: 1.4;
+  letter-spacing: 0.02em;
+  /* Japanese has no spaces to break at, so let the browser wrap mid-run only
+     where it must rather than pushing a whole clause onto its own line. */
+  word-break: keep-all;
+}
+
+/* keep-all belongs on the heading, where the run is short and a break would
+   read as a mistake. On body copy it is what pushes a whole Japanese sentence
+   onto one unbreakable line and off the side of a phone — normal lets the
+   browser apply its own kinsoku rules instead. */
+.cp-about__body p {
+  margin: 0;
+  font-size: clamp(0.95rem, 1.15vw, 1.125rem);
+  line-height: 2.15;
+  color: rgba(255, 255, 255, 0.88);
+  word-break: normal;
+  text-wrap: pretty;
+}
+
+.cp-about__body p + p {
+  margin-top: 2.25rem;
+}
+
+@media (max-width: 979px) {
+  .cp-panel {
+    padding: 4rem max(var(--gutter), 1.5rem);
+  }
+
+  .cp-about__title {
+    margin-bottom: 1.75rem;
+  }
+
+  .cp-about__body p + p {
+    margin-top: 1.75rem;
+  }
+}
+
+/* Sticky plus a looping background video is the whole point of the section, so
+   with motion turned down the video holds on its poster frame instead. */
+@media (prefers-reduced-motion: reduce) {
+  .cp-hero__cue {
+    display: none;
+  }
+}
