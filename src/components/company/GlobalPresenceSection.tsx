@@ -76,25 +76,38 @@ function StatCard({ stat, index, rowRef }: { stat: Stat; index: number; rowRef: 
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
 
     const suf = sufRef.current
-    if (suf) suf.style.opacity = '0'
-    num.textContent = '0'
+    let tween: { kill: () => void } | null = null
 
+    function reset() {
+      tween?.kill()
+      tween = null
+      if (num) num.textContent = '0'
+      if (suf) suf.style.opacity = '0'
+    }
+
+    reset()
+
+    // Re-armed rather than disconnected: leaving the row winds it back, so
+    // scrolling past and returning counts again instead of finding the figure
+    // already arrived.
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (!entry.isIntersecting) return
-        observer.disconnect()
+        if (!entry.isIntersecting) {
+          reset()
+          return
+        }
         void import('gsap').then(({ default: gsap }) => {
           const counter = { value: 0 }
-          gsap.to(counter, {
+          tween = gsap.to(counter, {
             value: stat.value,
             duration: 2,
             delay: index * 0.08,
             ease: 'power2.out',
             onUpdate: () => {
-              num.textContent = Math.round(counter.value).toLocaleString('ja-JP')
+              if (num) num.textContent = Math.round(counter.value).toLocaleString('ja-JP')
             },
             onComplete: () => {
-              num.textContent = stat.value.toLocaleString('ja-JP')
+              if (num) num.textContent = stat.value.toLocaleString('ja-JP')
               if (suf) suf.style.opacity = '1'
             },
           })
@@ -104,7 +117,10 @@ function StatCard({ stat, index, rowRef }: { stat: Stat; index: number; rowRef: 
     )
 
     observer.observe(row)
-    return () => observer.disconnect()
+    return () => {
+      observer.disconnect()
+      tween?.kill()
+    }
   }, [stat.value, index, rowRef])
 
   return (
@@ -159,8 +175,8 @@ export default function GlobalPresenceSection() {
         className="cp-global__map"
         src="/images/companyprofile/mapprof.jpg"
         alt="JOMOOの世界の拠点を示す地図。中国、UAE、ロシア、欧州、アメリカを中心に120を超える国と地域に展開しています。"
-        width={2400}
-        height={1479}
+        width={1891}
+        height={913}
         loading="lazy"
       />
 

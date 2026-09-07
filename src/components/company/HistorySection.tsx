@@ -4,9 +4,9 @@ import { useRef } from 'react'
 import { useCssScrollProgress } from './useCssScrollProgress'
 import { useScrollReveal } from './useScrollReveal'
 
-/** The rail's sticky window, as a fraction of the viewport. Mirrors the CSS. */
-const RAIL_HEIGHT = 0.9
-const RAIL_INSET = 0.05
+/** The rail's clearance above and below, as a fraction of the viewport.
+ *  Mirrors --cp-rail-gap in the stylesheet. */
+const RAIL_GAP = 0.1
 
 interface Era {
   from: string
@@ -154,14 +154,17 @@ export default function HistorySection() {
   const sectionRef = useRef<HTMLElement>(null)
   const bodyRef = useRef<HTMLDivElement>(null)
 
-  // The rail is pinned RAIL_INSET below the nav and stands RAIL_HEIGHT tall, so
-  // the dot's travel is the distance between the body entering that window and
-  // its end reaching the bottom of it. The floor is a guard for a timeline
+  // The rail is pinned RAIL_GAP below the nav and stops the same distance short
+  // of the foot of the screen, so the dot's travel is the distance between the
+  // body entering that window and its end reaching the bottom of it. The floor is a guard for a timeline
   // shorter than the rail itself, which would otherwise leave nothing to move
   // through and the dot sitting dead at the top.
   useCssScrollProgress(bodyRef, '--cp-rail', (rect, viewport, navHeight) => {
-    const top = navHeight + viewport * RAIL_INSET
-    const rail = Math.min(viewport * RAIL_HEIGHT, rect.height)
+    const gap = viewport * RAIL_GAP
+    const top = navHeight + gap
+    // Matches the min() the stylesheet caps the line with, so the dot's travel
+    // is measured against the line actually drawn.
+    const rail = Math.min(viewport - navHeight - gap * 2, rect.height)
     const travel = Math.max(rect.height - rail, viewport * 0.5)
     return (top - rect.top) / travel
   })

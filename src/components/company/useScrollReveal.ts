@@ -24,6 +24,10 @@ interface Parallax {
  * each element crosses the lower third of the screen, and an optional slower
  * drift, scrubbed against the scrollbar, for anything sitting inside a frame.
  *
+ * Both run in either direction — the rise winds back when its element leaves
+ * upwards, the drift follows the scrollbar by nature — so a section scrolled
+ * past and returned to plays again rather than sitting there already finished.
+ *
  * The reveal's resting state is what the stylesheet paints. The start state is
  * applied from here rather than in CSS, so a viewer whose browser never runs
  * this — GSAP failed to load, motion is turned down — sees the finished layout
@@ -71,7 +75,11 @@ export function useScrollReveal(
                   // the last row of anything sitting near the foot of the page
                   // never gets there — the page runs out of scroll first and
                   // they stay half faded in. This always finishes.
-                  once: true,
+                  //
+                  // It also winds back when the element leaves upwards, so
+                  // scrolling back over a section and down again plays it
+                  // again rather than showing it already done.
+                  toggleActions: 'play none none reverse',
                 },
               },
             )
