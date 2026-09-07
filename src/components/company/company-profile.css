@@ -183,6 +183,10 @@
   color: var(--cp-blue);
 }
 
+.cp-history__head {
+  text-align: center;
+}
+
 .cp-history__title {
   margin: 1.25rem 0 0;
   font-size: clamp(2rem, 4.4vw, 3.6rem);
@@ -201,14 +205,20 @@
   margin-top: 4rem;
   padding-left: 4.5rem;
   display: grid;
-  grid-template-columns: minmax(0, 40fr) minmax(0, 60fr);
-  column-gap: clamp(2rem, 5vw, 5rem);
+  /* The photograph sets the first column, and the years start a fixed 160px
+     past its edge. The gap is written as a clamp rather than a flat 160px so
+     the two columns still have somewhere to live between here and the point
+     the layout stacks. */
+  grid-template-columns: minmax(0, 360px) minmax(0, 1fr);
+  column-gap: clamp(3rem, 12vw, 160px);
   row-gap: 3rem;
   align-items: start;
 }
 
+/* Spans both columns: the era title is wider than the photograph beneath it,
+   and it has the row to itself either way. */
 .cp-era__head {
-  grid-column: 1;
+  grid-column: 1 / -1;
   grid-row: 1;
 }
 
@@ -262,15 +272,23 @@
 }
 
 .cp-era__years {
-  margin: 0 0 1rem;
-  font-size: clamp(2rem, 3.4vw, 3rem);
-  font-weight: 700;
-  line-height: 1.2;
+  margin: 0 0 0.5rem;
+  font-size: clamp(2.75rem, 5.5vw, 5.5rem);
+  font-weight: 500;
+  line-height: 1.1;
   letter-spacing: -0.01em;
 }
 
 .cp-era__years-to {
   color: var(--cp-blue);
+}
+
+/* Sits under a very large title rather than alone above a section, so it is
+   set solid — the tracking that spaces out OUR HISTORY would only pull it
+   apart here. */
+.cp-era__eyebrow {
+  font-size: clamp(1.125rem, 1.9vw, 1.75rem);
+  letter-spacing: normal;
 }
 
 .cp-era__subtitle {
@@ -282,7 +300,8 @@
 
 .cp-era__image {
   display: block;
-  width: 100%;
+  width: 360px;
+  max-width: 100%;
   height: auto;
   border-radius: 16px;
 }
@@ -293,7 +312,13 @@
   list-style: none;
 }
 
+/* Year beside the event rather than above it, aligned on the first baseline so
+   the pairing holds however many lines the event runs to. */
 .cp-entry {
+  display: grid;
+  grid-template-columns: 4.5rem minmax(0, 1fr);
+  column-gap: 2.5rem;
+  align-items: baseline;
   padding: 0 0 2rem;
   border-bottom: 1px solid #000;
 }
@@ -310,10 +335,10 @@
 }
 
 .cp-entry__year {
-  margin: 0 0 0.75rem;
-  font-size: clamp(1.25rem, 1.8vw, 1.5rem);
-  font-weight: 700;
-  line-height: 1.2;
+  margin: 0;
+  font-size: clamp(1.125rem, 1.5vw, 1.375rem);
+  font-weight: 400;
+  line-height: 1.9;
   color: var(--cp-blue);
 }
 
@@ -374,6 +399,13 @@
 
   .cp-era__entries {
     margin: 2.5rem 0;
+  }
+
+  /* The year keeps its own column on a phone, just a narrower one — the event
+     text has little enough room as it is. */
+  .cp-entry {
+    grid-template-columns: 3.5rem minmax(0, 1fr);
+    column-gap: 1.25rem;
   }
 }
 

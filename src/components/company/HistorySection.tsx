@@ -63,7 +63,7 @@ export default function HistorySection() {
           <h3 className="cp-era__years">
             1990<span className="cp-era__years-to">-1999</span>
           </h3>
-          <p className="cp-eyebrow">THE FOUNDING YEARS</p>
+          <p className="cp-eyebrow cp-era__eyebrow">THE FOUNDING YEARS</p>
         </div>
 
         <div className="cp-era__aside">
