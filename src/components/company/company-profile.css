@@ -3,7 +3,9 @@
    ============================================ */
 
 .cp {
-  --cp-accent: #73a4c7;
+  /* The site-wide primary, as used for eyebrows and rules on the homepage. */
+  --cp-blue: #73a4c7;
+  --cp-rule: #b5b5b5;
   /* The nav is fixed and opaque, and .site-main already pads the page down by
      its height — so a "full screen" panel here is the viewport minus the nav,
      not the whole viewport. svh keeps mobile browser chrome from cropping it. */
@@ -13,21 +15,35 @@
   font-family: var(--font-poppins), sans-serif;
 }
 
+/* Shared by both sections. Colour is not set here: it is white over the video
+   and blue on the white history section. */
+.cp-eyebrow {
+  margin: 0;
+  font-size: clamp(1rem, 1.5vw, 1.25rem);
+  font-weight: 600;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+}
+
 /* ---- The fixed-video stage -------------------------------------------------
    One video carries both the hero and the about panel: the media layer sticks
    under the nav while the panels scroll across it.
 
    The panels are pulled back over the media by exactly one panel height rather
    than the media being given a negative margin of its own. That distinction
-   matters — a negative margin on the sticky box collapses its margin box to
-   nothing, and sticky is bounded by the margin box, so it would stay pinned
-   past the end of the stage and ride up over the footer. Pulling the panels
-   instead leaves the media a real 1-panel margin box inside a 2-panel stage,
-   which is precisely the travel it should have: pinned through both panels,
-   released as the second one leaves. */
+   matters — a negative margin on the sticky box collapses its margin box, and
+   sticky is bounded by the margin box, so it would stay pinned past the end of
+   the stage and ride up over the footer. Pulling the panels instead leaves the
+   media a real 1-panel margin box inside a 2-panel stage, which is precisely
+   the travel it should have: pinned through both panels, released as the
+   second one leaves. */
 
 .cp-stage {
   position: relative;
+  /* Written by BrandStage: 0 across the title panel, 1 once the introduction
+     has arrived. Declared here so the first paint is sharp rather than
+     resolving the calc() below against an empty value. */
+  --cp-focus: 0;
 }
 
 .cp-stage__media {
@@ -50,16 +66,29 @@
   height: 100%;
   object-fit: cover;
   display: block;
+  /* The footage drops out of focus as the introduction takes over, so the copy
+     sits on a soft field rather than competing with a moving room. The scale is
+     permanent: a blur samples past the element's edges and would otherwise
+     feather them into the black behind. */
+  filter: blur(calc(var(--cp-focus) * 22px));
+  transform: scale(1.08);
 }
 
 /* Darkens the footage enough for white type to hold contrast, weighted to the
-   centre where the copy sits rather than flattening the whole frame. */
+   centre where the copy sits rather than flattening the whole frame. Deepens
+   alongside the blur so the longer body copy has more to sit on. */
 .cp-stage__scrim {
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(ellipse at center, rgba(0, 0, 0, 0.58) 0%, rgba(0, 0, 0, 0.34) 55%, rgba(0, 0, 0, 0.46) 100%),
+    radial-gradient(
+      ellipse at center,
+      rgba(0, 0, 0, 0.58) 0%,
+      rgba(0, 0, 0, 0.34) 55%,
+      rgba(0, 0, 0, 0.46) 100%
+    ),
     linear-gradient(to bottom, rgba(0, 0, 0, 0.35) 0%, rgba(0, 0, 0, 0) 30%);
+  opacity: calc(1 + var(--cp-focus) * 0.35);
   pointer-events: none;
 }
 
@@ -71,29 +100,21 @@
   align-items: center;
   justify-content: center;
   text-align: center;
+  /* The site gutter drops to 1rem on small screens, which is fine beside a card
+     but leaves centred copy touching both edges. Hold a floor of its own. */
   padding: 5rem max(var(--gutter), 1.75rem);
 }
 
-/* ---- Panel 1 — World of JOMOO ---- */
+/* ---- Panel 1 — Welcome to JOMOO ---- */
 
 .cp-hero__title {
   margin: 0;
-  font-size: clamp(2.75rem, 9.5vw, 10rem);
+  font-size: clamp(2.75rem, 6.5vw, 10rem);
   font-weight: 400;
   line-height: 0.95;
   letter-spacing: -0.02em;
   text-wrap: balance;
   text-shadow: 0 2px 40px rgba(0, 0, 0, 0.45);
-}
-
-.cp-hero__cue {
-  position: absolute;
-  left: 50%;
-  bottom: 3rem;
-  transform: translateX(-50%);
-  width: 1px;
-  height: 3.5rem;
-  background: linear-gradient(to bottom, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.8));
 }
 
 /* ---- Panel 2 — JOMOOについて ---- */
@@ -105,17 +126,17 @@
   text-shadow: 0 1px 22px rgba(0, 0, 0, 0.55);
 }
 
+/* Carries more weight than the history eyebrows: over footage it is the only
+   thing above the heading, so it has to hold its own. */
 .cp-about__eyebrow {
   margin: 0 0 1.5rem;
-  font-size: clamp(0.9rem, 1.4vw, 1.15rem);
-  font-weight: 400;
-  letter-spacing: 0.3em;
-  text-transform: uppercase;
-  color: var(--cp-accent);
+  font-size: clamp(1.125rem, 1.8vw, 1.5rem);
+  font-weight: 700;
+  color: #fff;
 }
 
 .cp-about__title {
-  margin: 0 0 2.5rem;
+  margin: 0 0 1.75rem;
   font-size: clamp(2rem, 4.4vw, 3.6rem);
   font-weight: 700;
   line-height: 1.4;
@@ -125,15 +146,23 @@
   word-break: keep-all;
 }
 
+.cp-about__rule {
+  display: block;
+  width: 38px;
+  height: 2px;
+  margin: 0 auto 2.5rem;
+  background: #fff;
+}
+
 /* keep-all belongs on the heading, where the run is short and a break would
    read as a mistake. On body copy it is what pushes a whole Japanese sentence
    onto one unbreakable line and off the side of a phone — normal lets the
    browser apply its own kinsoku rules instead. */
 .cp-about__body p {
   margin: 0;
-  font-size: clamp(0.95rem, 1.15vw, 1.125rem);
+  font-size: clamp(1.125rem, 1.45vw, 1.25rem);
   line-height: 2.15;
-  color: rgba(255, 255, 255, 0.88);
+  color: rgba(255, 255, 255, 0.92);
   word-break: normal;
   text-wrap: pretty;
 }
@@ -142,24 +171,221 @@
   margin-top: 2.25rem;
 }
 
-@media (max-width: 979px) {
+/* ---- Section 3 — JOMOOの歩み ---------------------------------------------- */
+
+.cp-history {
+  background: #fff;
+  color: #000;
+  padding: 7.5rem max(var(--gutter), 1.75rem) 8rem;
+}
+
+.cp-history .cp-eyebrow {
+  color: var(--cp-blue);
+}
+
+.cp-history__title {
+  margin: 1.25rem 0 0;
+  font-size: clamp(2rem, 4.4vw, 3.6rem);
+  font-weight: 700;
+  line-height: 1.4;
+  letter-spacing: 0.02em;
+  word-break: keep-all;
+}
+
+/* The era title stands alone on the first row; 創業 and the year list share the
+   second. That is what puts the right column level with 創業 — no one has to
+   guess how tall the title above it happens to be. */
+.cp-history__body {
+  --cp-rail: 0;
+  position: relative;
+  margin-top: 4rem;
+  padding-left: 4.5rem;
+  display: grid;
+  grid-template-columns: minmax(0, 40fr) minmax(0, 60fr);
+  column-gap: clamp(2rem, 5vw, 5rem);
+  row-gap: 3rem;
+  align-items: start;
+}
+
+.cp-era__head {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+.cp-era__aside {
+  grid-column: 1;
+  grid-row: 2;
+}
+
+.cp-era__entries {
+  grid-column: 2;
+  grid-row: 2;
+}
+
+/* The rail spans the whole block; the line inside it is the part that sticks,
+   so it stays in view while the era scrolls past and the dot has somewhere to
+   travel. */
+.cp-history__rail {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+}
+
+/* min(), not a flat 90vh: the line is taller than a single era, and sticky
+   clamps where a box sits, not how tall it is — at 90vh it simply hung out of
+   the bottom of the block and ruled a line down the footer. */
+.cp-history__rail-line {
+  position: sticky;
+  top: calc(var(--nav-height) + 5vh);
+  display: block;
+  width: 1px;
+  height: min(90vh, 100%);
+  background: var(--cp-rule);
+}
+
+.cp-history__dot {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--cp-blue);
+  /* Centred on the 1px line, then walked down it by however far the block has
+     scrolled — HistorySection writes --cp-rail as 0–1. The offset is a share of
+     the line's own height rather than of 90vh, so it still lands on the end of
+     a line that the min() above has cut short. */
+  top: calc(var(--cp-rail) * (100% - 12px));
+  transform: translateX(-50%);
+}
+
+.cp-era__years {
+  margin: 0 0 1rem;
+  font-size: clamp(2rem, 3.4vw, 3rem);
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+}
+
+.cp-era__years-to {
+  color: var(--cp-blue);
+}
+
+.cp-era__subtitle {
+  margin: 0 0 3rem;
+  font-size: clamp(1.5rem, 2.2vw, 2rem);
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+.cp-era__image {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 16px;
+}
+
+.cp-era__entries {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cp-entry {
+  padding: 0 0 2rem;
+  border-bottom: 1px solid #000;
+}
+
+.cp-entry + .cp-entry {
+  padding-top: 2rem;
+}
+
+/* The list is a run of rules between entries, not a boxed table — so the last
+   one closes on the copy rather than a line. */
+.cp-entry:last-child {
+  border-bottom: 0;
+  padding-bottom: 0;
+}
+
+.cp-entry__year {
+  margin: 0 0 0.75rem;
+  font-size: clamp(1.25rem, 1.8vw, 1.5rem);
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--cp-blue);
+}
+
+.cp-entry__event {
+  margin: 0;
+  font-size: clamp(1rem, 1.25vw, 1.125rem);
+  line-height: 1.9;
+  color: #000;
+  word-break: normal;
+  text-wrap: pretty;
+}
+
+/* ---- Narrow screens -------------------------------------------------------
+   Below the timeline's two-column width the rail has nothing to mark out, so it
+   goes and the era stacks in column order: the title, then 創業 and its
+   photograph, then the years. */
+
+@media (max-width: 899px) {
   .cp-panel {
     padding: 4rem max(var(--gutter), 1.5rem);
   }
 
   .cp-about__title {
-    margin-bottom: 1.75rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .cp-about__rule {
+    margin-bottom: 2rem;
   }
 
   .cp-about__body p + p {
     margin-top: 1.75rem;
   }
+
+  .cp-history {
+    padding-top: 5rem;
+    padding-bottom: 5.5rem;
+  }
+
+  .cp-history__body {
+    padding-left: 0;
+    display: block;
+  }
+
+  .cp-history__rail {
+    display: none;
+  }
+
+  /* The grid's row-gap went with the grid, and the era title still owes the
+     same 3rem to the subtitle underneath it. */
+  .cp-era__head {
+    margin-bottom: 3rem;
+  }
+
+  .cp-era__subtitle {
+    margin-bottom: 2rem;
+  }
+
+  .cp-era__entries {
+    margin: 2.5rem 0;
+  }
 }
 
-/* Sticky plus a looping background video is the whole point of the section, so
-   with motion turned down the video holds on its poster frame instead. */
+/* The blur, the moving dot and a looping backdrop are all motion. With it
+   turned down the video holds on its poster (BrandStage never starts playback)
+   and the rest simply stops moving. */
 @media (prefers-reduced-motion: reduce) {
-  .cp-hero__cue {
-    display: none;
+  .cp-stage__video {
+    filter: none;
+  }
+
+  .cp-history__dot {
+    top: 0;
   }
 }
