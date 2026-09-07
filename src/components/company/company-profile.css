@@ -174,9 +174,10 @@
 /* ---- Section 3 — JOMOOの歩み ---------------------------------------------- */
 
 .cp-history {
+  --cp-side: max(var(--gutter), 1.75rem);
   background: #fff;
   color: #000;
-  padding: 7.5rem max(var(--gutter), 1.75rem) 8rem;
+  padding: 7.5rem var(--cp-side) 8rem;
 }
 
 .cp-history .cp-eyebrow {
@@ -187,9 +188,12 @@
   text-align: center;
 }
 
+/* Shared by JOMOOの歩み and ブランドファミリー — the same rank of heading, and
+   the brand family screen puts it at 64px. */
+.cp-section-title,
 .cp-history__title {
   margin: 1.25rem 0 0;
-  font-size: clamp(2rem, 4.4vw, 3.6rem);
+  font-size: clamp(2rem, 4.45vw, 4rem);
   font-weight: 700;
   line-height: 1.4;
   letter-spacing: 0.02em;
@@ -247,8 +251,11 @@
 /* The rail spans the whole block; the line inside it is the part that sticks,
    so it stays in view while the era scrolls past and the dot has somewhere to
    travel. */
+/* Above the era tints: they are positioned too, and being later in the document
+   they would otherwise paint straight over the line. */
 .cp-history__rail {
   position: absolute;
+  z-index: 2;
   left: 0;
   top: 0;
   bottom: 0;
@@ -295,9 +302,9 @@
   color: var(--cp-blue);
 }
 
-/* Sits under a very large title rather than alone above a section, so it is
-   set solid — the tracking that spaces out OUR HISTORY would only pull it
-   apart here. */
+/* Set solid: the design tracks neither the era eyebrows nor BRAND FAMILY, and
+   at 30px the spacing that suits OUR HISTORY only pulls them apart. */
+.cp-eyebrow--display,
 .cp-era__eyebrow {
   font-size: clamp(1.125rem, 2.1vw, 1.875rem);
   letter-spacing: normal;
@@ -315,16 +322,33 @@
   white-space: nowrap;
 }
 
-.cp-era__image {
+/* The frame is what the layout sees and what fades in; the photograph inside
+   it is oversized and drifts, so the frame has to clip and hold the shape. */
+.cp-era__frame {
+  position: relative;
   display: block;
+  margin: 0;
   width: 360px;
   max-width: 100%;
-  height: auto;
+  overflow: hidden;
   border-radius: 16px;
 }
 
-.cp-era__image + .cp-era__image {
+.cp-era__frame + .cp-era__frame {
   margin-top: 1.5rem;
+}
+
+.cp-era__image {
+  display: block;
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  /* The standalone property, not transform: the drift is written to `transform`
+     and would otherwise wipe this out. The overscan is what the drift moves
+     within — without it the pass would expose an edge. */
+  scale: 1.14;
 }
 
 .cp-era__entries {
@@ -379,6 +403,192 @@
   display: block;
 }
 
+/* The tint runs the full width of the section, so it reaches back through the
+   side padding and the rail's gutter. Stated as those exact insets rather than
+   a 100vw break-out, which counts the scrollbar and would set the page
+   scrolling sideways. */
+.cp-era--tint {
+  position: relative;
+}
+
+.cp-era--tint::before {
+  content: '';
+  position: absolute;
+  z-index: 0;
+  top: -4rem;
+  bottom: -4rem;
+  left: calc(-1 * (var(--cp-side) + 4.5rem));
+  right: calc(-1 * var(--cp-side));
+  background-image: url('/images/companyprofile/timelinebg.jpg');
+  background-repeat: no-repeat;
+  /* Twice the height, anchored top or bottom: each era shows one half of the
+     gradient — the faint end for 2000–2009, the deep end for 2020–NOW. */
+  background-size: 100% 200%;
+  /* Each half is cut out of the middle of the gradient, so its far edge is
+     already blue and met the white of the next era as a hard line. Fading the
+     ends out is what lets the tint arrive and leave. */
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent 0,
+    #000 7rem,
+    #000 calc(100% - 7rem),
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    transparent 0,
+    #000 7rem,
+    #000 calc(100% - 7rem),
+    transparent 100%
+  );
+}
+
+.cp-era--tint-top::before {
+  background-position: center top;
+}
+
+.cp-era--tint-bottom::before {
+  background-position: center bottom;
+}
+
+/* The tint is positioned, so the era's own content has to be too — otherwise
+   it paints underneath. */
+.cp-era__head,
+.cp-era__aside,
+.cp-era__entries {
+  position: relative;
+  z-index: 1;
+}
+
+/* ---- Section 4 — ブランドファミリー ---------------------------------------- */
+
+.cp-brands {
+  --cp-side: max(var(--gutter), 1.75rem);
+  background: #fafafb;
+  color: #000;
+  padding: 7.5rem var(--cp-side) 8rem;
+}
+
+.cp-brands__head {
+  max-width: 60rem;
+  margin: 0 auto 4.5rem;
+  text-align: center;
+}
+
+.cp-brands .cp-eyebrow {
+  color: var(--cp-blue);
+}
+
+.cp-brands__rule {
+  display: block;
+  width: 38px;
+  height: 2px;
+  margin: 2rem auto 2.5rem;
+  background: var(--cp-blue);
+}
+
+.cp-brands__intro p {
+  margin: 0;
+  font-size: clamp(1rem, 1.8vw, 1.625rem);
+  line-height: 1.92;
+  color: #000;
+  word-break: normal;
+}
+
+.cp-brands__grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 2rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cp-brand {
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.03), 0 12px 32px rgba(0, 0, 0, 0.06);
+}
+
+.cp-brand__frame {
+  position: relative;
+  margin: 0;
+  /* The proportion the design crops every card photograph to. */
+  aspect-ratio: 405 / 310;
+  overflow: hidden;
+}
+
+.cp-brand__photo {
+  display: block;
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  scale: 1.14;
+}
+
+.cp-brand__body {
+  padding: 2.5rem;
+}
+
+/* The height is set per brand from the markup — the wordmarks are different
+   shapes and the design sizes them optically. contain is what lets a logo that
+   is too wide for a narrow card shrink without being squashed. */
+.cp-brand__logo {
+  display: flex;
+  align-items: center;
+  margin-bottom: 2.5rem;
+}
+
+.cp-brand__logo img {
+  height: 100%;
+  width: auto;
+  max-width: 100%;
+  object-fit: contain;
+  object-position: left center;
+}
+
+.cp-brand__copy {
+  margin: 0;
+  font-size: clamp(0.95rem, 1.65vw, 1.5rem);
+  line-height: 1.92;
+  color: #000;
+  word-break: normal;
+}
+
+.cp-brand__line {
+  display: block;
+}
+
+@media (max-width: 1100px) {
+  .cp-brands__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 700px) {
+  .cp-brands {
+    padding-top: 5rem;
+    padding-bottom: 5.5rem;
+  }
+
+  .cp-brands__grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .cp-brands__head {
+    margin-bottom: 3rem;
+  }
+
+  .cp-brand__body {
+    padding: 2rem;
+  }
+}
+
 /* ---- Narrow screens -------------------------------------------------------
    Below the timeline's two-column width the rail has nothing to mark out, so it
    goes and the era stacks in column order: the title, then 創業 and its
@@ -418,6 +628,10 @@
     margin-top: 5rem;
   }
 
+  .cp-era--tint::before {
+    left: calc(-1 * var(--cp-side));
+  }
+
   .cp-history__rail {
     display: none;
   }
@@ -451,6 +665,12 @@
 @media (prefers-reduced-motion: reduce) {
   .cp-stage__video {
     filter: none;
+  }
+
+  /* Nothing drifts, so nothing needs the overscan that hid the drift's edge. */
+  .cp-era__image,
+  .cp-brand__photo {
+    scale: 1;
   }
 
   .cp-history__dot {

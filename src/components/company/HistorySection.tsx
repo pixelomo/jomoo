@@ -2,6 +2,7 @@
 
 import { useRef } from 'react'
 import { useCssScrollProgress } from './useCssScrollProgress'
+import { useScrollReveal } from './useScrollReveal'
 
 /** The rail's sticky window, as a fraction of the viewport. Mirrors the CSS. */
 const RAIL_HEIGHT = 0.9
@@ -10,6 +11,8 @@ const RAIL_INSET = 0.05
 interface Era {
   from: string
   to: string
+  /** Which half of timelinebg.jpg tints the era, if any. */
+  tint?: 'top' | 'bottom'
   eyebrow: string
   subtitle: string
   images: { src: string; alt: string; width: number; height: number }[]
@@ -41,6 +44,7 @@ const ERAS: Era[] = [
   {
     from: '2000',
     to: '2009',
+    tint: 'top',
     eyebrow: 'THE EXPANSION YEARS',
     subtitle: '本格展開期',
     images: [
@@ -85,6 +89,7 @@ const ERAS: Era[] = [
   {
     from: '2020',
     to: 'NOW',
+    tint: 'bottom',
     eyebrow: 'THE SMART LIVING ERA',
     subtitle: 'テクノロジー期',
     images: [
@@ -146,6 +151,7 @@ const ERAS: Era[] = [
  * through the whole timeline rather than through whichever era is in view.
  */
 export default function HistorySection() {
+  const sectionRef = useRef<HTMLElement>(null)
   const bodyRef = useRef<HTMLDivElement>(null)
 
   // The rail is pinned RAIL_INSET below the nav and stands RAIL_HEIGHT tall, so
@@ -160,8 +166,24 @@ export default function HistorySection() {
     return (top - rect.top) / travel
   })
 
+  useScrollReveal(
+    sectionRef,
+    [
+      { selector: '.cp-era__head' },
+      { selector: '.cp-era__subtitle' },
+      { selector: '.cp-era__frame', x: -32 },
+      { selector: '.cp-entry', y: 36 },
+    ],
+    [{ selector: '.cp-era__image' }],
+  )
+
   return (
-    <section className="cp-history" data-nav="light" aria-labelledby="cp-history-title">
+    <section
+      className="cp-history"
+      ref={sectionRef}
+      data-nav="light"
+      aria-labelledby="cp-history-title"
+    >
       <header className="cp-history__head">
         <p className="cp-eyebrow">OUR HISTORY</p>
         <h2 className="cp-history__title" id="cp-history-title">
@@ -178,7 +200,10 @@ export default function HistorySection() {
 
         <div className="cp-history__eras">
           {ERAS.map((era) => (
-            <article className="cp-era" key={era.from}>
+            <article
+              className={`cp-era${era.tint ? ` cp-era--tint cp-era--tint-${era.tint}` : ''}`}
+              key={era.from}
+            >
               <div className="cp-era__head">
                 <h3 className="cp-era__years">
                   {era.from}
@@ -190,16 +215,21 @@ export default function HistorySection() {
               <div className="cp-era__aside">
                 <h4 className="cp-era__subtitle">{era.subtitle}</h4>
                 {era.images.map((image) => (
-                  /* eslint-disable-next-line @next/next/no-img-element */
-                  <img
+                  <figure
+                    className="cp-era__frame"
                     key={image.src}
-                    className="cp-era__image"
-                    src={image.src}
-                    alt={image.alt}
-                    width={image.width}
-                    height={image.height}
-                    loading="lazy"
-                  />
+                    style={{ aspectRatio: `${image.width} / ${image.height}` }}
+                  >
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      className="cp-era__image"
+                      src={image.src}
+                      alt={image.alt}
+                      width={image.width}
+                      height={image.height}
+                      loading="lazy"
+                    />
+                  </figure>
                 ))}
               </div>
 
