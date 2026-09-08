@@ -25,7 +25,7 @@ const ERAS: Era[] = [
     from: '1990',
     to: '1999',
     eyebrow: 'THE FOUNDING YEARS',
-    subtitle: '創業',
+    subtitle: '創業期',
     images: [
       {
         src: '/images/companyprofile/founding.jpg',

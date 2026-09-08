@@ -180,7 +180,10 @@
   --cp-rail-gap: 10vh;
   background: #fff;
   color: #000;
-  padding: 7.5rem var(--cp-side) 8rem;
+  /* No bottom padding: the last era is tinted and runs to the foot of the
+     section, so anything below it would show as a white band under the
+     gradient. */
+  padding: 7.5rem var(--cp-side) 0;
 }
 
 .cp-history .cp-eyebrow {
@@ -223,16 +226,16 @@
    its margins — and an era whose entries outgrow the screen simply gets
    taller. */
 .cp-era {
+  /* The clearance between the photograph and the years. It belongs to the left
+     column rather than sitting between the two, so the split below is a true
+     40/60 of the block and the years get the whole of their 60%. */
+  --cp-era-gutter: clamp(2rem, 7vw, 120px);
   min-height: var(--cp-panel-h);
   align-content: center;
   padding: 4rem 0;
   display: grid;
-  /* The photograph sets the first column, and the years start a fixed 160px
-     past its edge. The gap is written as a clamp rather than a flat 160px so
-     the two columns still have somewhere to live between here and the point
-     the layout stacks. */
-  grid-template-columns: minmax(0, 360px) minmax(0, 1fr);
-  column-gap: clamp(3rem, 12vw, 160px);
+  grid-template-columns: minmax(0, 40fr) minmax(0, 60fr);
+  column-gap: 0;
   row-gap: 3rem;
   align-items: start;
 }
@@ -343,8 +346,9 @@
   position: relative;
   display: block;
   margin: 0;
-  width: 360px;
-  max-width: 100%;
+  /* The column minus its gutter — the whitespace before the years is the tail
+     of this column, not a grid gap. */
+  width: calc(100% - var(--cp-era-gutter));
   overflow: hidden;
   border-radius: 16px;
 }
@@ -463,7 +467,16 @@
 }
 
 .cp-era--tint-bottom::before {
-  background-position: center bottom;
+  background-position: center center;
+}
+
+/* The timeline closes on the gradient rather than on white: the tint runs to
+   the exact foot of the section and keeps its edge there, so only its arrival
+   is faded. */
+.cp-era:last-child.cp-era--tint::before {
+  bottom: 0;
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 7rem);
+  mask-image: linear-gradient(to bottom, transparent 0, #000 7rem);
 }
 
 /* The tint is positioned, so the era's own content has to be too — otherwise
@@ -739,9 +752,20 @@
   }
 }
 
+/* Between the design's width and the point the timeline stacks, an era holds
+   far less than a screen — held to one, the eras drift apart and the section
+   reads as whitespace with dates in it. The era is only as tall as its
+   content here. */
+@media (max-width: 1100px) {
+  .cp-era {
+    min-height: 0;
+    padding: 3.5rem 0;
+  }
+}
+
 /* ---- Narrow screens -------------------------------------------------------
    Below the timeline's two-column width the rail has nothing to mark out, so it
-   goes and the era stacks in column order: the title, then 創業 and its
+   goes and the era stacks in column order: the title, then 創業期 and its
    photograph, then the years. */
 
 @media (max-width: 899px) {
@@ -763,23 +787,34 @@
 
   .cp-history {
     padding-top: 5rem;
-    padding-bottom: 5.5rem;
   }
 
   .cp-history__eras {
     padding-left: 0;
   }
 
+  /* Stacked, an era is only as tall as what it holds — held to a screen it
+     would open a gap under the short eras the width no longer justifies. */
   .cp-era {
     display: block;
+    min-height: 0;
+    padding: 2rem 0;
   }
 
   .cp-era + .cp-era {
-    margin-top: 5rem;
+    margin-top: 0;
   }
 
   .cp-era--tint::before {
+    top: -2rem;
+    bottom: -2rem;
     left: calc(-1 * var(--cp-side));
+  }
+
+  /* The photograph has the column to itself once the years sit under it, so it
+     gives up the gutter it was holding clear for them. */
+  .cp-era__frame {
+    width: 100%;
   }
 
   .cp-history__rail {
@@ -787,17 +822,17 @@
   }
 
   /* The grid's row-gap went with the grid, and the era title still owes the
-     same 3rem to the subtitle underneath it. */
+     subtitle underneath it a gap — a tighter one at this width. */
   .cp-era__head {
-    margin-bottom: 3rem;
-  }
-
-  .cp-era__subtitle {
     margin-bottom: 2rem;
   }
 
+  .cp-era__subtitle {
+    margin-bottom: 1.5rem;
+  }
+
   .cp-era__entries {
-    margin: 2.5rem 0;
+    margin: 2rem 0 0;
   }
 
   /* The year keeps its own column on a phone, just a narrower one — the event
