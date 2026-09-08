@@ -178,12 +178,13 @@
   /* The rail's clearance, above and below equally. Mirrored in HistorySection,
      which measures the dot's travel against the line this describes. */
   --cp-rail-gap: 10vh;
+  /* The rail's clearance below the last era, matching the section's own top
+     padding. The last era's tint reaches down through it, so the gap is
+     gradient rather than the white band it used to be. */
+  --cp-history-foot: 8rem;
   background: #fff;
   color: #000;
-  /* No bottom padding: the last era is tinted and runs to the foot of the
-     section, so anything below it would show as a white band under the
-     gradient. */
-  padding: 7.5rem var(--cp-side) 0;
+  padding: 7.5rem var(--cp-side) var(--cp-history-foot);
 }
 
 .cp-history .cp-eyebrow {
@@ -470,11 +471,11 @@
   background-position: center center;
 }
 
-/* The timeline closes on the gradient rather than on white: the tint runs to
-   the exact foot of the section and keeps its edge there, so only its arrival
-   is faded. */
+/* The timeline closes on the gradient rather than on white: the tint runs the
+   whole way to the foot of the section — the clearance under the rail
+   included — and keeps its edge there, so only its arrival is faded. */
 .cp-era:last-child.cp-era--tint::before {
-  bottom: 0;
+  bottom: calc(-1 * var(--cp-history-foot));
   -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 7rem);
   mask-image: linear-gradient(to bottom, transparent 0, #000 7rem);
 }
@@ -492,7 +493,7 @@
 
 .cp-brands {
   --cp-side: max(var(--gutter), 1.75rem);
-  background: #fafafb;
+  background: #fff;
   color: #000;
   padding: 7.5rem var(--cp-side) 8rem;
 }
@@ -786,6 +787,7 @@
   }
 
   .cp-history {
+    --cp-history-foot: 5.5rem;
     padding-top: 5rem;
   }
 

@@ -1,5 +1,4 @@
 import { Children, type ReactNode } from 'react'
-import Link from 'next/link'
 import { PortableText, type PortableTextComponents } from '@portabletext/react'
 import type { DefinitionRow, LegalDocument } from '@/lib/sanity'
 import './legal.css'
@@ -62,14 +61,6 @@ export default function LegalDocumentView({ doc }: { doc: LegalDocument }) {
   return (
     <main className="flex-1 legal">
       <div className="legal__container">
-        <nav className="legal__crumbs" aria-label="パンくずリスト">
-          <Link href="/">ホーム</Link>
-          <span className="legal__crumbs-sep" aria-hidden="true">
-            /
-          </span>
-          <span className="legal__crumbs-current">{doc.title}</span>
-        </nav>
-
         <h1 className="legal__title">{doc.title}</h1>
         <div className="legal__rule" />
 

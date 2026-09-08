@@ -1,144 +1,125 @@
-/* Type and rhythm follow the blog's article pages — the same black-on-white
-   and the same 1400px container — but a legal document is read in one column
-   rather than scanned, so the measure is tighter and the headings smaller. */
+/* Type and rhythm follow the legal design screens: one centred title over a
+   hairline rule, a single measure of body copy set large, and every article
+   headed by a black bar. The whole page is set in one ink — the design draws no
+   distinction between a heading and the copy under it beyond size and weight. */
 
 .legal {
+  --legal-ink: #2f2d2c;
   background: #fff;
-  color: #000;
-  padding-top: 40px;
+  color: var(--legal-ink);
+  padding-top: 105px;
 }
 
+/* The measure is the page: the rule, the headings and the copy all share this
+   column, and it is centred rather than ranged left. */
 .legal__container {
-  width: 1400px;
-  max-width: 90%;
+  width: 830px;
+  max-width: calc(100% - 3.5rem);
   margin: 0 auto 130px;
 }
 
-/* Breadcrumb */
-.legal__crumbs {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 8px;
-  font-size: 14px;
-  color: #888;
-}
-
-.legal__crumbs a {
-  color: #888;
-  text-decoration: none;
-  transition: color 0.3s ease;
-}
-
-.legal__crumbs a:hover {
-  color: #000;
-}
-
-.legal__crumbs-sep {
-  color: #c9c9c9;
-}
-
-.legal__crumbs-current {
-  color: #000;
-}
-
+/* Centred, and held to a measure narrower than the column so a title as long as
+   JOMOO ウェブサイト ご利用条件 breaks at its own space into two lines rather
+   than running the width of the page. */
 .legal__title {
-  color: #000;
+  max-width: 560px;
+  margin: 0 auto 87px;
   font-size: 44px;
-  line-height: 60px;
-  font-weight: 500;
-  margin: 90px 0 40px;
+  line-height: 64px;
+  font-weight: 700;
+  text-align: center;
+  /* Break at the space between the two halves of the title rather than
+     mid-word: Japanese wraps anywhere by default, which would split 
+     ご利用条件 across the two lines. */
+  word-break: keep-all;
 }
 
 .legal__rule {
-  border-top: 1px solid #000;
-  margin-bottom: 60px;
-}
-
-/* One column, held to a comfortable reading measure. */
-.legal__body {
-  max-width: 860px;
-}
-
-.legal__section + .legal__section {
-  margin-top: 50px;
-}
-
-.legal__heading {
-  color: #000;
-  font-size: 20px;
-  line-height: 32px;
-  font-weight: 600;
-  margin-bottom: 18px;
+  border-top: 1px solid #cdcdcd;
+  margin-bottom: 91px;
 }
 
 .legal__text {
-  color: #333;
-  font-size: 16px;
-  line-height: 32px;
+  font-size: 19px;
+  line-height: 33px;
 }
 
+/* The design runs its paragraphs on: a new one starts on the next line rather
+   than after a gap, so the clause reads as one block of prose. */
 .legal__text + .legal__text {
-  margin-top: 18px;
+  margin-top: 0;
 }
 
-/* Numbered clauses hang their (1) in the margin so the text stays flush. The
-   number is a counter rather than typed into the copy, so the client can add or
-   remove a clause in Sanity without renumbering the rest by hand. */
+/* 第1条, 第2条 … each stand behind a bar the height of their own line. The bar
+   is stretched by the flex row rather than given a height, so a heading that
+   wraps keeps a bar the full height of what it heads. */
+.legal__heading {
+  display: flex;
+  gap: 28px;
+  margin: 70px 0 27px;
+  font-size: 37px;
+  line-height: 1.28;
+  font-weight: 700;
+}
+
+.legal__heading::before {
+  content: '';
+  flex: none;
+  align-self: stretch;
+  width: 9px;
+  background: currentColor;
+}
+
+/* Numbered clauses carry their (1) inline: a wrapped line returns to the left
+   edge of the column rather than hanging under the text. The number is a
+   counter rather than typed into the copy, so the client can add or remove a
+   clause in Sanity without renumbering the rest by hand. */
 .legal__list {
   list-style: none;
   counter-reset: clause;
   padding: 0;
-  margin: 18px 0 0;
-  color: #333;
-  font-size: 16px;
-  line-height: 32px;
+  margin: 0;
+  font-size: 19px;
+  line-height: 33px;
 }
 
 .legal__list li {
   counter-increment: clause;
-  padding-left: 44px;
-  position: relative;
 }
 
 .legal__list li::before {
-  content: '(' counter(clause) ')';
-  position: absolute;
-  left: 0;
-  color: #000;
+  content: '(' counter(clause) ')\00a0';
 }
 
 .legal__list li + li {
-  margin-top: 10px;
+  margin-top: 3px;
 }
 
 /* 事業者情報 and the contact window: label in one column, value in the next. */
 .legal__fields {
-  margin: 22px 0 0;
+  margin: 26px 0 0;
   border-top: 1px solid #e6e6e6;
 }
 
 .legal__field {
   display: flex;
   flex-wrap: wrap;
-  gap: 0 24px;
+  gap: 0 28px;
   border-bottom: 1px solid #e6e6e6;
-  padding: 14px 0;
-  font-size: 16px;
-  line-height: 28px;
+  padding: 16px 0;
+  font-size: 17px;
+  line-height: 32px;
 }
 
 .legal__field dt {
   flex: none;
-  width: 200px;
-  color: #000;
-  font-weight: 500;
+  width: 220px;
+  font-weight: 700;
 }
 
 .legal__field dd {
-  flex: 1 1 240px;
+  flex: 1 1 260px;
   margin: 0;
-  color: #333;
 }
 
 /* A detail the client has yet to supply. Marked rather than dressed up as
@@ -151,33 +132,53 @@
 }
 
 .legal__colophon {
-  max-width: 860px;
-  margin-top: 70px;
-  padding-top: 34px;
-  border-top: 1px solid #000;
-  color: #333;
-  font-size: 15px;
-  line-height: 30px;
+  margin-top: 80px;
+  padding-top: 36px;
+  border-top: 1px solid #cdcdcd;
+  font-size: 17px;
+  line-height: 32px;
 }
 
 .legal__copyright {
-  margin-top: 18px;
-  color: #888;
+  margin-top: 20px;
+  color: #8a8a8a;
 }
 
-@media (max-width: 767px) {
-  .legal__title {
-    font-size: 30px;
-    line-height: 44px;
-    margin: 50px 0 28px;
-  }
-
-  .legal__rule {
-    margin-bottom: 40px;
+@media (max-width: 900px) {
+  .legal {
+    padding-top: 56px;
   }
 
   .legal__container {
-    margin-bottom: 80px;
+    max-width: calc(100% - 2.5rem);
+    margin-bottom: 90px;
+  }
+
+  .legal__title {
+    max-width: none;
+    margin-bottom: 48px;
+    font-size: 30px;
+    line-height: 46px;
+  }
+
+  .legal__rule {
+    margin-bottom: 44px;
+  }
+
+  .legal__text,
+  .legal__list {
+    font-size: 16px;
+    line-height: 1.85;
+  }
+
+  .legal__heading {
+    gap: 18px;
+    margin: 48px 0 18px;
+    font-size: 24px;
+  }
+
+  .legal__heading::before {
+    width: 6px;
   }
 
   .legal__field dt {
