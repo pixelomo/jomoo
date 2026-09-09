@@ -17,7 +17,7 @@ export default function DesignerPage() {
       <DesignerIntro />
 
       <DesignerProfile
-        tone="light"
+        tone="grey"
         side="left"
         watermark="JOHAN DUCK"
         name="ヨハン・デュック"
@@ -37,7 +37,7 @@ export default function DesignerPage() {
       />
 
       <DesignerProfile
-        tone="light"
+        tone="white"
         side="left"
         watermark="DANIEL GEMECKE"
         name="ダニエル・ジェメッケ"

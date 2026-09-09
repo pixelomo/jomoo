@@ -3,11 +3,14 @@
    ============================================ */
 
 .dz {
-  /* The site-wide primary, as used for eyebrows and rules elsewhere. */
-  --dz-blue: #73a4c7;
-  --dz-ink: #1c1c1c;
-  --dz-body: #3d3d3d;
-  --dz-dark: #2e2d2b;
+  /* Read off the design screens. The page runs on one ink and two papers:
+     every dark mark — body copy, names, 受賞歴, and the dark band's own
+     background — is the same #2f2d2c, and the light bands alternate between
+     #fff and #f8f8f8, each using the other as its watermark. */
+  --dz-blue: #80a3c4;
+  --dz-ink: #2f2d2c;
+  --dz-paper: #fff;
+  --dz-paper-alt: #f8f8f8;
   /* The nav is fixed and opaque and .site-main already pads the page down by
      its height, so a "full screen" panel here is the viewport minus the nav.
      svh keeps mobile browser chrome from cropping it. */
@@ -111,7 +114,7 @@
   margin: 0;
   font-size: var(--dz-body-size);
   line-height: 2;
-  color: var(--dz-body);
+  color: var(--dz-ink);
 }
 
 /* Each sentence is its own line at desktop widths, as the design sets them. */
@@ -136,17 +139,20 @@
   padding: clamp(3.5rem, 6vw, 5.5rem) 0 0;
 }
 
-.dz-profile--light {
-  background: linear-gradient(100deg, #eceef0 0%, #f7f8f9 42%, #fff 100%);
+/* The two light bands are the same pair of greys with their roles swapped,
+   which is what keeps the oversized name readable as a watermark on both. */
+.dz-profile--grey {
+  background: var(--dz-paper-alt);
   color: var(--dz-ink);
 }
 
-.dz-profile--right.dz-profile--light {
-  background: linear-gradient(260deg, #eceef0 0%, #f7f8f9 42%, #fff 100%);
+.dz-profile--white {
+  background: var(--dz-paper);
+  color: var(--dz-ink);
 }
 
 .dz-profile--dark {
-  background: var(--dz-dark);
+  background: var(--dz-ink);
   color: #fff;
 }
 
@@ -162,7 +168,7 @@
      the screen's width by it sets every name to span the viewport, which is
      what the design does — the short name huge, the long one much smaller,
      each just grazing both edges. */
-  font-size: calc(106vw / var(--dz-wm-em, 8));
+  font-size: calc(99vw / var(--dz-wm-em, 8));
   font-weight: 700;
   letter-spacing: -0.01em;
   line-height: 1;
@@ -171,12 +177,17 @@
   pointer-events: none;
 }
 
-.dz-profile--light .dz-profile__watermark {
-  color: rgba(28, 28, 28, 0.055);
+.dz-profile--grey .dz-profile__watermark {
+  color: var(--dz-paper);
 }
 
+.dz-profile--white .dz-profile__watermark {
+  color: var(--dz-paper-alt);
+}
+
+/* #434140 — the dark band lifted by the same small step. */
 .dz-profile--dark .dz-profile__watermark {
-  color: rgba(255, 255, 255, 0.05);
+  color: rgba(255, 255, 255, 0.096);
 }
 
 .dz-profile__inner {
@@ -251,12 +262,8 @@
   line-height: 2;
 }
 
-.dz-profile--light .dz-profile__body {
-  color: var(--dz-body);
-}
-
 .dz-profile--dark .dz-profile__body {
-  color: rgba(255, 255, 255, 0.88);
+  color: #fff;
 }
 
 /* ---- 受賞歴 -------------------------------------------------------------- */
@@ -264,9 +271,11 @@
 .dz-awards {
   position: relative;
   padding: clamp(4.5rem, 8vw, 7rem) 0 clamp(4.5rem, 8vw, 7rem);
-  background:
-    radial-gradient(120% 90% at 72% 30%, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0) 60%),
-    linear-gradient(170deg, #fbfcfc 0%, #eef1f3 55%, #e7ebee 100%);
+  /* A soft wash rather than a flat ground: white at the top left, settling to
+     a light grey across and down. The band the cards sit in has to carry some
+     of that grey — the cards are pure white, and on a white field the first
+     ones read as nothing but their shadow. */
+  background: linear-gradient(115deg, #fff 0%, #f4f5f5 25%, #ecedee 75%, #e7e8ea 100%);
   overflow: hidden;
 }
 
@@ -292,7 +301,7 @@
   line-height: 1.2;
   font-weight: 700;
   letter-spacing: 0.02em;
-  color: #111;
+  color: var(--dz-ink);
 }
 
 .dz-awards__rule {
@@ -366,7 +375,7 @@
   margin: clamp(2.5rem, 5vw, 4rem) auto 0;
   height: 4px;
   border-radius: 4px;
-  background: #d2d5d8;
+  background: #ccc;
 }
 
 .dz-awards__bar-fill {

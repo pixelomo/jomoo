@@ -42,8 +42,12 @@ function watermarkEm(text: string): number {
 interface Props {
   /** Which way round the band reads. 'left' puts the portrait on the left. */
   side: 'left' | 'right'
-  /** Dark bands are the alternating rhythm of the page, not a per-person trait. */
-  tone: 'light' | 'dark'
+  /**
+   * Which of the three bands this is — the page's alternating rhythm, not a
+   * trait of the person. 'grey' and 'white' are the same pair of papers with
+   * their roles swapped: each uses the other as the colour of its watermark.
+   */
+  tone: 'grey' | 'dark' | 'white'
   /** The romanised name, set oversized behind the band. */
   watermark: string
   name: string
@@ -80,7 +84,7 @@ export default function DesignerProfile({ side, tone, watermark, name, role, pho
       className={`dz-profile dz-profile--${tone} dz-profile--${side}`}
       ref={sectionRef}
       // The nav flips to its dark type over the light bands only.
-      data-nav={tone === 'light' ? 'light' : undefined}
+      data-nav={tone === 'dark' ? undefined : 'light'}
       aria-label={name}
     >
       <span
