@@ -5,18 +5,38 @@ import { useRef, type CSSProperties } from 'react'
 import { useScrollReveal } from '@/components/company/useScrollReveal'
 
 /**
- * Roughly how wide the name will set, in em, for bold uppercase Poppins.
+ * Poppins Bold advance widths for the characters a romanised name uses, in
+ * thousandths of an em. Only the glyphs that actually appear are listed; the
+ * fallback covers anything else.
+ */
+const ADVANCE: Record<string, number> = {
+  A: 683, B: 683, C: 700, D: 727, E: 604, F: 585, G: 738, H: 745, I: 300,
+  J: 512, K: 675, L: 570, M: 907, N: 764, O: 776, P: 668, Q: 776, R: 675,
+  S: 616, T: 601, U: 733, V: 668, W: 986, X: 656, Y: 630, Z: 620, ' ': 260,
+}
+
+/** Tracking the stylesheet applies, which shortens the line a little. */
+const TRACKING = -0.01
+
+/**
+ * How wide the name will set, in em.
  *
- * The stylesheet divides the target overflow width by this, so every name
- * bleeds off both edges by the same amount however long it is — which is what
- * the design does: the short name is set huge and the long one much smaller,
- * both running off the page. Measuring the text for real would mean a layout
- * pass and a resize observer for something only ever seen out of focus, so the
- * advance widths are approximated: caps are near enough uniform in this face,
- * and the space is the one character that is obviously not.
+ * The stylesheet divides the target width by this, so every name spans the
+ * screen whatever its length — which is what the design does: the short name
+ * set huge, the long one much smaller, both running off both edges.
+ *
+ * The widths are a table rather than one average per letter: an average is
+ * wrong by up to 15% on a name like MATTHIAS LEHNER, where the I, T, L and E
+ * are far narrower than the M — enough to leave it visibly short of the edges
+ * while a name of Ms and Os overshoots. Measuring the rendered text instead
+ * would mean a layout read and a resize observer for something only ever seen
+ * at 5% opacity behind a photograph.
  */
 function watermarkEm(text: string): number {
-  return [...text].reduce((width, char) => width + (char === ' ' ? 0.26 : 0.72), 0)
+  return [...text].reduce(
+    (width, char) => width + (ADVANCE[char] ?? 700) / 1000 + TRACKING,
+    0,
+  )
 }
 
 interface Props {
