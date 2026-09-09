@@ -13,6 +13,7 @@ const staticPages: { path: string; priority: number; changeFrequency: ChangeFreq
   ...SERIES.map(series => ({
     path: `/products/${series}`,   priority: 0.9, changeFrequency: 'weekly' as ChangeFreq,
   })),
+  { path: '/designer',             priority: 0.7, changeFrequency: 'monthly' },
   { path: '/register',             priority: 0.7, changeFrequency: 'monthly' },
   { path: '/dashboard',            priority: 0.6, changeFrequency: 'monthly' },
   { path: '/privacy-policy',       priority: 0.3, changeFrequency: 'yearly'  },

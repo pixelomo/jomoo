@@ -19,6 +19,7 @@ interface Props {
 const NAV_LINKS = [
   { href: '/products/smart-toilet', label: '商品情報' },
   { href: '/company-information', label: '会社情報' },
+  { href: '/designer', label: 'デザイナー' },
   { href: '/blog', label: 'ブログ' },
   // Hidden until that page is built — restore it when it ships.
   // { href: '/inspiration', label: 'インスピレーション' },
