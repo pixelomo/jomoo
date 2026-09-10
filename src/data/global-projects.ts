@@ -10,7 +10,7 @@ export interface GlobalProject {
   description: string
   /** Matches one entry of PROJECT_COUNTRIES. */
   country: string
-  /** Matches one entry of PROJECT_CATEGORIES, except 交通拠点 — see below. */
+  /** Matches one entry of PROJECT_CATEGORIES. */
   category: string
 }
 
@@ -26,10 +26,9 @@ export const PROJECT_COUNTRIES = [
 /**
  * Filter row 2 in the design: what the project is.
  *
- * The design's second row stops at スポーツ施設, so 交通拠点 — the tag the
- * railway project carries on its own card — has no chip. Adding it here would
- * make that project reachable from the filter; left out for now to keep the
- * panel identical to the design.
+ * 交通拠点 is not in the design's second row, which stops at スポーツ施設 —
+ * but the railway project carries that tag on its own card, so without a chip
+ * it was the one project the filter could never reach. Added on request.
  */
 export const PROJECT_CATEGORIES = [
   '古代遺産と古代建築',
@@ -37,6 +36,7 @@ export const PROJECT_CATEGORIES = [
   '教育機関',
   '市営建物',
   'スポーツ施設',
+  '交通拠点',
 ] as const
 
 export const GLOBAL_PROJECTS: GlobalProject[] = [
