@@ -270,12 +270,22 @@
 
 .dz-awards {
   position: relative;
+  /* The closing section is a panel in its own right, not a strip: it holds a
+     screen and a bit, with the head, the logos and the rule centred in it. */
+  min-height: 110svh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
   padding: clamp(4.5rem, 8vw, 7rem) 0 clamp(4.5rem, 8vw, 7rem);
-  /* A soft wash rather than a flat ground: white at the top left, settling to
-     a light grey across and down. The band the cards sit in has to carry some
-     of that grey — the cards are pure white, and on a white field the first
-     ones read as nothing but their shadow. */
-  background: linear-gradient(115deg, #fff 0%, #f4f5f5 25%, #ecedee 75%, #e7e8ea 100%);
+  /* The marble, read back off awards1/awards2: cover, and pulled down to 66%
+     so the band crossing the section is the one the design shows rather than
+     the middle of the slab. Over it a flat white veil — fitting the screens
+     against the source puts the wash at white/0.29, not the grey it was
+     guessed at, which is what keeps the pure-white cards reading against it. */
+  background:
+    linear-gradient(rgba(255, 255, 255, 0.29), rgba(255, 255, 255, 0.29)),
+    url('/images/awardsbg.webp') center 66% / cover no-repeat,
+    #f6f6f7;
   overflow: hidden;
 }
 
@@ -314,7 +324,7 @@
 
 /* Full-bleed: the cards run off both edges, as the design has them. */
 .dz-awards__track {
-  margin-top: clamp(2.5rem, 5vw, 4.5rem);
+  margin-top: clamp(3rem, 6.85vw, 6.25rem);
   display: flex;
   gap: clamp(1.25rem, 2.2vw, 2rem);
   overflow-x: auto;
@@ -351,7 +361,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: clamp(1.5rem, 2.5vw, 2.25rem);
+  padding: clamp(0.85rem, 1.35vw, 1.25rem);
   background: #fff;
   border-radius: 24px;
   box-shadow: 0 10px 34px rgba(24, 38, 56, 0.09);
@@ -360,7 +370,7 @@
 .dz-awards__card img {
   /* The seven files are all different natural sizes — left to themselves they
      would sit at seven different weights in the row. */
-  height: 50px;
+  height: clamp(60px, 5.8vw, 84px);
   width: auto;
   max-width: 100%;
   object-fit: contain;
@@ -372,7 +382,7 @@
   position: relative;
   /* Lines up with the copy above it. */
   width: var(--dz-inner);
-  margin: clamp(2.5rem, 5vw, 4rem) auto 0;
+  margin: clamp(3rem, 6.85vw, 6.25rem) auto 0;
   height: 4px;
   border-radius: 4px;
   background: #ccc;
