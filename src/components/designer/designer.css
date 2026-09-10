@@ -324,7 +324,16 @@
 
 /* Full-bleed: the cards run off both edges, as the design has them. */
 .dz-awards__track {
-  margin-top: clamp(3rem, 6.85vw, 6.25rem);
+  /* overflow-x: auto forces overflow-y to auto with it, so the box clips at its
+     padding edge — and with the cards exactly as tall as the track, that edge
+     ran straight through their shadows and left a hard grey line along the top
+     and bottom of the strip. The padding gives the shadow somewhere to fade
+     inside the clip; the margins take the same amount back off the layout, so
+     the head, the cards and the rule stay where the screens put them. */
+  --dz-shadow-room: 3rem;
+  padding-block: var(--dz-shadow-room);
+  margin-top: calc(clamp(3rem, 6.85vw, 6.25rem) - var(--dz-shadow-room));
+  margin-bottom: calc(-1 * var(--dz-shadow-room));
   display: flex;
   /* No gap between the two copies: each run already opens with a padding-left
      of exactly one gap, so the seam is spaced like every other join. A gap here
@@ -370,7 +379,7 @@
   padding: clamp(0.85rem, 1.35vw, 1.25rem);
   background: #fff;
   border-radius: 24px;
-  box-shadow: 0 10px 34px rgba(24, 38, 56, 0.09);
+  box-shadow: 0 8px 28px rgba(24, 38, 56, 0.07);
 }
 
 .dz-awards__card img {
