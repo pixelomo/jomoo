@@ -1,0 +1,407 @@
+/* ============================================================
+   GLOBAL PROJECTS — /global-projects
+
+   Every length here was read off the client's screenshots
+   (public/images/screens/projects1-6.png). Those are 2680x1512
+   retina captures of a 1340px viewport, so CSS px = image px / 2
+   and the vw-based clamps below resolve to the measured value at
+   exactly 1340px wide.
+   ============================================================ */
+
+.gp {
+  --gp-ink: #312d2c;
+  --gp-line: #707070;
+  --gp-chip-on: #ededed;
+  --gp-rule: #73a4c7;
+  /* 147px of margin either side of a 1044px column at 1340px wide. */
+  --gp-container: 1044px;
+  --gp-pad: clamp(1.25rem, 5vw, 4rem);
+  --gp-filter-pad: clamp(1.25rem, 4.63vw, 3.875rem); /* 62px */
+
+  flex: 1;
+  background: #ffffff;
+  color: var(--gp-ink);
+}
+
+/* 1044px wide until the gutter needs it, never edge-to-edge. */
+.gp__container {
+  width: min(var(--gp-container), 100% - 2 * var(--gp-pad));
+  margin-inline: auto;
+}
+
+/* ─── HERO ──────────────────────────────────────────────── */
+
+.gp-hero {
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: min(calc(100vh - var(--nav-height)), 47.25rem);
+  overflow: hidden;
+  background: var(--gp-ink);
+}
+
+.gp-hero__image {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* The artwork sits ~40% under black in the design so the white type holds. */
+.gp-hero__scrim {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+}
+
+.gp-hero__inner {
+  position: relative;
+  color: #ffffff;
+}
+
+.gp-hero__eyebrow {
+  font-family: var(--font-en);
+  font-size: clamp(1.25rem, 2.09vw, 1.75rem); /* 28px */
+  font-weight: 400;
+  line-height: 1.2;
+  letter-spacing: 0;
+  text-transform: uppercase;
+  margin: 0 0 1.25rem;
+}
+
+.gp-hero__title {
+  font-size: clamp(2.25rem, 4.33vw, 3.625rem); /* 58px */
+  font-weight: 700;
+  line-height: 1.3;
+  letter-spacing: 0.01em;
+  margin: 0;
+  word-break: keep-all;
+}
+
+/* ─── INTRO ─────────────────────────────────────────────── */
+
+.gp-intro {
+  padding-top: 6.75rem; /* 108px */
+  text-align: center;
+}
+
+.gp-intro__text {
+  font-size: 1.5rem; /* 24px */
+  line-height: 2;
+  margin: 0;
+}
+
+.gp-intro__rule {
+  width: 34px;
+  height: 2px;
+  background: var(--gp-rule);
+  margin: 4.4375rem auto 0; /* 71px */
+}
+
+/* ─── FILTER PANEL ──────────────────────────────────────── */
+
+.gp-explorer {
+  padding-top: 5.5rem; /* 88px */
+  padding-bottom: 9rem;
+}
+
+.gp-filter {
+  border: 1px solid var(--gp-ink);
+  border-radius: 20px;
+  overflow: hidden;
+  background: #ffffff;
+}
+
+.gp-filter__head {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  width: 100%;
+  height: 58px;
+  padding: 0 3.5rem;
+  border: 0;
+  background: var(--gp-ink);
+  color: #ffffff;
+  font: inherit;
+  font-size: 1.5rem; /* 24px */
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.gp-filter__toggle {
+  position: absolute;
+  right: 2.625rem; /* icon's right edge sits 42px in from the card edge */
+  top: 50%;
+  translate: 0 -50%;
+  width: 16px;
+  height: 16px;
+}
+
+.gp-filter__toggle::before,
+.gp-filter__toggle::after {
+  content: '';
+  position: absolute;
+  inset: 50% 0 auto;
+  height: 2px;
+  translate: 0 -50%;
+  background: currentColor;
+}
+
+/* The vertical stroke only shows when the panel is shut, turning − into +. */
+.gp-filter__toggle::after {
+  rotate: 90deg;
+  transition: opacity 0.2s ease, rotate 0.2s ease;
+}
+
+.gp-filter__head[aria-expanded='true'] .gp-filter__toggle::after {
+  opacity: 0;
+  rotate: 0deg;
+}
+
+.gp-filter__body {
+  padding: 3.4375rem var(--gp-filter-pad) 3.5rem; /* 55px / 62px / 56px */
+}
+
+/* Both rows start hard against the panel's left padding in the design — the
+   second row only looks centred because it very nearly fills the width. */
+.gp-filter__chips {
+  display: flex;
+  flex-wrap: wrap;
+  column-gap: 14px;
+  row-gap: 20px;
+}
+
+.gp-filter__chips + .gp-filter__chips {
+  margin-top: 20px;
+}
+
+.gp-chip {
+  min-width: 108px;
+  height: 48px;
+  padding: 0 1.625rem; /* 26px */
+  border: 1px solid var(--gp-line);
+  border-radius: 999px;
+  background: #ffffff;
+  color: var(--gp-ink);
+  font: inherit;
+  font-size: 1.125rem; /* 18px */
+  line-height: 1;
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.gp-chip:hover {
+  background: #f6f6f6;
+}
+
+.gp-chip[aria-pressed='true'] {
+  background: var(--gp-chip-on);
+  border-color: var(--gp-ink);
+}
+
+.gp-filter__actions {
+  margin-top: 3.125rem; /* 50px */
+  text-align: center;
+}
+
+.gp-filter__search {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-width: 281px;
+  height: 58px;
+  padding: 0 2.5rem;
+  border: 0;
+  border-radius: 999px;
+  background: var(--gp-ink);
+  color: #ffffff;
+  font: inherit;
+  font-size: 1.25rem; /* 20px */
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.gp-filter__search:hover {
+  opacity: 0.85;
+}
+
+.gp-filter__search svg {
+  width: 19px;
+  height: 19px;
+  flex-shrink: 0;
+}
+
+.gp-filter__reset {
+  display: block;
+  margin: 1.5625rem auto 0; /* 25px */
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--gp-ink);
+  font: inherit;
+  font-size: 1.25rem; /* 20px */
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.gp-filter__reset:hover {
+  text-decoration: underline;
+}
+
+/* ─── RESULTS ───────────────────────────────────────────── */
+
+.gp-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: 92px;
+  row-gap: 96px;
+  margin-top: 9rem; /* 144px */
+}
+
+.gp-card {
+  display: flex;
+  flex-direction: column;
+}
+
+.gp-card__title {
+  font-size: 1.75rem; /* 28px */
+  font-weight: 700;
+  line-height: 1.4;
+  margin: 0 0 1.375rem;
+  word-break: keep-all;
+}
+
+.gp-card__image {
+  width: 100%;
+  /* 475.5 x 300 in the design. */
+  aspect-ratio: 1.585;
+  object-fit: cover;
+  border-radius: 14px;
+}
+
+.gp-card__body {
+  font-size: 1.5rem; /* 24px */
+  line-height: 1.75; /* 42px */
+  margin: 1.875rem 0 0;
+}
+
+.gp-card__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+  margin-top: auto;
+  padding-top: 1.875rem; /* 30px */
+}
+
+.gp-tag {
+  display: inline-flex;
+  align-items: center;
+  min-width: 99px;
+  height: 45px;
+  padding: 0 1.625rem;
+  border: 1px solid var(--gp-line);
+  border-radius: 999px;
+  font-size: 1.125rem; /* 18px */
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.gp-empty {
+  margin-top: 9rem;
+  text-align: center;
+  font-size: 1.5rem;
+  line-height: 2;
+}
+
+.gp-visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* ─── NARROW ────────────────────────────────────────────── */
+
+@media (max-width: 979px) {
+  .gp-intro {
+    padding-top: 4.5rem;
+  }
+
+  .gp-intro__text {
+    font-size: 1.25rem;
+  }
+
+  .gp-hero__title {
+    word-break: normal;
+  }
+
+  .gp-intro__rule {
+    margin-top: 3rem;
+  }
+
+  .gp-explorer {
+    padding-top: 3.5rem;
+    padding-bottom: 5rem;
+  }
+
+  .gp-filter__head {
+    font-size: 1.25rem;
+    padding: 0 2.75rem;
+  }
+
+  .gp-filter__toggle {
+    right: 1.25rem;
+  }
+
+  .gp-filter__body {
+    padding-top: 2.25rem;
+    padding-bottom: 2.25rem;
+  }
+
+  .gp-chip {
+    min-width: 0;
+    height: 42px;
+    padding: 0 1.125rem;
+    font-size: 1rem;
+  }
+
+  .gp-filter__actions {
+    margin-top: 2rem;
+  }
+
+  .gp-filter__search {
+    min-width: 0;
+    width: 100%;
+    max-width: 281px;
+  }
+
+  .gp-grid {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: 4rem;
+    margin-top: 4.5rem;
+  }
+
+  .gp-card__title {
+    font-size: 1.375rem;
+    word-break: normal;
+  }
+
+  .gp-card__body {
+    font-size: 1.125rem;
+  }
+
+  .gp-tag {
+    min-width: 0;
+    height: 40px;
+    padding: 0 1.125rem;
+    font-size: 1rem;
+  }
+}

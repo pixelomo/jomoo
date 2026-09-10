@@ -59,4 +59,8 @@ next-env.d.ts
 
 # Design references — screenshots and comps we build from, not shipped assets
 design/
+# Screens the client sends us. They sit under public/ so they can be opened in
+# a browser while we work, but they are references, not assets — 14MB of client
+# comps has no business being served in production.
+public/images/screens/
 .env*
