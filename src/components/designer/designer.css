@@ -326,7 +326,12 @@
 .dz-awards__track {
   margin-top: clamp(3rem, 6.85vw, 6.25rem);
   display: flex;
-  gap: clamp(1.25rem, 2.2vw, 2rem);
+  /* No gap between the two copies: each run already opens with a padding-left
+     of exactly one gap, so the seam is spaced like every other join. A gap here
+     would put half of one between the copies, which is not the loop's period —
+     scrollWidth / 2 would land short and the strip would visibly jump back at
+     the wrap. */
+  gap: 0;
   overflow-x: auto;
   overscroll-behavior-x: contain;
   /* The drift writes scrollLeft every frame; smooth scrolling would fight it. */
@@ -355,9 +360,10 @@
 .dz-awards__card {
   flex: 0 0 auto;
   box-sizing: border-box;
-  /* Square — 243px at the width the design was drawn at. */
-  width: clamp(180px, 16.9vw, 260px);
-  height: clamp(180px, 16.9vw, 260px);
+  /* Square. The design draws these at 243px; held a little under that so the
+     row carries more of the strip at once. */
+  width: clamp(160px, 15vw, 232px);
+  height: clamp(160px, 15vw, 232px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -370,7 +376,7 @@
 .dz-awards__card img {
   /* The seven files are all different natural sizes — left to themselves they
      would sit at seven different weights in the row. */
-  height: clamp(60px, 5.8vw, 84px);
+  height: clamp(54px, 5.2vw, 76px);
   width: auto;
   max-width: 100%;
   object-fit: contain;

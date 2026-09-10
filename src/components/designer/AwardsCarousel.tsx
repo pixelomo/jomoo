@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 'use client'
 
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useScrollReveal } from '@/components/company/useScrollReveal'
 
 /**
@@ -24,7 +24,7 @@ const AWARD_LOGOS = [
 }))
 
 /** Pixels per second the strip travels when nothing is holding it. */
-const SPEED = 42
+const SPEED = 150
 /** How long after a touch or a wheel before the drift picks up again. */
 const RESUME_DELAY = 2200
 
@@ -38,13 +38,40 @@ const RESUME_DELAY = 2200
  * wraps at the halfway mark, which makes the loop seamless in both directions
  * without the copy ever being announced twice — the duplicate is aria-hidden.
  *
- * The rule underneath is the scroll position of one pass, so it stays honest
- * whether the strip is drifting or the viewer is dragging it.
+ * The rule underneath runs the length of one loop, so it reaches its end at the
+ * moment the first mark returns to where it started — no part-filled reset —
+ * and stays honest whether the strip is drifting or being dragged.
  */
 export default function AwardsCarousel() {
   const sectionRef = useRef<HTMLElement>(null)
   const trackRef = useRef<HTMLDivElement>(null)
   const barRef = useRef<HTMLSpanElement>(null)
+  const [copies, setCopies] = useState(2)
+
+  /**
+   * Two copies are only enough while a copy is wider than the rail. Past that,
+   * scrollLeft's own ceiling — content less rail — sits below one copy's width,
+   * so the position clamps before the wrap and the strip sits dead at the end
+   * of the last copy: on a 2560px screen that was eight seconds of nothing
+   * moving. One copy beyond what the rail can show puts the ceiling back above
+   * the loop, whatever the screen.
+   */
+  useEffect(() => {
+    const track = trackRef.current
+    if (!track) return
+
+    function fit() {
+      const run = track!.querySelector<HTMLElement>('.dz-awards__run')
+      const width = run?.getBoundingClientRect().width
+      if (!width) return
+      setCopies(Math.max(2, Math.ceil(track!.clientWidth / width) + 1))
+    }
+
+    fit()
+    const observer = new ResizeObserver(fit)
+    observer.observe(track)
+    return () => observer.disconnect()
+  }, [])
 
   useScrollReveal(sectionRef, [
     { selector: '.dz-awards__eyebrow', y: 24 },
@@ -73,11 +100,10 @@ export default function AwardsCarousel() {
     let pos = 0
     let written = 0
 
-    // One logo's worth of rail, travelling the whole rail over one pass — the
-    // slim indicator the design draws. Sizing it like a scrollbar thumb
-    // (viewport ÷ content) is the other reading, but on a strip that only just
-    // overflows a desktop screen that thumb fills most of the rule and stops
-    // telling the viewer anything.
+    // One logo's worth of rail — the slim indicator the design draws. A true
+    // scrollbar thumb (rail ÷ content) would be over 80% of the rule here,
+    // because one copy of the strip barely overflows the screen, and a thumb
+    // that size nudging back and forth tells the viewer nothing.
     const thumb = 1 / AWARD_LOGOS.length
 
     function paintBar(half: number) {
@@ -87,11 +113,23 @@ export default function AwardsCarousel() {
       bar.style.setProperty('--dz-bar-at', `${progress * (1 - thumb) * 100}%`)
     }
 
+    // The loop's period is the distance from one copy to the next, measured off
+    // the runs themselves rather than taken as scrollWidth / 2. Those agree only
+    // while the track has no column gap — with one, half of it falls between the
+    // copies and scrollWidth / 2 lands short of a whole copy, so every wrap
+    // shunts the strip back by that much and the cards visibly jump. offsetLeft
+    // is unaffected by scrolling, so this stays right whatever the spacing.
+    function period() {
+      const runs = track!.querySelectorAll<HTMLElement>('.dz-awards__run')
+      if (runs.length < 2) return track!.scrollWidth / 2
+      return runs[1].offsetLeft - runs[0].offsetLeft
+    }
+
     function step(now: number) {
       frame = requestAnimationFrame(step)
       if (!track) return
 
-      const half = track.scrollWidth / 2
+      const half = period()
       const dt = last ? Math.min((now - last) / 1000, 0.05) : 0
       last = now
       if (half <= 0) return
@@ -143,7 +181,7 @@ export default function AwardsCarousel() {
       track.removeEventListener('touchstart', hold)
       track.removeEventListener('touchmove', hold)
     }
-  }, [])
+  }, [copies])
 
   return (
     <section className="dz-awards" ref={sectionRef} data-nav="light" aria-labelledby="dz-awards-title">
@@ -156,8 +194,8 @@ export default function AwardsCarousel() {
       </div>
 
       <div className="dz-awards__track" ref={trackRef} tabIndex={0} role="group" aria-label="受賞歴のロゴ">
-        {[0, 1].map((copy) => (
-          <div className="dz-awards__run" key={copy} aria-hidden={copy === 1 ? true : undefined}>
+        {Array.from({ length: copies }, (_, copy) => (
+          <div className="dz-awards__run" key={copy} aria-hidden={copy > 0 ? true : undefined}>
             {AWARD_LOGOS.map((logo) => (
               <div className="dz-awards__card" key={logo.src}>
                 <img
