@@ -13,7 +13,7 @@ export default function GlobalProjectsPage() {
   return (
     <main className="gp">
       <section className="gp-hero" aria-label="グローバルプロジェクト">
-        <img className="gp-hero__image" src="/images/global1.jpeg" alt="" />
+        <img className="gp-hero__image" src="/images/global1-hero.webp" alt="" />
         <div className="gp-hero__scrim" aria-hidden="true" />
         <div className="gp-hero__inner gp__container">
           <p className="gp-hero__eyebrow">GLOBAL PROJECTS</p>
