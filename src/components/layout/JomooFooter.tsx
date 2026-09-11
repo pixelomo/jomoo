@@ -83,7 +83,8 @@ export default function JomooFooter({ legalLinks = [] }: { legalLinks?: LegalLin
             </ul>
           </div>
 
-          {/* Hidden until the インスピレーション pages are built — restore this column when they ship.
+          {/* Hidden until the インスピレーション pages are built — restore this column when
+              they ship, and take .footer__cols back to four tracks with it.
           <div className="footer__col">
             <h4>インスピレーション</h4>
             <ul>
@@ -99,6 +100,7 @@ export default function JomooFooter({ legalLinks = [] }: { legalLinks?: LegalLin
               {/* Hidden until /company-information is built.
               <li><a href="/company-information">会社紹介</a></li>
               */}
+              <li><a href="/global-projects">グローバルプロジェクト</a></li>
               <li><a href="/blog">ニュース＆ブログ</a></li>
               <li className="footer__li--gap">
                 <a href="/register" className="footer__link--bold">

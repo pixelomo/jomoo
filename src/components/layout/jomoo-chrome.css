@@ -632,9 +632,13 @@
   display: block;
 }
 
+/* One track per column actually rendered. There were four tracks here while
+   インスピレーション was live; it is commented out in JomooFooter, so the
+   fourth sat empty and held the three real columns to ~3/4 of the row. Restore
+   the track along with the column. */
 .footer__cols {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1.45fr) minmax(0, 1fr);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 32px;
   font-size: 1.2rem;
   padding-bottom: 3rem;
