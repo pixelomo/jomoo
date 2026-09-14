@@ -1,0 +1,315 @@
+/* ============================================
+   CAREERS — 採用情報
+   ============================================ */
+
+/* Every length below was measured off the design screens in
+   design/careers/screens, which were drawn at a 1439px viewport. The vw
+   figures are those measurements divided by 1439, so the page reproduces the
+   screens exactly at that width and keeps their proportions either side of it.
+   Type is capped at the measured size rather than allowed to grow with the
+   viewport — the design's 25px body and 40px headings are already at the top
+   of their range. */
+.cr {
+  /* The same ink and blue as the designer page: one dark for every mark, and
+     the rule/dot blue. */
+  --cr-ink: #2f2d2c;
+  --cr-blue: #80a3c4;
+
+  /* The page margin on the outer side of a band's copy — 160px at 1439. */
+  --cr-side: clamp(1.5rem, 11.1vw, 13rem);
+  /* The gap between the copy and the photograph it sits beside. The two
+     orientations are not mirror images in the design: where the copy is on the
+     left it is held out at the page margin and stops well short of the card;
+     where it is on the right it sits closer to the card and further from the
+     page edge. */
+  --cr-gap-inner: clamp(1rem, 4.23vw, 4.75rem);
+  --cr-gap-outer: clamp(1.5rem, 5.7vw, 6.5rem);
+  --cr-edge: clamp(1.5rem, 8.8vw, 10rem);
+
+  /* The statement and every band's copy are set at one size. */
+  --cr-body-size: clamp(1rem, 1.74vw, 1.5625rem);
+  --cr-rule-w: clamp(28px, 2.43vw, 35px);
+  /* Only the two corners facing into the page are rounded. */
+  --cr-radius: clamp(18px, 2.08vw, 30px);
+  /* The band's photograph: 54.1% of the screen, at the proportion the design
+     draws it. */
+  --cr-card-w: 54.1%;
+  --cr-card-ratio: 779 / 484;
+  /* Above and below every card. */
+  --cr-band-pad: clamp(3rem, 6.95vw, 6.25rem);
+
+  background: #fff;
+  color: var(--cr-ink);
+  font-family: var(--font-poppins), sans-serif;
+}
+
+/* ---- Hero ---------------------------------------------------------------- */
+
+.cr-hero {
+  position: relative;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  background: #17150f;
+  /* The composed photograph's own proportion, as the design shows it whole.
+     The floor keeps it from collapsing to a strip on a phone, where 1.81:1
+     would leave no room for the title — and the explicit width keeps the floor
+     from resolving the other way round, where the ratio would widen the
+     section to match a taller box and push the page sideways. */
+  width: 100%;
+  aspect-ratio: 1.81;
+  min-height: min(calc(100svh - var(--nav-height)), 30rem);
+}
+
+.cr-hero__media {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  /* The composed picture is a touch wider in proportion than the band it
+     fills, and the design takes the difference off the foot rather than
+     splitting it: the seam where the two lower tiles begin sits just under the
+     title, and centring the crop would push it up across the last line. */
+  object-position: left top;
+  display: block;
+}
+
+/* The design lays the title straight onto the photograph with no wash at all —
+   the showroom is on its shadowed side there, and it carries white type on its
+   own. Almost none is put back: only enough that the brightest specular spots
+   in the glass, which the design lets fall to about 2.8:1, clear 3:1 for the
+   large type over them. At a tenth it is below the frame-to-frame variation
+   between the screens and the shipped file. */
+.cr-hero__scrim {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(
+      90deg,
+      rgba(12, 14, 20, 0.1) 0%,
+      rgba(12, 14, 20, 0.1) 34%,
+      rgba(12, 14, 20, 0.04) 52%,
+      rgba(12, 14, 20, 0) 66%
+    );
+}
+
+.cr-hero__inner {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  padding-inline: var(--cr-side);
+  /* The design does not centre the block exactly — it sits a little below the
+     middle of the frame, clear of the seam where the two lower tiles begin.
+     Flex centring splits a margin between both sides, so this is twice the
+     offset it produces. */
+  margin-top: 1.8vw;
+  color: #fff;
+}
+
+.cr-hero__eyebrow {
+  margin: 0 0 0.66em;
+  font-size: clamp(0.95rem, 1.99vw, 1.75rem);
+  font-weight: 500;
+  line-height: 1.2;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.cr-hero__title {
+  margin: 0;
+  font-size: clamp(2rem, 4.17vw, 3.75rem);
+  font-weight: 700;
+  line-height: 1.325;
+  letter-spacing: 0.01em;
+}
+
+/* ---- The statement ------------------------------------------------------- */
+
+.cr-intro {
+  padding: clamp(3.5rem, 7.61vw, 6.85rem) var(--cr-side) clamp(3.5rem, 6.88vw, 6.2rem);
+  background: #fff;
+}
+
+.cr-intro__inner {
+  margin: 0 auto;
+  text-align: center;
+}
+
+.cr-intro__body {
+  margin: 0;
+  font-size: var(--cr-body-size);
+  line-height: 2;
+  color: var(--cr-ink);
+}
+
+/* One sentence per line, as the design sets them. */
+.cr-intro__line {
+  display: block;
+}
+
+.cr-intro__rule {
+  display: block;
+  width: var(--cr-rule-w);
+  height: 2px;
+  margin: clamp(2.5rem, 5.56vw, 5rem) auto 0;
+  background: var(--cr-blue);
+}
+
+/* ---- One band ------------------------------------------------------------ */
+
+.cr-band {
+  padding-block: var(--cr-band-pad);
+  background: #fff;
+}
+
+/* The wash under the first and third bands. It is the client's own gradient
+   file rather than a CSS approximation — it is a photographed blur, not a
+   ramp — held back with a white veil to the strength the screens show, and cut
+   square at both ends: the design has no fade between one band and the next. */
+.cr-band--wash {
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.36), rgba(255, 255, 255, 0.36)),
+    url('/images/career/wash.webp');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.cr-band__inner {
+  display: grid;
+  /* The photograph's column runs to the edge of the screen; the copy takes
+     what is left and pads itself. */
+  grid-template-columns: calc(100% - var(--cr-card-w)) var(--cr-card-w);
+  align-items: center;
+}
+
+.cr-band--left .cr-band__inner {
+  grid-template-columns: var(--cr-card-w) calc(100% - var(--cr-card-w));
+}
+
+.cr-band__media {
+  grid-column: 2;
+  grid-row: 1;
+  min-width: 0;
+}
+
+.cr-band--left .cr-band__media {
+  grid-column: 1;
+}
+
+.cr-band__photo {
+  display: block;
+  width: 100%;
+  aspect-ratio: var(--cr-card-ratio);
+  object-fit: cover;
+  /* Square against the screen's edge, rounded where it faces the copy. */
+  border-radius: var(--cr-radius) 0 0 var(--cr-radius);
+  box-shadow: 0 10px 48px rgba(47, 45, 44, 0.115);
+}
+
+.cr-band--left .cr-band__photo {
+  border-radius: 0 var(--cr-radius) var(--cr-radius) 0;
+}
+
+.cr-band__text {
+  grid-column: 1;
+  grid-row: 1;
+  min-width: 0;
+  padding-inline: var(--cr-side) var(--cr-gap-inner);
+}
+
+.cr-band--left .cr-band__text {
+  grid-column: 2;
+  padding-inline: var(--cr-gap-outer) var(--cr-edge);
+}
+
+.cr-band__dot {
+  display: block;
+  width: clamp(8px, 0.7vw, 10px);
+  height: clamp(8px, 0.7vw, 10px);
+  border-radius: 50%;
+  background: var(--cr-blue);
+}
+
+.cr-band__title {
+  margin: clamp(0.6rem, 0.87vw, 0.8rem) 0 0;
+  font-size: clamp(1.5rem, 2.78vw, 2.5rem);
+  font-weight: 700;
+  line-height: 1.4;
+  letter-spacing: 0.01em;
+  color: var(--cr-ink);
+}
+
+.cr-band__body {
+  margin: clamp(1.5rem, 3.02vw, 2.75rem) 0 0;
+  font-size: var(--cr-body-size);
+  line-height: 2;
+  color: var(--cr-ink);
+  /* The design's breaks are evened out rather than greedy — its last lines are
+     never the two or three characters a greedy wrap leaves behind. */
+  text-wrap: pretty;
+}
+
+/* ---- Narrow -------------------------------------------------------------- */
+
+@media (max-width: 979px) {
+  .cr {
+    --cr-side: clamp(1.25rem, 5vw, 3rem);
+  }
+
+  /* The copy is centred over the whole frame here rather than sitting in the
+     left third, so a gradient weighted to one side would leave half of it on
+     bare paper. */
+  .cr-hero__scrim {
+    background:
+      linear-gradient(
+        180deg,
+        rgba(18, 20, 26, 0.34) 0%,
+        rgba(18, 20, 26, 0.56) 40%,
+        rgba(18, 20, 26, 0.56) 72%,
+        rgba(18, 20, 26, 0.3) 100%
+      );
+  }
+
+  .cr-hero__media {
+    object-position: 28% center;
+  }
+
+  /* Sentence-per-line is a desktop refinement; at this width the breaks strand
+     single words, so the paragraph is allowed to flow. */
+  .cr-intro__line {
+    display: inline;
+  }
+
+  /* The photograph goes above the copy and keeps its bleed to one edge. */
+  .cr-band__inner,
+  .cr-band--left .cr-band__inner {
+    grid-template-columns: 1fr;
+  }
+
+  .cr-band__media,
+  .cr-band--left .cr-band__media {
+    grid-column: 1;
+    grid-row: 1;
+    /* Still runs off its own edge, so the band keeps the design's asymmetry
+       instead of becoming a centred card. */
+    margin-inline: 0 calc(-1 * var(--cr-side));
+  }
+
+  .cr-band--left .cr-band__media {
+    margin-inline: calc(-1 * var(--cr-side)) 0;
+  }
+
+  .cr-band__text,
+  .cr-band--left .cr-band__text {
+    grid-column: 1;
+    grid-row: 2;
+    padding-inline: 0;
+    padding-top: clamp(1.75rem, 5vw, 2.5rem);
+  }
+
+  .cr-band__inner {
+    padding-inline: var(--cr-side);
+  }
+}

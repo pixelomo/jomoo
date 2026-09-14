@@ -3,8 +3,11 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "predev": "node scripts/generate-route-manifest.mjs",
     "dev": "next dev",
+    "prebuild": "node scripts/generate-route-manifest.mjs",
     "build": "next build --webpack",
+    "routes": "node scripts/generate-route-manifest.mjs",
     "start": "next start",
     "lint": "eslint",
     "check:auth-schema": "tsx scripts/check-auth-schema-fields.ts",

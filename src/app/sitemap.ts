@@ -1,5 +1,6 @@
 import type { MetadataRoute } from 'next'
 import { getProductSlugs } from '@/lib/sanity'
+import { SITE_ROUTES } from '@/lib/site-routes.generated'
 
 const baseUrl = process.env.NEXT_PUBLIC_SITE_URL
   ?? (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000')
@@ -8,18 +9,37 @@ type ChangeFreq = 'always' | 'hourly' | 'daily' | 'weekly' | 'monthly' | 'yearly
 
 const SERIES = ['smart-toilet', 'washstand', 'faucets', 'shower-set'] as const
 
-const staticPages: { path: string; priority: number; changeFrequency: ChangeFreq }[] = [
-  { path: '',                      priority: 1.0, changeFrequency: 'weekly'  },
-  ...SERIES.map(series => ({
-    path: `/products/${series}`,   priority: 0.9, changeFrequency: 'weekly' as ChangeFreq,
-  })),
-  { path: '/global-projects',      priority: 0.8, changeFrequency: 'monthly' },
-  { path: '/designer',             priority: 0.7, changeFrequency: 'monthly' },
-  { path: '/register',             priority: 0.7, changeFrequency: 'monthly' },
-  { path: '/dashboard',            priority: 0.6, changeFrequency: 'monthly' },
-  { path: '/privacy-policy',       priority: 0.3, changeFrequency: 'yearly'  },
-  { path: '/terms-of-use',         priority: 0.3, changeFrequency: 'yearly'  },
-]
+/**
+ * How often a page changes and how much it matters, for the pages where the
+ * default is wrong. Everything else — including any page added from now on —
+ * takes DEFAULT_RANK, so a new route is listed the moment it exists rather
+ * than the moment somebody remembers to come back here.
+ */
+const RANK: Record<string, { priority: number; changeFrequency: ChangeFreq }> = {
+  '/': { priority: 1.0, changeFrequency: 'weekly' },
+  '/blog': { priority: 0.8, changeFrequency: 'weekly' },
+  '/global-projects': { priority: 0.8, changeFrequency: 'monthly' },
+  '/company-information': { priority: 0.8, changeFrequency: 'monthly' },
+  '/contact-us': { priority: 0.6, changeFrequency: 'yearly' },
+  '/privacy-policy': { priority: 0.3, changeFrequency: 'yearly' },
+  '/terms-of-use': { priority: 0.3, changeFrequency: 'yearly' },
+  ...Object.fromEntries(
+    SERIES.map((series) => [
+      `/products/${series}`,
+      { priority: 0.9, changeFrequency: 'weekly' as ChangeFreq },
+    ])
+  ),
+}
+
+const DEFAULT_RANK = { priority: 0.7, changeFrequency: 'monthly' as ChangeFreq }
+
+/**
+ * Pages that are not in SITE_ROUTES — it only covers the public tree — but that
+ * belong in the sitemap anyway. 製品登録 sits behind a session, yet it is the
+ * page the packaging and the footer point owners at, so it is worth indexing;
+ * the rest of the protected tree is not.
+ */
+const EXTRA = [{ path: '/register', priority: 0.7, changeFrequency: 'monthly' as ChangeFreq }]
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const lastModified = new Date()
@@ -40,9 +60,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }))
   )
 
+  const staticPages = [
+    ...SITE_ROUTES.map((route) => ({ path: route, ...(RANK[route] ?? DEFAULT_RANK) })),
+    ...EXTRA,
+  ]
+
   return [
     ...staticPages.map(page => ({
-      url: `${baseUrl}${page.path}`,
+      // The home page's route is '/', which would otherwise give a trailing slash.
+      url: page.path === '/' ? baseUrl : `${baseUrl}${page.path}`,
       lastModified,
       changeFrequency: page.changeFrequency,
       priority: page.priority,

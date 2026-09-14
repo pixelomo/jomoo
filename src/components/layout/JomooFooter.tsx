@@ -102,6 +102,7 @@ export default function JomooFooter({ legalLinks = [] }: { legalLinks?: LegalLin
               */}
               <li><a href="/global-projects">グローバルプロジェクト</a></li>
               <li><a href="/blog">ニュース＆ブログ</a></li>
+              <li><a href="/careers">採用情報</a></li>
               <li className="footer__li--gap">
                 <a href="/register" className="footer__link--bold">
                   製品登録
@@ -127,7 +128,10 @@ export default function JomooFooter({ legalLinks = [] }: { legalLinks?: LegalLin
           <button type="button" className="footer__legal-btn" onClick={openConsentSettings}>
             Cookie設定
           </button>
-          <a href="#">サイトマップ</a>
+          {/* The generated sitemap — scripts/generate-route-manifest.mjs keeps it
+              in step with the pages that exist, so this no longer needs a list
+              of its own. */}
+          <a href="/sitemap.xml">サイトマップ</a>
         </span>
       </div>
     </footer>
