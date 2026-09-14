@@ -2,8 +2,23 @@ import type { MetadataRoute } from 'next'
 import { getProductSlugs } from '@/lib/sanity'
 import { SITE_ROUTES } from '@/lib/site-routes.generated'
 
-const baseUrl = process.env.NEXT_PUBLIC_SITE_URL
-  ?? (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000')
+/**
+ * The origin every URL in the sitemap is written against.
+ *
+ * VERCEL_PROJECT_PRODUCTION_URL comes before VERCEL_URL deliberately: the
+ * latter is the URL of *this deployment*, which is a different host on every
+ * push. A sitemap built from it tells Google about jomoo-3dv9g….vercel.app
+ * rather than jomoo.jp — every canonical URL wrong, and a new set of them each
+ * time the site ships. VERCEL_URL is kept last so a preview deployment still
+ * links to itself rather than to production.
+ */
+const baseUrl =
+  process.env.NEXT_PUBLIC_SITE_URL
+  ?? (process.env.VERCEL_PROJECT_PRODUCTION_URL
+    ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+    : process.env.VERCEL_URL
+      ? `https://${process.env.VERCEL_URL}`
+      : 'http://localhost:3000')
 
 type ChangeFreq = 'always' | 'hourly' | 'daily' | 'weekly' | 'monthly' | 'yearly' | 'never'
 
