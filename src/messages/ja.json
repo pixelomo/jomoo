@@ -549,7 +549,7 @@
   },
   "cookies": {
     "title": "Cookieの使用について",
-    "body": "当サイトでは、サイトの動作に必要なCookieのほか、外部メディア（YouTubeなど）の表示やサイトの改善のためにCookieを使用することがあります。「必須のみ」を選んだ場合は、必要なCookieだけを使用します。設定はフッターの「Cookie設定」からいつでも変更できます。",
+    "body": "当サイトでは、サイトの動作に必要なCookieのほか、外部メディア（YouTube・Googleマップなど）の表示やサイトの改善のためにCookieを使用することがあります。「必須のみ」を選んだ場合は、必要なCookieだけを使用します。設定はフッターの「Cookie設定」からいつでも変更できます。",
     "acceptAll": "すべて許可",
     "necessaryOnly": "必須のみ",
     "settings": "詳細設定",
@@ -560,10 +560,13 @@
     "analyticsTitle": "分析Cookie",
     "analyticsDesc": "どのページがどのように見られているかを集計し、サイトの改善に役立てるためのCookieです。個人を特定する目的では使用しません。",
     "mediaTitle": "外部メディアCookie",
-    "mediaDesc": "製品ページのYouTube動画など、外部サービスの埋め込みコンテンツを表示するためのCookieです。許可しない場合、動画は再生前に確認を表示します。",
+    "mediaDesc": "製品ページのYouTube動画やショールームのGoogleマップなど、外部サービスの埋め込みコンテンツを表示するためのCookieです。許可しない場合、動画や地図は表示前に確認を表示します。",
     "footerLink": "Cookie設定",
     "videoBlocked": "この動画はYouTubeから配信され、再生にあたりYouTubeのCookieが使用されます。",
     "videoLoadOnce": "この動画を読み込む",
-    "videoOpenSettings": "Cookie設定を開く"
+    "mapBlocked": "この地図はGoogleマップから配信され、表示にあたりGoogleのCookieが使用されます。",
+    "mapLoadOnce": "この地図を読み込む",
+    "mapOpenExternal": "Googleマップで開く",
+    "embedOpenSettings": "Cookie設定を開く"
   }
 }

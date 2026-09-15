@@ -15,5 +15,6 @@ export const SITE_ROUTES = [
   '/products/shower-set',
   '/products/smart-toilet',
   '/products/washstand',
+  '/showroom',
   '/terms-of-use',
 ] as const

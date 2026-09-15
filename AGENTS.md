@@ -21,7 +21,7 @@ Dealer branches (`dealer_branches`, `user.member_type`, `user.branch_id`, `produ
 # Cookie consent
 
 The banner in `src/components/consent/` stores one cookie, `jomoo_consent`, holding
-a version and one bit per optional category (`v1.10` — analytics yes, external
+a version and one bit per optional category (`v2.10` — analytics yes, external
 media no). `src/lib/cookieConsent.ts` is the shared model, read on the server in
 `(site)/layout.tsx` so the bar never flashes, and written in the browser.
 
@@ -30,8 +30,8 @@ behind them does: an older value parses as "no answer yet", so everyone is asked
 again rather than being held to a choice about a different set of cookies.
 
 Nothing optional runs without consent. YouTube embeds go through
-`ConsentedVideo`, which does not request the frame at all until 外部メディア is
-allowed. Google Analytics loads only when `NEXT_PUBLIC_GA_ID` is set **and**
+`ConsentedVideo` and the ショールーム map through `ConsentedMap`, neither of which
+requests the frame at all until 外部メディア is allowed. Google Analytics loads only when `NEXT_PUBLIC_GA_ID` is set **and**
 分析Cookie is agreed to — with no id the analytics row is hidden entirely, since
 a category that gates nothing should not be offered.
 

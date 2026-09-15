@@ -100,6 +100,7 @@ export default function JomooFooter({ legalLinks = [] }: { legalLinks?: LegalLin
               {/* Hidden until /company-information is built.
               <li><a href="/company-information">会社紹介</a></li>
               */}
+              <li><a href="/showroom">ショールーム</a></li>
               <li><a href="/global-projects">グローバルプロジェクト</a></li>
               <li><a href="/blog">ニュース＆ブログ</a></li>
               <li><a href="/careers">採用情報</a></li>

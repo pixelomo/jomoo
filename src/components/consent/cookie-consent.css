@@ -269,3 +269,76 @@
   outline: 2px solid #ffffff;
   outline-offset: 2px;
 }
+
+/* ── The map placeholder ────────────────────────────────────────────────
+   The same offer as the video one, on light ground: the ショールーム map sits
+   on white paper, where the video placeholder's white-on-dark would be
+   invisible. The frame it replaces is rounded and sized by the page, so this
+   only has to fill it. */
+.cc-map {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding: 24px;
+  text-align: center;
+  background: #f1f1f0;
+  color: rgba(47, 45, 44, 0.62);
+  font-family: var(--font-poppins), sans-serif;
+}
+
+.cc-map__text {
+  margin: 0;
+  font-size: 0.85rem;
+  line-height: 1.8;
+  max-width: 44ch;
+}
+
+.cc-map__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+}
+
+.cc-map__btn {
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 20px;
+  border: 1px solid rgba(47, 45, 44, 0.35);
+  border-radius: 999px;
+  background: transparent;
+  color: #2f2d2c;
+  font: inherit;
+  font-size: 0.78rem;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.cc-map__btn:hover {
+  background: rgba(47, 45, 44, 0.08);
+  border-color: #2f2d2c;
+}
+
+.cc-map__btn--ghost {
+  border-color: transparent;
+  color: rgba(47, 45, 44, 0.6);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.cc-map__btn--ghost:hover {
+  background: transparent;
+  color: #2f2d2c;
+}
+
+.cc-map__btn:focus-visible {
+  outline: 2px solid #2f2d2c;
+  outline-offset: 2px;
+}

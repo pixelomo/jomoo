@@ -80,11 +80,14 @@ export default function DesignExcellenceSection() {
               <br />
               世界基準のデザイナーが製造しています。
             </p>
-            {/* Hidden until /inspiration is built — restore this CTA when it ships.
-            <a className="design-excellence__link reveal" href="/inspiration">
-              詳しく見る&gt;
+            {/* The section names the designers without naming them, so it ends
+                on the way through to the page that does. */}
+            <a className="design-excellence__btn reveal" href="/designer">
+              デザイナーを見る
+              <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <path d="M4 12h15M13 6l6 6-6 6" />
+              </svg>
             </a>
-            */}
           </div>
         </div>
       </div>

@@ -27,6 +27,12 @@ export type BlogPost = {
   date: string
   author: string
   cover: string
+  /** The cover's intrinsic pixel size, stamped in by the same script that
+   *  stamps the body images. The index reads it to tell a landscape cover from
+   *  a portrait one — the landscape ones are all cropped to one band so the
+   *  cards line up, and a portrait cover would lose most of itself to it. */
+  coverWidth: number
+  coverHeight: number
   /** Shown on the card and as the standfirst above the article body. */
   excerpt: string
   body: BlogBlock[]
@@ -39,6 +45,8 @@ export const BLOG_POSTS: BlogPost[] = [
     date: '2026-08-10',
     author: 'JOMOO',
     cover: '/images/blog/jd-public-restroom-cover.jpg',
+    coverWidth: 2000,
+    coverHeight: 1000,
     excerpt:
       '中国西部の雄大な自然のなかで、快適な公共トイレを用意することは簡単ではありません。施設と施設の距離は長く、密度は低く、繁忙期には人が集中し、気候も厳しい。新疆・伊犁のナラティ草原に、JOMOO は JD.com とともに一棟だけの施設を建てました。名前は「天山の下の一つの石」。風景に対して主張するのではなく、風景に溶け込むことを出発点にした施設です。',
     body: [
@@ -138,6 +146,8 @@ export const BLOG_POSTS: BlogPost[] = [
     date: '2026-06-02',
     author: 'JOMOO',
     cover: '/images/blog/restrooms-healthcare-cover.jpg',
+    coverWidth: 2000,
+    coverHeight: 1125,
     excerpt:
       '病院の環境は、高度な医療機器と複雑なケアの仕組みによって語られがちです。しかしもっとも頻繁に使われる空間のひとつであるトイレは、これまで設計上の関心をはるかに少なくしか向けられてきませんでした。実際にはそこは医療体制のなかでもっとも脆弱な利用者を受け止め、衛生リスクの管理、感染対策、運用効率に継続的な役割を果たしています。',
     body: [
@@ -285,6 +295,8 @@ export const BLOG_POSTS: BlogPost[] = [
     date: '2026-02-25',
     author: 'JOMOO',
     cover: '/images/blog/z1-pro-power-storage-cover.jpg',
+    coverWidth: 1263,
+    coverHeight: 536,
     excerpt:
       'スマートバスルームの可能性は、いまなお住宅のインフラに縛られています。電源の有無、コンセントの位置、老朽化した配線、不安定な電圧。JOMOO Z1 Pro 蓄電式スマートトイレ（型番 VND6150-S0-IDO305）は、独立した蓄電システムを内蔵することでこの依存関係を組み替え、固定された条件に頼る設計から、現実の住環境に適応する設計へと軸足を移します。',
     body: [
@@ -392,6 +404,8 @@ export const BLOG_POSTS: BlogPost[] = [
     date: '2025-11-24',
     author: 'JOMOO Tech',
     cover: '/images/blog/flip-flush-technology-cover.jpg',
+    coverWidth: 1080,
+    coverHeight: 1350,
     excerpt:
       'JOMOO が独自開発した「反転洗浄技術（Flip-Flush Technology）」が、調査会社 iResearch により「世界初」として認定されました。従来の水流による洗浄に代えて、モーターが反転して汚物をそのまま排出する仕組みです。洗浄音は 38 dB まで下がり、飛散を抑え、衛生性を高めます。',
     body: [
@@ -490,6 +504,8 @@ export const BLOG_POSTS: BlogPost[] = [
     date: '2025-10-01',
     author: 'JOMOO',
     cover: '/images/blog/public-restrooms-redefined-cover.jpg',
+    coverWidth: 1440,
+    coverHeight: 1920,
     excerpt:
       '公共トイレはもはや単なるインフラとは見なされていません。文化的なアイデンティティを担い、利用体験を高め、都市の成熟を映し出す「第三の空間」へと変わりつつあります。JOMOO グループは敦煌文化旅游集団とともに、沙州夜市に「敦煌浄土」スマートトイレを公開しました。',
     body: [
@@ -575,6 +591,8 @@ export const BLOG_POSTS: BlogPost[] = [
     date: '2025-08-15',
     author: 'JOMOO Product Team',
     cover: '/images/blog/ai-bath-cover.jpg',
+    coverWidth: 2000,
+    coverHeight: 1284,
     excerpt:
       '本当にインテリジェントなバスルームとは、機能を積み上げることではありません。必要とされていることを先回りして感じ取り、精確に応え、小さくても消えない不便を静かに解いていくこと。AI BATH は 15 個の独立したマイクロクリスタルセンサーによる受動認識から、DeepSeek を搭載した音声アシスタントまで、日常のディテールに配慮を織り込みます。',
     body: [
@@ -664,6 +682,8 @@ export const BLOG_POSTS: BlogPost[] = [
     date: '2025-07-23',
     author: 'JOMOO Product Design Team',
     cover: '/images/blog/x70-ultra-quiet-cover.jpg',
+    coverWidth: 1400,
+    coverHeight: 787,
     excerpt:
       '耳ざわりな洗浄音、残る臭い、清潔に保ちにくい表面、そして手を触れずに済ませたい場面。日々の暮らしのなかで見過ごされがちなこれらは、家族一人ひとりの健康と安心に確かな影響を与えます。JOMOO X70 超静音スマートトイレは、38 dB の洗浄音、99% を超える除菌率、そして完全な非接触操作で応えます。',
     body: [

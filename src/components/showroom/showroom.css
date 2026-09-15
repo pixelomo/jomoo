@@ -1,0 +1,250 @@
+/* ============================================
+   SHOWROOM — ショールーム
+   ============================================ */
+
+/* Measured off the design screens in design/showroom/screens, which were drawn
+   at a 1439px viewport. The vw figures are those measurements divided by 1439,
+   so the page reproduces the screens at that width and keeps their proportions
+   either side of it. Type is capped at the measured size rather than allowed to
+   grow: the design's 25px table and 40px heading are already at the top of
+   their range.
+
+   It is the careers page's scale throughout — 28px eyebrow, 60px title, 25px
+   body — because the two were drawn together. */
+.sh {
+  /* The same dark the careers and designer pages use for every mark. */
+  --sh-ink: #2f2d2c;
+  /* The rule between the table's rows. */
+  --sh-line: #d3d3d3;
+
+  /* The page margin. Both the heading and the table start here, and the table
+     ends the same distance from the other edge — 160px at 1439. */
+  --sh-side: clamp(1.5rem, 11.12vw, 10rem);
+  /* The label column. The values line up at 448px at 1439, whatever the label
+     above them is. */
+  --sh-label-w: clamp(7rem, 20.01vw, 18rem);
+
+  --sh-body-size: clamp(1rem, 1.74vw, 1.5625rem);
+  /* One line of the table. 1.6 rather than the careers page's 2: the 営業時間
+     rows are a list, not a paragraph. */
+  --sh-line-h: 1.6;
+  --sh-row-pad: clamp(0.9rem, 1.67vw, 1.5rem);
+
+  background: #fff;
+  color: var(--sh-ink);
+  font-family: var(--font-poppins), sans-serif;
+}
+
+/* ---- Hero ---------------------------------------------------------------- */
+
+.sh-hero {
+  position: relative;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  background: #d9d7d3;
+  /* The render is 16:9 and the design draws the band at 16:9, so it is shown
+     whole. The floor keeps it from collapsing to a strip on a phone, where
+     there would be no room left for the title — and the explicit width keeps
+     the floor from resolving the other way round, widening the section to match
+     a taller box and pushing the page sideways. */
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  min-height: min(calc(100svh - var(--nav-height)), 28rem);
+}
+
+.sh-hero__media {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* The showroom is bright almost everywhere, and the design lays the white type
+   straight onto its one shadowed corner with no wash at all — where the
+   brightest tiles behind the lettering fall to about 2:1. This puts back only
+   what that costs: a quarter of a stop over the left third, enough for the
+   brightest ground under either line to clear 3:1 for the large type on it, and
+   nothing at all across the right two thirds of the picture. */
+.sh-hero__scrim {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(
+      90deg,
+      rgba(20, 22, 26, 0.28) 0%,
+      rgba(20, 22, 26, 0.26) 34%,
+      rgba(20, 22, 26, 0.1) 52%,
+      rgba(20, 22, 26, 0) 68%
+    );
+}
+
+.sh-hero__inner {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  padding-inline: var(--sh-side);
+  /* The design sets the block a little above the middle of the frame, clear of
+     the vanity units along the bottom. Flex centring splits a margin between
+     both sides, so this is twice the offset it produces. */
+  margin-bottom: 1.67vw;
+  color: #fff;
+}
+
+.sh-hero__eyebrow {
+  margin: 0 0 0.3em;
+  font-size: clamp(0.95rem, 1.95vw, 1.75rem);
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: 0.01em;
+}
+
+.sh-hero__title {
+  margin: 0;
+  font-size: clamp(2rem, 4.17vw, 3.75rem);
+  font-weight: 700;
+  line-height: 1.325;
+  letter-spacing: 0.01em;
+}
+
+/* ---- The details --------------------------------------------------------- */
+
+.sh-info {
+  padding: clamp(3.5rem, 13.13vw, 11.8rem) var(--sh-side) clamp(4rem, 11.12vw, 10rem);
+  background: #fff;
+}
+
+.sh-info__title {
+  margin: 0;
+  font-size: clamp(1.625rem, 2.78vw, 2.5rem);
+  font-weight: 700;
+  line-height: 1.4;
+  letter-spacing: 0.01em;
+}
+
+.sh-info__table {
+  margin: clamp(2rem, 3.34vw, 3rem) 0 0;
+}
+
+.sh-info__row {
+  display: grid;
+  grid-template-columns: var(--sh-label-w) minmax(0, 1fr);
+  align-items: start;
+  padding-block: var(--sh-row-pad);
+}
+
+/* The rule belongs to the row below it, so the table has no line above the
+   first row or below the last — which is how the design draws it. */
+.sh-info__row + .sh-info__row {
+  border-top: 1px solid var(--sh-line);
+}
+
+.sh-info__label {
+  margin: 0;
+  font-size: var(--sh-body-size);
+  font-weight: 700;
+  line-height: var(--sh-line-h);
+}
+
+.sh-info__value {
+  margin: 0;
+  font-size: var(--sh-body-size);
+  line-height: var(--sh-line-h);
+}
+
+/* 営業時間 is a list of lines, not a paragraph that happens to wrap. */
+.sh-info__line {
+  display: block;
+}
+
+/* ---- Map ----------------------------------------------------------------- */
+
+.sh-info__map {
+  position: relative;
+  width: min(100%, 56.43vw);
+  aspect-ratio: 812 / 468;
+  margin: clamp(3rem, 8.27vw, 7.45rem) auto 0;
+  border-radius: clamp(16px, 2.08vw, 30px);
+  overflow: hidden;
+}
+
+.sh-info__map iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  display: block;
+}
+
+/* ---- The booking button -------------------------------------------------- */
+
+.sh-info__cta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: min(100%, 37.81vw);
+  min-height: clamp(3.5rem, 5.7vw, 5.125rem);
+  margin: clamp(2.75rem, 10.63vw, 9.55rem) auto 0;
+  padding: 0.75rem 1.5rem;
+  border-radius: 10px;
+  background: var(--sh-ink);
+  color: #fff;
+  font-size: var(--sh-body-size);
+  line-height: var(--sh-line-h);
+  text-align: center;
+  text-decoration: none;
+  transition: background 0.25s ease;
+}
+
+.sh-info__cta:hover,
+.sh-info__cta:focus-visible {
+  background: #4a4644;
+}
+
+/* ---- Narrow -------------------------------------------------------------- */
+
+@media (max-width: 979px) {
+  .sh {
+    --sh-side: clamp(1.25rem, 5vw, 3rem);
+    --sh-body-size: clamp(0.95rem, 2.4vw, 1.125rem);
+  }
+
+  /* The copy is centred over the whole frame here rather than sitting in the
+     left third, so a gradient weighted to one side would leave half of it on
+     bare paper. */
+  .sh-hero__scrim {
+    background:
+      linear-gradient(
+        180deg,
+        rgba(18, 20, 26, 0.3) 0%,
+        rgba(18, 20, 26, 0.5) 45%,
+        rgba(18, 20, 26, 0.5) 75%,
+        rgba(18, 20, 26, 0.26) 100%
+      );
+  }
+
+  .sh-hero__media {
+    object-position: 34% center;
+  }
+
+  /* The label sits above its value rather than beside it: a 20vw label column
+     leaves the address breaking after every other character. */
+  .sh-info__row {
+    grid-template-columns: 1fr;
+    gap: 0.35rem;
+  }
+
+  .sh-info__map,
+  .sh-info__cta {
+    width: 100%;
+  }
+
+  .sh-info__map {
+    /* Squarer than the design's band, which is very shallow once it is only a
+       phone wide. */
+    aspect-ratio: 4 / 3;
+  }
+}

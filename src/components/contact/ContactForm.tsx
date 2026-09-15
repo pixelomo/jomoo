@@ -41,6 +41,10 @@ export default function ContactForm() {
   const presetCategory = CONTACT_CATEGORIES.some((c) => c.id === requested)
     ? (requested as ContactCategory)
     : undefined
+  // ?showroom=1 ticks the reservation box, so the ショールーム page's
+  // ショールーム予約へ button lands on the form already asking for what it
+  // promised rather than on a section the visitor has to find.
+  const presetShowroom = searchParams.get('showroom') === '1'
 
   const {
     register,
@@ -51,7 +55,7 @@ export default function ContactForm() {
     resolver: zodResolver(ContactSchema),
     defaultValues: {
       countryCode: '+81',
-      showroomReservation: false,
+      showroomReservation: presetShowroom,
       ...(presetCategory && { category: presetCategory }),
     },
   })
@@ -189,7 +193,7 @@ export default function ContactForm() {
               </SignUpField>
             </section>
 
-            <section className="signup__section">
+            <section className="signup__section" id="showroom-reservation">
               <h2 className="signup__legend">ショールーム予約</h2>
 
               <SignUpField label="ご予約" htmlFor="showroomReservation">

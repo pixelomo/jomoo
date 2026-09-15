@@ -40,12 +40,24 @@ function SearchIcon() {
 }
 
 function Card({ post }: { post: BlogPost }) {
+  // Every landscape cover is shown at one height, so the cards sit level across
+  // the three columns however the pictures were cropped — the covers run from
+  // 1.56:1 to 2.36:1 on their own. A portrait cover keeps its proportions: the
+  // band would take more than half of it away.
+  const landscape = post.coverWidth > post.coverHeight
+
   return (
     <Link href={`/blog/${post.slug}`} className="blog__card">
       <div className="blog__card-time">{formatBlogDate(post.date)}</div>
-      <div className="blog__card-media">
+      <div className={`blog__card-media${landscape ? ' blog__card-media--landscape' : ''}`}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={post.cover} alt={post.title} loading="lazy" />
+        <img
+          src={post.cover}
+          alt={post.title}
+          width={post.coverWidth}
+          height={post.coverHeight}
+          loading="lazy"
+        />
       </div>
       <h3 className="blog__card-title">{post.title}</h3>
       <p className="blog__card-desc">{post.excerpt}</p>

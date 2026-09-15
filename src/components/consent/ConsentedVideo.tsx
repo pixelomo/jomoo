@@ -54,7 +54,7 @@ export default function ConsentedVideo({ src, title }: { src: string; title: str
           {t('videoLoadOnce')}
         </button>
         <button type="button" className="cc-video__btn cc-video__btn--ghost" onClick={openConsentSettings}>
-          {t('videoOpenSettings')}
+          {t('embedOpenSettings')}
         </button>
       </div>
     </div>

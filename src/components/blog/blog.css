@@ -154,6 +154,10 @@
 .blog__card-media {
   width: 100%;
   overflow: hidden;
+  /* The global site leaves these square. The client asked for the corner the
+     rest of this site uses on a picture — the same 20px as the homepage cards
+     and the product tiles. */
+  border-radius: 20px;
 }
 
 .blog__card-media img {
@@ -161,6 +165,17 @@
   height: auto;
   display: block;
   transition: transform 0.8s ease;
+}
+
+/* The covers are cropped anywhere between 1.56:1 and 2.36:1, which left the
+   cards in a column stepping up and down for no reason the reader can see.
+   Every landscape cover is shown in one 16:9 band instead — the proportion
+   most of them already arrive at, so it is the least cropping that makes them
+   agree. Portrait covers are left alone; see the class in BlogIndex. */
+.blog__card-media--landscape img {
+  aspect-ratio: 16 / 9;
+  height: 100%;
+  object-fit: cover;
 }
 
 .blog__card:hover .blog__card-media img {
@@ -548,6 +563,10 @@
 
   .blog__card {
     margin-bottom: 30px;
+  }
+
+  .blog__card-media {
+    border-radius: 14px;
   }
 
   .blog-post__meta {

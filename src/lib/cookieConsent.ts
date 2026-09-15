@@ -8,7 +8,9 @@ export const CONSENT_COOKIE = 'jomoo_consent'
 // Bump when the categories change or the policy behind them does: an older
 // version parses as "no answer yet", so everyone is asked again rather than
 // being held to a choice they made about a different set of cookies.
-export const CONSENT_VERSION = 1
+// v2: 外部メディア now also gates the ショールーム page's Google Map, so an
+// answer given when the category meant YouTube alone no longer stands for it.
+export const CONSENT_VERSION = 2
 
 // Six months. Long enough not to nag, short enough that a stale choice expires
 // on its own — the common reading of "consent does not last forever".
@@ -24,7 +26,7 @@ export type Consent = Record<ConsentCategory, boolean>
 // The starting point for everything: nothing optional until they say so.
 export const DECLINE_ALL: Consent = { analytics: false, media: false }
 
-/** e.g. `v1.10` — analytics on, external media off. */
+/** e.g. `v2.10` — analytics on, external media off. */
 export function serializeConsent(consent: Consent): string {
   const bits = OPTIONAL_CATEGORIES.map((key) => (consent[key] ? '1' : '0')).join('')
   return `v${CONSENT_VERSION}.${bits}`
