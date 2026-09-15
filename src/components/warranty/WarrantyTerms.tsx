@@ -60,15 +60,21 @@ export default function WarrantyTerms() {
         </div>
       </section>
 
+      {/* Address and postcode follow the ショールーム listing. A field per line,
+          rather than one run broken by <br>, so the label stays with its value
+          and only a value too long for the measure wraps — 製造元 and the
+          company name sit together on one line at the 52rem measure. */}
       <section className="warranty-maker">
         <div className="warranty-maker__inner">
-          製造元：
-          <br />
-          JOMOO Kitchen &amp; Bath Co., Ltd.（九牧厨卫股份有限公司）
-          <br />
-          所在地：***
-          <br />
-          郵便番号：***
+          <p className="warranty-maker__line">
+            <span className="warranty-maker__label">製造元：</span>JOMOO Kitchen &amp; Bath Co., Ltd.（九牧厨卫股份有限公司）
+          </p>
+          <p className="warranty-maker__line">
+            <span className="warranty-maker__label">所在地：</span>東京都多摩市山王下1-12-12 福満ビル 101
+          </p>
+          <p className="warranty-maker__line">
+            <span className="warranty-maker__label">郵便番号：</span>206-0042
+          </p>
         </div>
       </section>
     </>

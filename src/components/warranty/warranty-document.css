@@ -211,6 +211,16 @@
   color: #000000;
 }
 
+.warranty-maker__line {
+  margin: 0;
+}
+
+/* The label never carries the break; if a value outgrows the measure it wraps
+   on its own, under its label rather than away from it. */
+.warranty-maker__label {
+  white-space: nowrap;
+}
+
 /* The inners are capped at 52rem and centred, so above this width they already
    sit clear of the edges. Below it the section itself has to hold the margin —
    otherwise the text runs into the bezel. */
