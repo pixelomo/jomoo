@@ -171,93 +171,6 @@
   background: #ffffff;
 }
 
-.warranty-section {
-  padding: 4rem 0;
-  background: #ffffff;
-}
-
-.warranty-section--grey {
-  background: #f4f4f5;
-}
-
-.warranty-section__inner {
-  max-width: 52rem;
-  margin: 0 auto;
-}
-
-.warranty-section__title {
-  margin: 0 0 2rem;
-  font-size: 2.5rem;
-  font-weight: 700;
-  line-height: 1.5;
-  color: #0a0a0a;
-}
-
-.warranty-section__title--center {
-  text-align: center;
-}
-
-.warranty-section__lead {
-  margin: 0 0 1.5rem;
-}
-
-.warranty-terms {
-  font-size: 1.25rem;
-  line-height: 2;
-  color: #000000;
-}
-
-/* The client marked these passages for emphasis in the supplied copy. */
-.warranty-hi {
-  color: #e41712;
-}
-
-.warranty-terms ol {
-  margin: 0 0 1.75rem;
-  padding-left: 0;
-  list-style-position: inside;
-  display: flex;
-  flex-direction: column;
-  /* 2em at line-height 2 is exactly one blank line, so each clause reads as its
-     own paragraph the way the source copy is spaced. */
-  gap: 2em;
-}
-
-/* Sub-clauses run on without the blank line between them. */
-.warranty-terms ol ol {
-  margin: 0.5rem 0 0;
-  gap: 0.5rem;
-}
-
-/* …except the 免責事項 list, which the copy separates from its lead-in. */
-.warranty-terms ol ol.warranty-terms__sub--gap {
-  margin-top: 2em;
-}
-
-.warranty-terms li::marker {
-  color: #000000;
-  font-weight: 600;
-}
-
-/* The sub-clauses are numbered 1）2）in the source, not 1. 2. */
-.warranty-terms ol ol > li {
-  list-style: none;
-  position: relative;
-}
-
-/* Only the marker carries weight. Matching on the first <span> instead caught
-   the emphasis wrapper too, which set whole clauses in bold. */
-.warranty-terms__marker {
-  font-weight: 600;
-  margin-right: 0.35rem;
-}
-
-.warranty-terms__closing {
-  margin: 0;
-  padding-top: 1.5rem;
-  border-top: 1px solid #d4d4d8;
-}
-
 .warranty-club__cta {
   display: flex;
   width: 100%;
@@ -304,10 +217,6 @@
 @media (max-width: 980px) {
   .warranty-actions {
     margin: 0 1rem 4rem;
-  }
-
-  .warranty-section {
-    padding: 4rem 1.5rem;
   }
 
   .warranty-maker {

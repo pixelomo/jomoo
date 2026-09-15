@@ -4,6 +4,7 @@
 /** Every static, publicly reachable page under src/app/(site). */
 export const SITE_ROUTES = [
   '/',
+  '/after-sales',
   '/blog',
   '/careers',
   '/company-information',

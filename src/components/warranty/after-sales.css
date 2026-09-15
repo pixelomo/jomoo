@@ -1,0 +1,36 @@
+/* ============================================================
+   アフターサービス — /after-sales
+
+   The free-repair terms are the page, so only the wrapper and its
+   heading live here; the terms bring their own styling with them.
+   ============================================================ */
+
+/* The terms are a document rather than a portal screen, so the page behind
+   them is paper, not .site-main's grey. */
+.after-sales {
+  background: #ffffff;
+}
+
+/* Set to match the certificate page's own intro, which introduces the same
+   copy — the two should not read as different documents. */
+.after-sales__intro {
+  max-width: var(--container);
+  margin-inline: auto;
+  padding: 3.5rem var(--gutter) 0;
+  text-align: center;
+}
+
+.after-sales__title {
+  margin: 0 0 1rem;
+  font-size: clamp(1.75rem, 3vw, 2.5rem);
+  font-weight: 700;
+  line-height: 1.4;
+  color: #0a0a0a;
+}
+
+.after-sales__lead {
+  margin: 0;
+  font-size: clamp(1rem, 1.5vw, 1.125rem);
+  line-height: 1.9;
+  color: #3a3a3a;
+}
