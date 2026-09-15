@@ -607,9 +607,13 @@ export default function JomooHomepage() {
               <div className="feature__content">
                 <span className="feature__pill">SMART TOILET</span>
                 <h3 className="feature__name">X40-B</h3>
+                <p className="feature__tagline">
+                  スマート洗浄で
+                  <br />
+                  毎日をもっと快適を。
+                </p>
                 <p className="feature__desc">
-                  設置しているセンサーに反応して、
-                  自動で蓋が開閉したり、洗浄します。
+                  クリーンボットアームの泡洗浄からUV除菌、オート開閉まで自動化。触れることなく快適に使え、清潔さをしっかり維持します。さりげなく活躍する先進技術が毎日の暮らしに安心と心地良さを届けます。
                 </p>
                 <span className="feature__more">詳しく見る&gt;</span>
               </div>
@@ -635,8 +639,13 @@ export default function JomooHomepage() {
               <div className="feature__content">
                 <span className="feature__pill">SMART TOILET</span>
                 <h3 className="feature__name">X40-C</h3>
+                <p className="feature__tagline">
+                  選べる洗浄で
+                  <br />
+                  心地良い毎日を
+                </p>
                 <p className="feature__desc">
-                  世界で多くの賞を獲得したデザインチームによる革新的なデザインです。
+                  足元センサーによる自動洗浄とエアイン洗浄技術を採用。やさしい水流と快適な温度設定で、心地良い洗浄体験を実現します。毎日の使いやすさと清潔さに配慮した機能が、快適なトイレ空間を演出します。
                 </p>
                 <span className="feature__more">詳しく見る&gt;</span>
               </div>
@@ -721,7 +730,14 @@ export default function JomooHomepage() {
                 <div className="stat__icon">
                   <img src="/images/icon/icon_00005.png" alt="" />
                 </div>
-                <div className="stat__label">ハイエンドスマートファクトリー</div>
+                {/* Two inline-blocks rather than a hard <br>: they wrap as
+                    units, so the line breaks between スマート and ファクトリー
+                    where there is room, and still falls back to breaking inside
+                    a part on a column too narrow for either. */}
+                <div className="stat__label">
+                  <span className="stat__label-part">ハイエンドスマート</span>
+                  <span className="stat__label-part">ファクトリー</span>
+                </div>
               </div>
               <div className="stat__num">
                 <span className="stat__val">

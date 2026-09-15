@@ -79,7 +79,7 @@ export default function JomooFooter({ legalLinks = [] }: { legalLinks?: LegalLin
             <ul>
               <li><a href="/contact-us">お客様相談窓口</a></li>
               <li><a href="/after-sales">アフターサービス</a></li>
-              <li><a href="#">Q&amp;A</a></li>
+              <li><a href="/faq">Q&amp;A</a></li>
             </ul>
           </div>
 

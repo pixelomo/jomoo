@@ -1,0 +1,243 @@
+/* ============================================================
+   よくあるご質問 — /faq
+   ============================================================ */
+
+.faq {
+  --faq-ink: #312d2c;
+  --faq-muted: #5a5a5a;
+  --faq-line: #e2e2e4;
+  --faq-accent: #73a4c7;
+  --faq-measure: 56rem;
+  --faq-pad: clamp(1.25rem, 5vw, 4rem);
+
+  flex: 1;
+  background: #ffffff;
+  color: var(--faq-ink);
+}
+
+.faq__inner {
+  width: min(var(--faq-measure), 100% - 2 * var(--faq-pad));
+  margin-inline: auto;
+}
+
+/* ─── Head ──────────────────────────────────────────────── */
+
+.faq__intro {
+  padding: 3.5rem 0 0;
+  text-align: center;
+}
+
+.faq__eyebrow {
+  margin: 0 0 0.75rem;
+  font-family: var(--font-en);
+  font-size: clamp(1rem, 1.4vw, 1.25rem);
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--faq-accent);
+}
+
+.faq__title {
+  margin: 0;
+  font-size: clamp(1.75rem, 3vw, 2.5rem);
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+.faq__lead {
+  margin: 1.25rem 0 0;
+  font-size: clamp(1rem, 1.5vw, 1.125rem);
+  line-height: 1.9;
+  color: var(--faq-muted);
+}
+
+.faq__rule {
+  width: 34px;
+  height: 2px;
+  margin: 2.5rem auto 0;
+  background: var(--faq-accent);
+}
+
+/* ─── Category jump list ────────────────────────────────── */
+
+.faq__nav {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.75rem;
+  margin: 3rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.faq__nav a {
+  display: inline-flex;
+  align-items: center;
+  height: 2.75rem;
+  padding: 0 1.375rem;
+  border: 1px solid var(--faq-line);
+  border-radius: 999px;
+  color: var(--faq-ink);
+  font-size: 1rem;
+  line-height: 1;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.faq__nav a:hover {
+  background: #f6f6f7;
+  border-color: var(--faq-ink);
+}
+
+/* ─── Categories ────────────────────────────────────────── */
+
+.faq__group {
+  /* Clears the fixed nav when a jump link lands on a heading. */
+  scroll-margin-top: calc(var(--nav-height) + 1.5rem);
+  padding-top: 4rem;
+}
+
+.faq__group:last-of-type {
+  padding-bottom: 6rem;
+}
+
+.faq__group-title {
+  margin: 0 0 0.25rem;
+  font-size: clamp(1.375rem, 2vw, 1.75rem);
+  font-weight: 700;
+  line-height: 1.5;
+}
+
+.faq__count {
+  margin: 0 0 1.5rem;
+  font-size: 0.9375rem;
+  color: var(--faq-muted);
+}
+
+/* ─── One question ─────────────────────────────────────── */
+
+.faq__item {
+  border-top: 1px solid var(--faq-line);
+}
+
+.faq__group .faq__item:last-child {
+  border-bottom: 1px solid var(--faq-line);
+}
+
+.faq__q {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 1.375rem 0;
+  font-size: 1.125rem;
+  font-weight: 600;
+  line-height: 1.7;
+  cursor: pointer;
+  list-style: none;
+}
+
+/* Safari draws its own triangle without this. */
+.faq__q::-webkit-details-marker {
+  display: none;
+}
+
+.faq__q:hover {
+  color: #000000;
+}
+
+.faq__item:focus-within .faq__q {
+  outline: 2px solid var(--faq-accent);
+  outline-offset: 3px;
+}
+
+/* The marker is drawn rather than typed: a glyph would sit on the text
+   baseline and shift as the question wraps to a second line. */
+.faq__marker {
+  position: relative;
+  flex: 0 0 1.125rem;
+  width: 1.125rem;
+  /* Centres the cross on the first line of the question, whatever it wraps to. */
+  height: calc(1.125rem * 1.7);
+  margin-left: auto;
+}
+
+.faq__marker::before,
+.faq__marker::after {
+  content: '';
+  position: absolute;
+  inset: 50% 0 auto;
+  height: 2px;
+  translate: 0 -50%;
+  background: currentColor;
+}
+
+.faq__marker::after {
+  rotate: 90deg;
+  transition: rotate 0.2s ease, opacity 0.2s ease;
+}
+
+.faq__item[open] .faq__marker::after {
+  rotate: 0deg;
+  opacity: 0;
+}
+
+.faq__a {
+  padding: 0 0 1.75rem;
+  /* The marker column, so answers line up under their question. */
+  padding-right: 2.125rem;
+}
+
+.faq__a p {
+  margin: 0;
+  font-size: 1.0625rem;
+  line-height: 2;
+  color: var(--faq-muted);
+}
+
+/* The source lays several answers out as numbered steps on their own lines;
+   they read as one block, not as separate paragraphs. */
+.faq__a p + p {
+  margin-top: 0.25rem;
+}
+
+/* ─── Footer note ──────────────────────────────────────── */
+
+.faq__more {
+  margin-top: 1rem;
+  padding: 2rem;
+  border: 1px solid var(--faq-line);
+  border-radius: 14px;
+  background: #f8f8f9;
+  text-align: center;
+}
+
+.faq__more p {
+  margin: 0;
+  font-size: 1.0625rem;
+  line-height: 1.9;
+  color: var(--faq-muted);
+}
+
+.faq__more a {
+  color: var(--faq-ink);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+@media (max-width: 767px) {
+  .faq__group {
+    padding-top: 3rem;
+  }
+
+  .faq__q {
+    font-size: 1.0625rem;
+  }
+
+  .faq__a p {
+    font-size: 1rem;
+  }
+
+  .faq__more {
+    padding: 1.5rem;
+  }
+}

@@ -10,6 +10,7 @@ export const SITE_ROUTES = [
   '/company-information',
   '/contact-us',
   '/designer',
+  '/faq',
   '/global-projects',
   '/privacy-policy',
   '/products/faucets',

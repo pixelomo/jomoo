@@ -187,6 +187,12 @@ img {
      clipped top and bottom, so it stops here and stays centred. */
   max-width: 1440px;
   height: auto;
+  /* And a ceiling, because width alone is not enough: on a wide short window —
+     1366x768 is the case — the artwork is taller than the hero, so its own type
+     ran past the bottom edge and into the footnote there. contain means this
+     scales the artwork down rather than cropping it, and the 3rem is the room
+     the footnote needs below. */
+  max-height: calc(100% - 3rem);
   object-fit: contain;
   transform: translate(-50%, -50%);
 }
@@ -493,16 +499,22 @@ img {
 
 /* The same citation on slide 2, where the artwork is dark and the note belongs
    at the foot of the frame rather than beside the copy. */
+/* The lockup beside it is width-driven — min(100vw, 1440px) with height auto —
+   so on a wide but short window it grows down towards this note while the hero
+   itself is capped at 52rem. At a fixed 3.25rem up from the bottom the note met
+   the lockup's own type: touching at 1440-1600 wide, 12px into it at 1280x800.
+   So the offset and the size both scale with the window now, holding the note
+   near the bottom edge and out of the artwork's way at every size. */
 .hero__slide-note {
   position: absolute;
   left: 50%;
-  bottom: 3.25rem;
+  bottom: clamp(1.25rem, 2.5vh, 2.5rem);
   transform: translateX(-50%);
   z-index: 3;
   margin: 0;
   width: min(100% - 2rem, 60rem);
   font-family: var(--font-jp);
-  font-size: 0.8rem;
+  font-size: clamp(0.7rem, 0.66vw, 0.8rem);
   line-height: 1.8;
   color: rgba(255, 255, 255, 0.82);
   text-align: center;
@@ -1370,6 +1382,16 @@ img {
   letter-spacing: 0;
   margin-bottom: 0.75rem;
 }
+/* The line the card leads on, between the model name and the detail: set in the
+   ink the name uses rather than the body grey, and sized between the two. */
+.feature__tagline {
+  font-size: 1.75rem;
+  font-weight: 600;
+  line-height: 1.6;
+  color: var(--jomoo-black);
+  margin-bottom: 1rem;
+}
+
 .feature__desc {
   font-size: 1.5rem;
   line-height: 1.9;
@@ -1687,7 +1709,7 @@ img {
 .stat__top {
   display: flex;
   align-items: center;
-  gap: 1.25rem;
+  gap: 1rem;
   margin-bottom: 2rem;
   min-width: 0;
 }
@@ -1735,11 +1757,29 @@ img {
 .stat__label {
   flex: 1;
   min-width: 0;
-  font-size: 1.8rem;
+  /* 1.6rem, not 1.8: the longest label — ハイエンドスマートファクトリー — is
+     meant to break after スマート, and nine full-width characters do not fit
+     this column at 1.8rem on any screen, which left ト stranded on a line of
+     its own. This is the size the 1280px breakpoint already used. */
+  font-size: 1.6rem;
   font-weight: 600;
   color: #000000;
   font-family: var(--font-jp);
   line-height: 1.35;
+}
+
+.stat__label-part {
+  display: inline-block;
+}
+
+/* Between these widths the column is too narrow to hold ハイエンドスマート on
+   one line — 229px of text into 163-217px of column — so the preferred break is
+   given up and the string wraps wherever it must. Two full lines read better
+   than a clean break followed by one stranded character. */
+@media (max-width: 1239px) and (min-width: 980px) {
+  .stat__label-part {
+    display: inline;
+  }
 }
 
 /* ============================================
