@@ -98,6 +98,11 @@ export const dealerBranch = pgTable('dealer_branches', {
   city: text('city'),
   streetAddress: text('street_address'),
   building: text('building'),
+  /** How a customer reaches this branch. Seeded from the first 法人 account to
+   *  sign up for it, and shown to anyone who picks the branch when registering
+   *  a product — the point of a dealer list nobody can ring is thin. */
+  phone: text('phone'),
+  email: text('email'),
   /** Normalised name + postal code. Two colleagues signing up separately must
    *  land on one branch, not two — see lib/dealerBranches.ts. */
   matchKey: text('match_key').notNull(),

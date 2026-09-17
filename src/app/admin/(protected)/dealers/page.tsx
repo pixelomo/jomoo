@@ -1,6 +1,7 @@
 import { db } from '@/lib/db'
 import { dealerBranch, productRegistration, user } from '@/lib/db/schema'
 import { asc, ilike, sql } from 'drizzle-orm'
+import { branchAddress } from '@/lib/dealerBranches'
 import Link from 'next/link'
 import { Suspense } from 'react'
 import AdminSearch from '@/components/admin/AdminSearch'
@@ -42,6 +43,10 @@ export default async function AdminDealersPage({
       prefecture: dealerBranch.prefecture,
       city: dealerBranch.city,
       postalCode: dealerBranch.postalCode,
+      streetAddress: dealerBranch.streetAddress,
+      building: dealerBranch.building,
+      phone: dealerBranch.phone,
+      email: dealerBranch.email,
       createdAt: dealerBranch.createdAt,
       accounts: accountCount,
       registrations: registrationCount,
@@ -73,7 +78,7 @@ export default async function AdminDealersPage({
         <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
           <thead>
             <tr style={{ borderBottom: '1px solid var(--line)', background: 'var(--bg-soft)' }}>
-              {['Dealer', 'Location', 'Accounts', 'Customers', 'Registrations', 'Added', ''].map(h => (
+              {['Dealer', 'Address', 'Contact', 'Accounts', 'Customers', 'Registrations', 'Added', ''].map(h => (
                 <th key={h} style={{ padding: '10px 16px', textAlign: 'left', fontWeight: 600, color: 'var(--ink-3)', fontSize: 12 }}>{h}</th>
               ))}
             </tr>
@@ -81,7 +86,7 @@ export default async function AdminDealersPage({
           <tbody>
             {dealers.length === 0 && (
               <tr>
-                <td colSpan={7} style={{ padding: '32px 16px', textAlign: 'center', color: 'var(--ink-3)' }}>
+                <td colSpan={8} style={{ padding: '32px 16px', textAlign: 'center', color: 'var(--ink-3)' }}>
                   {q ? 'No dealers match that name' : 'No dealers yet — a branch is added when a 法人 member signs up.'}
                 </td>
               </tr>
@@ -89,11 +94,18 @@ export default async function AdminDealersPage({
             {dealers.map(d => (
               <tr key={d.id} style={{ borderBottom: '1px solid var(--line-2)' }}>
                 <td style={{ padding: '12px 16px', fontWeight: 500, color: 'var(--ink)' }}>{d.name}</td>
-                <td style={{ padding: '12px 16px', color: 'var(--ink-2)' }}>
-                  {[d.prefecture, d.city].filter(Boolean).join(' ') || '—'}
+                <td style={{ padding: '12px 16px', color: 'var(--ink-2)', maxWidth: 280 }}>
                   {d.postalCode && (
-                    <span style={{ color: 'var(--ink-3)', fontSize: 12 }}> 〒{d.postalCode}</span>
+                    <div style={{ color: 'var(--ink-3)', fontSize: 12 }}>〒{d.postalCode}</div>
                   )}
+                  {branchAddress(d) ?? '—'}
+                </td>
+                <td style={{ padding: '12px 16px', color: 'var(--ink-2)' }}>
+                  {d.phone ? <div>{d.phone}</div> : null}
+                  {d.email ? (
+                    <div style={{ fontSize: 12, color: 'var(--ink-3)' }}>{d.email}</div>
+                  ) : null}
+                  {!d.phone && !d.email && '—'}
                 </td>
                 <td style={{ padding: '12px 16px', color: 'var(--ink-2)' }}>{d.accounts}</td>
                 <td style={{ padding: '12px 16px', color: 'var(--ink-2)' }}>{d.customers}</td>

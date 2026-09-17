@@ -18,9 +18,12 @@ const NAV = [
 export default function AdminSidebar({
   username,
   roleLabel,
+  departmentLabel,
 }: {
   username?: string
   roleLabel?: string
+  /** Set when the account only reads one contact inbox. */
+  departmentLabel?: string
 }) {
   const pathname = usePathname()
   const router = useRouter()
@@ -75,7 +78,12 @@ export default function AdminSidebar({
           // permission.
           <div className="admin-sidebar__who">
             <span className="admin-sidebar__name">{username}</span>
-            <span className="admin-sidebar__role">{roleLabel}</span>
+            <span className="admin-sidebar__role">
+              {roleLabel}
+              {/* Without this, an enquiry list missing half its rows looks like
+                  data loss rather than the scope the account was given. */}
+              {departmentLabel ? ` · ${departmentLabel}` : ''}
+            </span>
           </div>
         )}
         <button onClick={handleLogout} className="admin-signout" title="Sign out">

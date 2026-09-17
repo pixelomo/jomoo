@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation'
 import { headers } from 'next/headers'
 import { auth } from '@/lib/auth'
 import AccountForm, { type AccountValues } from '@/components/dashboard/AccountForm'
+import { isDealerAccount } from '@/lib/memberProfile'
 
 export default async function AccountPage() {
   const session = await auth.api.getSession({ headers: await headers() })
@@ -25,5 +26,8 @@ export default async function AccountPage() {
     building: str('building'),
   }
 
-  return <AccountForm initial={initial} />
+  // 法人 accounts are dealer branches as far as the rest of the site is
+  // concerned, so their 会社名 and address are set at sign-up and changed by an
+  // admin afterwards.
+  return <AccountForm initial={initial} locked={isDealerAccount(u.memberType)} />
 }

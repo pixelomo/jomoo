@@ -57,6 +57,7 @@ export const auth = betterAuth({
             memberType?: string | null
             companyName?: string | null
             companyNameKana?: string | null
+            phoneNumber?: string | null
             postalCode?: string | null
             prefecture?: string | null
             city?: string | null

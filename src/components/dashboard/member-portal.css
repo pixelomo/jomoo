@@ -1034,6 +1034,21 @@
   color: #a1a1aa;
 }
 
+/* Read-only fields: the sign-in address, and — for a dealer — the company name
+   and address that other members' registrations point at. Greyed rather than
+   disabled so the value still reads clearly and still copies. */
+.account-input[readonly],
+.account-select:disabled {
+  background: #f4f4f5;
+  color: #52525b;
+  cursor: not-allowed;
+}
+
+.account-input[readonly]:focus {
+  outline: none;
+  border-color: #d4d4d8;
+}
+
 /* Spans both grid columns rather than sitting in the input column, so the note
    runs the full width of the form instead of being ragged under the field. */
 .account-note {

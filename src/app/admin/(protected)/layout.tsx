@@ -1,5 +1,6 @@
 import { redirect } from 'next/navigation'
 import { getAdminSession, ROLE_LABELS } from '@/lib/admin-auth'
+import { departmentLabel } from '@/types/contact'
 import type { ReactNode } from 'react'
 import AdminSidebar from '@/components/admin/AdminSidebar'
 import '@/components/admin/admin-chrome.css'
@@ -10,7 +11,11 @@ export default async function AdminPortalLayout({ children }: { children: ReactN
 
   return (
     <div className="admin-shell">
-      <AdminSidebar username={session.username} roleLabel={ROLE_LABELS[session.role]} />
+      <AdminSidebar
+        username={session.username}
+        roleLabel={ROLE_LABELS[session.role]}
+        departmentLabel={session.department ? departmentLabel(session.department) : undefined}
+      />
       <main className="admin-main">{children}</main>
     </div>
   )

@@ -46,6 +46,11 @@ export default function Step1BasicInfo({ defaultValues, models, dealers = [], on
     return ''
   })
 
+  const selectedDealer =
+    dealerChoice && dealerChoice !== OTHER_DEALER
+      ? dealers.find((d) => d.id === dealerChoice) ?? null
+      : null
+
   const handleDealerChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const choice = e.target.value
     setDealerChoice(choice)
@@ -217,6 +222,48 @@ export default function Step1BasicInfo({ defaultValues, models, dealers = [], on
                 placeholder={t('dealerNamePlaceholder')}
                 {...register('dealerName')}
               />
+            )}
+            {/* Picking a branch fills its address and contact in straight away:
+                the customer confirms they chose the right shop before going on,
+                and the details they will need for a warranty call are in front
+                of them without a search. */}
+            {selectedDealer && (
+              <dl className="rounded-lg border border-zinc-200 bg-zinc-50 px-4 py-3 text-sm">
+                <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-zinc-500">
+                  {t('dealerDetailsTitle')}
+                </p>
+                <div className="font-medium text-zinc-900">{selectedDealer.name}</div>
+                {selectedDealer.address && (
+                  <div className="mt-1.5 flex gap-2">
+                    <dt className="w-12 shrink-0 text-zinc-500">{t('dealerAddress')}</dt>
+                    <dd className="text-zinc-700">
+                      {selectedDealer.postalCode ? `〒${selectedDealer.postalCode} ` : ''}
+                      {selectedDealer.address}
+                    </dd>
+                  </div>
+                )}
+                {selectedDealer.phone && (
+                  <div className="mt-1 flex gap-2">
+                    <dt className="w-12 shrink-0 text-zinc-500">{t('dealerPhone')}</dt>
+                    <dd className="text-zinc-700">
+                      <a href={`tel:${selectedDealer.phone}`} className="hover:underline">
+                        {selectedDealer.phone}
+                      </a>
+                    </dd>
+                  </div>
+                )}
+                {selectedDealer.email && (
+                  <div className="mt-1 flex gap-2">
+                    <dt className="w-12 shrink-0 text-zinc-500">{t('dealerEmail')}</dt>
+                    <dd className="text-zinc-700">
+                      <a href={`mailto:${selectedDealer.email}`} className="hover:underline">
+                        {selectedDealer.email}
+                      </a>
+                    </dd>
+                  </div>
+                )}
+                <p className="mt-2 text-xs text-zinc-500">{t('dealerDetailsNote')}</p>
+              </dl>
             )}
             {/* Keeps the chosen branch in the form state while the visible
                 control is the select above. */}

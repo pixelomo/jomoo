@@ -1,5 +1,11 @@
 import { SignJWT, jwtVerify } from 'jose'
 import { cookies } from 'next/headers'
+import {
+  categoriesForDepartment,
+  isContactDepartment,
+  type ContactCategory,
+  type ContactDepartment,
+} from '@/types/contact'
 
 export const ADMIN_COOKIE = 'admin_session'
 const TTL_SECONDS = 60 * 60 * 24 * 7 // 7 days
@@ -33,6 +39,27 @@ export const ROLE_LABELS: Record<AdminRole, string> = {
 export interface AdminSession {
   username: string
   role: AdminRole
+  /**
+   * The inbox this account answers for, or null for someone who reads them all.
+   *
+   * Roles say what an account may *do*; a department says what it may *see*.
+   * They are separate because the after-sales manager and the recruitment
+   * manager need the same buttons and different post.
+   */
+  department: ContactDepartment | null
+}
+
+/**
+ * The enquiry categories this session is allowed to read, or null for every
+ * category. Null rather than "all the ids" so a caller cannot forget to filter
+ * and quietly build a query with an empty `in ()`.
+ */
+export function visibleContactCategories(
+  session: AdminSession | null
+): ContactCategory[] | null {
+  if (!session) return []
+  if (!session.department) return null
+  return categoriesForDepartment(session.department)
 }
 
 export function can(session: AdminSession | null, permission: AdminPermission): boolean {
@@ -57,17 +84,25 @@ interface AdminAccount {
   username: string
   password: string
   role: AdminRole
+  department: ContactDepartment | null
 }
 
 /**
  * ADMIN_USERNAME / ADMIN_PASSWORD stay the owner account so nothing that was
  * working needs reconfiguring. Extra staff go in ADMIN_ACCOUNTS as
- * `username:password:role` entries separated by newlines or commas:
+ * `username:password:role[:department]` entries separated by newlines or
+ * commas:
  *
- *   ADMIN_ACCOUNTS="ops:s3cret:operator,reception:hunter2:manager"
+ *   ADMIN_ACCOUNTS="ops:s3cret:operator,sales:hunter2:manager:business"
  *
- * An entry naming a role that does not exist is dropped rather than defaulted —
- * a typo must not quietly hand someone the owner's delete button.
+ * The fourth field is optional and pins the account to one contact inbox, so
+ * `sales` above sees only the enquiries routed to business@jomoogroup.com.
+ * Leaving it off gives that account every enquiry, which is what the owner
+ * account gets.
+ *
+ * An entry naming a role or a department that does not exist is dropped rather
+ * than defaulted — a typo must not quietly hand someone the owner's delete
+ * button, nor the recruitment desk's applications.
  */
 function adminAccounts(): AdminAccount[] {
   const accounts: AdminAccount[] = []
@@ -75,17 +110,26 @@ function adminAccounts(): AdminAccount[] {
   const owner = process.env.ADMIN_USERNAME
   const ownerPassword = process.env.ADMIN_PASSWORD
   if (owner && ownerPassword) {
-    accounts.push({ username: owner, password: ownerPassword, role: 'owner' })
+    accounts.push({ username: owner, password: ownerPassword, role: 'owner', department: null })
   }
 
   for (const entry of (process.env.ADMIN_ACCOUNTS ?? '').split(/[\n,]+/)) {
-    const [username, password, role] = entry.trim().split(':')
+    const [username, password, role, department] = entry.trim().split(':')
     if (!username || !password) continue
     if (!ADMIN_ROLES.includes(role as AdminRole)) {
       console.error(`[admin] ignoring account "${username}" — unknown role "${role ?? ''}"`)
       continue
     }
-    accounts.push({ username, password, role: role as AdminRole })
+    if (department && !isContactDepartment(department)) {
+      console.error(`[admin] ignoring account "${username}" — unknown department "${department}"`)
+      continue
+    }
+    accounts.push({
+      username,
+      password,
+      role: role as AdminRole,
+      department: department ? (department as ContactDepartment) : null,
+    })
   }
 
   return accounts
@@ -114,11 +158,17 @@ export function authenticateAdmin(username: string, password: string): AdminSess
       matched = account
     }
   }
-  return matched ? { username: matched.username, role: matched.role } : null
+  return matched
+    ? { username: matched.username, role: matched.role, department: matched.department }
+    : null
 }
 
 export async function signAdminToken(session: AdminSession): Promise<string> {
-  return new SignJWT({ role: session.role, username: session.username })
+  return new SignJWT({
+    role: session.role,
+    username: session.username,
+    department: session.department,
+  })
     .setProtectedHeader({ alg: 'HS256' })
     .setIssuedAt()
     .setExpirationTime('7d')
@@ -131,11 +181,14 @@ export async function verifyAdminToken(token: string): Promise<AdminSession | nu
     const role = payload.role
     // Tokens issued before roles existed carry role:'admin' and belong to the
     // single shared login, which is now the owner.
-    if (role === 'admin') return { username: 'admin', role: 'owner' }
+    if (role === 'admin') return { username: 'admin', role: 'owner', department: null }
     if (typeof role !== 'string' || !ADMIN_ROLES.includes(role as AdminRole)) return null
     return {
       username: typeof payload.username === 'string' ? payload.username : 'admin',
       role: role as AdminRole,
+      // Tokens issued before departments existed carry none, which reads as
+      // "every inbox" — the same access the account had when it signed in.
+      department: isContactDepartment(payload.department) ? payload.department : null,
     }
   } catch {
     return null

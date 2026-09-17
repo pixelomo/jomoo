@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { authClient } from '@/lib/auth-client'
 import { JP_PREFECTURES } from '@/data/jp-prefectures'
 import AccountField from '@/components/ui/AccountField'
+import { DEALER_LOCKED_FIELDS, DEALER_LOCKED_NOTE } from '@/lib/memberProfile'
 import './member-portal.css'
 
 export interface AccountValues {
@@ -35,7 +36,16 @@ const REQUIRED: (keyof AccountValues)[] = [
   'streetAddress',
 ]
 
-export default function AccountForm({ initial }: { initial: AccountValues }) {
+export default function AccountForm({
+  initial,
+  locked = false,
+}: {
+  initial: AccountValues
+  /** 法人 members: 会社名 and address are the branch other members register
+   *  products against, so they are shown but not editable. The API drops them
+   *  too — see lib/memberProfile.ts. */
+  locked?: boolean
+}) {
   const router = useRouter()
   const [, startTransition] = useTransition()
   const [values, setValues] = useState(initial)
@@ -83,6 +93,7 @@ export default function AccountForm({ initial }: { initial: AccountValues }) {
         ...Object.fromEntries(
           (Object.keys(values) as (keyof AccountValues)[])
             .filter((k) => k !== 'email')
+            .filter((k) => !locked || !(DEALER_LOCKED_FIELDS as readonly string[]).includes(k))
             .map((k) => [k, values[k].trim() || null])
         ),
         name: `${values.lastName.trim()} ${values.firstName.trim()}`.trim(),
@@ -127,12 +138,12 @@ export default function AccountForm({ initial }: { initial: AccountValues }) {
           <input className="account-input" type="email" value={values.email} readOnly placeholder="例）example@jomoo.com" />
         </AccountField>
 
-        <AccountField label="会社名" required>
-          <input className="account-input" value={values.companyName} onChange={set('companyName')} placeholder="会社名を入力" />
+        <AccountField label="会社名" required note={locked ? DEALER_LOCKED_NOTE : undefined}>
+          <input className="account-input" value={values.companyName} onChange={set('companyName')} placeholder="会社名を入力" readOnly={locked} />
         </AccountField>
 
         <AccountField label="会社名フリガナ">
-          <input className="account-input" value={values.companyNameKana} onChange={set('companyNameKana')} placeholder="会社名のフリガナを入力" />
+          <input className="account-input" value={values.companyNameKana} onChange={set('companyNameKana')} placeholder="会社名のフリガナを入力" readOnly={locked} />
         </AccountField>
 
         <AccountField label="担当者名" required>
@@ -154,11 +165,13 @@ export default function AccountForm({ initial }: { initial: AccountValues }) {
         <h3 className="account-form__legend">住所登録</h3>
 
         <AccountField label="郵便番号" required>
-          <input className="account-input" inputMode="numeric" value={values.postalCode} onChange={set('postalCode')} placeholder="例）0123456" />
+          <input className="account-input" inputMode="numeric" value={values.postalCode} onChange={set('postalCode')} placeholder="例）0123456" readOnly={locked} />
         </AccountField>
 
         <AccountField label="住所" required>
-          <select className="account-select" value={values.prefecture} onChange={set('prefecture')}>
+          {/* A disabled select still submits its value from state, which is the
+              one the account was created with — nothing to guard beyond this. */}
+          <select className="account-select" value={values.prefecture} onChange={set('prefecture')} disabled={locked}>
             <option value="">選択してください</option>
             {JP_PREFECTURES.map((p) => (
               <option key={p} value={p}>{p}</option>
@@ -167,15 +180,18 @@ export default function AccountForm({ initial }: { initial: AccountValues }) {
         </AccountField>
 
         <AccountField label="市区町村" required>
-          <input className="account-input" value={values.city} onChange={set('city')} placeholder="市区町村を入力" />
+          <input className="account-input" value={values.city} onChange={set('city')} placeholder="市区町村を入力" readOnly={locked} />
         </AccountField>
 
         <AccountField label="番地" required>
-          <input className="account-input" value={values.streetAddress} onChange={set('streetAddress')} placeholder="番地を入力" />
+          <input className="account-input" value={values.streetAddress} onChange={set('streetAddress')} placeholder="番地を入力" readOnly={locked} />
         </AccountField>
 
-        <AccountField label="建物名・号室など">
-          <input className="account-input" value={values.building} onChange={set('building')} placeholder="建物名・号室などを入力" />
+        <AccountField
+          label="建物名・号室など"
+          note={locked ? DEALER_LOCKED_NOTE : undefined}
+        >
+          <input className="account-input" value={values.building} onChange={set('building')} placeholder="建物名・号室などを入力" readOnly={locked} />
         </AccountField>
       </section>
 

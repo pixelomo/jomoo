@@ -1,5 +1,6 @@
 import { db } from '@/lib/db'
-import { user, productRegistration, warrantyRecord, ownershipTransfer } from '@/lib/db/schema'
+import { user, productRegistration, warrantyRecord, ownershipTransfer, dealerBranch } from '@/lib/db/schema'
+import { branchAddress } from '@/lib/dealerBranches'
 import { eq } from 'drizzle-orm'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
@@ -25,6 +26,15 @@ export default async function AdminRegistrationDetailPage({
       phoneNumber: productRegistration.phoneNumber,
       purchaseDate: productRegistration.purchaseDate,
       dealerName: productRegistration.dealerName,
+      branchId: productRegistration.branchId,
+      branchName: dealerBranch.name,
+      branchPostalCode: dealerBranch.postalCode,
+      branchPrefecture: dealerBranch.prefecture,
+      branchCity: dealerBranch.city,
+      branchStreetAddress: dealerBranch.streetAddress,
+      branchBuilding: dealerBranch.building,
+      branchPhone: dealerBranch.phone,
+      branchEmail: dealerBranch.email,
       serialNumber: productRegistration.serialNumber,
       serialNumberValid: productRegistration.serialNumberValid,
       warrantyCardUrl: productRegistration.warrantyCardUrl,
@@ -38,6 +48,7 @@ export default async function AdminRegistrationDetailPage({
     .from(productRegistration)
     .leftJoin(user, eq(productRegistration.userId, user.id))
     .leftJoin(warrantyRecord, eq(warrantyRecord.registrationId, productRegistration.id))
+    .leftJoin(dealerBranch, eq(dealerBranch.id, productRegistration.branchId))
     .where(eq(productRegistration.id, id))
     .limit(1)
 
@@ -67,7 +78,21 @@ export default async function AdminRegistrationDetailPage({
     ['Contact Person', reg.contactPerson],
     ['Phone Number', reg.phoneNumber ?? '—'],
     ['Purchase Date', reg.purchaseDate ? new Date(reg.purchaseDate).toLocaleDateString('en-AU') : '—'],
-    ['Dealer', reg.dealerName ?? '—'],
+    // A registration filed against a branch carries that branch's own details;
+    // one where the customer typed a shop name has only the name to show.
+    ['Dealer', reg.branchName ?? reg.dealerName ?? '—'],
+    ['Dealer Address', reg.branchId
+      ? [
+          reg.branchPostalCode ? `〒${reg.branchPostalCode}` : null,
+          branchAddress({
+            prefecture: reg.branchPrefecture,
+            city: reg.branchCity,
+            streetAddress: reg.branchStreetAddress,
+            building: reg.branchBuilding,
+          }),
+        ].filter(Boolean).join(' ') || '—'
+      : '—'],
+    ['Dealer Contact', [reg.branchPhone, reg.branchEmail].filter(Boolean).join('　·　') || '—'],
     ['Submitted', reg.submittedAt ? new Date(reg.submittedAt).toLocaleString('en-AU') : '—'],
     ['Warranty Expires', reg.warrantyExpiry ? new Date(reg.warrantyExpiry).toLocaleDateString('en-AU') : '—'],
   ]

@@ -12,7 +12,7 @@ import { contactAddressFor } from '@/lib/resend'
 
 const EXPECTED: Record<ContactCategory, string> = {
   partnership: 'business@jomoogroup.com',
-  product: 'aftersales@jomoogroup.com',
+  product: 'business@jomoogroup.com',
   materials: 'business@jomoogroup.com',
   support: 'aftersales@jomoogroup.com',
   fault: 'aftersales@jomoogroup.com',

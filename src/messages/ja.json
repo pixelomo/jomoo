@@ -227,7 +227,12 @@
       "dealerName": "販売店",
       "dealerNamePlaceholder": "販売店名を入力してください（任意）",
       "dealerSelectPlaceholder": "販売店を選択してください（任意）",
-      "dealerOther": "リストにない／直接入力する"
+      "dealerOther": "リストにない／直接入力する",
+      "dealerDetailsTitle": "販売店情報",
+      "dealerAddress": "住所",
+      "dealerPhone": "TEL",
+      "dealerEmail": "メール",
+      "dealerDetailsNote": "選択された販売店の連絡先です。保証やアフターサービスのご相談はこちらへ。"
     },
     "step2": {
       "title": "製造番号の確認",

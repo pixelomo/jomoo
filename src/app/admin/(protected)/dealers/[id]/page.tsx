@@ -1,6 +1,7 @@
 import { db } from '@/lib/db'
 import { dealerBranch, productRegistration, user, warrantyRecord } from '@/lib/db/schema'
 import { asc, desc, eq } from 'drizzle-orm'
+import { branchAddress } from '@/lib/dealerBranches'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import MemberTypeBadge from '@/components/admin/MemberTypeBadge'
@@ -94,10 +95,7 @@ export default async function AdminDealerDetailPage({
     })
   }
 
-  const address =
-    [branch.prefecture, branch.city, branch.streetAddress, branch.building]
-      .filter(Boolean)
-      .join(' ') || null
+  const address = branchAddress(branch)
 
   return (
     <div>
@@ -109,10 +107,17 @@ export default async function AdminDealerDetailPage({
         <h1 style={{ fontSize: 22, fontWeight: 700, color: 'var(--ink)', margin: 0 }}>{branch.name}</h1>
       </div>
 
-      <p style={{ fontSize: 13, color: 'var(--ink-3)', margin: '0 0 24px' }}>
+      <p style={{ fontSize: 13, color: 'var(--ink-3)', margin: '0 0 6px' }}>
         {branch.postalCode ? `〒${branch.postalCode}　` : ''}
         {address ?? 'No address on file'}
         {branch.nameKana ? `　·　${branch.nameKana}` : ''}
+      </p>
+
+      {/* The same contact a customer is shown when they pick this branch on the
+          registration form, so a support call can be handed straight over. */}
+      <p style={{ fontSize: 13, color: 'var(--ink-3)', margin: '0 0 24px' }}>
+        {branch.phone ? `TEL ${branch.phone}` : 'No phone on file'}
+        {branch.email ? `　·　${branch.email}` : ''}
       </p>
 
       <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginBottom: 28 }}>

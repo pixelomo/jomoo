@@ -4,6 +4,7 @@ import { db } from '@/lib/db'
 import { user } from '@/lib/db/schema'
 import { eq } from 'drizzle-orm'
 import { z } from 'zod'
+import { DEALER_LOCKED_FIELDS, isDealerAccount } from '@/lib/memberProfile'
 
 const UpdateUserSchema = z.object({
   name: z.string().min(1).max(100).optional(),
@@ -44,6 +45,17 @@ export async function PATCH(req: Request) {
   }
 
   const d = parsed.data
+
+  // A dealer's company name and address describe a branch other members
+  // register products against, so they are read-only once the account exists —
+  // enforced here rather than only in the form, since the form is not the only
+  // way to reach this route. Dropped silently rather than refused: the rest of
+  // the save is legitimate, and the fields arrive unchanged from a read-only
+  // input anyway.
+  if (isDealerAccount((session.user as { memberType?: unknown }).memberType)) {
+    for (const field of DEALER_LOCKED_FIELDS) delete d[field]
+  }
+
   await db.update(user).set({
     ...(d.name !== undefined && { name: d.name }),
     ...(d.gender !== undefined && { gender: d.gender }),

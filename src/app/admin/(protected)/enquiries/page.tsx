@@ -1,28 +1,82 @@
-import { desc } from 'drizzle-orm'
+import { desc, inArray } from 'drizzle-orm'
 import { db } from '@/lib/db'
 import { contactSubmission } from '@/lib/db/schema'
-import { categoryLabel, type ContactCategory } from '@/types/contact'
+import { getAdminSession, visibleContactCategories } from '@/lib/admin-auth'
+import {
+  CONTACT_CATEGORIES,
+  categoryLabel,
+  departmentEmail,
+  departmentLabel,
+  type ContactCategory,
+} from '@/types/contact'
 import DownloadButton from '@/components/admin/DownloadButton'
+import EnquiryCategoryFilter from '@/components/admin/EnquiryCategoryFilter'
 
 export const metadata = { title: 'Enquiries | JOMOO Admin' }
 
-export default async function EnquiriesPage() {
-  const rows = await db
+/**
+ * The contact form's post, narrowed to the desk that has to answer it.
+ *
+ * An admin account pinned to a department (see lib/admin-auth.ts) reads only
+ * the categories routed to that inbox — the after-sales desk opens this page
+ * and finds support and fault reports, not recruitment applications. Accounts
+ * with no department read everything and get a filter instead.
+ */
+export default async function EnquiriesPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ category?: string }>
+}) {
+  const { category } = await searchParams
+  const session = await getAdminSession()
+  const allowed = visibleContactCategories(session)
+
+  // The chosen filter is intersected with what the account may see, so a
+  // hand-typed ?category= cannot reach another department's enquiries.
+  const picked = CONTACT_CATEGORIES.find(c => c.id === category)?.id
+  const selected = picked && (!allowed || allowed.includes(picked)) ? picked : undefined
+
+  const categories: ContactCategory[] | null = selected
+    ? [selected]
+    : allowed
+
+  const query = db
     .select()
     .from(contactSubmission)
     .orderBy(desc(contactSubmission.submittedAt))
     .limit(200)
 
+  const rows = categories
+    ? await query.where(inArray(contactSubmission.category, categories))
+    : await query
+
+  const scopeAddress = session?.department ? departmentEmail(session.department) : null
+
   return (
     <div>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16, marginBottom: 28 }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16, marginBottom: 8 }}>
         <h1 style={{ fontSize: 22, fontWeight: 700, color: 'var(--ink)', margin: 0 }}>
           Contact Enquiries
         </h1>
         <DownloadButton href="/api/admin/export/contact" label="Download CSV" />
       </div>
 
-      <div style={{ background: 'var(--paper)', border: '1px solid var(--line)', borderRadius: 10, overflowX: 'auto' }}>
+      <p style={{ fontSize: 13, color: 'var(--ink-3)', margin: '0 0 20px' }}>
+        {session?.department ? (
+          <>
+            {departmentLabel(session.department)} — enquiries sent to{' '}
+            <strong style={{ color: 'var(--ink-2)', fontWeight: 600 }}>{scopeAddress}</strong>
+          </>
+        ) : (
+          'Every enquiry, across all departments.'
+        )}
+      </p>
+
+      {/* Someone who sees everything needs a way to pick a desk; someone pinned
+          to one desk already has the only view they are allowed. */}
+      {!session?.department && <EnquiryCategoryFilter selected={selected} />}
+
+      <div style={{ background: 'var(--paper)', border: '1px solid var(--line)', borderRadius: 10, overflowX: 'auto', marginTop: 16 }}>
         <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
           <thead>
             <tr style={{ borderBottom: '1px solid var(--line)', background: 'var(--bg-soft)' }}>

@@ -7,6 +7,25 @@ export interface BranchOption {
   name: string
   /** 都道府県 + 市区町村, so two branches of one chain can be told apart. */
   locality: string | null
+  /** 〒 and the full street address, shown once the branch is picked. */
+  postalCode: string | null
+  address: string | null
+  phone: string | null
+  email: string | null
+}
+
+/** The one-line address a branch is printed with, or null if none is on file. */
+export function branchAddress(branch: {
+  prefecture?: string | null
+  city?: string | null
+  streetAddress?: string | null
+  building?: string | null
+}): string | null {
+  return (
+    [branch.prefecture, branch.city, branch.streetAddress, branch.building]
+      .filter(Boolean)
+      .join(' ') || null
+  )
 }
 
 /**
@@ -33,6 +52,10 @@ type BranchSource = {
   city?: string | null
   streetAddress?: string | null
   building?: string | null
+  /** The signing-up account's own contact details. The first person from a
+   *  branch supplies them; an admin corrects them if they were personal. */
+  phoneNumber?: string | null
+  email?: string | null
 }
 
 /**
@@ -68,6 +91,8 @@ export async function ensureBranch(source: BranchSource): Promise<string | null>
         city: source.city ?? null,
         streetAddress: source.streetAddress ?? null,
         building: source.building ?? null,
+        phone: source.phoneNumber ?? null,
+        email: source.email ?? null,
         matchKey,
       })
       .returning({ id: dealerBranch.id })
@@ -104,16 +129,27 @@ export async function listBranchOptions(): Promise<BranchOption[]> {
     .select({
       id: dealerBranch.id,
       name: dealerBranch.name,
+      postalCode: dealerBranch.postalCode,
       prefecture: dealerBranch.prefecture,
       city: dealerBranch.city,
+      streetAddress: dealerBranch.streetAddress,
+      building: dealerBranch.building,
+      phone: dealerBranch.phone,
+      email: dealerBranch.email,
     })
     .from(dealerBranch)
     .orderBy(asc(dealerBranch.name))
 
+  // The whole branch comes back rather than just a label, so picking one in the
+  // 販売店 select can fill in its address and contact without another request.
   return rows.map((row) => ({
     id: row.id,
     name: row.name,
     locality: [row.prefecture, row.city].filter(Boolean).join(' ') || null,
+    postalCode: row.postalCode,
+    address: branchAddress(row),
+    phone: row.phone,
+    email: row.email,
   }))
 }
 
