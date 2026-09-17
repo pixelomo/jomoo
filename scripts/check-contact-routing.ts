@@ -8,7 +8,7 @@
  * Usage: npx tsx scripts/check-contact-routing.ts
  */
 import { CONTACT_CATEGORIES, type ContactCategory } from '@/types/contact'
-import { contactAddressFor } from '@/lib/resend'
+import { contactAddressFor } from '@/lib/contactRouting'
 
 const EXPECTED: Record<ContactCategory, string> = {
   partnership: 'business@jomoogroup.com',

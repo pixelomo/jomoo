@@ -11,6 +11,7 @@
     "start": "next start",
     "lint": "eslint",
     "check:auth-schema": "tsx scripts/check-auth-schema-fields.ts",
+    "check:contact-routing": "tsx scripts/check-contact-routing.ts",
     "db:push": "drizzle-kit push",
     "test": "playwright test",
     "test:ui": "playwright test --ui",

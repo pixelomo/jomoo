@@ -1,10 +1,10 @@
 import { Resend } from 'resend'
 import {
-  categoryEmail,
   categoryLabel,
   type ContactCategory,
   type ContactData,
 } from '@/types/contact'
+import { contactAddressFor } from '@/lib/contactRouting'
 import { notificationConfig, type NotificationKey } from '@/lib/notifications'
 import { buildEmail } from '@/lib/emailTemplates'
 import { appOrigin } from '@/lib/appUrl'
@@ -47,25 +47,8 @@ function from() {
 
 const appUrl = appOrigin
 
-/**
- * Routes to the department that owns the selected category.
- *
- * The address in types/contact.ts is the source of truth; a CONTACT_TO_<ID>
- * environment variable overrides it so a department can be redirected without
- * a deploy. CONTACT_TO_EMAIL is the last resort and should never be reached —
- * every category ships with an address.
- */
-export function contactAddressFor(category: ContactCategory) {
-  if (process.env.NODE_ENV === 'development' && process.env.CONTACT_DEV_TO_EMAIL?.trim()) {
-    return process.env.CONTACT_DEV_TO_EMAIL.trim()
-  }
-
-  const override = process.env[`CONTACT_TO_${category.toUpperCase()}`]?.trim()
-  const address = override || categoryEmail(category) || process.env.CONTACT_TO_EMAIL?.trim()
-
-  if (!address) throw new Error(`No contact address configured for category "${category}"`)
-  return address
-}
+// Re-exported so callers that already reach for the mailer keep one import.
+export { contactAddressFor }
 
 async function deliverEmail({
   to,

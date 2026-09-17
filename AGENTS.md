@@ -34,6 +34,10 @@ the categories routed there. No department means every enquiry, which is what
 
 A department is an address, not a label: moving one in `CONTACT_DEPARTMENTS`
 moves the contact form's routing and the portal's filter together.
+`npm run check:contact-routing` prints where each category resolves and fails
+if one moved unintentionally; `npx tsx scripts/seed-mock-enquiries.mts` writes
+one briefing enquiry per category so each desk login has something to open, and
+`--remove` takes them away again.
 
 # Cookie consent
 

@@ -97,9 +97,8 @@ export default function JomooFooter({ legalLinks = [] }: { legalLinks?: LegalLin
           <div className="footer__col">
             <h4>会社概要</h4>
             <ul>
-              {/* Hidden until /company-information is built.
               <li><a href="/company-information">会社紹介</a></li>
-              */}
+              <li><a href="/designer">デザイナー</a></li>
               <li><a href="/showroom">ショールーム</a></li>
               <li><a href="/global-projects">グローバルプロジェクト</a></li>
               <li><a href="/blog">ニュース＆ブログ</a></li>

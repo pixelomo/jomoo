@@ -1,5 +1,6 @@
 import type { MetadataRoute } from 'next'
-import { getProductSlugs } from '@/lib/sanity'
+import { getProductSlugs, getLegalLinks } from '@/lib/sanity'
+import { BLOG_POSTS } from '@/lib/blog/posts'
 import { SITE_ROUTES } from '@/lib/site-routes.generated'
 
 /**
@@ -61,10 +62,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   // Detail pages come from Sanity rather than a hand-kept list — the previous
   // hardcoded slugs no longer matched any published product and were listing
-  // URLs that 404.
-  const bySeries = await Promise.all(
-    SERIES.map(async series => ({ series, slugs: await getProductSlugs(series) }))
-  )
+  // URLs that 404. Legal documents are fetched for the same reason: the two
+  // that ship have static routes, but the sitemap should say so only while the
+  // document behind them is actually published.
+  const [bySeries, legalLinks] = await Promise.all([
+    Promise.all(SERIES.map(async series => ({ series, slugs: await getProductSlugs(series) }))),
+    getLegalLinks(),
+  ])
 
   const productPages = bySeries.flatMap(({ series, slugs }) =>
     slugs.map(slug => ({
@@ -75,8 +79,36 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }))
   )
 
+  // Posts are a module rather than a CMS collection, so each one can carry its
+  // own publication date instead of today's — a sitemap that claims every page
+  // changed this morning tells a crawler nothing.
+  const blogPages = BLOG_POSTS.map(post => ({
+    url: `${baseUrl}/blog/${post.slug}`,
+    lastModified: new Date(post.date),
+    changeFrequency: 'yearly' as ChangeFreq,
+    priority: 0.6,
+  }))
+
+  // Any legal document beyond the two with routes of their own is skipped: it
+  // has no page to point at, and a sitemap entry that 404s is worse than a
+  // missing one.
+  const LEGAL_ROUTES = new Set(['privacy-policy', 'terms-of-use'])
+  const legalSlugs = new Set(
+    legalLinks.map(link => link.slug).filter(slug => LEGAL_ROUTES.has(slug))
+  )
+
   const staticPages = [
-    ...SITE_ROUTES.map((route) => ({ path: route, ...(RANK[route] ?? DEFAULT_RANK) })),
+    ...SITE_ROUTES
+      // A legal route whose document is unpublished renders an empty page, so
+      // it is left out until there is something to read on it. Sanity being
+      // unreachable returns no links at all, which would drop both — so an
+      // empty list is treated as "cannot tell" and both are kept.
+      .filter(route => {
+        const slug = route.slice(1)
+        if (!LEGAL_ROUTES.has(slug) || legalLinks.length === 0) return true
+        return legalSlugs.has(slug)
+      })
+      .map((route) => ({ path: route, ...(RANK[route] ?? DEFAULT_RANK) })),
     ...EXTRA,
   ]
 
@@ -89,5 +121,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: page.priority,
     })),
     ...productPages,
+    ...blogPages,
   ]
 }
