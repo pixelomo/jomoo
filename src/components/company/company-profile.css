@@ -612,12 +612,48 @@
   padding: 7.5rem var(--cp-side) 8rem;
 }
 
+/* Holds the ratio the flat map had, so the section keeps its height and the
+   scene — which fits itself to whatever box it is given — is framed the same
+   way it was drawn. */
 .cp-global__map {
   display: block;
   width: 100%;
   max-width: 1400px;
+  aspect-ratio: 1891 / 913;
   height: auto;
   margin: 0 auto;
+  border: 0;
+  /* The scene is a live illustration here, not a control. Standing alone it
+     pans, zooms on the wheel and highlights on hover, but framed mid-page that
+     turns against the reader: the wheel is captured with preventDefault, so
+     once the frame has been touched, scrolling over the map stops scrolling the
+     page — and the pan does not survive the frame anyway, because the parent
+     claims the gesture and the subframe gets a pointercancel. Letting pointer
+     events pass straight through drops both problems and keeps what the panel
+     is for: it replaces a flat image, and it moves. */
+  pointer-events: none;
+}
+
+/* The scene takes the panel once the frame is wide enough for its labels to
+   stand apart; below that the flat map has it. 900px of viewport puts about
+   820px of map on screen, which is where the labels stop colliding. */
+.cp-global__map--scene {
+  display: none;
+}
+
+.cp-global__map--flat {
+  aspect-ratio: auto;
+  pointer-events: auto;
+}
+
+@media (min-width: 900px) {
+  .cp-global__map--scene {
+    display: block;
+  }
+
+  .cp-global__map--flat {
+    display: none;
+  }
 }
 
 /* The three figures. Card, icon and counter follow the homepage's stats —

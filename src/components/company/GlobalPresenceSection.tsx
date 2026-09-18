@@ -170,15 +170,44 @@ export default function GlobalPresenceSection() {
         </div>
       </header>
 
+      {/* The map is a WebGL scene, framed rather than ported: it is a
+          self-contained document that positions its canvas against its own
+          viewport and sizes itself off it, which is exactly what a frame gives
+          it and what dropping it into this page would have taken away. It
+          carries its own copy of three.js, so the frame reaches nothing
+          off-origin and there is nothing here for the consent bar to gate.
+
+          Both the scene and the flat map it replaced are rendered, and the
+          stylesheet picks between them on width. The scene's labels are fixed
+          in px, so on a phone all thirty-three of them collapse into each other
+          — the flat map is the legible one at that size. A lazily-loaded frame
+          that CSS has set to display:none requests nothing at all, so a phone
+          pays for the 74KB image instead of 650KB of WebGL rather than both. */}
+      <iframe
+        className="cp-global__map cp-global__map--scene"
+        src="/global-map/index.html"
+        title="JOMOOの世界の拠点を示す地図。中国、UAE、ロシア、欧州、アメリカを中心に120を超える国と地域に展開しています。"
+        loading="lazy"
+      />
+
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
-        className="cp-global__map"
+        className="cp-global__map cp-global__map--flat"
         src="/images/companyprofile/mapprof.jpg"
         alt="JOMOOの世界の拠点を示す地図。中国、UAE、ロシア、欧州、アメリカを中心に120を超える国と地域に展開しています。"
         width={1891}
         height={913}
         loading="lazy"
       />
+
+      {/* With scripting off the frame paints nothing, so the flat map takes the
+          panel back at every width. */}
+      <noscript>
+        <style>{
+          '.cp-global__map--scene{display:none}'
+          + '.cp-global__map--flat{display:block}'
+        }</style>
+      </noscript>
 
       <ul className="cp-stats" ref={rowRef}>
         {STATS.map((stat, i) => (

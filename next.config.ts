@@ -46,6 +46,18 @@ const nextConfig: NextConfig = {
         source: '/(.*)',
         headers: globalSecurityHeaders,
       },
+      // The global map is a WebGL scene served as its own document and framed
+      // into /company-information. X-Frame-Options: DENY above blocks framing
+      // outright — same-origin included — so this one path relaxes to
+      // SAMEORIGIN. frame-ancestors 'self' says the same thing to browsers
+      // that have dropped X-Frame-Options.
+      {
+        source: '/global-map/:path*',
+        headers: [
+          { key: 'X-Frame-Options', value: 'SAMEORIGIN' },
+          { key: 'Content-Security-Policy', value: "frame-ancestors 'self'" },
+        ],
+      },
       // Studio: allow Sanity.io to embed the studio in their hosted dashboard.
       // Overrides the global DENY on X-Frame-Options for /studio paths only.
       {
