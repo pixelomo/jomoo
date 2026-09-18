@@ -939,6 +939,11 @@ img {
   object-position: center;
 }
 
+/* X40 — six renders cross-dissolved into one continuous rotation.
+   A plain fade and nothing else: the frames were normalised on the ceramic
+   body and stood on a common floor line, so the unit holds still and only the
+   view of it changes. Any drift or scale on top of that read as the product
+   sliding about rather than turning, so there is deliberately none. */
 .spotlight__loop {
   position: absolute;
   inset: 0;
@@ -954,7 +959,8 @@ img {
   object-fit: contain;
   object-position: center;
   opacity: 0;
-  transition: opacity 0.8s ease-in-out;
+  transition: opacity 0.7s ease-in-out;
+  will-change: opacity;
   pointer-events: none;
 }
 

@@ -18,28 +18,92 @@ type SpotlightSlide = {
   playTheme?: 'light' | 'dark'
 }
 
-const X40_LOOP = [
-  '/images/x40loop1.png',
-  '/images/x40loop2.png',
-  '/images/x40loop3.png',
+/**
+ * Six renders of the X40, ordered so the unit turns the same way at every step.
+ *
+ * Their measured lid offsets run -84°, +74°, +141°, +149° and then wrap round to
+ * -148°, -140°, so playing them in this order is one continuous rotation that
+ * meets itself at the end rather than snapping back. The closed pair leads,
+ * which puts the single lid-open beat at the front of each turn.
+ *
+ * All six were normalised on the ceramic body — a vertical dimension, so it
+ * holds still while the camera swings — and stood on a common floor line, so
+ * the unit does not change size or hop as the frames cross over.
+ */
+const X40_TURNTABLE = [
+  '/images/x40-3d/frame1.webp',
+  '/images/x40-3d/frame2.webp',
+  '/images/x40-3d/frame3.webp',
+  '/images/x40-3d/frame4.webp',
+  '/images/x40-3d/frame5.webp',
+  '/images/x40-3d/frame6.webp',
 ] as const
 
-function SpotlightLoop({ srcs, alt }: { srcs: readonly string[]; alt: string }) {
-  const [active, setActive] = useState(0)
+/**
+ * How long each render holds.
+ *
+ * Deliberately shorter than AUTOPLAY_MS: the carousel moves off this slide
+ * every 3s, so a step slow enough to feel stately would only ever show one
+ * frame. At 900ms a visitor sees three of the six go by per visit, and the
+ * turntable picks up where it left off on the next pass instead of restarting
+ * — so the rotation reads as continuous across visits. Hovering holds the
+ * carousel, which lets the whole turn play out in one go.
+ */
+const LOOP_STEP_MS = 900
+
+/**
+ * Cross-fades the renders, and does nothing else — the frames share a floor
+ * line and a body height, so the unit stays put and only the view of it
+ * changes.
+ *
+ * Runs only while its own slide is the active one and the panel is actually on
+ * screen — no point painting a rotation nobody is looking at.
+ *
+ * Its own observer, rather than the section's useFullyInView: that hook asks
+ * for a whole screenful of the section, which is the right question for "should
+ * the slides advance" and the wrong one here. This section is 927px tall in a
+ * 913px window, so a screenful is only ever showing across about 14px of
+ * scroll, and the product would have sat frozen the rest of the time while in
+ * plain sight.
+ */
+function SpotlightLoop({
+  srcs,
+  alt,
+  playing,
+}: {
+  srcs: readonly string[]
+  alt: string
+  playing: boolean
+}) {
+  // A monotonic counter rather than an index that wraps: the frame on show is
+  // derived from it, so a re-render can never land on the wrong one.
+  const [step, setStep] = useState(0)
+  const [onScreen, setOnScreen] = useState(false)
+  const hostRef = useRef<HTMLDivElement>(null)
+  const active = step % srcs.length
 
   useEffect(() => {
-    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    if (reduced) return
+    const host = hostRef.current
+    if (!host) return
 
-    const timer = window.setInterval(() => {
-      setActive((index) => (index + 1) % srcs.length)
-    }, 1500)
+    const observer = new IntersectionObserver(
+      ([entry]) => setOnScreen(entry.isIntersecting),
+      { threshold: 0.25 }
+    )
+    observer.observe(host)
+    return () => observer.disconnect()
+  }, [])
 
+  useEffect(() => {
+    if (!playing || !onScreen) return
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+
+    const timer = window.setInterval(() => setStep((s) => s + 1), LOOP_STEP_MS)
     return () => window.clearInterval(timer)
-  }, [srcs.length])
+  }, [playing, onScreen])
 
   return (
-    <div className="spotlight__loop">
+    <div className="spotlight__loop" ref={hostRef}>
       {srcs.map((src, index) => (
         <img
           key={src}
@@ -47,6 +111,8 @@ function SpotlightLoop({ srcs, alt }: { srcs: readonly string[]; alt: string }) 
           src={src}
           alt={index === active ? alt : ''}
           aria-hidden={index === active ? undefined : true}
+          draggable={false}
+          decoding="async"
         />
       ))}
     </div>
@@ -64,7 +130,7 @@ const SLIDES: SpotlightSlide[] = [
       '機能だけではなく、',
       '心地よく穏やかな毎日を支えます。',
     ],
-    media: { type: 'loop', srcs: X40_LOOP },
+    media: { type: 'loop', srcs: X40_TURNTABLE },
   },
   {
     index: '01',
@@ -308,7 +374,11 @@ export default function SpotlightCarousel() {
                   )}
 
                   {slide.media.type === 'loop' ? (
-                    <SpotlightLoop srcs={slide.media.srcs} alt="" />
+                    <SpotlightLoop
+                      srcs={slide.media.srcs}
+                      alt=""
+                      playing={index === activeIndex}
+                    />
                   ) : slide.media.type === 'video' ? (
                     <video
                       ref={(el) => {
