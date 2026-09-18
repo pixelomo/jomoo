@@ -308,6 +308,15 @@ export default function GlobalProjectsSection() {
             <br />
             世界的なランドマークまで、その実績は世界中で高く評価されています。
           </p>
+          {/* The carousel below only shows five of them; this is the way
+              through to the rest. Same pill as デザイナーを見る, so the page
+              keeps one kind of call to action. */}
+          <a className="global-projects__cta reveal" href="/global-projects">
+            グローバルプロジェクトを見る
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path d="M4 12h15M13 6l6 6-6 6" />
+            </svg>
+          </a>
         </div>
       </div>
 

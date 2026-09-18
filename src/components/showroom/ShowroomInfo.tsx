@@ -79,8 +79,9 @@ export default function ShowroomInfo() {
 
       {/* The contact form already has a ショールーム予約 section; the flag ticks
           it on arrival so the visitor lands on the form already asking for what
-          this button promised. */}
-      <a className="sh-info__cta" href="/contact-us?showroom=1#showroom-reservation">
+          this button promised. No #hash — that dropped the visitor at the
+          bottom of the form, past the fields they still have to fill in. */}
+      <a className="sh-info__cta" href="/contact-us?showroom=1">
         ショールーム予約へ
       </a>
     </section>

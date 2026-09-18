@@ -68,9 +68,11 @@ export default function JomooFooter({ legalLinks = [] }: { legalLinks?: LegalLin
             <h4>製品情報</h4>
             <ul>
               <li><a href="/products/smart-toilet">スマートトイレ</a></li>
-              <li><a href="/products/washstand">洗面化粧台</a></li>
-              <li><a href="/products/faucets">水栓金具</a></li>
-              <li><a href="/products/shower-set">シャワーセット</a></li>
+              {/* Hidden for now, not removed — these three categories go back
+                  in the footer when they are ready to be linked to. */}
+              {/* <li><a href="/products/washstand">洗面化粧台</a></li> */}
+              {/* <li><a href="/products/faucets">水栓金具</a></li> */}
+              {/* <li><a href="/products/shower-set">シャワーセット</a></li> */}
             </ul>
           </div>
 
