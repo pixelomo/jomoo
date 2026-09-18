@@ -18,7 +18,7 @@
   }
   #stage{position:fixed; inset:0}
   #fallback{display:none; position:fixed; inset:0; width:100%; height:100%; object-fit:contain}
-  #stage canvas{display:block; touch-action:none}
+  #stage canvas{display:block; touch-action:auto}
   #labels{position:fixed; inset:0; pointer-events:none}
 
   .lbl{position:absolute; left:0; top:0; transform-origin:0 0; will-change:transform;
@@ -723,24 +723,23 @@
   const pointers = new Map();
   let drag = null, moved = 0, pinch = 0, lastPick = 0;
 
+  /* Embedded, the map hovers and it takes a click on a hub — it does not pan,
+     zoom or pinch. Those fought the page: the wheel was captured with
+     preventDefault, so scrolling over the map stopped scrolling the page, and
+     the pan did not survive the frame anyway because the parent claims the
+     gesture and this document gets a pointercancel. What is kept here is the
+     press/release bookkeeping, because that is what tells a click from a drag. */
   canvas.addEventListener('pointerdown', function (e) {
     pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
-    if (pointers.size === 2) {
-      const p = Array.from(pointers.values());
-      pinch = Math.hypot(p[0].x - p[1].x, p[0].y - p[1].y);
-      drag = null; return;
-    }
     drag = { x: e.clientX, y: e.clientY, id: e.pointerId };
     moved = 0;
-    canvas.setPointerCapture(e.pointerId);
-    canvas.style.cursor = 'grabbing';
   });
   function release(e) {
     pointers.delete(e.pointerId);
     if (pointers.size < 2) pinch = 0;
     if (drag && drag.id === e.pointerId) {
       if (moved < 5) click();
-      drag = null; canvas.style.cursor = '';
+      drag = null;
     }
   }
   window.addEventListener('pointerup', release);
@@ -751,19 +750,10 @@
     if (pointers.has(e.pointerId)) {
       const p = pointers.get(e.pointerId); p.x = e.clientX; p.y = e.clientY;
     }
-    if (pointers.size === 2) {
-      const p = Array.from(pointers.values());
-      const d = Math.hypot(p[0].x - p[1].x, p[0].y - p[1].y);
-      if (pinch > 0 && d > 0) view.tr = clamp(view.tr * (pinch / d), view.fit * 0.22, view.fit * 1.2);
-      pinch = d; return;
-    }
     if (drag) {
-      const k = (view.r * 2) / Math.max(stage.clientHeight, 1);
+      /* Still counted, so a press that travels is not read as a click. */
       moved += Math.abs(e.clientX - drag.x) + Math.abs(e.clientY - drag.y);
-      view.ttarget.x = clamp(view.ttarget.x - (e.clientX - drag.x) * k, -190, 210);
-      view.ttarget.z = clamp(view.ttarget.z - (e.clientY - drag.y) * k, MAP_MID_Z - 130, MAP_MID_Z + 130);
       drag.x = e.clientX; drag.y = e.clientY;
-      return;
     }
     ndc.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
     ndc.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
@@ -776,10 +766,6 @@
       refresh();
     }
   });
-  canvas.addEventListener('wheel', function (e) {
-    e.preventDefault();
-    view.tr = clamp(view.tr * Math.exp(e.deltaY * 0.0011), view.fit * 0.22, view.fit * 1.2);
-  }, { passive: false });
   canvas.addEventListener('dblclick', reset);
 
   function pick(cx, cy) {
