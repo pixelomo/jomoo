@@ -26,10 +26,10 @@
      line-height:1 keeps the box to the letters, so "centred on the dot" is
      centred on the text rather than on a line box with air above it. */
   .lbl{position:absolute; left:0; top:0; transform-origin:0 0; will-change:transform;
-    white-space:nowrap; color:var(--ink); font-size:12.5px; font-weight:500; line-height:1;
+    white-space:nowrap; color:var(--ink); font-size:11px; font-weight:500; line-height:1;
     text-shadow:0 0 2px var(--paper), 0 0 3px var(--paper), 0 0 4px var(--paper);
     transition:opacity .2s linear, color .15s linear;}
-  .lbl.hub{font-size:15px; font-weight:600; letter-spacing:.09em;}
+  .lbl.hub{font-size:14px; font-weight:600; letter-spacing:.09em;}
   .lbl.dim{opacity:.2}
   .lbl.on{text-decoration:underline; text-underline-offset:3px}
 
@@ -90,7 +90,7 @@
   const HUBS = [
     { id: 'usa', label: 'USA', full: 'North America', lon: -98, lat: 40 },
     { id: 'eur', label: 'EUR', full: 'Europe', lon: 9, lat: 50 },
-    { id: 'uae', label: 'UAE', full: 'Gulf', lon: 57.2, lat: 33 },
+    { id: 'uae', label: 'UAE', full: 'Gulf', lon: 57, lat: 33.1 },
     { id: 'chn', label: 'CHINA', full: 'East Asia', lon: 114, lat: 36 },
     { id: 'rus', label: 'RUSSIA', full: 'Eurasia', lon: 93, lat: 61 }
   ];
@@ -98,22 +98,22 @@
      positions, not surveyed ones: each name sits to the right of its pin, and
      in the Gulf, the Levant and South-East Asia the true capitals are too close
      together for that, so each crowded dot has been moved the least it takes
-     for no name to meet another name or pin — never more than ~12px at full
-     width, and never outside its own country. The UAE hub sits north of the
+     for no name to meet another name or pin — with a few pixels' clear space
+     round every name, and never outside its own country. The UAE hub sits north of the
      Gulf, as it does on the client's reference map, to leave the Gulf markets
      room. Laid out at a 1400px frame; dots and names scale with the frame, so
      the same layout holds at every width the page shows the scene at. */
   const NODES = [
-    ['Canada', -106.1, 55.9], ['Brazil', -47.8, -16], ['Morocco', -6.7, 32.3],
-    ['Algeria', 3.2, 27.3], ['Egypt', 30.5, 24.4], ['Nigeria', 8.8, 8.7],
-    ['Uganda', 32.1, 3], ['Kenya', 37.8, -2.8], ['Ethiopia', 39.6, 10.2],
-    ['Angola', 18.2, -11.2], ['South Africa', 24.7, -29.2], ['Jordan', 36.1, 30.8],
-    ['Iraq', 43.4, 36.8], ['Saudi Arabia', 45.3, 19.1], ['Qatar', 51.1, 25.8],
-    ['India', 78, 21.7], ['Nepal', 84, 30.6], ['Bangladesh', 91.7, 25.5],
-    ['Myanmar', 96.2, 20.2], ['Thailand', 100.7, 14.7], ['Cambodia', 105.3, 9],
-    ['Malaysia', 102.2, 1.8], ['Indonesia', 114, -4], ['The Philippines', 122.1, 16.1],
-    ['Japan', 138.4, 36.5], ['Mongolia', 104, 47.2], ['Australia', 134.7, -25.7],
-    ['New Zealand', 173.1, -41.1]
+    ['Canada', -105.6, 56], ['Brazil', -48.4, -16.4], ['Morocco', -6.8, 32.6],
+    ['Algeria', 2.9, 27.2], ['Egypt', 30.3, 23.6], ['Nigeria', 8.7, 9.3],
+    ['Uganda', 32.2, 2.9], ['Kenya', 37.7, -3.2], ['Ethiopia', 39.9, 10.6],
+    ['Angola', 18, -11.9], ['South Africa', 25.2, -29.4], ['Jordan', 35.2, 30.4],
+    ['Iraq', 43.5, 36.8], ['Saudi Arabia', 45.4, 19], ['Qatar', 51.6, 26.1],
+    ['India', 77.9, 21.3], ['Nepal', 82.8, 28.4], ['Bangladesh', 91.2, 21],
+    ['Myanmar', 97.5, 28], ['Thailand', 100.4, 15.2], ['Cambodia', 105.3, 9.2],
+    ['Malaysia', 102.2, 1.4], ['Indonesia', 113.8, -4.8], ['The Philippines', 122.2, 16.7],
+    ['Japan', 138, 36.1], ['Mongolia', 103.8, 47], ['Australia', 134.8, -25.8],
+    ['New Zealand', 172.8, -40.9]
   ];
   const RELAYS = [];
 
@@ -338,7 +338,7 @@
   });
 
   let capsMesh;
-  // Coastlines and borders: 2px, with a crisper edge than the shared line
+  // Coastlines and borders (drawn in the land colour): 3.5px, with a crisper edge than the shared line
   // shader's default so the full width reads solid rather than feathering off.
   const topInkMat = fatLineMaterial({
     fragmentShader: [
@@ -349,7 +349,7 @@
       ' gl_FragColor = vec4(uColor, uOpacity*soft); }'
     ].join('\n')
   });
-  topInkMat.uniforms.uWidth.value = 2.0;
+  topInkMat.uniforms.uWidth.value = 3.5;
 
   (function buildLand() {
     const cp = [], cn = [], cc = [];
@@ -406,9 +406,10 @@
 
     const topInk = new THREE.Mesh(fatLineGeometry(topSeg), topInkMat);
     topInk.renderOrder = 3;
-    // Borders are off: the land reads as one flat shape against the paper.
-    // Set this back to true to draw every coastline and border again.
-    topInk.visible = false;
+    // No visible borders: the land reads as one flat shape. The lines are still
+    // drawn, in the land's own colour (see paint), because each country's
+    // outline is smoothed on its own and neighbours no longer quite meet —
+    // without this the seams between them show as white slivers.
     scene.add(topInk);
   })();
 
@@ -883,7 +884,7 @@
     document.body.classList.toggle('inv', state.inverted);
     capsMat.uniforms.uPaper.value.set(p.land);
     capsMat.uniforms.uHoverTint.value.set(p.hoverCap);
-    topInkMat.uniforms.uColor.value.set(p.ink);
+    topInkMat.uniforms.uColor.value.set(p.land);
     [laneMat].forEach(function (m) {
       m.uniforms.uGhost.value.set(p.ghost);
       m.uniforms.uInk.value.set(p.hot);

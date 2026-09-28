@@ -628,7 +628,7 @@
 /* The scene takes the panel once the frame is wide enough for its names to
    be read; below that the flat map has it. The scene's dots and names scale
    with the frame (its layout is fixed at 1400px so no name meets another), and
-   1100px of viewport gives a ~1010px frame, where the market names are 9px. */
+   1260px of viewport gives a ~1160px frame, where the market names are 9px. */
 .cp-global__map--scene {
   display: none;
 }
@@ -637,7 +637,7 @@
   aspect-ratio: auto;
 }
 
-@media (min-width: 1100px) {
+@media (min-width: 1260px) {
   .cp-global__map--scene {
     display: block;
   }
