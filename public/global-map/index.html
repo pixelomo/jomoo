@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>JOMOOのグローバル展開</title>
 <style>
-  :root{ --paper:#ffffff; --ink:#15384f; --grey:#7fa6bd; --hair:#35b4ee; }
+  :root{ --paper:#ffffff; --ink:#4a4a4a; --grey:#7fa6bd; --hair:#35b4ee; }
   body.inv{ --paper:#050d18; --ink:#d3ecfa; --grey:#5d87a3; --hair:#d3ecfa; }
 
   *{box-sizing:border-box}
@@ -138,9 +138,10 @@
   };
 
   const INK = {
-    // Land #f1ede8; borders, arcs and pins in the brand gold #c3a763.
+    // Land #f1ede8, pins in the brand gold #c3a763, arcs dark grey #4a4a4a
+    // like the names.
     paper: 0xffffff, land: 0xf1ede8, wall: 0xd7e7f2, wallLow: 0xa9c4d8,
-    ink: 0xc3a763, edge: 0xc3a763, ghost: 0xc3a763, hot: 0xa88a45, marker: 0xc3a763,
+    ink: 0xc3a763, edge: 0xc3a763, ghost: 0x4a4a4a, hot: 0x2b2b2b, marker: 0xc3a763, pinHot: 0xa88a45,
     hoverCap: 0xe4dccf,
     under: 0x4cc6ff, underA: 0.42, glow: 0x6fd0ff, glowA: 0.20, additive: false
   };
@@ -405,6 +406,9 @@
 
     const topInk = new THREE.Mesh(fatLineGeometry(topSeg), topInkMat);
     topInk.renderOrder = 3;
+    // Borders are off: the land reads as one flat shape against the paper.
+    // Set this back to true to draw every coastline and border again.
+    topInk.visible = false;
     scene.add(topInk);
   })();
 
@@ -889,7 +893,7 @@
       m.needsUpdate = true;
     });
     markerMat.uniforms.uInk.value.set(p.marker);
-    markerMat.uniforms.uHot.value.set(p.hot);
+    markerMat.uniforms.uHot.value.set(p.pinHot || p.hot);
     markerMat.blending = p.additive ? THREE.AdditiveBlending : THREE.NormalBlending;
     markerMat.needsUpdate = true;
   }
