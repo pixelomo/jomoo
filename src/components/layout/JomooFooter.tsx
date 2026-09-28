@@ -6,6 +6,14 @@
 import { FaLinkedinIn } from 'react-icons/fa6'
 import { openConsentSettings } from '@/components/consent/useConsent'
 import { SiFacebook, SiInstagram, SiX, SiYoutube } from 'react-icons/si'
+import {
+  BLOG_LINK,
+  COMPANY_LINK,
+  COMPANY_SUB_LINKS,
+  DESIGNER_LINK,
+  PRODUCTS_LINK,
+  PRODUCT_CATEGORY_LINKS,
+} from './siteLinks'
 
 // The group's international accounts. WeChat is deliberately absent: the client
 // asked for it to come off the Japanese site.
@@ -65,9 +73,11 @@ export default function JomooFooter({ legalLinks = [] }: { legalLinks?: LegalLin
 
         <div className="footer__cols">
           <div className="footer__col">
-            <h4>製品情報</h4>
+            <h4>{PRODUCTS_LINK.label}</h4>
             <ul>
-              <li><a href="/products/smart-toilet">スマートトイレ</a></li>
+              {PRODUCT_CATEGORY_LINKS.map((link) => (
+                <li key={link.href}><a href={link.href}>{link.label}</a></li>
+              ))}
               {/* Hidden for now, not removed — these three categories go back
                   in the footer when they are ready to be linked to. */}
               {/* <li><a href="/products/washstand">洗面化粧台</a></li> */}
@@ -96,15 +106,14 @@ export default function JomooFooter({ legalLinks = [] }: { legalLinks?: LegalLin
           </div>
           */}
 
+          {/* Same names and order as the header: 会社情報 and its dropdown,
+              then デザイナー and ブログ. */}
           <div className="footer__col">
-            <h4>会社概要</h4>
+            <h4>{COMPANY_LINK.label}</h4>
             <ul>
-              <li><a href="/company-information">会社紹介</a></li>
-              <li><a href="/designer">デザイナー</a></li>
-              <li><a href="/showroom">ショールーム</a></li>
-              <li><a href="/global-projects">グローバルプロジェクト</a></li>
-              <li><a href="/blog">ニュース＆ブログ</a></li>
-              <li><a href="/careers">採用情報</a></li>
+              {[COMPANY_LINK, ...COMPANY_SUB_LINKS, DESIGNER_LINK, BLOG_LINK].map((link) => (
+                <li key={link.href}><a href={link.href}>{link.label}</a></li>
+              ))}
               <li className="footer__li--gap">
                 <a href="/register" className="footer__link--bold">
                   製品登録

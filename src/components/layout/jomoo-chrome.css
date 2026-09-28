@@ -85,6 +85,102 @@
   opacity: 1;
 }
 
+/* 会社情報's dropdown. Opens on hover or keyboard focus for a mouse, and on the
+   chevron (.is-open) for touch. The panel starts at the li's bottom edge with
+   its gap as padding, so the pointer never crosses dead space on the way in. */
+.nav__menu-item--parent {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.nav__submenu-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  cursor: pointer;
+}
+
+.nav__submenu-toggle svg {
+  width: 11px;
+  height: 8px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  transition: transform 0.2s ease;
+}
+
+.nav__submenu {
+  position: absolute;
+  top: 100%;
+  left: -1.25rem;
+  min-width: 15rem;
+  margin: 0;
+  padding: 1.35rem 0 0;
+  list-style: none;
+  font-size: 1rem;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-4px);
+  transition: opacity 0.18s ease, transform 0.18s ease, visibility 0.18s;
+}
+
+.nav__submenu li {
+  background: #302d2c;
+}
+
+.nav__submenu li:first-child {
+  padding-top: 0.5rem;
+}
+
+.nav__submenu li:last-child {
+  padding-bottom: 0.5rem;
+}
+
+.nav__submenu a {
+  display: block;
+  padding: 0.7rem 1.25rem;
+  white-space: nowrap;
+  opacity: 0.85;
+}
+
+.nav__submenu a:hover,
+.nav__submenu a:focus-visible {
+  opacity: 1;
+}
+
+.nav__menu-item--parent:hover .nav__submenu,
+.nav__menu-item--parent:focus-within .nav__submenu,
+.nav__menu-item--parent.is-open .nav__submenu {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+}
+
+.nav__menu-item--parent:hover .nav__submenu-toggle svg,
+.nav__menu-item--parent.is-open .nav__submenu-toggle svg {
+  transform: rotate(180deg);
+}
+
+.nav__drawer-submenu {
+  list-style: none;
+  margin: 0 0 0.35rem;
+  padding: 0 0 0 1.25rem;
+}
+
+.nav__drawer-menu .nav__drawer-submenu a {
+  padding: 0.55rem 0;
+  font-size: 16px;
+  opacity: 0.75;
+}
+
 .nav__end {
   display: flex;
   align-items: center;

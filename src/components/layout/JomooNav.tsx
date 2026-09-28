@@ -8,6 +8,13 @@
 import { useEffect, useRef, useState } from 'react'
 import { authClient } from '@/lib/auth-client'
 import NavSearchPanel from '@/components/search/NavSearchPanel'
+import {
+  BLOG_LINK,
+  COMPANY_LINK,
+  COMPANY_SUB_LINKS,
+  DESIGNER_LINK,
+  PRODUCTS_LINK,
+} from './siteLinks'
 
 /** The client's global site — the language switch beside the search glyph. */
 const GLOBAL_SITE = 'https://jomoo.com/'
@@ -16,14 +23,15 @@ interface Props {
   isSignedIn: boolean
 }
 
+// 会社情報 carries its sub-pages as a dropdown: seven links side by side do not
+// fit beside the actions at 1300px, where the full menu first appears.
+// インスピレーション is hidden until that page is built — add it back when it ships.
 const NAV_LINKS = [
-  { href: '/products/smart-toilet', label: '商品情報' },
-  { href: '/company-information', label: '会社情報' },
-  { href: '/designer', label: 'デザイナー' },
-  { href: '/blog', label: 'ブログ' },
-  // Hidden until that page is built — restore it when it ships.
-  // { href: '/inspiration', label: 'インスピレーション' },
-] as const
+  PRODUCTS_LINK,
+  { ...COMPANY_LINK, children: COMPANY_SUB_LINKS },
+  DESIGNER_LINK,
+  BLOG_LINK,
+]
 
 /**
  * Auth glyphs, traced from public/images/signin.png (51x41) rather than
@@ -54,6 +62,7 @@ export default function JomooNav({ isSignedIn }: Props) {
   const navRef = useRef<HTMLElement>(null)
   const [menuOpen, setMenuOpen] = useState(false)
   const [searchOpen, setSearchOpen] = useState(false)
+  const [submenuOpen, setSubmenuOpen] = useState<string | null>(null)
 
   useEffect(() => {
     const nav = navRef.current
@@ -122,6 +131,27 @@ export default function JomooNav({ isSignedIn }: Props) {
     }
   }, [searchOpen])
 
+  useEffect(() => {
+    if (!submenuOpen) return
+
+    function onKeyDown(event: KeyboardEvent) {
+      if (event.key === 'Escape') setSubmenuOpen(null)
+    }
+
+    function onPointerDown(event: MouseEvent) {
+      const target = event.target as Element
+      if (!target.closest?.('.nav__menu-item--parent')) setSubmenuOpen(null)
+    }
+
+    document.addEventListener('keydown', onKeyDown)
+    document.addEventListener('mousedown', onPointerDown)
+
+    return () => {
+      document.removeEventListener('keydown', onKeyDown)
+      document.removeEventListener('mousedown', onPointerDown)
+    }
+  }, [submenuOpen])
+
   function closeMenu() {
     setMenuOpen(false)
   }
@@ -138,11 +168,44 @@ export default function JomooNav({ isSignedIn }: Props) {
       </a>
 
       <ul className="nav__menu">
-        {NAV_LINKS.map((item) => (
-          <li key={item.href}>
-            <a href={item.href}>{item.label}</a>
-          </li>
-        ))}
+        {NAV_LINKS.map((item) =>
+          'children' in item ? (
+            <li
+              key={item.href}
+              className={`nav__menu-item--parent${
+                submenuOpen === item.href ? ' is-open' : ''
+              }`}
+            >
+              <a href={item.href}>{item.label}</a>
+              {/* Hover opens it with a mouse; the chevron is for touch and
+                  keyboard, where there is no hover to rely on. */}
+              <button
+                type="button"
+                className="nav__submenu-toggle"
+                aria-label={`${item.label}のメニュー`}
+                aria-expanded={submenuOpen === item.href}
+                onClick={() =>
+                  setSubmenuOpen((open) => (open === item.href ? null : item.href))
+                }
+              >
+                <svg viewBox="0 0 12 8" aria-hidden="true" focusable="false">
+                  <path d="M1 1.5l5 5 5-5" />
+                </svg>
+              </button>
+              <ul className="nav__submenu">
+                {item.children.map((child) => (
+                  <li key={child.href}>
+                    <a href={child.href}>{child.label}</a>
+                  </li>
+                ))}
+              </ul>
+            </li>
+          ) : (
+            <li key={item.href}>
+              <a href={item.href}>{item.label}</a>
+            </li>
+          )
+        )}
       </ul>
 
       <div className="nav__end">
@@ -239,6 +302,17 @@ export default function JomooNav({ isSignedIn }: Props) {
               <a href={item.href} onClick={closeMenu}>
                 {item.label}
               </a>
+              {'children' in item && (
+                <ul className="nav__drawer-submenu">
+                  {item.children.map((child) => (
+                    <li key={child.href}>
+                      <a href={child.href} onClick={closeMenu}>
+                        {child.label}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              )}
             </li>
           ))}
         </ul>
