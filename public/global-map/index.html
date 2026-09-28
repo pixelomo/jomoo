@@ -26,12 +26,10 @@
      line-height:1 keeps the box to the letters, so "centred on the dot" is
      centred on the text rather than on a line box with air above it. */
   .lbl{position:absolute; left:0; top:0; transform-origin:0 0; will-change:transform;
-    white-space:nowrap; color:var(--ink); font-size:11.5px; font-weight:500; line-height:1;
+    white-space:nowrap; color:var(--ink); font-size:12.5px; font-weight:500; line-height:1;
+    text-shadow:0 0 2px var(--paper), 0 0 3px var(--paper), 0 0 4px var(--paper);
     transition:opacity .2s linear, color .15s linear;}
-  .lbl.hub{font-size:14px; font-weight:600; letter-spacing:.09em;}
-  /* Leader lines, for a name that had to move out from beside its dot. */
-  #leaders{position:absolute; inset:0; width:100%; height:100%; overflow:visible}
-  #leaders line{stroke:var(--grey); stroke-width:1; stroke-linecap:round}
+  .lbl.hub{font-size:15px; font-weight:600; letter-spacing:.09em;}
   .lbl.dim{opacity:.2}
   .lbl.on{text-decoration:underline; text-underline-offset:3px}
 
@@ -44,11 +42,6 @@
 
   @media (max-width:820px){
     .head{left:16px; top:14px}
-  }
-  /* The page shows this frame from 820px wide; below 1000 the names are
-     smaller so the crowded regions have room to place them. */
-  @media (max-width:999px){
-    .lbl{font-size:10.5px} .lbl.hub{font-size:12px}
   }
 </style>
 </head>
@@ -97,21 +90,29 @@
   const HUBS = [
     { id: 'usa', label: 'USA', full: 'North America', lon: -98, lat: 40 },
     { id: 'eur', label: 'EUR', full: 'Europe', lon: 9, lat: 50 },
-    { id: 'uae', label: 'UAE', full: 'Gulf', lon: 54, lat: 24.5 },
+    { id: 'uae', label: 'UAE', full: 'Gulf', lon: 57.2, lat: 33.4 },
     { id: 'chn', label: 'CHINA', full: 'East Asia', lon: 114, lat: 36 },
     { id: 'rus', label: 'RUSSIA', full: 'Eurasia', lon: 93, lat: 61 }
   ];
-  // named markets, in the reference's own wording
+  /* Named markets, in the reference's own wording. These are display
+     positions, not surveyed ones: each name sits to the right of its dot, and
+     in the Gulf, the Levant and South-East Asia the true capitals are too close
+     together for that, so each crowded dot has been moved the least it takes
+     for no name to meet another name or dot — never more than ~12px at full
+     width, and never outside its own country. The UAE hub sits north of the
+     Gulf, as it does on the client's reference map, to leave the Gulf markets
+     room. Laid out at a 1400px frame; dots and names scale with the frame, so
+     the same layout holds at every width the page shows the scene at. */
   const NODES = [
-    ['Canada', -106, 56], ['Brazil', -47.9, -15.8], ['Morocco', -6.8, 31.8],
-    ['Algeria', 3, 28], ['Egypt', 30.8, 26.8], ['Nigeria', 8.7, 9.1],
-    ['Uganda', 32.3, 1.4], ['Kenya', 37.9, 0.1], ['Ethiopia', 39.6, 9.1],
-    ['Angola', 17.9, -11.2], ['South Africa', 25, -29], ['Jordan', 36.2, 31.2],
-    ['Iraq', 44.4, 33.2], ['Saudi Arabia', 45.1, 23.9], ['Qatar', 51.2, 25.3],
-    ['India', 78.9, 22], ['Nepal', 84.1, 28.4], ['Bangladesh', 90.4, 23.7],
-    ['Myanmar', 96, 21], ['Thailand', 100.9, 15.9], ['Cambodia', 104.9, 12.6],
-    ['Malaysia', 102, 4.2], ['Indonesia', 113.9, -2.5], ['The Philippines', 122, 12.9],
-    ['Japan', 138.3, 36.2], ['Mongolia', 103.8, 46.9], ['Australia', 134.5, -25.7],
+    ['Canada', -106, 56.1], ['Brazil', -47.9, -16.1], ['Morocco', -6.6, 32.2],
+    ['Algeria', 3.1, 27.1], ['Egypt', 31.2, 25.6], ['Nigeria', 8.6, 9.2],
+    ['Uganda', 32.3, 3.3], ['Kenya', 38.1, -2.6], ['Ethiopia', 39.5, 9.1],
+    ['Angola', 18.3, -11.2], ['South Africa', 25, -29.2], ['Jordan', 36.3, 30.7],
+    ['Iraq', 42.3, 35.5], ['Saudi Arabia', 45.2, 19.8], ['Qatar', 51.1, 25.2],
+    ['India', 79.1, 20.3], ['Nepal', 84.1, 30.6], ['Bangladesh', 90.6, 25.5],
+    ['Myanmar', 95.9, 20.2], ['Thailand', 100.8, 14.7], ['Cambodia', 104.6, 9],
+    ['Malaysia', 101.8, 3.3], ['Indonesia', 114.3, -2.5], ['The Philippines', 121.9, 14.7],
+    ['Japan', 138.4, 36.1], ['Mongolia', 103.8, 46.7], ['Australia', 134.4, -25.9],
     ['New Zealand', 172.9, -41]
   ];
   const RELAYS = [];
@@ -458,7 +459,7 @@
         ' float ends = smoothstep(0.0,0.03,vT)*smoothstep(1.0,0.97,vT);',
         ' float head = fract(uTime*uSpeed + vSeed);',
         ' float behind = head - vT;',
-        ' float dash = (behind > 0.0 && behind < 0.13) ? 1.0 - behind/0.13*0.35 : 0.0;',
+        ' float dash = (behind > 0.0 && behind < 0.16) ? 1.0 - behind/0.16*0.3 : 0.0;',
         ' float trail = (behind > 0.0 && behind < 0.30) ? exp(-behind*9.0) : 0.0;',
         ' dash = max(dash*uFlow, trail*uFlow*0.6);',
         ' float dim = mix(0.10, 1.0, vActive);',
@@ -466,15 +467,20 @@
           ? [' float across = pow(1.0 - min(lineD(), 1.0), 2.2);',
              ' vec3 col = mix(uHot, uInk, 0.25);',
              ' float a = across * uGlowA * (0.45 + dash*1.5 + vHot*0.8) * ends * dim;'].join('\n')
+          // The pulse is white: a bright run travelling out from the hub
+          // along the blue arc, repeating. It fills the arc's core and leaves
+          // its edges blue, so it reads as a streak rather than as a gap on a
+          // white page.
           : [' vec3 base = mix(uGhost, uHot, vHot*0.7);',
-             ' vec3 col = mix(base, uInk, dash);',
+             ' float core = smoothstep(0.75, 0.3, lineD());',
+             ' vec3 col = mix(base, vec3(1.0), clamp(dash, 0.0, 1.0) * core);',
              ' float soft = smoothstep(1.0, 0.6, lineD());',
-             ' float a = (0.8 + vHot*0.2 + dash*0.2) * ends * dim * soft;'].join('\n'),
+             ' float a = (0.85 + vHot*0.15) * ends * dim * soft;'].join('\n'),
         ' gl_FragColor = vec4(col, clamp(a,0.0,1.0));',
         '}'
       ].join('\n')
     });
-    m.uniforms.uWidth.value = glow ? 6.0 : 2.2;
+    m.uniforms.uWidth.value = glow ? 6.0 : 3.2;
     return m;
   }
   const laneMat = laneShader(false);
@@ -520,18 +526,18 @@
 
   const markerMat = new THREE.ShaderMaterial({
     uniforms: {
-      uRes: { value: RES }, uTime: { value: 0 }, uFlow: { value: 1 },
+      uRes: { value: RES }, uScale: { value: 1 }, uTime: { value: 0 }, uFlow: { value: 1 },
       uInk: { value: C(INK.ink) }, uPaper: { value: C(INK.paper) }
     },
     transparent: true, depthWrite: false, depthTest: false,
     extensions: { derivatives: true },
     vertexShader: [
       'attribute vec2 aCorner; attribute float aSize,aPhase,aKind,aActive,aHot;',
-      'uniform vec2 uRes;',
+      'uniform vec2 uRes; uniform float uScale;',
       'varying vec2 vC; varying float vPhase,vKind,vActive,vHot;',
       'void main(){ vC=aCorner; vPhase=aPhase; vKind=aKind; vActive=aActive; vHot=aHot;',
       ' vec4 c = projectionMatrix*modelViewMatrix*vec4(position,1.0);',
-      ' c.xy += aCorner*aSize*(2.0/uRes)*c.w;',
+      ' c.xy += aCorner*aSize*uScale*(2.0/uRes)*c.w;',
       ' gl_Position = c; }'
     ].join('\n'),
     fragmentShader: [
@@ -570,7 +576,7 @@
     const pos = [], corner = [], size = [], phase = [], kind = [], active = [], hot = [], idx = [];
     const cs = [[-1, -1], [1, -1], [1, 1], [-1, 1]];
     markers.forEach(function (m, i) {
-      const s = m.kind === 'hub' ? 34 : m.kind === 'node' ? 19 : 13;
+      const s = m.kind === 'hub' ? 34 : m.kind === 'node' ? 16 : 13;
       for (let k = 0; k < 4; k++) {
         pos.push(m.pos.x, m.pos.y, m.pos.z);
         corner.push(cs[k][0], cs[k][1]);
@@ -621,125 +627,19 @@
 
   /* ------------------------------------------------------- label placement */
 
-  /* Every name sits to the left of its dot, right-aligned against it, for
-     consistency. Where the spot beside the dot is taken — the Gulf and
-     mainland South-East Asia at any width — the name moves further left
-     and/or up or down to the nearest clear spot, and a thin leader line runs
-     back to its dot. Nothing is hidden. */
+  /* Every name reads like a bullet point: dot first, then the name to its
+     right, centred on the dot's height. Nothing moves or hides at run time —
+     the crowded markets' dots are placed (see NODES) so that no name meets
+     another name or dot at the narrowest frame the page shows. */
   const labelOrder = markers.filter(function (m) { return m.el; });
-  const OUT = [0, 14, 28, 44, 62, 82];                    // px further left
-  const NUDGES = [0, -0.8, 0.8, -1.6, 1.6, -2.4, 2.4, -3.2, 3.2, -4, 4, -4.8, 4.8];   // in lines
 
-  const SVGNS = 'http://www.w3.org/2000/svg';
-  const leaderLayer = document.createElementNS(SVGNS, 'svg');
-  leaderLayer.id = 'leaders';
-  labelLayer.insertBefore(leaderLayer, labelLayer.firstChild);
-  labelOrder.forEach(function (m) {
-    m.leader = document.createElementNS(SVGNS, 'line');
-    m.leader.style.display = 'none';
-    leaderLayer.appendChild(m.leader);
-  });
-
-  function overlap(a, b) {
-    const w = Math.min(a[2], b[2]) - Math.max(a[0], b[0]);
-    const h = Math.min(a[3], b[3]) - Math.max(a[1], b[1]);
-    return w > 0 && h > 0 ? w * h : 0;
-  }
-  function inBox(x, y, b) { return x > b[0] && x < b[2] && y > b[1] && y < b[3]; }
-
-  let layoutKey = '';
   function placeLabels(w, h, sc) {
-    // The layout only changes with the view, so it is worked out again only
-    // when the frame, the zoom or the pan has moved.
-    const key = [w, h, view.r.toFixed(2), view.target.x.toFixed(2), view.target.z.toFixed(2)].join();
-    if (key === layoutKey) return;
-    layoutKey = key;
-
-    const PAD = 2;
-    const dots = [];
-    for (let i = 0; i < markers.length; i++) {
-      const s = screen[i];
-      if (s.vis) dots.push([s.x, s.y, (markers[i].kind === 'hub' ? 16 : 7) + PAD, i]);
-    }
-    // How far a dot's circle reaches into a box, 0 when clear.
-    function dotCost(b, d) {
-      const cx = Math.max(b[0], Math.min(d[0], b[2])), cy = Math.max(b[1], Math.min(d[1], b[3]));
-      const dist = Math.hypot(d[0] - cx, d[1] - cy);
-      return dist < d[2] ? (d[2] - dist) * 40 : 0;
-    }
-
-    const live = labelOrder.filter(function (m) {
-      if (!screen[m.index].vis) { m.box = null; return false; }
-      return true;
-    });
-    // Hubs first, then the most crowded markets, which have the least room.
-    live.forEach(function (m) {
-      const a = screen[m.index];
-      m.crowd = 0;
-      for (let i = 0; i < markers.length; i++) {
-        const b = screen[i];
-        if (b.vis && i !== m.index && Math.abs(a.x - b.x) < 90 && Math.abs(a.y - b.y) < 40) m.crowd++;
-      }
-    });
-    live.sort(function (a, b) {
-      return (b.kind === 'hub') - (a.kind === 'hub') || b.crowd - a.crowd;
-    });
-
-    const placed = [];
-    live.forEach(function (m) {
-      const s = screen[m.index];
-      const tw = m.tw * sc, th = m.th * sc;
-      const R = (m.kind === 'hub' ? 16 : 7) * sc;
-      const g = R + 4 * sc;
-      let best = null, bestCost = Infinity, bestLead = false;
-      // A hub's name stays beside the hub — at most a small nudge, never a
-      // leader — so the five hubs always read as the map's anchors.
-      const outs = m.kind === 'hub' ? [0] : OUT;
-      const nudges = m.kind === 'hub' ? [0, -0.8, 0.8, -1.3, 1.3] : NUDGES;
-      for (let o = 0; o < outs.length; o++) {
-        for (let k = 0; k < nudges.length; k++) {
-          const right = s.x - g - outs[o], mid = s.y + nudges[k] * th;
-          const bx = [right - tw, mid - th / 2, right, mid + th / 2];
-          const padded = [bx[0] - PAD, bx[1] - PAD, bx[2] + PAD, bx[3] + PAD];
-          const lead = m.kind !== 'hub' && (outs[o] > 0 || Math.abs(nudges[k]) > 1);
-          // Nearer is better: distance costs a little, so the spot beside the
-          // dot wins whenever it is clear.
-          let cost = outs[o] * 0.5 + Math.abs(nudges[k]) * th * 0.5;
-          if (bx[0] < 0 || bx[1] < 0 || bx[3] > h) cost += 1e6;
-          for (let d = 0; d < dots.length; d++) if (dots[d][3] !== m.index) cost += dotCost(padded, dots[d]);
-          for (let p = 0; p < placed.length; p++) cost += overlap(padded, placed[p]) * 10;
-          if (lead) {
-            // The leader must not run through another dot or name.
-            const x0 = s.x, y0 = s.y, x1 = right + 2, y1 = mid;
-            for (let t = 0.3; t < 0.95; t += 0.15) {
-              const x = x0 + (x1 - x0) * t, y = y0 + (y1 - y0) * t;
-              for (let d = 0; d < dots.length; d++) {
-                if (dots[d][3] !== m.index && Math.hypot(x - dots[d][0], y - dots[d][1]) < dots[d][2]) cost += 60;
-              }
-              for (let p = 0; p < placed.length; p++) if (inBox(x, y, placed[p])) cost += 60;
-            }
-          }
-          if (cost < bestCost) { bestCost = cost; best = bx; bestLead = lead; }
-        }
-        if (bestCost < 1) break;
-      }
-      m.box = best;
-      m.lead = bestLead;
-      placed.push(best);
-    });
-
     labelOrder.forEach(function (m) {
       const s = screen[m.index];
-      if (!m.box || !m.lead) { m.leader.style.display = 'none'; return; }
-      // From the dot's rim to the name's right-hand middle.
-      const ex = m.box[2] + 2, ey = (m.box[1] + m.box[3]) / 2;
-      const dx = ex - s.x, dy = ey - s.y, len = Math.hypot(dx, dy) || 1;
-      const R = (m.kind === 'hub' ? 16 : 7) * sc;
-      m.leader.setAttribute('x1', (s.x + dx / len * R).toFixed(1));
-      m.leader.setAttribute('y1', (s.y + dy / len * R).toFixed(1));
-      m.leader.setAttribute('x2', ex.toFixed(1));
-      m.leader.setAttribute('y2', ey.toFixed(1));
-      m.leader.style.display = '';
+      if (!s.vis) { m.box = null; return; }
+      const tw = m.tw * sc, th = m.th * sc;
+      const g = ((m.kind === 'hub' ? 16 : 6) + 4) * sc;
+      m.box = [s.x + g, s.y - th / 2, s.x + g + tw, s.y + th / 2];
     });
   }
 
@@ -902,7 +802,7 @@
     for (let i = 0; i < markers.length; i++) {
       const s = screen[i];
       if (!s.vis) continue;
-      const rr = markers[i].kind === 'hub' ? 26 * 26 : 18 * 18;
+      const rr = Math.pow((markers[i].kind === 'hub' ? 26 : 16) * pickScale, 2);
       const d = (s.x - cx) * (s.x - cx) + (s.y - cy) * (s.y - cy);
       if (d < rr && d < bestD) { bestD = d; best = i; }
     }
@@ -953,7 +853,7 @@
       laneMat.uniforms.uFlow.value = on ? 1 : 0;
       markerMat.uniforms.uFlow.value = on ? 1 : 0;
     },
-    labels: function (on) { state.labels = on; labelLayer.style.display = on ? '' : 'none'; layoutKey = ''; },
+    labels: function (on) { state.labels = on; labelLayer.style.display = on ? '' : 'none'; },
     invert: function (on) { state.manual = true; setNight(on); }
   };
   document.querySelectorAll('.tog').forEach(function (t) {
@@ -1003,6 +903,7 @@
   /* ------------------------------------------------------------------ loop */
 
   const proj = new THREE.Vector3();
+  let pickScale = 1;
   let last = performance.now(), tSec = 0;
 
   function tick(now) {
@@ -1013,7 +914,11 @@
     markerMat.uniforms.uTime.value = tSec;
 
     const w = stage.clientWidth, h = stage.clientHeight;
-    const sc = clamp(view.fit / view.r, 0.8, 1.35);
+    // Dots and names scale with the frame (laid out at 1400px) as well as with
+    // the zoom, so the layout in NODES holds at every width.
+    const sc = clamp(view.fit / view.r, 0.8, 1.35) * (w / 1400);
+    markerMat.uniforms.uScale.value = sc;
+    pickScale = sc;
     for (let i = 0; i < markers.length; i++) {
       const m = markers[i];
       proj.copy(m.pos).project(camera);
@@ -1051,6 +956,9 @@
   }
   window.addEventListener('resize', resize);
 
+  // Names sit to the right of their dots, so the frame keeps room past the
+  // easternmost one (New Zealand) for its name.
+  bounds.maxX += 28;
   MAP_MID_X = (bounds.minX + bounds.maxX) / 2;
   MAP_MID_Z = (bounds.minZ + bounds.maxZ) / 2;
   view.target.set(MAP_MID_X, 0, MAP_MID_Z);
