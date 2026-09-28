@@ -21,13 +21,14 @@
   #stage canvas{display:block; touch-action:auto}
   #labels{position:fixed; inset:0; pointer-events:none}
 
+  /* Labels carry no offset of their own: the script works out where each one
+     goes around its dot (see placeLabels) and sets the box's top-left there.
+     line-height:1 keeps the box to the letters, so "centred on the dot" is
+     centred on the text rather than on a line box with air above it. */
   .lbl{position:absolute; left:0; top:0; transform-origin:0 0; will-change:transform;
-    white-space:nowrap; color:var(--ink); font-size:11.5px; font-weight:500;
-    padding-left:12px; margin:-7px 0 0 1px;
+    white-space:nowrap; color:var(--ink); font-size:11.5px; font-weight:500; line-height:1;
     transition:opacity .2s linear, color .15s linear;}
-  .lbl.hub{font-size:14px; font-weight:600; letter-spacing:.09em; padding-left:20px; margin-top:-24px;}
-  .lbl.flip{padding:0 12px 0 0; text-align:right}
-  .lbl.hub.flip{padding-right:20px}
+  .lbl.hub{font-size:14px; font-weight:600; letter-spacing:.09em;}
   .lbl.dim{opacity:.2}
   .lbl.on{text-decoration:underline; text-underline-offset:3px}
 
@@ -40,6 +41,10 @@
 
   @media (max-width:820px){
     .head{left:16px; top:14px}
+  }
+  /* The page shows this frame from 820px wide; below 1000 the names are
+     smaller so the crowded regions have room to place them. */
+  @media (max-width:999px){
     .lbl{font-size:10.5px} .lbl.hub{font-size:12px}
   }
 </style>
@@ -107,6 +112,16 @@
     ['New Zealand', 172.9, -41]
   ];
   const RELAYS = [];
+  /* The side each label tries first; anything unnamed tries the right. The
+     rest is left to placeLabels, which walks round the dot until the name
+     clears every other name and dot — at 820px of frame the Gulf, the Levant
+     and mainland South-East Asia are too tight for any fixed layout. */
+  const PREFER = {
+    'Saudi Arabia': 'l', 'Qatar': 'b', 'Jordan': 'l', 'Iraq': 't', 'Egypt': 'l',
+    'Uganda': 'l', 'Nepal': 't', 'Bangladesh': 'l', 'India': 'l', 'Thailand': 'l',
+    'Malaysia': 'l', 'Morocco': 'l', eur: 't'
+  };
+
   const LANES = {
     usa: ['Canada', 'Brazil'],
     eur: [],
@@ -315,8 +330,18 @@
   });
 
   let capsMesh;
-  const topInkMat = fatLineMaterial({});
-  topInkMat.uniforms.uWidth.value = 1.4;
+  // Coastlines and borders: 2px, with a crisper edge than the shared line
+  // shader's default so the full width reads solid rather than feathering off.
+  const topInkMat = fatLineMaterial({
+    fragmentShader: [
+      'precision highp float; uniform vec3 uColor; uniform float uOpacity;',
+      'varying float vSide, vAlong, vLen;',
+      'float lineD(){ float t = clamp(vAlong, 0.0, vLen); return length(vec2(vAlong - t, vSide)); }',
+      'void main(){ float soft = smoothstep(1.0, 0.6, lineD());',
+      ' gl_FragColor = vec4(uColor, uOpacity*soft); }'
+    ].join('\n')
+  });
+  topInkMat.uniforms.uWidth.value = 2.0;
 
   (function buildLand() {
     const cp = [], cn = [], cc = [];
@@ -575,6 +600,145 @@
     labelLayer.appendChild(el);
     m.el = el;
   });
+  // Unscaled text size; placement scales it with the view. Measured again on
+  // resize, since the font size steps down in a narrow frame.
+  function measureLabels() {
+    markers.forEach(function (m) {
+      if (!m.el) return;
+      const t = m.el.style.transform;
+      m.el.style.transform = 'none';
+      const r = m.el.getBoundingClientRect();
+      m.tw = r.width; m.th = r.height;
+      m.el.style.transform = t;
+    });
+  }
+  measureLabels();
+
+  /* ------------------------------------------------------- label placement */
+
+  // Hubs claim their spot first, then markets in the order they are listed.
+  const labelOrder = markers.filter(function (m) { return m.el; })
+    .sort(function (a, b) { return (b.kind === 'hub') - (a.kind === 'hub'); });
+  const SIDES = ['r', 'l', 't', 'b', 'tr', 'br', 'tl', 'bl'];
+  // The close ring, then one a little further out — still near enough that
+  // the name reads as its dot's.
+  const RINGS = [1, 1.45];
+  const DIAG = Math.SQRT1_2;
+
+  // The label's box for one side of its dot. gap is the dot's radius plus air.
+  function boxFor(side, x, y, w, h, g) {
+    switch (side) {
+      case 'r': return [x + g, y - h / 2, x + g + w, y + h / 2];
+      case 'l': return [x - g - w, y - h / 2, x - g, y + h / 2];
+      case 't': return [x - w / 2, y - g - h, x + w / 2, y - g];
+      case 'b': return [x - w / 2, y + g, x + w / 2, y + g + h];
+      case 'tr': return [x + g * DIAG, y - g * DIAG - h, x + g * DIAG + w, y - g * DIAG];
+      case 'br': return [x + g * DIAG, y + g * DIAG, x + g * DIAG + w, y + g * DIAG + h];
+      case 'tl': return [x - g * DIAG - w, y - g * DIAG - h, x - g * DIAG, y - g * DIAG];
+      default: return [x - g * DIAG - w, y + g * DIAG, x - g * DIAG, y + g * DIAG + h];
+    }
+  }
+  function overlap(a, b) {
+    const w = Math.min(a[2], b[2]) - Math.max(a[0], b[0]);
+    const h = Math.min(a[3], b[3]) - Math.max(a[1], b[1]);
+    return w > 0 && h > 0 ? w * h : 0;
+  }
+
+  /* Greedy: each label takes the first side, preferred one first, whose box
+     clears the frame edge, every dot and every label already placed. If none
+     does it takes the side that collides least. */
+  function placeLabels(w, h, sc) {
+    const PAD = 2;
+    const dots = [];
+    for (let i = 0; i < markers.length; i++) {
+      const s = screen[i];
+      if (!s.vis) continue;
+      dots.push([s.x, s.y, (markers[i].kind === 'hub' ? 16 : 7) + PAD]);
+    }
+    function boxDist(b, x, y) {
+      const cx = Math.max(b[0], Math.min(x, b[2])), cy = Math.max(b[1], Math.min(y, b[3]));
+      return Math.hypot(x - cx, y - cy);
+    }
+    // How far a dot's circle reaches into a box, 0 when clear.
+    function dotCost(b, d) {
+      const cx = Math.max(b[0], Math.min(d[0], b[2])), cy = Math.max(b[1], Math.min(d[1], b[3]));
+      const dist = Math.hypot(d[0] - cx, d[1] - cy);
+      return dist < d[2] ? (d[2] - dist) * 40 : 0;
+    }
+    const live = labelOrder.filter(function (m) {
+      if (!screen[m.index].vis) { m.box = null; return false; }
+      return true;
+    });
+
+    function place(m, others) {
+      const s = screen[m.index];
+      const tw = m.tw * sc, th = m.th * sc;
+      const g = ((m.kind === 'hub' ? 16 : 7) + 4) * sc;
+      const first = PREFER[m.id] || 'r';
+      const order = [first].concat(SIDES.filter(function (k) { return k !== first; }));
+      let best = null, bestCost = Infinity;
+      search:
+      for (let ring = 0; ring < RINGS.length; ring++) {
+        for (let k = 0; k < order.length; k++) {
+          const bx = boxFor(order[k], s.x, s.y, tw, th, g * RINGS[ring]);
+          const padded = [bx[0] - PAD, bx[1] - PAD, bx[2] + PAD, bx[3] + PAD];
+          let cost = 0;
+          if (bx[0] < 0 || bx[2] > w || bx[1] < 0 || bx[3] > h) cost += 1e6;
+          for (let d = 0; d < dots.length; d++) cost += dotCost(padded, dots[d]);
+          // A name has to read as its own dot's: if another dot's centre is
+          // nearer the name than this one's, the spot is out.
+          const own = boxDist(bx, s.x, s.y);
+          for (let d = 0; d < dots.length; d++) {
+            const o = dots[d];
+            if ((o[0] !== s.x || o[1] !== s.y) && boxDist(bx, o[0], o[1]) < own + 3) { cost += 1e4; break; }
+          }
+          for (let p = 0; p < others.length; p++) cost += overlap(padded, others[p]) * 4;
+          if (cost < bestCost) { bestCost = cost; best = bx; }
+          if (cost < 1) break search;
+        }
+      }
+      m.box = best; m.cost = bestCost;
+    }
+
+    /* Every name sits right beside its own dot or not at all: a market whose
+       name has no clear spot there is left off, and comes back while its dot
+       is hovered. Hubs always show. At full width everything fits; it is the
+       narrower frames where the Gulf and South-East Asia run out of room. */
+    const hovered = state.hover != null ? markers[state.hover] : null;
+    // Hubs first; then the most crowded markets, which have the fewest spots
+    // to choose from, before the ones out on their own.
+    live.forEach(function (m) {
+      const a = screen[m.index];
+      m.crowd = 0;
+      for (let i = 0; i < markers.length; i++) {
+        const b = screen[i];
+        if (b.vis && i !== m.index && Math.abs(a.x - b.x) < 90 && Math.abs(a.y - b.y) < 40) m.crowd++;
+      }
+    });
+    live.sort(function (a, b) {
+      return (b.kind === 'hub') - (a.kind === 'hub') || b.crowd - a.crowd;
+    });
+    const placed = [];
+    live.forEach(function (m) {
+      if (m === hovered) return;
+      place(m, placed);
+      if (m.kind !== 'hub' && m.cost >= 1) { m.box = null; return; }
+      placed.push(m.box);
+    });
+    if (hovered && hovered.el && screen[hovered.index].vis) place(hovered, placed);
+  }
+
+  // For checking placement from outside the frame: every visible label's box
+  // and every visible dot, in frame pixels.
+  window.__labelLayout = function () {
+    return {
+      labels: labelOrder.filter(function (m) { return m.box; })
+        .map(function (m) { return { name: m.label, box: m.box }; }),
+      dots: markers.map(function (m, i) {
+        return screen[i].vis ? { name: m.label, hub: m.kind === 'hub', x: screen[i].x, y: screen[i].y } : null;
+      }).filter(Boolean)
+    };
+  };
 
   /* ----------------------------------------------------------- highlighting */
 
@@ -841,13 +1005,18 @@
       const x = (proj.x * 0.5 + 0.5) * w, y = (-proj.y * 0.5 + 0.5) * h;
       const vis = proj.z < 1 && x > -80 && x < w + 80 && y > -40 && y < h + 40;
       screen[i].x = x; screen[i].y = y; screen[i].vis = vis;
-      if (!m.el || !state.labels) continue;
-      if (m.shown !== vis) { m.el.style.opacity = vis ? '' : '0'; m.shown = vis; }
-      if (!vis) continue;
-      const flip = x > w - 130;
-      if (m.flip !== flip) { m.el.classList.toggle('flip', flip); m.flip = flip; }
-      m.el.style.transform = 'translate3d(' + x.toFixed(1) + 'px,' + y.toFixed(1) + 'px,0)' +
-        (flip ? ' translateX(-100%)' : '') + ' scale(' + sc.toFixed(3) + ')';
+    }
+    if (state.labels) {
+      placeLabels(w, h, sc);
+      for (let i = 0; i < markers.length; i++) {
+        const m = markers[i];
+        if (!m.el) continue;
+        const vis = !!m.box;
+        if (m.shown !== vis) { m.el.style.opacity = vis ? '' : '0'; m.shown = vis; }
+        if (!vis) continue;
+        m.el.style.transform = 'translate3d(' + m.box[0].toFixed(1) + 'px,' + m.box[1].toFixed(1) +
+          'px,0) scale(' + sc.toFixed(3) + ')';
+      }
     }
     renderer.render(scene, camera);
     requestAnimationFrame(tick);
@@ -855,6 +1024,7 @@
 
   function resize() {
     const w = stage.clientWidth, h = stage.clientHeight;
+    measureLabels();
     renderer.setSize(w, h);
     aspectRatio = w / h;
     RES.set(w, h);
