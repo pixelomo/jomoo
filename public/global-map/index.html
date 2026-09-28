@@ -90,30 +90,30 @@
   const HUBS = [
     { id: 'usa', label: 'USA', full: 'North America', lon: -98, lat: 40 },
     { id: 'eur', label: 'EUR', full: 'Europe', lon: 9, lat: 50 },
-    { id: 'uae', label: 'UAE', full: 'Gulf', lon: 57.2, lat: 33.4 },
+    { id: 'uae', label: 'UAE', full: 'Gulf', lon: 57.2, lat: 33 },
     { id: 'chn', label: 'CHINA', full: 'East Asia', lon: 114, lat: 36 },
     { id: 'rus', label: 'RUSSIA', full: 'Eurasia', lon: 93, lat: 61 }
   ];
   /* Named markets, in the reference's own wording. These are display
-     positions, not surveyed ones: each name sits to the right of its dot, and
+     positions, not surveyed ones: each name sits to the right of its pin, and
      in the Gulf, the Levant and South-East Asia the true capitals are too close
      together for that, so each crowded dot has been moved the least it takes
-     for no name to meet another name or dot — never more than ~12px at full
+     for no name to meet another name or pin — never more than ~12px at full
      width, and never outside its own country. The UAE hub sits north of the
      Gulf, as it does on the client's reference map, to leave the Gulf markets
      room. Laid out at a 1400px frame; dots and names scale with the frame, so
      the same layout holds at every width the page shows the scene at. */
   const NODES = [
-    ['Canada', -106, 56.1], ['Brazil', -47.9, -16.1], ['Morocco', -6.6, 32.2],
-    ['Algeria', 3.1, 27.1], ['Egypt', 31.2, 25.6], ['Nigeria', 8.6, 9.2],
-    ['Uganda', 32.3, 3.3], ['Kenya', 38.1, -2.6], ['Ethiopia', 39.5, 9.1],
-    ['Angola', 18.3, -11.2], ['South Africa', 25, -29.2], ['Jordan', 36.3, 30.7],
-    ['Iraq', 42.3, 35.5], ['Saudi Arabia', 45.2, 19.8], ['Qatar', 51.1, 25.2],
-    ['India', 79.1, 20.3], ['Nepal', 84.1, 30.6], ['Bangladesh', 90.6, 25.5],
-    ['Myanmar', 95.9, 20.2], ['Thailand', 100.8, 14.7], ['Cambodia', 104.6, 9],
-    ['Malaysia', 101.8, 3.3], ['Indonesia', 114.3, -2.5], ['The Philippines', 121.9, 14.7],
-    ['Japan', 138.4, 36.1], ['Mongolia', 103.8, 46.7], ['Australia', 134.4, -25.9],
-    ['New Zealand', 172.9, -41]
+    ['Canada', -106.1, 55.9], ['Brazil', -47.8, -16], ['Morocco', -6.7, 32.3],
+    ['Algeria', 3.2, 27.3], ['Egypt', 30.5, 24.4], ['Nigeria', 8.8, 8.7],
+    ['Uganda', 32.1, 3], ['Kenya', 37.8, -2.8], ['Ethiopia', 39.6, 10.2],
+    ['Angola', 18.2, -11.2], ['South Africa', 24.7, -29.2], ['Jordan', 36.1, 30.8],
+    ['Iraq', 43.4, 36.8], ['Saudi Arabia', 45.3, 19.1], ['Qatar', 51.1, 25.8],
+    ['India', 78, 21.7], ['Nepal', 84, 30.6], ['Bangladesh', 91.7, 25.5],
+    ['Myanmar', 96.2, 20.2], ['Thailand', 100.7, 14.7], ['Cambodia', 105.3, 9],
+    ['Malaysia', 102.2, 1.8], ['Indonesia', 114, -4], ['The Philippines', 122.1, 16.1],
+    ['Japan', 138.4, 36.5], ['Mongolia', 104, 47.2], ['Australia', 134.7, -25.7],
+    ['New Zealand', 173.1, -41.1]
   ];
   const RELAYS = [];
 
@@ -138,9 +138,10 @@
   };
 
   const INK = {
-    paper: 0xffffff, land: 0xffffff, wall: 0xd7e7f2, wallLow: 0xa9c4d8,
-    ink: 0x35b4ee, edge: 0x7fa6bf, ghost: 0x5bbde9, hot: 0x1f9ade, marker: 0x2aa6e5,
-    hoverCap: 0xd6eefb,
+    // Land #f1ede8; borders, arcs and pins in the brand gold #c3a763.
+    paper: 0xffffff, land: 0xf1ede8, wall: 0xd7e7f2, wallLow: 0xa9c4d8,
+    ink: 0xc3a763, edge: 0xc3a763, ghost: 0xc3a763, hot: 0xa88a45, marker: 0xc3a763,
+    hoverCap: 0xe4dccf,
     under: 0x4cc6ff, underA: 0.42, glow: 0x6fd0ff, glowA: 0.20, additive: false
   };
   const INV = {
@@ -443,7 +444,7 @@
     const m = fatLineMaterial({
       depthWrite: false,
       uniforms: {
-        uTime: { value: 0 }, uSpeed: { value: 0.15 }, uFlow: { value: 1 },
+        uTime: { value: 0 }, uSpeed: { value: 0.2 }, uFlow: { value: 1 },
         uGhost: { value: C(INK.ghost) }, uInk: { value: C(INK.ink) },
         uHot: { value: C(INK.hot) }, uGlowA: { value: INK.glowA }
       },
@@ -457,11 +458,15 @@
         'float lineD(){ float t = clamp(vAlong, 0.0, vLen); return length(vec2(vAlong - t, vSide)); }',
         'void main(){',
         ' float ends = smoothstep(0.0,0.03,vT)*smoothstep(1.0,0.97,vT);',
-        ' float head = fract(uTime*uSpeed + vSeed);',
+        // One short white segment per arc, leaving the hub and easing out
+        // (fast, then settling) as it reaches the far end, where it fades.
+        // The last quarter of each cycle is a rest before the next one.
+        ' float u = fract(uTime*uSpeed + vSeed) / 0.75;',
+        ' float head = 1.0 - pow(1.0 - min(u, 1.0), 3.0);',
         ' float behind = head - vT;',
-        ' float dash = (behind > 0.0 && behind < 0.16) ? 1.0 - behind/0.16*0.3 : 0.0;',
-        ' float trail = (behind > 0.0 && behind < 0.30) ? exp(-behind*9.0) : 0.0;',
-        ' dash = max(dash*uFlow, trail*uFlow*0.6);',
+        ' float L = 0.06;',
+        ' float dash = smoothstep(0.0, 0.012, behind) * (1.0 - smoothstep(L - 0.02, L, behind));',
+        ' dash *= step(u, 1.0) * (1.0 - smoothstep(0.85, 1.0, head)) * uFlow;',
         ' float dim = mix(0.10, 1.0, vActive);',
         glow
           ? [' float across = pow(1.0 - min(lineD(), 1.0), 2.2);',
@@ -472,7 +477,7 @@
           // its edges blue, so it reads as a streak rather than as a gap on a
           // white page.
           : [' vec3 base = mix(uGhost, uHot, vHot*0.7);',
-             ' float core = smoothstep(0.75, 0.3, lineD());',
+             ' float core = smoothstep(0.95, 0.5, lineD());',
              ' vec3 col = mix(base, vec3(1.0), clamp(dash, 0.0, 1.0) * core);',
              ' float soft = smoothstep(1.0, 0.6, lineD());',
              ' float a = (0.85 + vHot*0.15) * ends * dim * soft;'].join('\n'),
@@ -524,59 +529,56 @@
 
   /* --------------------------------------------------------------- markers */
 
+  /* Pins, drawn after public/images/mappin.png: a round head with a hole,
+     narrowing to a point that sits on the location. Drawn as a distance field
+     rather than a texture so the colour and hover tint come from the palette
+     and the edge stays crisp at any size. In the quad's own units (-1..1, y
+     up): head radius 0.74 centred at y 0.26, tip at y -1, the sides tangent
+     to the head, hole radius 0.55 of the head. */
   const markerMat = new THREE.ShaderMaterial({
     uniforms: {
       uRes: { value: RES }, uScale: { value: 1 }, uTime: { value: 0 }, uFlow: { value: 1 },
-      uInk: { value: C(INK.ink) }, uPaper: { value: C(INK.paper) }
+      uInk: { value: C(INK.marker) }, uHot: { value: C(INK.hot) }, uPaper: { value: C(INK.paper) }
     },
     transparent: true, depthWrite: false, depthTest: false,
     extensions: { derivatives: true },
     vertexShader: [
       'attribute vec2 aCorner; attribute float aSize,aPhase,aKind,aActive,aHot;',
       'uniform vec2 uRes; uniform float uScale;',
-      'varying vec2 vC; varying float vPhase,vKind,vActive,vHot;',
-      'void main(){ vC=aCorner; vPhase=aPhase; vKind=aKind; vActive=aActive; vHot=aHot;',
+      'varying vec2 vC; varying float vActive,vHot;',
+      'void main(){ vC=aCorner; vActive=aActive; vHot=aHot;',
       ' vec4 c = projectionMatrix*modelViewMatrix*vec4(position,1.0);',
-      ' c.xy += aCorner*aSize*uScale*(2.0/uRes)*c.w;',
+      // The quad sits above the point, so the pin's tip lands on it.
+      ' c.xy += (aCorner + vec2(0.0, 1.0))*aSize*uScale*(2.0/uRes)*c.w;',
       ' gl_Position = c; }'
     ].join('\n'),
     fragmentShader: [
       'precision highp float;',
-      'uniform vec3 uInk,uPaper; uniform float uTime,uFlow;',
-      'varying vec2 vC; varying float vPhase,vKind,vActive,vHot;',
+      'uniform vec3 uInk,uHot;',
+      'varying vec2 vC; varying float vActive,vHot;',
       'void main(){',
-      ' float r = length(vC);',
-      ' float aa = fwidth(r)*1.2;',
-      ' float hub = step(0.5, vKind);',
-      ' float relay = 1.0 - step(-0.5, vKind);',     // kind: -1 relay, 0 node, 1 hub
-      ' float R  = mix(0.34, 0.46, hub);',
-      ' float th = mix(0.075, 0.10, hub) + vHot*0.02;',
-      ' float disc = 1.0 - smoothstep(R-aa, R+aa, r);',
-      ' float ring = disc * smoothstep(R-th-aa, R-th+aa, r);',
-      ' float core = hub * (1.0 - smoothstep(0.16-aa, 0.16+aa, r));',
-      ' core += relay * (1.0 - smoothstep(0.12-aa, 0.12+aa, r));',
-      ' float t = fract(uTime*0.24 + vPhase);',
-      ' float pr = mix(R, 0.95, t);',
-      ' float pulse = (1.0-smoothstep(pr-aa,pr+aa,r)) * smoothstep(pr-0.06-aa,pr-0.02,r)',
-      '   * (1.0-t) * (0.35+hub*0.35) * uFlow;',
-      ' float fill = disc - ring - core;',
-      ' vec3 col = uInk;',
-      ' float a = clamp(ring + core + pulse + vHot*0.15, 0.0, 1.0);',
-      ' vec4 base = vec4(uPaper, clamp(fill,0.0,1.0));',
-      ' vec4 outp = vec4(mix(base.rgb, col, min(a,1.0)), clamp(base.a + a, 0.0, 1.0));',
-      ' outp.a *= mix(0.16, 1.0, vActive);',
-      ' if (outp.a < 0.005) discard;',
-      ' gl_FragColor = outp;',
+      ' const float RH = 0.74; const vec2 HC = vec2(0.0, 0.26); const float TIP = -1.0;',
+      ' const float SN = 0.5873; const float CS = 0.8094; const float TY = -0.1747;',
+      ' float circ = length(vC - HC) - RH;',
+      ' float cone = abs(vC.x)*CS - (vC.y - TIP)*SN;',
+      ' float sd = vC.y > TY ? circ : min(circ, cone);',
+      ' float hole = length(vC - HC) - RH*0.55;',
+      ' float aa = fwidth(sd);',
+      ' float a = (1.0 - smoothstep(-aa, aa, sd)) * smoothstep(-aa, aa, hole);',
+      ' a *= mix(0.25, 1.0, vActive);',
+      ' if (a < 0.005) discard;',
+      ' gl_FragColor = vec4(mix(uInk, uHot, vHot), a);',
       '}'
     ].join('\n')
   });
+
 
   const markerGeo = new THREE.BufferGeometry();
   (function buildMarkers() {
     const pos = [], corner = [], size = [], phase = [], kind = [], active = [], hot = [], idx = [];
     const cs = [[-1, -1], [1, -1], [1, 1], [-1, 1]];
     markers.forEach(function (m, i) {
-      const s = m.kind === 'hub' ? 34 : m.kind === 'node' ? 16 : 13;
+      const s = m.kind === 'hub' ? 16 : m.kind === 'node' ? 8 : 6;   // half the pin's height
       for (let k = 0; k < 4; k++) {
         pos.push(m.pos.x, m.pos.y, m.pos.z);
         corner.push(cs[k][0], cs[k][1]);
@@ -638,8 +640,11 @@
       const s = screen[m.index];
       if (!s.vis) { m.box = null; return; }
       const tw = m.tw * sc, th = m.th * sc;
-      const g = ((m.kind === 'hub' ? 16 : 6) + 4) * sc;
-      m.box = [s.x + g, s.y - th / 2, s.x + g + tw, s.y + th / 2];
+      // Right of the pin's head, centred on it: the head's radius is 0.74 and
+      // its centre 1.26 of the pin's half-height above the tip (see markerMat).
+      const S = (m.kind === 'hub' ? 16 : 8) * sc;
+      const x = s.x + 0.74 * S + 4 * sc, y = s.y - 1.26 * S;
+      m.box = [x, y - th / 2, x + tw, y + th / 2];
     });
   }
 
@@ -802,8 +807,9 @@
     for (let i = 0; i < markers.length; i++) {
       const s = screen[i];
       if (!s.vis) continue;
-      const rr = Math.pow((markers[i].kind === 'hub' ? 26 : 16) * pickScale, 2);
-      const d = (s.x - cx) * (s.x - cx) + (s.y - cy) * (s.y - cy);
+      const rr = Math.pow((markers[i].kind === 'hub' ? 20 : 12) * pickScale, 2);
+      const hy = s.y - 1.26 * (markers[i].kind === 'hub' ? 16 : 8) * pickScale;
+      const d = (s.x - cx) * (s.x - cx) + (hy - cy) * (hy - cy);
       if (d < rr && d < bestD) { bestD = d; best = i; }
     }
     let cid = state.hoverCountry;
@@ -883,7 +889,7 @@
       m.needsUpdate = true;
     });
     markerMat.uniforms.uInk.value.set(p.marker);
-    markerMat.uniforms.uPaper.value.set(p.additive ? p.paper : p.land);
+    markerMat.uniforms.uHot.value.set(p.hot);
     markerMat.blending = p.additive ? THREE.AdditiveBlending : THREE.NormalBlending;
     markerMat.needsUpdate = true;
   }
