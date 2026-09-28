@@ -4,8 +4,10 @@ import { useEffect, useRef, type ReactNode } from 'react'
 import { useScrollReveal } from './useScrollReveal'
 
 const INTRO = [
-  'JOMOOグループは、',
-  'キッチン・バスルーム領域における複数の個性あるブランドを保有・展開しています。',
+  '世界とつながり、日々の暮らしのすぐそばに。',
+  'JOMOOの歩みは世界各地に広がり、様々な市場へと発展を続けています。',
+  '世界で培ってきた技術、デザイン、サービスの知見を、',
+  'それぞれの土地の暮らしに寄り添った水まわりソリューションへと高めています。',
 ]
 
 /**

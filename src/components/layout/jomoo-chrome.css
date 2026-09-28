@@ -832,17 +832,24 @@
   opacity: 0.85;
 }
 
-@media (max-width: 1299px) {
-  :root {
-    --gutter: clamp(1.5rem, 4vw, 4rem);
-  }
-
+/* The full menu needs about 1450px logged out and 1495px logged in (マイページ
+   and ログアウト run wider than 会員登録 and ログイン), so below 1520px the
+   links move into the drawer rather than the actions wrapping onto a second
+   row. Keep this and the min-width query below in step with the resize
+   handler in JomooNav. */
+@media (max-width: 1519px) {
   .nav__menu {
     display: none;
   }
 
   .nav__toggle {
     display: inline-flex;
+  }
+}
+
+@media (max-width: 1299px) {
+  :root {
+    --gutter: clamp(1.5rem, 4vw, 4rem);
   }
 
   .footer__cols {
@@ -916,7 +923,7 @@
   }
 }
 
-@media (min-width: 1300px) {
+@media (min-width: 1520px) {
   .nav {
     display: flex;
     align-items: center;
