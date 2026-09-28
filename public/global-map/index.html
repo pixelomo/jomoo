@@ -138,10 +138,10 @@
   };
 
   const INK = {
-    // Land #f1ede8, pins in the brand gold #c3a763, arcs dark grey #4a4a4a
-    // like the names.
+    // Land #f1ede8, pins in the brand gold #c3a763, names dark grey #4a4a4a,
+    // arcs a lighter grey so they sit behind the pins and names.
     paper: 0xffffff, land: 0xf1ede8, wall: 0xd7e7f2, wallLow: 0xa9c4d8,
-    ink: 0xc3a763, edge: 0xc3a763, ghost: 0x4a4a4a, hot: 0x2b2b2b, marker: 0xc3a763, pinHot: 0xa88a45,
+    ink: 0xc3a763, edge: 0xc3a763, ghost: 0xa3a3a3, hot: 0x6e6e6e, marker: 0xc3a763, pinHot: 0xa88a45,
     hoverCap: 0xe4dccf,
     under: 0x4cc6ff, underA: 0.42, glow: 0x6fd0ff, glowA: 0.20, additive: false
   };
@@ -489,7 +489,7 @@
         '}'
       ].join('\n')
     });
-    m.uniforms.uWidth.value = glow ? 6.0 : 3.2;
+    m.uniforms.uWidth.value = glow ? 6.0 : 2.0;
     return m;
   }
   const laneMat = laneShader(false);
