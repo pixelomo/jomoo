@@ -585,6 +585,8 @@ export default function JomooHomepage() {
             </p>
           </div>
 
+          {/* The /products/smart-toilet cards show the same tagline and text from
+              Sanity (product → 一覧カード). Change one, change both. */}
           <div className="feature__grid">
             <a
               href="/products/smart-toilet/x40-b"

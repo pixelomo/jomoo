@@ -36,6 +36,7 @@ export default async function SeriesPage({ series }: Props) {
       href: `/products/${series}/${p.slug}`,
       eyebrow: p.heroEyebrow || fallbackEyebrow,
       name: p.heroTitle || p.name,
+      tagline: (p.card?.tagline ?? '').split('\n').filter(Boolean),
       desc: p.card?.description ?? p.tagline ?? '',
       art: { image, hover: url(p.card?.hoverImage?.asset) },
     }]
@@ -88,6 +89,16 @@ export default async function SeriesPage({ series }: Props) {
                   <div className="feature__content">
                     <span className="feature__pill">{card.eyebrow}</span>
                     <h2 className="feature__name">{card.name}</h2>
+                    {card.tagline.length > 0 && (
+                      <p className="feature__tagline">
+                        {card.tagline.map((line, i) => (
+                          <span key={line}>
+                            {i > 0 && <br />}
+                            {line}
+                          </span>
+                        ))}
+                      </p>
+                    )}
                     {card.desc && <p className="feature__desc">{card.desc}</p>}
                     <span className="feature__more">詳しく見る&gt;</span>
                   </div>

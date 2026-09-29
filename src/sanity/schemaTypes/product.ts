@@ -324,6 +324,13 @@ export const product = defineType({
           options: { hotspot: true },
         }),
         defineField({
+          name: 'tagline',
+          title: 'カードのキャッチコピー / Card Tagline',
+          type: 'text',
+          rows: 2,
+          description: '説明文の上に太字で表示されます。改行はそのまま反映されます。',
+        }),
+        defineField({
           name: 'description',
           title: 'カードの説明文 / Card Description',
           type: 'text',

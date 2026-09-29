@@ -105,6 +105,8 @@ export interface ProductHero {
 export interface ProductCard {
   image?: { asset?: AssetRef }
   hoverImage?: { asset?: AssetRef }
+  /** Bold line above the description, as on the homepage lineup cards. */
+  tagline?: string
   description?: string
 }
 
@@ -142,7 +144,7 @@ const PRODUCT_DETAIL_PROJECTION = `
   images[] { _key, asset, alt, caption },
   "model3dUrl": model3d.asset->url,
   price,
-  card { image, hoverImage, description },
+  card { image, hoverImage, tagline, description },
   featureVideos[] { embedUrl, title }
 `
 
@@ -237,7 +239,7 @@ export async function getProductsInSeries(series: string): Promise<ProductSummar
         "thumbnail": images[0].asset,
         "heroTitle": hero.title,
         "heroEyebrow": hero.eyebrow,
-        card { image, hoverImage, description }
+        card { image, hoverImage, tagline, description }
       }`,
       { series }
     )

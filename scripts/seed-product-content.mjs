@@ -168,7 +168,10 @@ const PRODUCTS = {
     card: {
       image: '/images/X-40-B.jpeg',
       hoverImage: '/images/X40-hover.jpeg',
-      description: '設置しているセンサーに反応して、自動で蓋が開閉したり、洗浄します。',
+      // Same words as the homepage lineup card (JomooHomepage.tsx) — keep in step.
+      tagline: 'スマート洗浄で\n毎日をもっと快適を。',
+      description:
+        'クリーンボットアームの泡洗浄からUV除菌、オート開閉まで自動化。触れることなく快適に使え、清潔さをしっかり維持します。さりげなく活躍する先進技術が毎日の暮らしに安心と心地良さを届けます。',
     },
     price: PRICE_PLACEHOLDER,
   },
@@ -183,7 +186,9 @@ const PRODUCTS = {
     card: {
       image: '/images/X-40-C.jpeg',
       hoverImage: '/images/X40-hover.jpeg',
-      description: '世界で多くの賞を獲得したデザインチームによる革新的なデザインです。',
+      tagline: '選べる洗浄で\n心地良い毎日を',
+      description:
+        '足元センサーによる自動洗浄とエアイン洗浄技術を採用。やさしい水流と快適な温度設定で、心地良い洗浄体験を実現します。毎日の使いやすさと清潔さに配慮した機能が、快適なトイレ空間を演出します。',
     },
     price: PRICE_PLACEHOLDER,
   },
@@ -289,6 +294,7 @@ async function main() {
       card: {
         image: imageRef(await upload(cfg.card.image)),
         hoverImage: imageRef(await upload(cfg.card.hoverImage)),
+        tagline: cfg.card.tagline,
         description: cfg.card.description,
       },
       price: cfg.price,
