@@ -103,6 +103,7 @@ export async function POST(req: Request) {
     serialNumber: data.serialNumber,
     registrationId: id,
     userId: sessionUser.id,
+    modelName: data.modelName,
   })
 
   let finalStatus = 'PENDING'

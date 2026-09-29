@@ -1,7 +1,7 @@
 import 'server-only'
-import { and, eq, ilike, inArray, isNull, or, type SQL } from 'drizzle-orm'
+import { and, eq, ilike, inArray, isNull, or, sql, type SQL } from 'drizzle-orm'
 import { db } from '@/lib/db'
-import { serialAuditLog, serialNumberEntry } from '@/lib/db/schema'
+import { productRegistration, serialAuditLog, serialNumberEntry } from '@/lib/db/schema'
 import {
   MAX_SERIAL_LENGTH,
   MIN_SERIAL_LENGTH,
@@ -372,6 +372,12 @@ export async function importSerials(
   const imported = inserted.length
   const skipped = parsed.rows.length - imported
 
+  // A member can register before the factory's list arrives: the serial is
+  // accepted and flagged, and nothing binds it because the library has no row.
+  // Now there is one, so claim it for that registration here — otherwise the
+  // library shows it UNUSED while a warranty already stands on it.
+  await bindToExistingRegistrations(parsed.rows.map((row) => row.serialNumber))
+
   // One summary row rather than one per serial: an import of ten thousand
   // serials would otherwise bury every other entry in the log, and each row
   // already records its own batch, importer and timestamp.
@@ -503,10 +509,15 @@ export async function bindSerialToRegistration({
   serialNumber,
   registrationId,
   userId,
+  modelName,
+  boundAt = new Date(),
 }: {
   serialNumber: string
   registrationId: string
   userId: string
+  /** The registered product. Fills the library row's model only if it has none. */
+  modelName?: string | null
+  boundAt?: Date
 }): Promise<void> {
   const serial = normaliseSerialNumber(serialNumber)
 
@@ -517,7 +528,10 @@ export async function bindSerialToRegistration({
         status: 'BOUND',
         registrationId,
         boundUserId: userId,
-        boundAt: new Date(),
+        boundAt,
+        // A factory list often carries only the series; the registration knows
+        // the model, so the library stops showing "—" for a bound serial.
+        modelName: sql`coalesce(${serialNumberEntry.modelName}, ${modelName ?? null})`,
         updatedAt: new Date(),
       })
       .where(
@@ -541,6 +555,38 @@ export async function bindSerialToRegistration({
     })
   } catch (err) {
     console.error('[serial-library] could not bind serial', serial, err)
+  }
+}
+
+/**
+ * Binds freshly imported serials to registrations already made against them.
+ * Best effort, like bindSerialToRegistration: an import must not fail over it.
+ */
+async function bindToExistingRegistrations(serials: string[]): Promise<void> {
+  if (!serials.length) return
+  try {
+    const registrations = await db
+      .select({
+        id: productRegistration.id,
+        userId: productRegistration.userId,
+        serialNumber: productRegistration.serialNumber,
+        modelName: productRegistration.modelName,
+        submittedAt: productRegistration.submittedAt,
+      })
+      .from(productRegistration)
+      .where(inArray(productRegistration.serialNumber, serials))
+
+    for (const reg of registrations) {
+      await bindSerialToRegistration({
+        serialNumber: reg.serialNumber,
+        registrationId: reg.id,
+        userId: reg.userId,
+        modelName: reg.modelName,
+        boundAt: reg.submittedAt,
+      })
+    }
+  } catch (err) {
+    console.error('[serial-library] could not bind imported serials to registrations', err)
   }
 }
 

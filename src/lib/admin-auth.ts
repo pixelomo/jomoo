@@ -151,10 +151,15 @@ function safeEqual(a: string, b: string): boolean {
 
 export function authenticateAdmin(username: string, password: string): AdminSession | null {
   let matched: AdminAccount | null = null
+  // Credentials arrive copied from a message or typed on a keyboard that
+  // capitalises the first letter, so "Support " must not read as a wrong
+  // account: surrounding spaces go from both, and usernames ignore case.
+  const user = username.trim().toLowerCase()
+  const pass = password.trim()
   // Every account is checked even after a hit, so the number of comparisons
   // does not reveal where in the list an account sits.
   for (const account of adminAccounts()) {
-    if (safeEqual(account.username, username) && safeEqual(account.password, password)) {
+    if (safeEqual(account.username.toLowerCase(), user) && safeEqual(account.password, pass)) {
       matched = account
     }
   }
