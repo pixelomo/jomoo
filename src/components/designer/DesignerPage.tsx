@@ -19,7 +19,7 @@ export default function DesignerPage() {
       <DesignerProfile
         tone="grey"
         side="left"
-        watermark="JOHAN DUCK"
+        watermark="JOHAN DÜCK"
         name="ヨハン・デュック"
         role="デザインディレクター（ID & UX）"
         photo="/images/designer/duck.webp"

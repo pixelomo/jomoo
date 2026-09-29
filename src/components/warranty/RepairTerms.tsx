@@ -1,4 +1,3 @@
-import type { ReactNode } from 'react'
 import './repair-terms.css'
 
 /**
@@ -9,26 +8,14 @@ import './repair-terms.css'
  * corrected in one place while the other keeps the old wording is worse than
  * either version on its own.
  *
- * Wording is the client's, supplied with the passages they want picked out in
- * red marked between backticks. Those become <Hi> here; the backticks
- * themselves are never rendered.
+ * Wording is the client's. It once picked passages out in red; the client
+ * asked for one colour throughout, so the copy is plain text now.
  */
 
-/** A passage the client marked for emphasis. */
-function Hi({ children }: { children: ReactNode }) {
-  return <span className="warranty-hi">{children}</span>
-}
-
-const EXCLUSIONS: { marker: string; text: ReactNode }[] = [
+const EXCLUSIONS: { marker: string; text: string }[] = [
   {
     marker: '1）',
-    text: (
-      <>
-        設置・使用・お手入れの不備：不適切な使用、施工説明書に従わない設置、指定外電源の使用、無許可または不適切なメンテナンス・改造、日常の清掃・お手入れの不備、設置場所の移動、
-        <Hi>製品説明書の設置条件に適合しないことにより</Hi>
-        生じた故障または損傷。および建物の変形など、製品自体以外の問題に起因する故障および損傷。
-      </>
-    ),
+    text: '設置・使用・お手入れの不備：不適切な使用、施工説明書に従わない設置、指定外電源の使用、無許可または不適切なメンテナンス・改造、日常の清掃・お手入れの不備、設置場所の移動、製品説明書の設置条件に適合しないことにより生じた故障または損傷。および建物の変形など、製品自体以外の問題に起因する故障および損傷。',
   },
   {
     marker: '2）',
@@ -44,13 +31,7 @@ const EXCLUSIONS: { marker: string; text: ReactNode }[] = [
   },
   {
     marker: '5）',
-    text: (
-      <>
-        水質・水圧および電源の問題：水圧の変動、水質不良など、水道法に定める飲用水の水質基準に適合しない水（温泉水、
-        <Hi>中水</Hi>
-        、井戸水など）の使用、配管の腐食、水垢の堆積、水道管内の異物、指定外電源（電圧・周波数）の使用に起因する故障および損傷。
-      </>
-    ),
+    text: '水質・水圧および電源の問題：水圧の変動、水質不良など、水道法に定める飲用水の水質基準に適合しない水（温泉水、中水、井戸水など）の使用、配管の腐食、水垢の堆積、水道管内の異物、指定外電源（電圧・周波数）の使用に起因する故障および損傷。',
   },
   {
     marker: '6）',
@@ -67,13 +48,7 @@ const EXCLUSIONS: { marker: string; text: ReactNode }[] = [
   { marker: '9）', text: '展示用商品、中古品は本保証の対象外です。' },
   {
     marker: '10）',
-    text: (
-      <>
-        上記のいずれかの事由に起因する付随的損害（家具、床、壁面などその
-        <Hi>他の財産への損害や人身傷害</Hi>
-        ）は、当社の無料保証および賠償責任の対象外です。
-      </>
-    ),
+    text: '上記のいずれかの事由に起因する付随的損害（家具、床、壁面などその他の財産への損害や人身傷害）は、当社の無料保証および賠償責任の対象外です。',
   },
 ]
 
@@ -88,20 +63,18 @@ export default function RepairTerms() {
             取扱説明書に従った正常なご使用状態で、保証期間内に故障が発生した場合は、無料で修理いたします。
           </li>
           <li>
-            無料修理をご希望の場合は、
-            <Hi>販売店またはJOMOOサービス</Hi>
-            ホットラインにご連絡のうえ、修理をご予約ください。修理の際は本保証書のご提示が必要です。
+            無料修理をご希望の場合は、販売店またはJOMOOサービスホットラインにご連絡のうえ、修理をご予約ください。修理の際は本保証書のご提示が必要です。
           </li>
           <li>
             保証期間は、本保証書に記載の引き渡し/販売日から開始します。保証書の記載内容に不備、改ざん、空欄、紛失などがある場合は、
-            {/* Red throughout and unemphasised — the markers are part of the
-                sentence here, not headings for it. */}
+            {/* Unemphasised — the markers are part of the sentence here, not
+                headings for it. */}
             <ol>
               <li>
-                <Hi>1）購入時のレシート・領収書などをご提示いただける場合は、販売日を基準に保証いたします。</Hi>
+                1）購入時のレシート・領収書などをご提示いただける場合は、販売日を基準に保証いたします。
               </li>
               <li>
-                <Hi>2）ご購入の販売店に再発行をご依頼ください。</Hi>
+                2）ご購入の販売店に再発行をご依頼ください。
               </li>
             </ol>
           </li>
@@ -123,10 +96,7 @@ export default function RepairTerms() {
         </ol>
 
         <p className="warranty-terms__closing">
-          本保証書は、
-          <Hi>
-            本書に記載の保証期間および条件に基づく無料修理をお約束するものであり、お客様の法律上の権利を制限するものではありません。保証などに関してご不明な点がある場合は、ご購入の販売店またはJOMOOサービスホットラインまでお問い合わせください。
-          </Hi>
+          本保証書は、本書に記載の保証期間および条件に基づく無料修理をお約束するものであり、お客様の法律上の権利を制限するものではありません。保証などに関してご不明な点がある場合は、ご購入の販売店またはJOMOOサービスホットラインまでお問い合わせください。
         </p>
       </div>
     </section>

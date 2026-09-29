@@ -27,7 +27,7 @@ function getStatStep(target: number) {
   if (target === 300000) return 10000
   if (target === 20000) return 1000
   if (target === 15 || target === 16) return 1
-  if (target === 120 || target === 350) return 10
+  if (target === 120 || target === 410) return 10
   return 1
 }
 
@@ -690,7 +690,7 @@ export default function JomooHomepage() {
                 </span>
               </div>
             </div>
-            <div className="stat" data-target="350">
+            <div className="stat" data-target="410">
               <div className="stat__top">
                 <div className="stat__icon">
                   <img src="/images/icon/icon_00003.png" alt="" />

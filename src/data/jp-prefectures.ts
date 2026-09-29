@@ -47,11 +47,3 @@ export const JP_PREFECTURES = [
   '鹿児島県',
   '沖縄県',
 ] as const
-
-export const COUNTRY_CODES = [
-  { value: '+81', label: '日本 (+81)' },
-  { value: '+86', label: '中国 (+86)' },
-  { value: '+1', label: 'アメリカ (+1)' },
-  { value: '+82', label: '韓国 (+82)' },
-  { value: '+44', label: 'イギリス (+44)' },
-] as const

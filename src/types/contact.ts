@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { isJapanesePhone, PHONE_ERROR } from '@/types/phone'
 
 /**
  * The inboxes an inquiry can land in.
@@ -91,7 +92,7 @@ export const ContactSchema = z
     phoneNumber: z
       .string()
       .optional()
-      .refine((value) => !value || /^\d+$/.test(value), 'phoneDigitsOnly'),
+      .refine((value) => !value || isJapanesePhone(value), PHONE_ERROR),
     message: z.string().min(1),
     showroomReservation: z.boolean(),
     preferredDateTime: z.string().optional(),

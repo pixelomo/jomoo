@@ -6,7 +6,8 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useTranslations } from 'next-intl'
 import SignUpField from './SignUpField'
 import NextCaret from './NextCaret'
-import { COUNTRY_CODES, JP_PREFECTURES } from '@/data/jp-prefectures'
+import { JP_PREFECTURES } from '@/data/jp-prefectures'
+import { PHONE_ERROR, PHONE_PLACEHOLDER } from '@/types/phone'
 import {
   CorporateSignupSchema,
   GENDER_OPTIONS,
@@ -40,7 +41,7 @@ function resolveError(
     message === 'passwordMinLength' ||
     message === 'passwordComplexity' ||
     message === 'passwordMismatch' ||
-    message === 'phoneDigitsOnly'
+    message === PHONE_ERROR
   ) {
     return t(`errors.${message}`)
   }
@@ -75,10 +76,7 @@ export default function SignUpStep2({
     resolver: zodResolver(
       isCorporate ? CorporateSignupSchema : IndividualSignupSchema
     ) as Resolver<SignupData>,
-    defaultValues: {
-      countryCode: '+81',
-      ...defaultValues,
-    },
+    defaultValues,
   })
 
   const err = (field: keyof SignupData) => resolveError(errors[field]?.message as string, t)
@@ -256,31 +254,17 @@ export default function SignUpStep2({
               label={t('phoneNumber')}
               required
               htmlFor="phoneNumber"
-              error={err('countryCode') ?? err('phoneNumber')}
+              error={err('phoneNumber')}
             >
-              <div className="signup__phone">
-                <select
-                  id="countryCode"
-                  className="account-select"
-                  aria-label={t('countryCodePlaceholder')}
-                  {...register('countryCode')}
-                >
-                  {COUNTRY_CODES.map((code) => (
-                    <option key={code.value} value={code.value}>
-                      {code.label}
-                    </option>
-                  ))}
-                </select>
-                <input
-                  id="phoneNumber"
-                  type="tel"
-                  inputMode="numeric"
-                  className="account-input"
-                  placeholder={t('phoneNumberPlaceholder')}
-                  autoComplete="tel-national"
-                  {...register('phoneNumber')}
-                />
-              </div>
+              <input
+                id="phoneNumber"
+                type="tel"
+                inputMode="tel"
+                className="account-input"
+                placeholder={PHONE_PLACEHOLDER}
+                autoComplete="tel-national"
+                {...register('phoneNumber')}
+              />
             </SignUpField>
           </>
         )}

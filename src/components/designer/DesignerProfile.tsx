@@ -13,6 +13,8 @@ const ADVANCE: Record<string, number> = {
   A: 683, B: 683, C: 700, D: 727, E: 604, F: 585, G: 738, H: 745, I: 300,
   J: 512, K: 675, L: 570, M: 907, N: 764, O: 776, P: 668, Q: 776, R: 675,
   S: 616, T: 601, U: 733, V: 668, W: 986, X: 656, Y: 630, Z: 620, ' ': 260,
+  // An umlaut sets on its base letter's width.
+  Ü: 733,
 }
 
 /** Tracking the stylesheet applies, which shortens the line a little. */

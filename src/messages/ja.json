@@ -105,7 +105,6 @@
       "birthMonth": "月",
       "birthDay": "日",
       "phoneNumber": "電話番号",
-      "countryCodePlaceholder": "国際番号",
       "phoneNumberPlaceholder": "電話番号",
       "postalCode": "郵便番号",
       "postalCodePlaceholder": "例）0123456",
@@ -131,7 +130,7 @@
         "passwordMinLength": "パスワードは8桁以上にしてください",
         "passwordComplexity": "パスワードは、大文字、小文字、数字もしくは記号を含めてください",
         "passwordMismatch": "パスワードが一致しません",
-        "phoneDigitsOnly": "半角数字ハイフンなしで入力ください"
+        "phoneFormat": "半角数字（ハイフン可）で入力してください"
       }
     }
   },

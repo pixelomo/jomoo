@@ -7,7 +7,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import SignUpField from '@/components/auth/SignUpField'
 import NextCaret from '@/components/auth/NextCaret'
 import ContactStepIndicator from './ContactStepIndicator'
-import { COUNTRY_CODES } from '@/data/jp-prefectures'
+import { PHONE_ERROR, PHONE_PLACEHOLDER } from '@/types/phone'
 import {
   CONTACT_CATEGORIES,
   ContactSchema,
@@ -22,7 +22,7 @@ const SUBMIT_ERROR_MESSAGE = '送信に失敗しました。しばらくして�
 
 function resolveError(message: string | undefined) {
   if (!message) return undefined
-  if (message === 'phoneDigitsOnly') return '半角数字ハイフンなしで入力ください'
+  if (message === PHONE_ERROR) return '半角数字（ハイフン可）で入力してください'
   if (message === 'showroomDateRequired') return 'ショールーム予約の日時を入力してください'
   return '必須項目です'
 }
@@ -54,7 +54,6 @@ export default function ContactForm() {
   } = useForm<ContactData>({
     resolver: zodResolver(ContactSchema),
     defaultValues: {
-      countryCode: '+81',
       showroomReservation: presetShowroom,
       ...(presetCategory && { category: presetCategory }),
     },
@@ -168,27 +167,15 @@ export default function ContactForm() {
                 htmlFor="phoneNumber"
                 error={resolveError(errors.phoneNumber?.message)}
               >
-                <div className="signup__phone">
-                  <select
-                    id="countryCode"
-                    className="account-select"
-                    aria-label="国番号"
-                    {...register('countryCode')}
-                  >
-                    {COUNTRY_CODES.map((code) => (
-                      <option key={code.value} value={code.value}>
-                        {code.label}
-                      </option>
-                    ))}
-                  </select>
-                  <input
-                    id="phoneNumber"
-                    type="tel"
-                    inputMode="numeric"
-                    className="account-input"
-                    {...register('phoneNumber')}
-                  />
-                </div>
+                <input
+                  id="phoneNumber"
+                  type="tel"
+                  inputMode="tel"
+                  className="account-input"
+                  placeholder={PHONE_PLACEHOLDER}
+                  autoComplete="tel-national"
+                  {...register('phoneNumber')}
+                />
                 <p className="signup__note">※法人の場合のみご記入ください。</p>
               </SignUpField>
             </section>

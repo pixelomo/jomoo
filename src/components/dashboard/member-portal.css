@@ -1351,12 +1351,6 @@
 }
 
 /* 電話番号: a narrow 国際番号 box beside the number itself. */
-.signup__phone {
-  display: grid;
-  grid-template-columns: 9rem minmax(0, 1fr);
-  gap: 1rem;
-}
-
 /* ── actions ───────────────────────────────────────────── */
 .signup__actions {
   display: flex;

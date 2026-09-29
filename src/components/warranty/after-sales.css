@@ -26,6 +26,8 @@
   font-weight: 700;
   line-height: 1.4;
   color: #0a0a0a;
+  word-break: auto-phrase;
+  text-wrap: balance;
 }
 
 .after-sales__lead {
@@ -33,4 +35,6 @@
   font-size: clamp(1rem, 1.5vw, 1.125rem);
   line-height: 1.9;
   color: #3a3a3a;
+  word-break: auto-phrase;
+  text-wrap: pretty;
 }

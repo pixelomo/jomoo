@@ -1,5 +1,6 @@
 import { z } from 'zod'
 import type { Gender } from '@/types/database'
+import { japanesePhone } from '@/types/phone'
 
 export type MembershipType = 'corporate' | 'individual'
 
@@ -17,11 +18,6 @@ const optionalGender = z.preprocess(
   (val) => (val === '' || val === undefined ? undefined : val),
   z.enum(['male', 'female', 'other', 'prefer_not_to_say']).optional()
 )
-
-const phoneDigits = z
-  .string()
-  .min(1)
-  .regex(/^\d+$/, 'phoneDigitsOnly')
 
 const passwordField = z
   .string()
@@ -83,8 +79,7 @@ export const IndividualSignupSchema = withPasswordMatch(
     ...nameFields,
     gender: optionalGender,
     ...birthFields,
-    countryCode: z.string().min(1),
-    phoneNumber: phoneDigits,
+    phoneNumber: japanesePhone,
     postalCode: optionalText,
     prefecture: optionalText,
     city: optionalText,

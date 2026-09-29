@@ -59,9 +59,7 @@ export default function SignUpForm() {
         memberType: membershipType,
         gender: optional(data.gender),
         dateOfBirth: buildDateOfBirth(data),
-        phoneNumber: optional(
-          data.phoneNumber ? `${data.countryCode ?? ''}${data.phoneNumber}` : undefined
-        ),
+        phoneNumber: optional(data.phoneNumber),
         companyName: optional(data.companyName),
         companyNameKana: optional(data.companyNameKana),
         lastName: optional(data.lastName),

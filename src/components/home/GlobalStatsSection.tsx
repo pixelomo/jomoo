@@ -8,7 +8,7 @@ const stats = [
   { value: 300000, suffix: '+', label: '販売拠点数' },
   { value: 16,     suffix: '',  label: 'グローバル研究開発センター' },
   { value: 15,     suffix: '+', label: 'ハイエンドスマートファクトリー' },
-  { value: 350,    suffix: '+', label: '国際デザイン賞受賞数' },
+  { value: 410,    suffix: '+', label: '国際デザイン賞受賞数' },
   { value: 20000,  suffix: '+', label: '特許取得数' },
 ]
 
