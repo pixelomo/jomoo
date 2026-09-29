@@ -3,9 +3,9 @@
  *
  * There is deliberately no rule here about how long a serial is or what it
  * starts with. The factory's numbers vary by product line and by production
- * run — X40 toilets are 19 characters, the toilets, shower heads and bathroom
- * cabinets shipped since are 20, and letters appear part way through the number
- * as well as at the front (J2339391200000HE1110). Every pattern we invented for
+ * run — an X40 is J + 19 (20 characters), every other toilet, shower head,
+ * faucet and cabinet is J + 20 (21), and letters appear part way through the
+ * number as well as at the front (J2339391200000HE1110). Every pattern we invented for
  * that was wrong within a batch, so the only question worth asking is whether
  * the number is one of the ones actually issued — which is a lookup against the
  * imported serial library, in serialLibrary.ts, not something this module can

@@ -223,8 +223,9 @@ function splitCsvLine(line: string): string[] {
  * a delivery note before importing it is how serials end up being retyped.
  *
  * Serials of any length and any mixture of letters and digits are accepted, so
- * a single file can hold every product in a delivery — a 19-character X40
- * beside a 20-character cabinet — without anyone sorting it first. This file is
+ * a single file can hold every product in a delivery — a 20-character X40
+ * (J + 19) beside a 21-character faucet (J + 20) — without anyone sorting it
+ * first. This file is
  * what defines a valid serial; nothing here second-guesses the factory.
  */
 export function parseSerialImport(
