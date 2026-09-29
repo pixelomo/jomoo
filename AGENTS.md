@@ -38,6 +38,10 @@ moves the contact form's routing and the portal's filter together.
 if one moved unintentionally; `npx tsx scripts/seed-mock-enquiries.mts` writes
 one briefing enquiry per category so each desk login has something to open, and
 `--remove` takes them away again.
+`npx tsx scripts/send-demo-enquiries.mts` sends three realistic enquiries per
+category through the live form (real mail to each desk) for client demos; it
+refuses to run while the Resend sending domain is unverified, and `--remove`
+deletes them — **run it before launch**.
 
 # Cookie consent
 
