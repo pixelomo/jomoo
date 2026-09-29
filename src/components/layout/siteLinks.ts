@@ -12,10 +12,9 @@ export const COMPANY_LINK: SiteLink = { href: '/company-information', label: '�
 export const COMPANY_SUB_LINKS: readonly SiteLink[] = [
   { href: '/showroom', label: 'ショールーム' },
   { href: '/global-projects', label: 'グローバルプロジェクト' },
+  { href: '/designer', label: 'デザイナー' },
   { href: '/careers', label: '採用情報' },
 ]
-
-export const DESIGNER_LINK: SiteLink = { href: '/designer', label: 'デザイナー' }
 
 export const BLOG_LINK: SiteLink = { href: '/blog', label: 'ブログ' }
 

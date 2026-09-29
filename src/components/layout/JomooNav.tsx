@@ -12,7 +12,6 @@ import {
   BLOG_LINK,
   COMPANY_LINK,
   COMPANY_SUB_LINKS,
-  DESIGNER_LINK,
   PRODUCTS_LINK,
 } from './siteLinks'
 
@@ -29,7 +28,6 @@ interface Props {
 const NAV_LINKS = [
   PRODUCTS_LINK,
   { ...COMPANY_LINK, children: COMPANY_SUB_LINKS },
-  DESIGNER_LINK,
   BLOG_LINK,
 ]
 

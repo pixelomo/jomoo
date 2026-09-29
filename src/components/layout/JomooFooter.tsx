@@ -10,7 +10,6 @@ import {
   BLOG_LINK,
   COMPANY_LINK,
   COMPANY_SUB_LINKS,
-  DESIGNER_LINK,
   PRODUCTS_LINK,
   PRODUCT_CATEGORY_LINKS,
 } from './siteLinks'
@@ -111,7 +110,7 @@ export default function JomooFooter({ legalLinks = [] }: { legalLinks?: LegalLin
           <div className="footer__col">
             <h4>{COMPANY_LINK.label}</h4>
             <ul>
-              {[COMPANY_LINK, ...COMPANY_SUB_LINKS, DESIGNER_LINK, BLOG_LINK].map((link) => (
+              {[COMPANY_LINK, ...COMPANY_SUB_LINKS, BLOG_LINK].map((link) => (
                 <li key={link.href}><a href={link.href}>{link.label}</a></li>
               ))}
               <li className="footer__li--gap">
