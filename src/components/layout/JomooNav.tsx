@@ -24,7 +24,7 @@ interface Props {
 }
 
 // 会社情報 carries its sub-pages as a dropdown: seven links side by side do not
-// fit beside the actions at 1520px, where the full menu first appears.
+// fit beside the actions at 1280px, where the full menu first appears.
 // インスピレーション is hidden until that page is built — add it back when it ships.
 const NAV_LINKS = [
   PRODUCTS_LINK,
@@ -99,7 +99,7 @@ export default function JomooNav({ isSignedIn }: Props) {
     }
 
     function onResize() {
-      if (window.innerWidth >= 1520) setMenuOpen(false)
+      if (window.innerWidth >= 1280) setMenuOpen(false)
     }
 
     document.addEventListener('keydown', onKeyDown)

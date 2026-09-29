@@ -832,12 +832,13 @@
   opacity: 0.85;
 }
 
-/* The full menu needs about 1450px logged out and 1495px logged in (マイページ
-   and ログアウト run wider than 会員登録 and ログイン), so below 1520px the
-   links move into the drawer rather than the actions wrapping onto a second
-   row. Keep this and the min-width query below in step with the resize
-   handler in JomooNav. */
-@media (max-width: 1519px) {
+/* At full size the menu needs about 1450px logged out and 1495px logged in
+   (マイページ and ログアウト run wider than 会員登録 and ログイン). Laptops sit
+   below that and the client wants the 会社情報 dropdown there, so from 1280 to
+   1519 the bar keeps its menu at a compact size (see the 1280-1519 query
+   below), and only under 1280 do the links move into the drawer. Keep this
+   and the min-width query below in step with the resize handler in JomooNav. */
+@media (max-width: 1279px) {
   .nav__menu {
     display: none;
   }
@@ -923,7 +924,7 @@
   }
 }
 
-@media (min-width: 1520px) {
+@media (min-width: 1280px) {
   .nav {
     display: flex;
     align-items: center;
@@ -950,3 +951,41 @@
   }
 }
 
+/* Laptop widths: the full menu stays, with smaller type and tighter spacing
+   everywhere in the bar so it fits on one row logged in or out. Must follow
+   the min-width: 1280px block above to win on source order. */
+@media (min-width: 1280px) and (max-width: 1519px) {
+  .nav {
+    --gutter: 2.5rem;
+    column-gap: 1.75rem;
+  }
+
+  .nav__menu {
+    gap: 28px;
+    font-size: 1.1rem;
+    letter-spacing: 0.04em;
+  }
+
+  .nav__submenu {
+    font-size: 0.95rem;
+  }
+
+  .nav__end,
+  .nav__actions {
+    gap: 12px;
+  }
+
+  .nav__actions {
+    font-size: 17px;
+  }
+
+  .nav__btn {
+    padding: 3px 16px;
+    letter-spacing: 0.04em;
+  }
+
+  .nav__auth-icon--signin,
+  .nav__auth-icon--signout {
+    letter-spacing: 0.04em;
+  }
+}

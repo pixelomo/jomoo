@@ -487,6 +487,42 @@ img {
   word-break: normal;
 }
 
+/* The hero's height follows the window, so on a short one (a 1366x768 laptop
+   less its browser chrome) the 9rem badges pushed the source notes off the
+   bottom. The badges take their mobile size there, and on narrower screens,
+   well before that can happen. */
+@media (max-width: 1439px), (max-height: 900px) {
+  .hero__awards {
+    flex-wrap: nowrap;
+  }
+
+  .hero__award {
+    height: auto;
+    width: calc(50% - 0.25rem);
+    max-width: 8.5rem;
+    flex-shrink: 1;
+  }
+}
+
+/* Smaller badges alone still left a laptop's real viewport (1366x768 is about
+   657px tall inside the browser) 86px short, because the X40 logo is sized by
+   width. On a short window the logo follows the height instead, and the gaps
+   tighten. */
+@media (max-height: 800px) and (min-width: 768px) {
+  :root {
+    --hero-pt: 2.5rem;
+  }
+
+  .hero__title--logo img {
+    height: clamp(64px, 14vh, 162px);
+  }
+
+  .hero__subtitle,
+  .hero__tagline {
+    margin-bottom: 1.25rem;
+  }
+}
+
 /* Source notes under the awards on slide 1. Quiet — they are a citation, not
    part of the pitch. */
 .hero__footnotes {
@@ -2386,10 +2422,6 @@ img {
     font-size: clamp(20px, 4vw, 26px);
   }
 
-  .hero__award {
-    height: 7rem;
-  }
-
   .world {
     padding: 5rem 0;
   }
@@ -2534,20 +2566,6 @@ img {
 
   .hero__tagline--control {
     font-size: clamp(17px, 4.2vw, 22px);
-  }
-
-  /* Side by side rather than stacked — stacked, the two badges pushed the
-     source notes below the hero's bottom edge. Width-driven so the pair always
-     fits the row. */
-  .hero__awards {
-    flex-wrap: nowrap;
-  }
-
-  .hero__award {
-    height: auto;
-    width: calc(50% - 0.25rem);
-    max-width: 8.5rem;
-    flex-shrink: 1;
   }
 
   .hero__footnotes {

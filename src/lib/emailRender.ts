@@ -105,7 +105,7 @@ function standardWrapper(greeting: string, body: string, logoUrl: string): strin
 }
 
 /** The wider internal one, for the enquiry table staff read. */
-function contactWrapper(body: string, logoUrl: string): string {
+function contactWrapper(body: string, logoUrl: string, heading = 'JOMOO お問い合わせ'): string {
   return `
 <!DOCTYPE html>
 <html>
@@ -113,7 +113,7 @@ function contactWrapper(body: string, logoUrl: string): string {
 <body style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f4f4f5;margin:0;padding:32px 16px">
   <div style="max-width:640px;margin:0 auto;background:#fff;border-radius:8px;overflow:hidden;border:1px solid #e4e4e7">
     <div style="background:#18181b;padding:20px 28px">
-      <p style="margin:0;color:#fff;font-size:18px;font-weight:700;letter-spacing:0.05em">JOMOO お問い合わせ</p>
+      <p style="margin:0;color:#fff;font-size:18px;font-weight:700;letter-spacing:0.05em">${heading}</p>
     </div>
     <div style="padding:24px 28px 16px">
       <table style="width:100%;border-collapse:collapse">${body}</table>
@@ -140,7 +140,7 @@ export interface TemplateContent {
  * one unclosed tag cannot take the whole email apart.
  */
 export function renderTemplate(
-  def: Pick<EmailTemplateDef, 'wrapper'>,
+  def: Pick<EmailTemplateDef, 'wrapper' | 'heading'>,
   content: TemplateContent,
   vars: Record<string, unknown>,
   /** Absolute URL of the footer wordmark. The admin preview passes its own
@@ -157,7 +157,7 @@ export function renderTemplate(
 
   if (def.wrapper === 'contact') {
     // The enquiry table is one raw fragment, not a run of paragraphs.
-    return { subject, html: contactWrapper(paragraphs.join(''), logoUrl) }
+    return { subject, html: contactWrapper(paragraphs.join(''), logoUrl, def.heading) }
   }
 
   return {

@@ -30,6 +30,8 @@ export interface EmailTemplateDef {
   description: string
   /** 'standard' is the JOMOO member wrapper; 'contact' is the wider staff one. */
   wrapper: 'standard' | 'contact'
+  /** Title bar of the 'contact' wrapper. Defaults to JOMOO お問い合わせ. */
+  heading?: string
   subject: string
   /** Line above the body. Unused by the 'contact' wrapper. */
   greeting: string
@@ -73,6 +75,26 @@ export const EMAIL_TEMPLATES: EmailTemplateDef[] = [
       NAME,
       DASHBOARD_URL,
       { name: 'signInUrl', description: 'Link to the sign-in page', sample: 'https://example.com/sign-in' },
+    ],
+  },
+  {
+    id: 'member_staff',
+    notification: 'member_staff',
+    label: '新規会員登録通知（社内）',
+    description: 'The internal notice sent to the JOMOO Japan inbox when someone signs up.',
+    wrapper: 'contact',
+    heading: 'JOMOO 新規会員登録',
+    subject: '【JOMOO】新規会員登録: {{name}}',
+    greeting: '',
+    body: '{{{detailsTable}}}',
+    variables: [
+      { ...NAME, description: "The new member's name" },
+      {
+        name: 'detailsTable',
+        description: 'The account details as a table, built by the site',
+        sample: '<tr><td>お名前</td><td>山田 太郎</td></tr>',
+        raw: true,
+      },
     ],
   },
   {

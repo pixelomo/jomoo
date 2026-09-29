@@ -22,6 +22,19 @@ function escapeHtml(value: unknown): string {
     .replace(/'/g, '&#39;')
 }
 
+/** Label/value rows for the staff emails' table, every cell escaped. */
+function detailsRows(rows: string[][]): string {
+  return rows
+    .map(
+      ([label, value]) => `
+        <tr>
+          <td style="padding:10px 12px;border-bottom:1px solid #f4f4f5;font-size:13px;color:#71717a;vertical-align:top;width:140px">${escapeHtml(label)}</td>
+          <td style="padding:10px 12px;border-bottom:1px solid #f4f4f5;font-size:14px;color:#18181b;white-space:pre-wrap">${escapeHtml(value)}</td>
+        </tr>`
+    )
+    .join('')
+}
+
 function isResendConfigured() {
   return Boolean(process.env.RESEND_API_KEY?.trim() && process.env.RESEND_FROM_EMAIL?.trim())
 }
@@ -160,15 +173,7 @@ export async function sendContactInquiry({
 
   // Built here rather than in the template so the cells stay escaped whatever
   // an admin does to the wording around them.
-  const detailsTable = rows
-    .map(
-      ([label, value]) => `
-        <tr>
-          <td style="padding:10px 12px;border-bottom:1px solid #f4f4f5;font-size:13px;color:#71717a;vertical-align:top;width:140px">${escapeHtml(label)}</td>
-          <td style="padding:10px 12px;border-bottom:1px solid #f4f4f5;font-size:14px;color:#18181b;white-space:pre-wrap">${escapeHtml(value)}</td>
-        </tr>`
-    )
-    .join('')
+  const detailsTable = detailsRows(rows)
 
   await deliverEmail({
     to: contactAddressFor(category),
@@ -231,6 +236,67 @@ export async function sendMemberWelcome({
     devLabel: 'member welcome',
     devSummary: { name },
     ...(await buildEmail('welcome', { name, dashboardUrl, signInUrl })),
+  })
+}
+
+// ─────────────────────────────────────────────
+// New member notice, to the JOMOO Japan inbox (fires once, on account creation)
+// ─────────────────────────────────────────────
+
+/**
+ * Where staff hear about new sign-ups. MEMBER_NOTIFY_EMAIL overrides it without
+ * a deploy; in development it follows CONTACT_DEV_TO_EMAIL like the contact
+ * form does, so a local test sign-up never lands in the client's inbox.
+ */
+function memberNotifyAddress() {
+  if (process.env.NODE_ENV === 'development' && process.env.CONTACT_DEV_TO_EMAIL?.trim()) {
+    return process.env.CONTACT_DEV_TO_EMAIL.trim()
+  }
+  return process.env.MEMBER_NOTIFY_EMAIL?.trim() || 'jomoojapan@jomoo.com'
+}
+
+export async function sendMemberSignupNotice(member: {
+  email: string
+  name?: string | null
+  memberType?: string | null
+  companyName?: string | null
+  phoneNumber?: string | null
+  postalCode?: string | null
+  prefecture?: string | null
+  city?: string | null
+  streetAddress?: string | null
+  building?: string | null
+}) {
+  const name = member.name || member.email
+  const address = [
+    member.postalCode && `〒${member.postalCode}`,
+    member.prefecture,
+    member.city,
+    member.streetAddress,
+    member.building,
+  ]
+    .filter(Boolean)
+    .join(' ')
+
+  const rows = [
+    ['会員種別', member.memberType === 'corporate' ? '法人' : member.memberType === 'individual' ? '個人' : '—'],
+    ['お名前', name],
+    ['会社名', member.companyName || '—'],
+    ['メールアドレス', member.email],
+    ['電話番号', member.phoneNumber || '—'],
+    ['住所', address || '—'],
+    ['登録日時', new Date().toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' })],
+  ]
+
+  const detailsTable = detailsRows(rows)
+
+  await deliverEmail({
+    to: memberNotifyAddress(),
+    replyTo: member.email,
+    notification: 'member_staff',
+    devLabel: 'new member notice',
+    devSummary: { email: member.email, memberType: member.memberType },
+    ...(await buildEmail('member_staff', { name, detailsTable })),
   })
 }
 

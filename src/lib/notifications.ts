@@ -11,6 +11,7 @@ import { notificationSetting } from '@/lib/db/schema'
  */
 export const NOTIFICATIONS = [
   { key: 'welcome', label: '会員登録完了メール', description: '新規会員登録の直後に送信されます。' },
+  { key: 'member_staff', label: '新規会員登録通知（社内）', description: '会員登録があったことを jomoojapan@jomoo.com へお知らせします。' },
   { key: 'password_reset', label: 'パスワード再設定メール', description: 'パスワードをお忘れの場合の再設定リンク。' },
   { key: 'registration', label: '製品登録受付メール', description: '製品登録を受け付けたことをお知らせします。' },
   { key: 'warranty', label: '電子保証カード発行メール', description: '保証が発行されたときに送信されます。' },

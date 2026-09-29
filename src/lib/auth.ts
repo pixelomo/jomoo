@@ -25,6 +25,8 @@ export const auth = betterAuth({
     'http://localhost:3000',
     'http://127.0.0.1:3000',
     authBaseURL,
+    'https://jomoo.jp',
+    'https://www.jomoo.jp',
     'https://jomoo-ashy.vercel.app',
   ],
   emailAndPassword: {
@@ -68,6 +70,17 @@ export const auth = betterAuth({
           if (member.memberType === 'corporate') {
             const { linkMemberToBranch } = await import('./dealerBranches')
             await linkMemberToBranch(createdUser.id, member)
+          }
+
+          // Staff hear about every sign-up at creation, verified or not.
+          try {
+            const { sendMemberSignupNotice } = await import('./resend')
+            await sendMemberSignupNotice(member)
+          } catch (err) {
+            console.error('[auth] new member notice failed', {
+              userId: createdUser.id,
+              err,
+            })
           }
 
           if (EMAIL_VERIFICATION_REQUIRED) return
