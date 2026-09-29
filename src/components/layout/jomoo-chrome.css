@@ -924,6 +924,66 @@
   }
 }
 
+/* The drawer's sign-in link and its search / global-site row only matter once
+   the bar has handed those over, at phone width below. */
+.nav__drawer-narrow {
+  display: none;
+}
+
+/* ログアウト is a button among links; it takes their look. */
+button.nav__drawer-btn {
+  background: none;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.nav__drawer-btn .nav__auth-glyph {
+  width: 20px;
+  height: 16px;
+  margin-right: 0.5rem;
+}
+
+.nav__drawer-utils {
+  gap: 1.5rem;
+  padding: 1.25rem 0 0.5rem;
+}
+
+.nav__drawer-util {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  font-size: 15px;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.nav__drawer-util img {
+  width: 20px;
+  height: 20px;
+}
+
+/* At 430 and below the logo, the icons, お問い合わせ and ログイン no longer fit
+   on one row and the bar wrapped to two. The bar keeps only the logo and the
+   burger; everything else is in the drawer. */
+@media (max-width: 430px) {
+  .nav__actions {
+    display: none;
+  }
+
+  .nav__drawer-narrow {
+    display: inline-flex;
+  }
+
+  .nav__drawer-utils {
+    display: flex;
+  }
+}
+
 @media (min-width: 1280px) {
   .nav {
     display: flex;

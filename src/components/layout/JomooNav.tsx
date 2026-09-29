@@ -154,6 +154,11 @@ export default function JomooNav({ isSignedIn }: Props) {
     setMenuOpen(false)
   }
 
+  async function signOut() {
+    await authClient.signOut()
+    window.location.assign('/')
+  }
+
   return (
     <nav
       className={`nav${menuOpen ? ' is-menu-open' : ''}${
@@ -248,10 +253,7 @@ export default function JomooNav({ isSignedIn }: Props) {
               <button
                 type="button"
                 className="nav__auth-icon nav__auth-icon--signout"
-                onClick={async () => {
-                  await authClient.signOut()
-                  window.location.assign('/')
-                }}
+                onClick={signOut}
               >
                 <AuthGlyph direction="out" />
                 ログアウト
@@ -323,22 +325,59 @@ export default function JomooNav({ isSignedIn }: Props) {
             お問い合わせ
           </a>
           {!isSignedIn ? (
-            <a
-              href="/sign-up"
-              className="nav__drawer-btn nav__drawer-btn--signup"
-              onClick={closeMenu}
-            >
-              会員登録
-            </a>
+            <>
+              <a
+                href="/sign-up"
+                className="nav__drawer-btn nav__drawer-btn--signup"
+                onClick={closeMenu}
+              >
+                会員登録
+              </a>
+              <a href="/sign-in" className="nav__drawer-btn nav__drawer-narrow" onClick={closeMenu}>
+                <AuthGlyph direction="in" />
+                ログイン
+              </a>
+            </>
           ) : (
-            <a
-              href="/dashboard"
-              className="nav__drawer-btn"
-              onClick={closeMenu}
-            >
-              マイページ
-            </a>
+            <>
+              <a
+                href="/dashboard"
+                className="nav__drawer-btn"
+                onClick={closeMenu}
+              >
+                マイページ
+              </a>
+              <button type="button" className="nav__drawer-btn nav__drawer-narrow" onClick={signOut}>
+                <AuthGlyph direction="out" />
+                ログアウト
+              </button>
+            </>
           )}
+        </div>
+        {/* On a phone the bar holds only the logo and the burger, so the
+            globe and search move in here with the sign-in link above. */}
+        <div className="nav__drawer-utils nav__drawer-narrow">
+          <button
+            type="button"
+            className="nav__drawer-util"
+            aria-controls="nav-search"
+            onClick={() => {
+              setMenuOpen(false)
+              setSearchOpen(true)
+            }}
+          >
+            <img src="/images/search.svg" alt="" />
+            検索
+          </button>
+          <a
+            href={GLOBAL_SITE}
+            className="nav__drawer-util"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <img src="/images/globe.svg" alt="" />
+            Global site (English)
+          </a>
         </div>
       </div>
     </nav>
