@@ -574,17 +574,20 @@
   padding: 2.5rem;
 }
 
-/* The height is set per brand from the markup — the wordmarks are different
-   shapes and the design sizes them optically. contain is what lets a logo that
-   is too wide for a narrow card shrink without being squashed. */
+/* The logo's own height is set per brand from the markup — the wordmarks are
+   different shapes and the design sizes them optically. The box around it is
+   one height for every card (a little over the tallest logo), so the copy below
+   starts level across a row. contain is what lets a logo that is too wide for
+   a narrow card shrink without being squashed. */
 .cp-brand__logo {
   display: flex;
   align-items: center;
+  min-height: 76px;
   margin-bottom: 2.5rem;
 }
 
 .cp-brand__logo img {
-  height: 100%;
+  display: block;
   width: auto;
   max-width: 100%;
   object-fit: contain;

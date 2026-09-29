@@ -9,6 +9,8 @@ interface Brand {
   logo: string
   /** Height the logo is drawn at, in px — see the note on the array below. */
   logoHeight: number
+  /** What the logo itself reads, when that is not the brand's name. */
+  logoAlt?: string
   lines: string[]
 }
 
@@ -18,49 +20,54 @@ interface Brand {
  * Each logo has its own height rather than one shared value: the wordmarks are
  * different shapes — JOMOO is a single line, THG carries PARIS beneath it,
  * poggenpohl is stacked over two — and the design sizes them optically, so the
- * heights here are the ones measured off it rather than a rule.
+ * heights here are the ones measured off it rather than a rule. Every file is
+ * cropped to its ink, so the heights are the wordmarks' own and the logos
+ * share a left edge with the copy. Every logo
+ * sits in a box as tall as the tallest one, so the copy under it starts on the
+ * same line in every card.
  */
 const BRANDS: Brand[] = [
   {
     name: 'JOMOO',
     photo: '/images/companyprofile/brand1.jpg',
     logo: '/images/companyprofile/brandlogo1.png',
-    logoHeight: 74,
+    logoHeight: 37,
     lines: ['先進技術と洗練された', 'デザインを融合した、', '高機能バスルームブランド。'],
   },
   {
     name: 'THG PARIS',
     photo: '/images/companyprofile/brand2.jpg',
     logo: '/images/companyprofile/brandlogo2.png',
-    logoHeight: 116,
+    logoHeight: 63,
     lines: ['パリの美意識が息づく、', 'ラグジュアリーな', '水まわりブランド。'],
   },
   {
     name: 'poggenpohl',
     photo: '/images/companyprofile/brand3.jpg',
     logo: '/images/companyprofile/brandlogo3.png',
-    logoHeight: 101,
+    logoHeight: 68,
     lines: ['130年以上の歴史を誇る、', 'ドイツ発のプレミアム', 'キッチンブランド。'],
   },
   {
     name: '小牧卫浴',
     photo: '/images/companyprofile/brand4.jpg',
     logo: '/images/companyprofile/brandlogo4.png',
-    logoHeight: 76,
+    logoAlt: 'SyncMood',
+    logoHeight: 49,
     lines: ['先進技術を搭載した、', 'ハイエンドスマート', 'シャワーブランド。'],
   },
   {
     name: 'URBAIN THG',
     photo: '/images/companyprofile/brand5.jpg',
     logo: '/images/companyprofile/brandlogo5.png',
-    logoHeight: 51,
+    logoHeight: 40,
     lines: ['パリの美意識が息づく、', 'ラグジュアリーな', '水まわりブランド。'],
   },
   {
     name: 'Goldreif poggenpohl',
     photo: '/images/companyprofile/brand6.jpg',
     logo: '/images/companyprofile/brandlogo6.png',
-    logoHeight: 68,
+    logoHeight: 37,
     lines: ['上質なキャビネットと', 'ワードローブを展開する、', 'ハイエンド収納ブランド。'],
   },
 ]
@@ -116,12 +123,14 @@ export default function BrandFamilySection() {
               />
             </figure>
             <div className="cp-brand__body">
-              <div
-                className="cp-brand__logo"
-                style={{ height: `${brand.logoHeight}px` }}
-              >
+              <div className="cp-brand__logo">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={brand.logo} alt={brand.name} loading="lazy" />
+                <img
+                  src={brand.logo}
+                  alt={brand.logoAlt ?? brand.name}
+                  loading="lazy"
+                  style={{ height: `${brand.logoHeight}px` }}
+                />
               </div>
               <p className="cp-brand__copy">
                 {brand.lines.map((line) => (
