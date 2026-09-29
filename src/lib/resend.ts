@@ -109,6 +109,9 @@ async function deliverEmail({
   })
 
   if (error) {
+    // Logged everywhere, not just in development: the thrown error is generic,
+    // and without this a revoked key reads as nothing more than "send failed".
+    console.error(`[email] Resend rejected ${devLabel}:`, error.name, error.message)
     if (contactDevFallbackEnabled()) {
       console.error(`[email:dev-fallback] Resend error for ${devLabel}:`, error)
       console.info(`[email:dev-fallback] Payload`, { to, replyTo, ...devSummary })
