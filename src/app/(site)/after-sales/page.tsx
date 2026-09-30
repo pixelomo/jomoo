@@ -1,22 +1,30 @@
+import { Fragment } from 'react'
 import type { Metadata } from 'next'
+import { notFound } from 'next/navigation'
 import RepairTerms from '@/components/warranty/RepairTerms'
+import { getAfterSalesPage, lines } from '@/lib/sanity'
 import '@/components/warranty/after-sales.css'
 
-export const metadata: Metadata = {
-  title: 'アフターサービス',
-  description:
-    'JOMOO製品の無料修理規定（保証規定）。保証期間、無料修理のご依頼方法、修理費用を申し受ける場合（免責事項）についてご案内します。',
+export async function generateMetadata(): Promise<Metadata> {
+  const data = await getAfterSalesPage()
+  return { title: data?.title || 'アフターサービス', description: data?.description }
 }
 
-export default function AfterSalesPage() {
+export default async function AfterSalesPage() {
+  const data = await getAfterSalesPage()
+  if (!data) notFound()
+
   return (
     <main className="flex-1 after-sales">
       <div className="after-sales__intro">
-        <h1 className="after-sales__title">アフターサービス</h1>
+        <h1 className="after-sales__title">{data.title}</h1>
         <p className="after-sales__lead">
-          JOMOO製品の無料修理規定（保証規定）について
-          <br />
-          説明しておりますので、下記内容をご覧ください。
+          {lines(data.lead).map((line, i) => (
+            <Fragment key={i}>
+              {i > 0 && <br />}
+              {line}
+            </Fragment>
+          ))}
         </p>
       </div>
 

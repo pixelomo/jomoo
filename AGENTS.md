@@ -25,10 +25,13 @@ the details printed on that page, and `--email … --password …` also gives it
 
 # CMS pages
 
-ブログ, 会社情報, デザイナー and グローバルプロジェクト render from Sanity: one
-`blogPost` document per post, and one singleton each for the other three
-(`companyPage`, `designerPage`, `globalProjectsPage` — the type name is the
-document id, and the Studio lists them under ページ). There is no fallback copy
+ブログ, 会社情報, デザイナー, グローバルプロジェクト, ショールーム, 採用情報,
+よくあるご質問 and アフターサービス render from Sanity: one `blogPost` document
+per post, and one singleton per page (`companyPage`, `designerPage`,
+`globalProjectsPage`, `showroomPage`, `careersPage`, `faqPage`,
+`afterSalesPage` — the type name is the document id, and the Studio lists them
+under ページ). The 無料修理規定 on the warranty certificate is read from
+`afterSalesPage` too, so the two cannot disagree. There is no fallback copy
 in the source; a missing singleton 404s its page.
 `node scripts/seed-cms-pages.mjs --apply` writes them from
 `scripts/cms-pages.json` (create-only; `--replace` overwrites Studio edits).

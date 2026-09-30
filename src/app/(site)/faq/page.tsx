@@ -1,12 +1,16 @@
 import type { Metadata } from 'next'
+import { notFound } from 'next/navigation'
 import FaqList from '@/components/faq/FaqList'
+import { getFaqPage } from '@/lib/sanity'
 
-export const metadata: Metadata = {
-  title: 'よくあるご質問',
-  description:
-    'JOMOO製品のよくあるご質問。スマートトイレ、水栓金具、シャワー、洗面化粧台、キッチンシンクなどの仕様・水圧条件・お手入れ方法についてご案内します。',
+export async function generateMetadata(): Promise<Metadata> {
+  const data = await getFaqPage()
+  return { title: data?.title || 'よくあるご質問', description: data?.description }
 }
 
-export default function FaqPage() {
-  return <FaqList />
+export default async function FaqPage() {
+  const data = await getFaqPage()
+  if (!data) notFound()
+
+  return <FaqList data={data} />
 }

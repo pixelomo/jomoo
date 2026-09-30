@@ -106,11 +106,14 @@ export default function JomooFooter({ legalLinks = [] }: { legalLinks?: LegalLin
           */}
 
           {/* Same names and order as the header: 会社情報 and its dropdown,
-              then デザイナー and ブログ. */}
+              then ブログ. The heading is the 会社情報 link itself rather than
+              a label over a link of the same name. */}
           <div className="footer__col">
-            <h4>{COMPANY_LINK.label}</h4>
+            <h4>
+              <a href={COMPANY_LINK.href}>{COMPANY_LINK.label}</a>
+            </h4>
             <ul>
-              {[COMPANY_LINK, ...COMPANY_SUB_LINKS, BLOG_LINK].map((link) => (
+              {[...COMPANY_SUB_LINKS, BLOG_LINK].map((link) => (
                 <li key={link.href}><a href={link.href}>{link.label}</a></li>
               ))}
               <li className="footer__li--gap">

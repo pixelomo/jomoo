@@ -768,6 +768,17 @@
   color: #fff;
 }
 
+/* A heading that is also a link keeps the heading's weight and colour. */
+.footer__col h4 a {
+  color: inherit;
+  font-weight: inherit;
+}
+
+.footer__col h4 a:hover {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
 .footer__li--gap {
   margin-top: 1.25rem;
 }

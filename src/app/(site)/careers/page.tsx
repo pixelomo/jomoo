@@ -1,12 +1,16 @@
 import type { Metadata } from 'next'
+import { notFound } from 'next/navigation'
 import CareersPage from '@/components/careers/CareersPage'
+import { getCareersPage } from '@/lib/sanity'
 
-export const metadata: Metadata = {
-  title: '採用情報',
-  description:
-    'JOMOOは、社員一人ひとりの挑戦と成長が会社の未来をつくると信じています。採用理念、働きやすい職場環境、成長を支える制度、社員の健康と福利厚生 — JOMOOで築くキャリアをご紹介します。',
+export async function generateMetadata(): Promise<Metadata> {
+  const data = await getCareersPage()
+  return { title: '採用情報', description: data?.description }
 }
 
-export default function Careers() {
-  return <CareersPage />
+export default async function Careers() {
+  const data = await getCareersPage()
+  if (!data) notFound()
+
+  return <CareersPage data={data} />
 }

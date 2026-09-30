@@ -1,12 +1,16 @@
 import type { Metadata } from 'next'
+import { notFound } from 'next/navigation'
 import ShowroomPage from '@/components/showroom/ShowroomPage'
+import { getShowroomPage } from '@/lib/sanity'
 
-export const metadata: Metadata = {
-  title: 'ショールーム',
-  description:
-    'JOMOOショールーム（運営：株式会社TRUST）。〒206-0042 東京都多摩市山王下1-12-12 福満ビル 101。スマートトイレ、洗面化粧台、水栓金具、シャワーセットを実際にご覧いただけます。ご来場は事前予約を承っています。',
+export async function generateMetadata(): Promise<Metadata> {
+  const data = await getShowroomPage()
+  return { title: 'ショールーム', description: data?.description }
 }
 
-export default function Showroom() {
-  return <ShowroomPage />
+export default async function Showroom() {
+  const data = await getShowroomPage()
+  if (!data) notFound()
+
+  return <ShowroomPage data={data} />
 }

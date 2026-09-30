@@ -310,7 +310,8 @@ export async function getLegalLinks(): Promise<{ slug: string; label: string }[]
 }
 
 /* ── Page singletons ─────────────────────────────────────────
-   会社情報, デザイナー and グローバルプロジェクト, one document each, stored
+   会社情報, デザイナー, グローバルプロジェクト, ショールーム, 採用情報,
+   よくあるご質問 and アフターサービス, one document each, stored
    under their type name as the id. Seeded by scripts/seed-cms-pages.mjs.
 
    Multi-line copy is one string, split on \n where it is drawn. */
@@ -480,5 +481,94 @@ export const getGlobalProjectsPage = cache(() =>
     countries, categories,
     projects[] { _key, title, image, description, country, category }
   `
+  )
+)
+
+export interface ShowroomPageData {
+  description?: string
+  heroImage?: { asset?: AssetRef }
+  heroEyebrow?: string
+  heroTitle?: string
+  infoTitle?: string
+  rows?: Array<{ _key: string; label: string; value?: string }>
+  mapQuery?: string
+  ctaLabel?: string
+}
+
+export const getShowroomPage = cache(() =>
+  getSingleton<ShowroomPageData>(
+    'showroomPage',
+    `description, heroImage, heroEyebrow, heroTitle, infoTitle,
+     rows[] { _key, label, value }, mapQuery, ctaLabel`
+  )
+)
+
+export interface CareersPageData {
+  description?: string
+  heroImage?: { asset?: AssetRef }
+  heroEyebrow?: string
+  heroTitle?: string
+  intro?: string
+  bands?: Array<{ _key: string; title: string; body?: string; photo?: { asset?: AssetRef }; alt?: string }>
+}
+
+export const getCareersPage = cache(() =>
+  getSingleton<CareersPageData>(
+    'careersPage',
+    `description, heroImage, heroEyebrow, heroTitle, intro,
+     bands[] { _key, title, body, photo, alt }`
+  )
+)
+
+export interface FaqPageData {
+  description?: string
+  eyebrow?: string
+  title?: string
+  lead?: string
+  categories?: Array<{
+    _key: string
+    label: string
+    anchor: string
+    /** Each answer's paragraphs are its lines. */
+    items?: Array<{ _key: string; q: string; a?: string }>
+  }>
+}
+
+export const getFaqPage = cache(() =>
+  getSingleton<FaqPageData>(
+    'faqPage',
+    `description, eyebrow, title, lead,
+     categories[] { _key, label, anchor, items[] { _key, q, a } }`
+  )
+)
+
+export interface TermSubClause {
+  _key: string
+  marker?: string
+  text: string
+}
+
+export interface TermClause {
+  _key: string
+  text: string
+  subClauses?: TermSubClause[]
+  spaced?: boolean
+}
+
+export interface AfterSalesPageData {
+  description?: string
+  title?: string
+  lead?: string
+  termsTitle?: string
+  termGroups?: Array<{ _key: string; clauses?: TermClause[] }>
+  termsClosing?: string
+}
+
+export const getAfterSalesPage = cache(() =>
+  getSingleton<AfterSalesPageData>(
+    'afterSalesPage',
+    `description, title, lead, termsTitle,
+     termGroups[] { _key, clauses[] { _key, text, spaced, subClauses[] { _key, marker, text } } },
+     termsClosing`
   )
 )

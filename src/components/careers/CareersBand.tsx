@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 'use client'
 
-import { useRef } from 'react'
+import { useId, useRef } from 'react'
 import { useScrollReveal } from '@/components/company/useScrollReveal'
 
 interface Props {
@@ -9,8 +9,8 @@ interface Props {
   side: 'left' | 'right'
   /**
    * Whether the band carries the soft wash behind it. The design puts it under
-   * the first and third bands only; the second and fourth are bare white, so
-   * the four read as two pairs rather than one repeating stripe.
+   * every other band, starting with the first, so they read as pairs rather
+   * than one repeating stripe.
    */
   wash?: boolean
   title: string
@@ -30,6 +30,7 @@ interface Props {
  */
 export default function CareersBand({ side, wash = false, title, body, photo, alt }: Props) {
   const bandRef = useRef<HTMLElement>(null)
+  const titleId = `cr-band-${useId()}`
 
   useScrollReveal(bandRef, [
     { selector: '.cr-band__dot', y: 16 },
@@ -43,17 +44,19 @@ export default function CareersBand({ side, wash = false, title, body, photo, al
     <section
       className={`cr-band cr-band--${side}${wash ? ' cr-band--wash' : ''}`}
       ref={bandRef}
-      aria-labelledby={`cr-band-${title}`}
+      aria-labelledby={titleId}
       data-nav="light"
     >
       <div className="cr-band__inner">
         <div className="cr-band__media">
-          <img className="cr-band__photo" src={photo} alt={alt} loading="lazy" decoding="async" />
+          {photo && (
+            <img className="cr-band__photo" src={photo} alt={alt} loading="lazy" decoding="async" />
+          )}
         </div>
 
         <div className="cr-band__text">
           <span className="cr-band__dot" aria-hidden="true" />
-          <h2 className="cr-band__title" id={`cr-band-${title}`}>
+          <h2 className="cr-band__title" id={titleId}>
             {title}
           </h2>
           <p className="cr-band__body">{body}</p>

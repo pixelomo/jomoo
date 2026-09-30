@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 'use client'
 
-import { useRef } from 'react'
+import { Fragment, useRef } from 'react'
 import { useScrollReveal } from '@/components/company/useScrollReveal'
 
 /**
@@ -13,7 +13,14 @@ import { useScrollReveal } from '@/components/company/useScrollReveal'
  * it is the page's LCP, there is only one size of it, and `fetchPriority="high"`
  * means it is requested with the document rather than after hydration.
  */
-export default function ShowroomHero() {
+interface Props {
+  image?: string
+  eyebrow: string
+  /** The title's lines, as the editor broke them. */
+  title: string[]
+}
+
+export default function ShowroomHero({ image, eyebrow, title }: Props) {
   const heroRef = useRef<HTMLElement>(null)
 
   useScrollReveal(heroRef, [
@@ -23,19 +30,20 @@ export default function ShowroomHero() {
 
   return (
     <section className="sh-hero" ref={heroRef} aria-labelledby="sh-hero-title">
-      <img
-        className="sh-hero__media"
-        src="/images/showroom/hero.webp"
-        alt=""
-        fetchPriority="high"
-        decoding="async"
-      />
+      {image && (
+        <img className="sh-hero__media" src={image} alt="" fetchPriority="high" decoding="async" />
+      )}
       <div className="sh-hero__scrim" aria-hidden="true" />
 
       <div className="sh-hero__inner">
-        <p className="sh-hero__eyebrow">SHOWROOM</p>
+        <p className="sh-hero__eyebrow">{eyebrow}</p>
         <h1 className="sh-hero__title" id="sh-hero-title">
-          ショールーム
+          {title.map((line, i) => (
+            <Fragment key={i}>
+              {i > 0 && <br />}
+              {line}
+            </Fragment>
+          ))}
         </h1>
       </div>
     </section>

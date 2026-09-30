@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 'use client'
 
-import { useRef } from 'react'
+import { Fragment, useRef } from 'react'
 import { useScrollReveal } from '@/components/company/useScrollReveal'
 
 /**
@@ -14,7 +14,14 @@ import { useScrollReveal } from '@/components/company/useScrollReveal'
  * page's LCP, there is only one size of it, and `fetchPriority="high"` means it
  * is requested with the document rather than after hydration.
  */
-export default function CareersHero() {
+interface Props {
+  image?: string
+  eyebrow: string
+  /** The title's lines, as the editor broke them. */
+  title: string[]
+}
+
+export default function CareersHero({ image, eyebrow, title }: Props) {
   const heroRef = useRef<HTMLElement>(null)
 
   useScrollReveal(heroRef, [
@@ -24,21 +31,20 @@ export default function CareersHero() {
 
   return (
     <section className="cr-hero" ref={heroRef} aria-labelledby="cr-hero-title">
-      <img
-        className="cr-hero__media"
-        src="/images/career/hero.webp"
-        alt=""
-        fetchPriority="high"
-        decoding="async"
-      />
+      {image && (
+        <img className="cr-hero__media" src={image} alt="" fetchPriority="high" decoding="async" />
+      )}
       <div className="cr-hero__scrim" aria-hidden="true" />
 
       <div className="cr-hero__inner">
-        <p className="cr-hero__eyebrow">Careers at JOMOO</p>
+        <p className="cr-hero__eyebrow">{eyebrow}</p>
         <h1 className="cr-hero__title" id="cr-hero-title">
-          JOMOOで
-          <br />
-          キャリアを築く
+          {title.map((line, i) => (
+            <Fragment key={i}>
+              {i > 0 && <br />}
+              {line}
+            </Fragment>
+          ))}
         </h1>
       </div>
     </section>
