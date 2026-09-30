@@ -1,4 +1,5 @@
 import { cache } from 'react'
+import { DEFAULT_NAV, type SiteNav } from '@/components/layout/siteLinks'
 import { createClient, type SanityClient } from '@sanity/client'
 import imageUrlBuilder from '@sanity/image-url'
 
@@ -678,3 +679,32 @@ export const getSiteCta = cache(() =>
      contact { image, eyebrow, title, button }`
   )
 )
+
+/* ── Header and footer ──────────────────────────────────────── */
+
+type Loose<T> = { [K in keyof T]?: T[K] | null }
+
+/** The ヘッダー・フッター document, each field falling back to what shipped. */
+export async function getSiteNavigation(): Promise<SiteNav> {
+  const data = await getSingleton<Loose<SiteNav>>(
+    'siteNavigation',
+    `menu[] { label, href, children[] { label, href } },
+     contactLabel, globalSite,
+     footerColumns[] { heading, headingHref, links[] { label, href, emphasis } },
+     social[] { platform, url },
+     copyright`
+  )
+  const pick = <K extends keyof SiteNav>(key: K): SiteNav[K] => {
+    const value = data?.[key]
+    if (value == null || value === '' || (Array.isArray(value) && value.length === 0)) return DEFAULT_NAV[key]
+    return value as SiteNav[K]
+  }
+  return {
+    menu: pick('menu'),
+    contactLabel: pick('contactLabel'),
+    globalSite: pick('globalSite'),
+    footerColumns: pick('footerColumns'),
+    social: pick('social'),
+    copyright: pick('copyright'),
+  }
+}

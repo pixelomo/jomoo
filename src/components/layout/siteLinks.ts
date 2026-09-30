@@ -1,25 +1,82 @@
-/* The site's own sections, shared by JomooNav and JomooFooter so the header and
-   footer cannot drift apart — the client asked for one name per concept, and
-   the labels here are the pages' own titles. */
+/* The header and footer links. They are edited in Sanity (ヘッダー・フッター);
+   what is here is what shipped, used field by field when the document is
+   missing a field or Sanity cannot be reached — the chrome is on every page,
+   and a site that loses its menu is worse than one showing a stale label. */
 
 export type SiteLink = { href: string; label: string }
 
-export const PRODUCTS_LINK: SiteLink = { href: '/products/smart-toilet', label: '商品情報' }
+export type NavItem = SiteLink & { children?: SiteLink[] }
 
-export const COMPANY_LINK: SiteLink = { href: '/company-information', label: '会社情報' }
+export type FooterLink = SiteLink & {
+  /** Bold, with a gap above — how 製品登録 is set apart. */
+  emphasis?: boolean
+}
 
-/** Under 会社情報 — the header's dropdown and the footer's column. */
-export const COMPANY_SUB_LINKS: readonly SiteLink[] = [
+export type FooterColumn = {
+  heading: string
+  /** When set, the heading is itself the link. */
+  headingHref?: string
+  links: FooterLink[]
+}
+
+export type SocialPlatform = 'facebook' | 'instagram' | 'youtube' | 'linkedin' | 'x'
+
+export type SiteNav = {
+  menu: NavItem[]
+  contactLabel: string
+  /** The client's global site — the language switch beside the search glyph. */
+  globalSite: string
+  footerColumns: FooterColumn[]
+  social: { platform: SocialPlatform; url: string }[]
+  copyright: string
+}
+
+const COMPANY_SUB_LINKS: SiteLink[] = [
   { href: '/showroom', label: 'ショールーム' },
   { href: '/global-projects', label: 'グローバルプロジェクト' },
   { href: '/designer', label: 'デザイナー' },
   { href: '/careers', label: '採用情報' },
 ]
 
-export const BLOG_LINK: SiteLink = { href: '/blog', label: 'ブログ' }
-
-/** The smart toilet is the only category linked for now; the rest return here
-    when their pages are ready. */
-export const PRODUCT_CATEGORY_LINKS: readonly SiteLink[] = [
-  { href: '/products/smart-toilet', label: 'スマートトイレ' },
-]
+export const DEFAULT_NAV: SiteNav = {
+  menu: [
+    { href: '/products/smart-toilet', label: '商品情報' },
+    { href: '/company-information', label: '会社情報', children: COMPANY_SUB_LINKS },
+    { href: '/blog', label: 'ブログ' },
+  ],
+  contactLabel: 'お問い合わせ',
+  globalSite: 'https://jomoo.com/',
+  footerColumns: [
+    {
+      heading: '商品情報',
+      links: [{ href: '/products/smart-toilet', label: 'スマートトイレ' }],
+    },
+    {
+      heading: 'お問い合わせ',
+      links: [
+        { href: '/contact-us', label: 'お客様相談窓口' },
+        { href: '/after-sales', label: 'アフターサービス' },
+        { href: '/faq', label: 'Q&A' },
+      ],
+    },
+    {
+      heading: '会社情報',
+      headingHref: '/company-information',
+      links: [
+        ...COMPANY_SUB_LINKS,
+        { href: '/blog', label: 'ブログ' },
+        { href: '/register', label: '製品登録', emphasis: true },
+      ],
+    },
+  ],
+  // The group's international accounts. WeChat is deliberately absent: the
+  // client asked for it to come off the Japanese site.
+  social: [
+    { platform: 'facebook', url: 'https://www.facebook.com/jomoointernational' },
+    { platform: 'instagram', url: 'https://www.instagram.com/jomoointer/' },
+    { platform: 'youtube', url: 'https://www.youtube.com/@JOMOOJapan' },
+    { platform: 'linkedin', url: 'https://www.linkedin.com/company/jomoo-group/' },
+    { platform: 'x', url: 'https://x.com/Jomoointer' },
+  ],
+  copyright: 'JOMOO KITCHEN & BATH CO., LTD. All Rights Reserved.',
+}

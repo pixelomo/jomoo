@@ -8,28 +8,17 @@
 import { useEffect, useRef, useState } from 'react'
 import { authClient } from '@/lib/auth-client'
 import NavSearchPanel from '@/components/search/NavSearchPanel'
-import {
-  BLOG_LINK,
-  COMPANY_LINK,
-  COMPANY_SUB_LINKS,
-  PRODUCTS_LINK,
-} from './siteLinks'
-
-/** The client's global site — the language switch beside the search glyph. */
-const GLOBAL_SITE = 'https://jomoo.com/'
+import type { SiteNav } from './siteLinks'
 
 interface Props {
   isSignedIn: boolean
+  /**
+   * The menu, edited in Sanity. An item with a submenu is a dropdown: 会社情報
+   * carries its sub-pages that way because seven links side by side do not fit
+   * beside the actions at 1280px, where the full menu first appears.
+   */
+  nav: Pick<SiteNav, 'menu' | 'contactLabel' | 'globalSite'>
 }
-
-// 会社情報 carries its sub-pages as a dropdown: seven links side by side do not
-// fit beside the actions at 1280px, where the full menu first appears.
-// インスピレーション is hidden until that page is built — add it back when it ships.
-const NAV_LINKS = [
-  PRODUCTS_LINK,
-  { ...COMPANY_LINK, children: COMPANY_SUB_LINKS },
-  BLOG_LINK,
-]
 
 /**
  * Auth glyphs, traced from public/images/signin.png (51x41) rather than
@@ -56,7 +45,9 @@ function AuthGlyph({ direction }: { direction: 'in' | 'out' }) {
   )
 }
 
-export default function JomooNav({ isSignedIn }: Props) {
+export default function JomooNav({ isSignedIn, nav }: Props) {
+  const NAV_LINKS = nav.menu
+  const GLOBAL_SITE = nav.globalSite
   const navRef = useRef<HTMLElement>(null)
   const [menuOpen, setMenuOpen] = useState(false)
   const [searchOpen, setSearchOpen] = useState(false)
@@ -172,7 +163,7 @@ export default function JomooNav({ isSignedIn }: Props) {
 
       <ul className="nav__menu">
         {NAV_LINKS.map((item) =>
-          'children' in item ? (
+          item.children?.length ? (
             <li
               key={item.href}
               className={`nav__menu-item--parent${
@@ -240,7 +231,7 @@ export default function JomooNav({ isSignedIn }: Props) {
             href="/contact-us"
             className="nav__btn nav__btn--white nav__btn--contact"
           >
-            お問い合わせ
+            {nav.contactLabel}
           </a>
           {isSignedIn ? (
             <>
@@ -302,7 +293,7 @@ export default function JomooNav({ isSignedIn }: Props) {
               <a href={item.href} onClick={closeMenu}>
                 {item.label}
               </a>
-              {'children' in item && (
+              {item.children?.length ? (
                 <ul className="nav__drawer-submenu">
                   {item.children.map((child) => (
                     <li key={child.href}>
@@ -312,7 +303,7 @@ export default function JomooNav({ isSignedIn }: Props) {
                     </li>
                   ))}
                 </ul>
-              )}
+              ) : null}
             </li>
           ))}
         </ul>
@@ -322,7 +313,7 @@ export default function JomooNav({ isSignedIn }: Props) {
             className="nav__drawer-btn nav__drawer-btn--contact"
             onClick={closeMenu}
           >
-            お問い合わせ
+            {nav.contactLabel}
           </a>
           {!isSignedIn ? (
             <>

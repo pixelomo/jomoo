@@ -11,6 +11,7 @@ import { product } from './product'
 import { productSeries } from './productSeries'
 import { showroomPage } from './showroomPage'
 import { siteCta } from './siteCta'
+import { siteNavigation } from './siteNavigation'
 
 /** Page types that exist exactly once. Each is stored under its own type name
  *  as the document id, and the Studio opens it directly instead of listing it. */
@@ -24,6 +25,7 @@ export const SINGLETONS = [
   { type: faqPage.name, title: 'よくあるご質問' },
   { type: afterSalesPage.name, title: 'アフターサービス' },
   { type: siteCta.name, title: 'カタログ・お問い合わせ' },
+  { type: siteNavigation.name, title: 'ヘッダー・フッター' },
 ]
 
 export const schemaTypes = [
@@ -32,6 +34,7 @@ export const schemaTypes = [
   blogPost,
   homePage,
   siteCta,
+  siteNavigation,
   companyPage,
   designerPage,
   globalProjectsPage,

@@ -39,7 +39,12 @@ order and their motion stay in code. Its lineup cards are references to
 row is `designerPage.awards`. The catalog/contact cards that close the top page,
 会社情報 and the product pages are the `siteCta` singleton, read by
 `FooterCtaSection` itself (an async server component, so a client component that
-ends on it takes it as a prop). There is no fallback copy
+ends on it takes it as a prop).
+
+Header and footer links are the `siteNavigation` singleton, fetched in
+`(site)/layout.tsx`. `DEFAULT_NAV` in `components/layout/siteLinks.ts` is what
+shipped and fills any field the document lacks — including every field when
+Sanity is unreachable — so the chrome never renders empty. There is no fallback copy
 in the source; a missing singleton 404s its page.
 `node scripts/seed-cms-pages.mjs --apply` writes them from
 `scripts/cms-pages.json` (create-only; `--replace` overwrites Studio edits).

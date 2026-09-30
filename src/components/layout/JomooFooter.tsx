@@ -6,23 +6,16 @@
 import { FaLinkedinIn } from 'react-icons/fa6'
 import { openConsentSettings } from '@/components/consent/useConsent'
 import { SiFacebook, SiInstagram, SiX, SiYoutube } from 'react-icons/si'
-import {
-  BLOG_LINK,
-  COMPANY_LINK,
-  COMPANY_SUB_LINKS,
-  PRODUCTS_LINK,
-  PRODUCT_CATEGORY_LINKS,
-} from './siteLinks'
+import type { SiteNav, SocialPlatform } from './siteLinks'
 
-// The group's international accounts. WeChat is deliberately absent: the client
-// asked for it to come off the Japanese site.
-const SOCIAL_LINKS = [
-  { label: 'Facebook', href: 'https://www.facebook.com/jomoointernational', Icon: SiFacebook },
-  { label: 'Instagram', href: 'https://www.instagram.com/jomoointer/', Icon: SiInstagram },
-  { label: 'YouTube', href: 'https://www.youtube.com/@JOMOOJapan', Icon: SiYoutube },
-  { label: 'LinkedIn', href: 'https://www.linkedin.com/company/jomoo-group/', Icon: FaLinkedinIn },
-  { label: 'X', href: 'https://x.com/Jomoointer', Icon: SiX },
-] as const
+/** Each platform the Studio offers, with its mark. */
+const SOCIAL_ICONS: Record<SocialPlatform, { label: string; Icon: typeof SiX }> = {
+  facebook: { label: 'Facebook', Icon: SiFacebook },
+  instagram: { label: 'Instagram', Icon: SiInstagram },
+  youtube: { label: 'YouTube', Icon: SiYoutube },
+  linkedin: { label: 'LinkedIn', Icon: FaLinkedinIn },
+  x: { label: 'X', Icon: SiX },
+}
 
 /* The legal row's wording comes from Sanity, so renaming a document in the
    Studio renames the link to it. These are the labels the documents shipped
@@ -42,7 +35,14 @@ function orderLegalLinks(links: LegalLink[]): LegalLink[] {
   )
 }
 
-export default function JomooFooter({ legalLinks = [] }: { legalLinks?: LegalLink[] }) {
+export default function JomooFooter({
+  legalLinks = [],
+  nav,
+}: {
+  legalLinks?: LegalLink[]
+  /** The columns, social links and copyright, edited in Sanity. */
+  nav: Pick<SiteNav, 'footerColumns' | 'social' | 'copyright'>
+}) {
   const year = new Date().getFullYear()
   const legal = orderLegalLinks(legalLinks)
 
@@ -54,82 +54,52 @@ export default function JomooFooter({ legalLinks = [] }: { legalLinks?: LegalLin
             <img src="/logo.svg" alt="JOMOO" />
           </div>
           <div className="footer__social">
-            {SOCIAL_LINKS.map(({ label, href, Icon }) => {
-              const external = href.startsWith('http')
+            {nav.social.map(({ platform, url }) => {
+              const icon = SOCIAL_ICONS[platform]
+              if (!icon) return null
               return (
-                <a
-                  key={label}
-                  href={href}
-                  aria-label={label}
-                  {...(external && { target: '_blank', rel: 'noopener noreferrer' })}
-                >
-                  <Icon aria-hidden="true" />
+                <a key={url} href={url} aria-label={icon.label} target="_blank" rel="noopener noreferrer">
+                  <icon.Icon aria-hidden="true" />
                 </a>
               )
             })}
           </div>
         </div>
 
+        {/* インスピレーション is hidden until its pages are built: adding that
+            column back means taking .footer__cols back to four tracks too. */}
         <div className="footer__cols">
-          <div className="footer__col">
-            <h4>{PRODUCTS_LINK.label}</h4>
-            <ul>
-              {PRODUCT_CATEGORY_LINKS.map((link) => (
-                <li key={link.href}><a href={link.href}>{link.label}</a></li>
-              ))}
-              {/* Hidden for now, not removed — these three categories go back
-                  in the footer when they are ready to be linked to. */}
-              {/* <li><a href="/products/washstand">洗面化粧台</a></li> */}
-              {/* <li><a href="/products/faucets">水栓金具</a></li> */}
-              {/* <li><a href="/products/shower-set">シャワーセット</a></li> */}
-            </ul>
-          </div>
-
-          <div className="footer__col">
-            <h4>お問い合わせ</h4>
-            <ul>
-              <li><a href="/contact-us">お客様相談窓口</a></li>
-              <li><a href="/after-sales">アフターサービス</a></li>
-              <li><a href="/faq">Q&amp;A</a></li>
-            </ul>
-          </div>
-
-          {/* Hidden until the インスピレーション pages are built — restore this column when
-              they ship, and take .footer__cols back to four tracks with it.
-          <div className="footer__col">
-            <h4>インスピレーション</h4>
-            <ul>
-              <li><a href="/inspiration">デザインストーリー</a></li>
-              <li><a href="/inspiration">プロジェクトショーケース</a></li>
-            </ul>
-          </div>
-          */}
-
-          {/* Same names and order as the header: 会社情報 and its dropdown,
-              then ブログ. The heading is the 会社情報 link itself rather than
-              a label over a link of the same name. */}
-          <div className="footer__col">
-            <h4>
-              <a href={COMPANY_LINK.href}>{COMPANY_LINK.label}</a>
-            </h4>
-            <ul>
-              {[...COMPANY_SUB_LINKS, BLOG_LINK].map((link) => (
-                <li key={link.href}><a href={link.href}>{link.label}</a></li>
-              ))}
-              <li className="footer__li--gap">
-                <a href="/register" className="footer__link--bold">
-                  製品登録
-                </a>
-              </li>
-            </ul>
-          </div>
+          {nav.footerColumns.map((column) => (
+            <div className="footer__col" key={column.heading}>
+              {/* A heading with a link is the link itself, rather than a label
+                  over a link of the same name. */}
+              <h4>
+                {column.headingHref ? <a href={column.headingHref}>{column.heading}</a> : column.heading}
+              </h4>
+              <ul>
+                {(column.links ?? []).map((link) =>
+                  link.emphasis ? (
+                    <li className="footer__li--gap" key={link.href}>
+                      <a href={link.href} className="footer__link--bold">
+                        {link.label}
+                      </a>
+                    </li>
+                  ) : (
+                    <li key={link.href}>
+                      <a href={link.href}>{link.label}</a>
+                    </li>
+                  )
+                )}
+              </ul>
+            </div>
+          ))}
         </div>
       </div>
 
       <hr className="footer__divider" />
 
       <div className="footer__bottom">
-        <span>© {year} JOMOO KITCHEN &amp; BATH CO., LTD. All Rights Reserved.</span>
+        <span>© {year} {nav.copyright}</span>
         <span className="footer__legal">
           {legal.map((link) => (
             <a href={`/${link.slug}`} key={link.slug}>

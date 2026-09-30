@@ -290,6 +290,126 @@
     }
   },
   {
+    "_id": "siteNavigation",
+    "_type": "siteNavigation",
+    "menu": [
+      {
+        "href": "/products/smart-toilet",
+        "label": "商品情報"
+      },
+      {
+        "href": "/company-information",
+        "label": "会社情報",
+        "children": [
+          {
+            "href": "/showroom",
+            "label": "ショールーム"
+          },
+          {
+            "href": "/global-projects",
+            "label": "グローバルプロジェクト"
+          },
+          {
+            "href": "/designer",
+            "label": "デザイナー"
+          },
+          {
+            "href": "/careers",
+            "label": "採用情報"
+          }
+        ]
+      },
+      {
+        "href": "/blog",
+        "label": "ブログ"
+      }
+    ],
+    "contactLabel": "お問い合わせ",
+    "globalSite": "https://jomoo.com/",
+    "footerColumns": [
+      {
+        "heading": "商品情報",
+        "links": [
+          {
+            "href": "/products/smart-toilet",
+            "label": "スマートトイレ"
+          }
+        ]
+      },
+      {
+        "heading": "お問い合わせ",
+        "links": [
+          {
+            "href": "/contact-us",
+            "label": "お客様相談窓口"
+          },
+          {
+            "href": "/after-sales",
+            "label": "アフターサービス"
+          },
+          {
+            "href": "/faq",
+            "label": "Q&A"
+          }
+        ]
+      },
+      {
+        "heading": "会社情報",
+        "headingHref": "/company-information",
+        "links": [
+          {
+            "href": "/showroom",
+            "label": "ショールーム"
+          },
+          {
+            "href": "/global-projects",
+            "label": "グローバルプロジェクト"
+          },
+          {
+            "href": "/designer",
+            "label": "デザイナー"
+          },
+          {
+            "href": "/careers",
+            "label": "採用情報"
+          },
+          {
+            "href": "/blog",
+            "label": "ブログ"
+          },
+          {
+            "href": "/register",
+            "label": "製品登録",
+            "emphasis": true
+          }
+        ]
+      }
+    ],
+    "social": [
+      {
+        "platform": "facebook",
+        "url": "https://www.facebook.com/jomoointernational"
+      },
+      {
+        "platform": "instagram",
+        "url": "https://www.instagram.com/jomoointer/"
+      },
+      {
+        "platform": "youtube",
+        "url": "https://www.youtube.com/@JOMOOJapan"
+      },
+      {
+        "platform": "linkedin",
+        "url": "https://www.linkedin.com/company/jomoo-group/"
+      },
+      {
+        "platform": "x",
+        "url": "https://x.com/Jomoointer"
+      }
+    ],
+    "copyright": "JOMOO KITCHEN & BATH CO., LTD. All Rights Reserved."
+  },
+  {
     "_id": "companyPage",
     "_type": "companyPage",
     "description": "1990年設立のJOMOOは、研究開発から製造、販売、アフターサービスまでをワンストップで担うグローバルなスマートバスルームブランドです。20,000名を超えるチームと120カ国の市場ネットワークで、スマートキッチン&バスルーム製品を届けています。",
