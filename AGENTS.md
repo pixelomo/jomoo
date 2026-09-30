@@ -25,13 +25,21 @@ the details printed on that page, and `--email … --password …` also gives it
 
 # CMS pages
 
-ブログ, 会社情報, デザイナー, グローバルプロジェクト, ショールーム, 採用情報,
-よくあるご質問 and アフターサービス render from Sanity: one `blogPost` document
-per post, and one singleton per page (`companyPage`, `designerPage`,
+The top page and ブログ, 会社情報, デザイナー, グローバルプロジェクト, ショールーム,
+採用情報, よくあるご質問 and アフターサービス render from Sanity: one `blogPost`
+document per post, and one singleton per page (`homePage`, `companyPage`, `designerPage`,
 `globalProjectsPage`, `showroomPage`, `careersPage`, `faqPage`,
 `afterSalesPage` — the type name is the document id, and the Studio lists them
 under ページ). The 無料修理規定 on the warranty certificate is read from
-`afterSalesPage` too, so the two cannot disagree. There is no fallback copy
+`afterSalesPage` too, so the two cannot disagree.
+
+On the top page only words and pictures are in the CMS — the sections, their
+order and their motion stay in code. Its lineup cards are references to
+`product` documents (the same 一覧カード the series page shows), and its award
+row is `designerPage.awards`. The catalog/contact cards that close the top page,
+会社情報 and the product pages are the `siteCta` singleton, read by
+`FooterCtaSection` itself (an async server component, so a client component that
+ends on it takes it as a prop). There is no fallback copy
 in the source; a missing singleton 404s its page.
 `node scripts/seed-cms-pages.mjs --apply` writes them from
 `scripts/cms-pages.json` (create-only; `--replace` overwrites Studio edits).

@@ -1,46 +1,109 @@
 /* eslint-disable @next/next/no-img-element */
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
-import SpotlightCarousel from './SpotlightCarousel'
-import GlobalProjectsSection from './GlobalProjectsSection'
-import DesignExcellenceSection from './DesignExcellenceSection'
-import FooterCtaSection from './FooterCtaSection'
+import { useEffect, useRef, useState, type ReactNode } from 'react'
+import Lines from '@/components/Lines'
+import SpotlightCarousel, { type SpotlightSlide } from './SpotlightCarousel'
+import GlobalProjectsSection, { type GlobalSlide } from './GlobalProjectsSection'
+import DesignExcellenceSection, { type LaneImage } from './DesignExcellenceSection'
 import './jomoo-homepage.css'
 
+/** One product card in the lineup — the same card the series page draws. */
+export interface LineupCard {
+  key: string
+  href: string
+  pill: string
+  name: string
+  image: string
+  hover?: string
+  tagline: string[]
+  desc: string
+}
+
 /**
- * The third slide is two layers rather than one flattened image: the scene
- * fills the frame like any other slide, while the GLOBAL No.1 lockup sits over
- * it at full width so it scales with the window instead of being cropped by
- * object-fit: cover. That is what lets it run on a phone, where the flattened
- * version had to be hidden.
+ * Everything the client edits on the top page, from the homePage document,
+ * resolved on the server to plain strings, line arrays and URLs.
  */
-const HERO_SLIDES = [
-  { type: 'image' as const, src: '/images/hero1.jpg' },
-  { type: 'video' as const, src: '/images/02.mp4' },
-  { type: 'split' as const, src: '/images/03bg.jpg', fg: '/images/03fg.png' },
-]
+export interface HomeContent {
+  heroProduct: {
+    image?: string
+    eyebrow: string
+    logo?: string
+    logoAlt: string
+    subtitle: string
+    tagline: string[]
+    awards: { src: string; alt: string }[]
+    footnotes: string[]
+  }
+  heroVideo: { src?: string; eyebrow: string; title: string[]; tagline: string[] }
+  heroBrand: { background?: string; foreground?: string; note: string }
+  world: {
+    eyebrow: string
+    title: string[]
+    /** Each paragraph as its lines. */
+    body: string[][]
+    closing: string[]
+    main?: string
+    forest?: string
+    shower?: string
+    bathroom?: string
+  }
+  expand: { image?: string; alt: string; label: string }
+  spotlight: SpotlightSlide[]
+  lineup: { eyebrow: string; title: string; subtitle: string[]; cards: LineupCard[] }
+  projects: { eyebrow: string; title: string; subtitle: string[]; cta: string; slides: GlobalSlide[] }
+  stats: { key: string; label: string[]; softBreak: boolean; value: number; suffix: string; icon?: string }[]
+  awardLogos: string[]
+  design: {
+    eyebrow: string
+    title: string[]
+    subtitle: string[]
+    button: string
+    lane1: LaneImage[]
+    lane2: LaneImage[]
+  }
+}
 
 const HERO_SLIDE_MS = 6000
 
+/**
+ * How far the counter moves per tick: a tenth of the figure's leading digit's
+ * place, so 300,000 climbs in 10,000s, 410 in 10s and 16 in 1s — the same
+ * cadence the hand-picked steps had, for whatever figure the client enters.
+ */
 function getStatStep(target: number) {
-  if (target === 300000) return 10000
-  if (target === 20000) return 1000
-  if (target === 15 || target === 16) return 1
-  if (target === 120 || target === 410) return 10
-  return 1
+  if (target < 100) return 1
+  return 10 ** (Math.floor(Math.log10(target)) - 1)
 }
 
-const DESIGN_LOGOS = Array.from({ length: 7 }, (_, i) =>
-  `/images/icon/jomoo_design_logo_${String(i + 1).padStart(5, '0')}.png`
-)
+export default function JomooHomepage({
+  content,
+  closing,
+}: {
+  content: HomeContent
+  /** The catalog and contact cards — a server component, so passed in. */
+  closing: ReactNode
+}) {
+  const { heroProduct, heroVideo, heroBrand, world, expand, lineup, stats } = content
 
-export default function JomooHomepage() {
+  /**
+   * The third slide is two layers rather than one flattened image: the scene
+   * fills the frame like any other slide, while the GLOBAL No.1 lockup sits
+   * over it at full width so it scales with the window instead of being
+   * cropped by object-fit: cover. That is what lets it run on a phone, where
+   * the flattened version had to be hidden.
+   */
+  const heroSlides = [
+    { type: 'image' as const, src: heroProduct.image },
+    { type: 'video' as const, src: heroVideo.src },
+    { type: 'split' as const, src: heroBrand.background, fg: heroBrand.foreground },
+  ]
+
   const expandRef = useRef<HTMLElement>(null)
   const statsGridRef = useRef<HTMLDivElement>(null)
   const heroVideoRefs = useRef<(HTMLVideoElement | null)[]>([])
   const [heroSlide, setHeroSlide] = useState(0)
-  const heroSlideCount = HERO_SLIDES.length
+  const heroSlideCount = heroSlides.length
 
   useEffect(() => {
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
@@ -66,7 +129,7 @@ export default function JomooHomepage() {
         return
       }
 
-      if (index === heroSlide && HERO_SLIDES[index].type === 'video') {
+      if (index === heroSlide && index === 1) {
         video.muted = true
         video.playsInline = true
         video.currentTime = 0
@@ -376,7 +439,7 @@ export default function JomooHomepage() {
           .join(' ')}
       >
         <div className="hero__carousel" aria-hidden="true">
-          {HERO_SLIDES.map((slide, index) => {
+          {heroSlides.map((slide, index) => {
             const isActive = index === heroSlide
             const slideClassName = ['hero__slide', isActive && 'is-active']
               .filter(Boolean)
@@ -384,7 +447,7 @@ export default function JomooHomepage() {
 
             if (slide.type === 'video') {
               return (
-                <div key={slide.src} className={slideClassName}>
+                <div key={index} className={slideClassName}>
                   <video
                     ref={(el) => {
                       heroVideoRefs.current[index] = el
@@ -404,7 +467,7 @@ export default function JomooHomepage() {
 
             if (slide.type === 'split') {
               return (
-                <div key={slide.src} className={`${slideClassName} hero__slide--split`}>
+                <div key={index} className={`${slideClassName} hero__slide--split`}>
                   <img className="hero__slide-bg" src={slide.src} alt="" />
                   <img className="hero__slide-fg" src={slide.fg} alt="" />
                 </div>
@@ -412,7 +475,7 @@ export default function JomooHomepage() {
             }
 
             return (
-              <div key={slide.src} className={slideClassName}>
+              <div key={index} className={slideClassName}>
                 {/* The first slide is the hero's largest paint — fetch it ahead
                     of the queue rather than letting it wait behind the video. */}
                 <img
@@ -436,46 +499,37 @@ export default function JomooHomepage() {
           >
             {heroSlide === 0 && (
               <>
-                <p className="hero__eyebrow">SMART TOILET</p>
+                <p className="hero__eyebrow">{heroProduct.eyebrow}</p>
                 <h1 className="hero__title hero__title--logo">
-                  <img src="/images/x40.svg" alt="X40" />
+                  {heroProduct.logo ? (
+                    <img src={heroProduct.logo} alt={heroProduct.logoAlt} />
+                  ) : (
+                    heroProduct.logoAlt
+                  )}
                 </h1>
-                <p className="hero__subtitle">超静音スマートトイレ</p>
+                <p className="hero__subtitle">{heroProduct.subtitle}</p>
                 <p className="hero__tagline">
-                  静けさが、<br />
-                  暮らしを変える。
+                  <Lines lines={heroProduct.tagline} />
                 </p>
                 <div className="hero__awards">
-                  <img
-                    className="hero__award"
-                    src="/images/award1.png"
-                    alt="スマートトイレ / 販売台数 世界NO.1"
-                  />
-                  <img
-                    className="hero__award"
-                    src="/images/award2.png"
-                    alt="iF デザインアワード / バスルーム業界受賞数 世界NO.1"
-                  />
+                  {heroProduct.awards.map((award, i) => (
+                    <img className="hero__award" src={award.src} alt={award.alt} key={i} />
+                  ))}
                 </div>
                 <p className="hero__footnotes">
-                  ※フロスト＆サリバンが調査した2024年の世界販売台数に基づく（2025年8月に調査完了）
-                  <br />
-                  ※iF デザインアワードのバス会社カテゴリーのiFデザインランキング 2022–2026年より
+                  <Lines lines={heroProduct.footnotes} />
                 </p>
               </>
             )}
 
             {heroSlide === 1 && (
               <>
-                <p className="hero__eyebrow">SMART CONTROL</p>
+                <p className="hero__eyebrow">{heroVideo.eyebrow}</p>
                 <h1 className="hero__title hero__title--jp">
-                  水を、<br />
-                  思いのままに。
+                  <Lines lines={heroVideo.title} />
                 </h1>
                 <p className="hero__tagline hero__tagline--control">
-                  スマートテクロノジーの活用により<br />
-                  暮らしに、快適さや利便性を<br />
-                  与えます。
+                  <Lines lines={heroVideo.tagline} />
                 </p>
               </>
             )}
@@ -483,9 +537,7 @@ export default function JomooHomepage() {
         </div>
 
         {heroSlide === 2 && (
-          <p className="hero__slide-note">
-            ※フロスト＆サリバンが調査した2024年の世界販売台数に基づく（2025年8月に調査完了）
-          </p>
+          <p className="hero__slide-note">{heroBrand.note}</p>
         )}
 
         <div className="hero__pagination" role="tablist" aria-label="ヒーロースライド">
@@ -509,52 +561,42 @@ export default function JomooHomepage() {
           <div className="world__stage">
             <div className="world__upper">
               <div className="world__intro">
-                <div className="world__eyebrow">THE WORLD OF JOMOO</div>
+                <div className="world__eyebrow">{world.eyebrow}</div>
                 <h2 className="world__title">
-                  日常の、<br />
-                  その先へ。
+                  <Lines lines={world.title} />
                 </h2>
                 <div className="world__rule" aria-hidden="true" />
                 <div className="world__body">
-                  <p>
-                    世界で磨いてきたテクノロジーとデザインを、<br />
-                    一人ひとりの暮らしにふさわしい形へ。
-                  </p>
-                  <p>
-                    静けさも、清潔さも、使いやすさも。<br />
-                    意識することなく、自然に満たされていく。
-                  </p>
+                  {world.body.map((paragraph, i) => (
+                    <p key={i}>
+                      <Lines lines={paragraph} />
+                    </p>
+                  ))}
                 </div>
                 <p className="world__body world__body--secondary world__body--secondary-intro">
-                  JOMOOは、<br />
-                  スマートトイレから、<br />
-                  新しい水まわりの<br />
-                  心地よさを提案します。
+                  <Lines lines={world.closing} />
                 </p>
               </div>
 
               <div className="world__photos">
                 <figure className="world__photo world__photo--hero">
-                  <img src="/images/world1.jpg" alt="" />
+                  {world.main && <img src={world.main} alt="" />}
                 </figure>
                 <figure className="world__photo world__photo--forest">
-                  <img src="/images/world2n.jpg" alt="" />
+                  {world.forest && <img src={world.forest} alt="" />}
                 </figure>
                 <figure className="world__photo world__photo--shower">
-                  <img src="/images/world3n.jpg" alt="" />
+                  {world.shower && <img src={world.shower} alt="" />}
                 </figure>
               </div>
             </div>
 
             <div className="world__lower">
               <figure className="world__figure world__figure--bathroom">
-                <img src="/images/world4.jpg" alt="" />
+                {world.bathroom && <img src={world.bathroom} alt="" />}
               </figure>
               <p className="world__body world__body--secondary world__body--secondary-lower">
-                JOMOOは、<br />
-                スマートトイレから、<br />
-                新しい水まわりの<br />
-                心地よさを提案します。
+                <Lines lines={world.closing} />
               </p>
             </div>
           </div>
@@ -564,203 +606,101 @@ export default function JomooHomepage() {
       {/* SMART TOILET SCROLL-EXPAND */}
       <section className="expand expand--animate" ref={expandRef}>
         <div className="expand__stage">
-          <img className="expand__media" src="/images/smart.jpg" alt="Smart toilet in luxury interior" />
-          <div className="expand__label">SMART TOILET</div>
+          {expand.image && <img className="expand__media" src={expand.image} alt={expand.alt} />}
+          <div className="expand__label">{expand.label}</div>
         </div>
       </section>
 
-      <SpotlightCarousel />
+      <SpotlightCarousel slides={content.spotlight} />
 
       {/* FEATURE ROW */}
       <section className="feature feature--animate" data-nav="light" id="feature">
         <div className="feature__inner">
           <div className="feature__head reveal">
-            <div className="feature__eyebrow">SMART TOILET LINEUP</div>
-            <h2 className="feature__title">あなたの空間に、最適な一台を。</h2>
+            <div className="feature__eyebrow">{lineup.eyebrow}</div>
+            <h2 className="feature__title">{lineup.title}</h2>
             <div className="feature__rule" aria-hidden="true" />
             <p className="feature__subtitle">
-              ライフスタイルや空間に合わせて選べる、
-              <br />
-              JOMOOのスマートトイレラインナップ。
+              <Lines lines={lineup.subtitle} />
             </p>
           </div>
 
-          {/* The /products/smart-toilet cards show the same tagline and text from
-              Sanity (product → 一覧カード). Change one, change both. */}
+          {/* The cards are the products' own 一覧カード in Sanity — the same
+              ones /products/smart-toilet draws. Change one, change both. */}
           <div className="feature__grid">
-            <a
-              href="/products/smart-toilet/x40-b"
-              className="feature__card"
-              aria-label="X40-B の詳細を見る"
-            >
-              <div className="feature__media">
-                <img
-                  className="feature__img feature__img--default"
-                  src="/images/X-40-B.jpeg"
-                  alt="JOMOO X40-B smart toilet"
-                />
-                <img
-                  className="feature__img feature__img--hover"
-                  src="/images/X40-hover.jpeg"
-                  alt=""
-                  aria-hidden="true"
-                />
-              </div>
-              <div className="feature__content">
-                <span className="feature__pill">SMART TOILET</span>
-                <h3 className="feature__name">X40-B</h3>
-                <p className="feature__tagline">
-                  スマート洗浄で
-                  <br />
-                  毎日をもっと快適を。
-                </p>
-                <p className="feature__desc">
-                  クリーンボットアームの泡洗浄からUV除菌、オート開閉まで自動化。触れることなく快適に使え、清潔さをしっかり維持します。さりげなく活躍する先進技術が毎日の暮らしに安心と心地良さを届けます。
-                </p>
-                <span className="feature__more">詳しく見る&gt;</span>
-              </div>
-            </a>
-            <a
-              href="/products/smart-toilet/x40-c"
-              className="feature__card"
-              aria-label="X40-C の詳細を見る"
-            >
-              <div className="feature__media">
-                <img
-                  className="feature__img feature__img--default"
-                  src="/images/X-40-C.jpeg"
-                  alt="JOMOO X40-C smart toilet"
-                />
-                <img
-                  className="feature__img feature__img--hover"
-                  src="/images/X40-hover.jpeg"
-                  alt=""
-                  aria-hidden="true"
-                />
-              </div>
-              <div className="feature__content">
-                <span className="feature__pill">SMART TOILET</span>
-                <h3 className="feature__name">X40-C</h3>
-                <p className="feature__tagline">
-                  選べる洗浄で
-                  <br />
-                  心地良い毎日を
-                </p>
-                <p className="feature__desc">
-                  足元センサーによる自動洗浄とエアイン洗浄技術を採用。やさしい水流と快適な温度設定で、心地良い洗浄体験を実現します。毎日の使いやすさと清潔さに配慮した機能が、快適なトイレ空間を演出します。
-                </p>
-                <span className="feature__more">詳しく見る&gt;</span>
-              </div>
-            </a>
+            {lineup.cards.map((card) => (
+              <a
+                key={card.key}
+                href={card.href}
+                className="feature__card"
+                aria-label={`${card.name} の詳細を見る`}
+              >
+                <div className="feature__media">
+                  <img
+                    className="feature__img feature__img--default"
+                    src={card.image}
+                    alt={`JOMOO ${card.name} smart toilet`}
+                  />
+                  {card.hover && (
+                    <img
+                      className="feature__img feature__img--hover"
+                      src={card.hover}
+                      alt=""
+                      aria-hidden="true"
+                    />
+                  )}
+                </div>
+                <div className="feature__content">
+                  <span className="feature__pill">{card.pill}</span>
+                  <h3 className="feature__name">{card.name}</h3>
+                  <p className="feature__tagline">
+                    <Lines lines={card.tagline} />
+                  </p>
+                  <p className="feature__desc">{card.desc}</p>
+                  <span className="feature__more">詳しく見る&gt;</span>
+                </div>
+              </a>
+            ))}
           </div>
         </div>
       </section>
 
       {/* One backdrop runs behind projects, stats and the award logos */}
       <div className="global-band">
-      <GlobalProjectsSection />
+      <GlobalProjectsSection {...content.projects} />
 
       {/* STATS */}
       <section className="stats stats--animate" data-nav="light">
         <div className="stats__inner">
           <div className="stats__grid" ref={statsGridRef}>
-            <div className="stat" data-target="120">
-              <div className="stat__top">
-                <div className="stat__icon">
-                  <img src="/images/icon/icon_00001.png" alt="" />
+            {stats.map((stat) => (
+              <div className="stat" data-target={stat.value} key={stat.key}>
+                <div className="stat__top">
+                  <div className="stat__icon">{stat.icon && <img src={stat.icon} alt="" />}</div>
+                  {/* A soft break is two inline-blocks rather than a hard <br>:
+                      they wrap as units, so the line breaks between them where
+                      there is room, and still falls back to breaking inside a
+                      part on a column too narrow for either. */}
+                  <div className="stat__label">
+                    {stat.softBreak ? (
+                      stat.label.map((part, i) => (
+                        <span className="stat__label-part" key={i}>
+                          {part}
+                        </span>
+                      ))
+                    ) : (
+                      <Lines lines={stat.label} />
+                    )}
+                  </div>
                 </div>
-                <div className="stat__label">展開国・地域数</div>
-              </div>
-              <div className="stat__num">
-                <span className="stat__val">
-                  <span className="stat__val-num">0</span>
-                  <span className="stat__suf">+</span>
-                </span>
-              </div>
-            </div>
-            <div className="stat" data-target="300000">
-              <div className="stat__top">
-                <div className="stat__icon">
-                  <img src="/images/icon/icon_00002.png" alt="" />
-                </div>
-                <div className="stat__label">販売拠点数</div>
-              </div>
-              <div className="stat__num">
-                <span className="stat__val">
-                  <span className="stat__val-num">0</span>
-                  <span className="stat__suf">+</span>
-                </span>
-              </div>
-            </div>
-            <div className="stat" data-target="410">
-              <div className="stat__top">
-                <div className="stat__icon">
-                  <img src="/images/icon/icon_00003.png" alt="" />
-                </div>
-                <div className="stat__label">
-                  国際デザイン賞
-                  <br />
-                  受賞数
+                <div className="stat__num">
+                  <span className="stat__val">
+                    <span className="stat__val-num">0</span>
+                    {stat.suffix && <span className="stat__suf">{stat.suffix}</span>}
+                  </span>
                 </div>
               </div>
-              <div className="stat__num">
-                <span className="stat__val">
-                  <span className="stat__val-num">0</span>
-                  <span className="stat__suf">+</span>
-                </span>
-              </div>
-            </div>
-            <div className="stat" data-target="16">
-              <div className="stat__top">
-                <div className="stat__icon">
-                  <img src="/images/icon/icon_00004.png" alt="" />
-                </div>
-                <div className="stat__label">
-                  グローバル研究
-                  <br />
-                  開発センター
-                </div>
-              </div>
-              <div className="stat__num">
-                <span className="stat__val">
-                  <span className="stat__val-num">0</span>
-                </span>
-              </div>
-            </div>
-            <div className="stat" data-target="15">
-              <div className="stat__top">
-                <div className="stat__icon">
-                  <img src="/images/icon/icon_00005.png" alt="" />
-                </div>
-                {/* Two inline-blocks rather than a hard <br>: they wrap as
-                    units, so the line breaks between スマート and ファクトリー
-                    where there is room, and still falls back to breaking inside
-                    a part on a column too narrow for either. */}
-                <div className="stat__label">
-                  <span className="stat__label-part">ハイエンドスマート</span>
-                  <span className="stat__label-part">ファクトリー</span>
-                </div>
-              </div>
-              <div className="stat__num">
-                <span className="stat__val">
-                  <span className="stat__val-num">0</span>
-                </span>
-              </div>
-            </div>
-            <div className="stat" data-target="20000">
-              <div className="stat__top">
-                <div className="stat__icon">
-                  <img src="/images/icon/icon_00006.png" alt="" />
-                </div>
-                <div className="stat__label">特許取得数</div>
-              </div>
-              <div className="stat__num">
-                <span className="stat__val">
-                  <span className="stat__val-num">0</span>
-                  <span className="stat__suf">+</span>
-                </span>
-              </div>
-            </div>
+            ))}
           </div>
         </div>
       </section>
@@ -768,12 +708,12 @@ export default function JomooHomepage() {
       <section className="design-logos" data-nav="light" aria-label="Design awards">
         <div className="design-logos__inner">
           <div className="design-logos__card">
-            {DESIGN_LOGOS.map((src, index) => (
-              <div key={src} className="design-logos__segment">
+            {content.awardLogos.map((src, index) => (
+              <div key={index} className="design-logos__segment">
                 <div className="design-logos__item">
                   <img src={src} alt="" />
                 </div>
-                {index < DESIGN_LOGOS.length - 1 ? (
+                {index < content.awardLogos.length - 1 ? (
                   <span className="design-logos__divider" aria-hidden="true" />
                 ) : null}
               </div>
@@ -783,9 +723,9 @@ export default function JomooHomepage() {
       </section>
       </div>
 
-      <DesignExcellenceSection />
+      <DesignExcellenceSection {...content.design} />
 
-      <FooterCtaSection />
+      {closing}
 
     </div>
   )

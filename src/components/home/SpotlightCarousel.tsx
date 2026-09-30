@@ -9,7 +9,7 @@ type SlideMedia =
   | { type: 'image'; src: string; background?: string }
   | { type: 'loop'; srcs: readonly string[] }
 
-type SpotlightSlide = {
+export type SpotlightSlide = {
   index: string
   title: string[]
   body: string[]
@@ -30,7 +30,7 @@ type SpotlightSlide = {
  * holds still while the camera swings — and stood on a common floor line, so
  * the unit does not change size or hop as the frames cross over.
  */
-const X40_TURNTABLE = [
+export const X40_TURNTABLE = [
   '/images/x40-3d/frame1.webp',
   '/images/x40-3d/frame2.webp',
   '/images/x40-3d/frame3.webp',
@@ -119,70 +119,10 @@ function SpotlightLoop({
   )
 }
 
-const SLIDES: SpotlightSlide[] = [
-  {
-    index: 'SMART TOILET',
-    title: ['やさしい繋がり'],
-    body: [
-      'JOMOO製品は人と空間をつなぐ、',
-      'やさしい存在。静けさと清潔さ、',
-      '使うたび自然と広がる安心感。',
-      '機能だけではなく、',
-      '心地よく穏やかな毎日を支えます。',
-    ],
-    media: { type: 'loop', srcs: X40_TURNTABLE },
-  },
-  {
-    index: '01',
-    title: ['超静音', 'スマートトイレ'],
-    body: [
-      'バスルームの静寂を妨げない',
-      'パワフルかつ圧倒的に静かな洗浄。',
-      'タッチ不要で、スマートなレスポンス。',
-      'ソフトな水流により、心地良い温度で、',
-      'スパのような洗浄体験ができます。',
-    ],
-    media: { type: 'video', src: '/images/slide2.mov' },
-    playLabel: 'VIEW',
-    playTheme: 'dark',
-  },
-  {
-    index: '02',
-    title: ['クリーンボットアーム泡洗浄'],
-    body: [
-      'ロボットアームが作動し、',
-      '360°さまざまな角度から',
-      'きめ細やかな泡を噴射することにより',
-      'トイレを清潔に保ちます',
-    ],
-    media: { type: 'image', src: '/images/feature1.jpg' },
-  },
-  {
-    index: '03',
-    title: ['足元センサー', '洗浄'],
-    body: [
-      '足元センサーによる',
-      '便蓋・便座の自動開閉はもちろん、',
-      'トイレ使用後の自動洗浄にも',
-      '対応しており、快適な暮らしを支えます',
-    ],
-    media: { type: 'image', src: '/images/slide4.jpeg' },
-  },
-  {
-    index: '04',
-    title: ['ノズルUV除菌'],
-    body: [
-      '除菌率99％の長期的な効果で交差感染を防ぎ、',
-      '家族全員が安全・安心に使用できます',
-    ],
-    media: { type: 'image', src: '/images/slide5.jpeg' },
-  },
-]
-
 const DRAG_THRESHOLD = 48
 const AUTOPLAY_MS = 3000
 
-export default function SpotlightCarousel() {
+export default function SpotlightCarousel({ slides: SLIDES }: { slides: SpotlightSlide[] }) {
   const [activeIndex, setActiveIndex] = useState(0)
   const [dragOffset, setDragOffset] = useState(0)
   const [isDragging, setIsDragging] = useState(false)
@@ -444,7 +384,7 @@ export default function SpotlightCarousel() {
 
                 <div className="spotlight__content">
                   <p
-                    className={`spotlight__index${slide.index === 'SMART TOILET' ? ' spotlight__index--label' : ''}`}
+                    className={`spotlight__index${/^\d+$/.test(slide.index) ? '' : ' spotlight__index--label'}`}
                   >
                     {slide.index}
                   </p>

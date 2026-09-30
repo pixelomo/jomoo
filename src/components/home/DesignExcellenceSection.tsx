@@ -1,24 +1,13 @@
 /* eslint-disable @next/next/no-img-element */
 'use client'
 
-interface LaneImage {
+import Lines from '@/components/Lines'
+
+export interface LaneImage {
   src: string
   /** Cut-outs with a transparent background need design-colbg behind them. */
   onBackdrop?: boolean
 }
-
-const COL1_IMAGES: LaneImage[] = [
-  { src: '/images/design-col1-1.png' },
-  { src: '/images/design-col1-2.png', onBackdrop: true },
-  { src: '/images/design-col1-3.png' },
-  { src: '/images/design-col1-4.png', onBackdrop: true },
-]
-
-const COL2_IMAGES: LaneImage[] = [
-  { src: '/images/design-col2-1.png', onBackdrop: true },
-  { src: '/images/design-col2-2.png' },
-  { src: '/images/design-col2-3.png', onBackdrop: true },
-]
 
 function VerticalLane({
   images,
@@ -34,7 +23,7 @@ function VerticalLane({
       <div className={`design-excellence__track design-excellence__track--${direction}`}>
         {loop.map((image, index) => (
           <div
-            key={`${image.src}-${index}`}
+            key={index}
             className={`design-excellence__card${
               image.onBackdrop ? ' design-excellence__card--backdrop' : ''
             }`}
@@ -47,43 +36,40 @@ function VerticalLane({
   )
 }
 
-export default function DesignExcellenceSection() {
+interface Props {
+  eyebrow: string
+  title: string[]
+  subtitle: string[]
+  button: string
+  /** The left column, drifting down. */
+  lane1: LaneImage[]
+  /** The right column, drifting up. */
+  lane2: LaneImage[]
+}
+
+export default function DesignExcellenceSection({ eyebrow, title, subtitle, button, lane1, lane2 }: Props) {
   return (
     <section className="design-excellence" data-nav="light" id="design">
       <div className="design-excellence__inner">
         <div className="design-excellence__layout">
           <div className="design-excellence__carousels" aria-hidden="true">
-            <VerticalLane images={COL1_IMAGES} direction="down" />
-            <VerticalLane images={COL2_IMAGES} direction="up" />
+            <VerticalLane images={lane1} direction="down" />
+            <VerticalLane images={lane2} direction="up" />
           </div>
 
           <div className="design-excellence__content">
-            <div className="design-excellence__eyebrow reveal">DESIGN EXCELLENCE</div>
+            <div className="design-excellence__eyebrow reveal">{eyebrow}</div>
             <h2 className="design-excellence__title reveal">
-              世界の舞台で
-              <br />
-              評価された
-              <br />
-              デザインチーム
+              <Lines lines={title} />
             </h2>
             <div className="design-excellence__rule reveal" aria-hidden="true" />
             <p className="design-excellence__subtitle reveal">
-              欧州デザインチームによる創造力、
-              <br />
-              視覚的な美しいデザインや
-              <br />
-              最先端の科学技術や
-              <br />
-              工学的な機能に融合により、
-              <br />
-              多くの国際的なデザイン賞を受賞している
-              <br />
-              世界基準のデザイナーが製造しています。
+              <Lines lines={subtitle} />
             </p>
             {/* The section names the designers without naming them, so it ends
                 on the way through to the page that does. */}
             <a className="design-excellence__btn reveal" href="/designer">
-              デザイナーを見る
+              {button}
               <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
                 <path d="M4 12h15M13 6l6 6-6 6" />
               </svg>

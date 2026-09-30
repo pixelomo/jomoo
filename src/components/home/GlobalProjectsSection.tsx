@@ -2,9 +2,10 @@
 'use client'
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import Lines from '@/components/Lines'
 import { useFullyInView } from './useFullyInView'
 
-type GlobalSlide = {
+export type GlobalSlide = {
   image: string
   title: string
   meta: string
@@ -12,67 +13,50 @@ type GlobalSlide = {
 
 type TrackSlide = GlobalSlide & { key: string }
 
-const SLIDES: GlobalSlide[] = [
-  {
-    image: '/images/global1.jpeg',
-    title: '北京国家体育场',
-    meta: '中国・北京 | 世界的スポーツ施設',
-  },
-  {
-    image: '/images/global2.jpeg',
-    title: '北京大興国際空港',
-    meta: '中国・北京 | 国際航空ハブ',
-  },
-  {
-    image: '/images/global3.jpeg',
-    title: '都市ランドマーク',
-    meta: '世界各地 | ラグジュアリー施設',
-  },
-  {
-    image: '/images/global4.jpeg',
-    title: 'グラン・ホテル・デュ・キャップ・フェラ',
-    meta: 'フランス・ニース | 五つ星ホテル',
-  },
-  {
-    image: '/images/global5.jpeg',
-    title: '紫禁城',
-    meta: '中国・北京 | 世界遺産',
-  },
-]
-
 const DRAG_THRESHOLD = 48
-const SLIDE_COUNT = SLIDES.length
 const AUTOPLAY_MS = 2000
 const FIRST_REAL_INDEX = 2
-const LAST_REAL_INDEX = FIRST_REAL_INDEX + SLIDE_COUNT - 1
 
 const TRACK_TRANSITION = 'transform 0.55s cubic-bezier(0.22, 0.61, 0.36, 1)'
 
-function toLogicalIndex(trackIndex: number) {
+/** The last real slide on the track; before and after it sit two clones each. */
+const lastRealIndex = (count: number) => FIRST_REAL_INDEX + count - 1
+
+function toLogicalIndex(trackIndex: number, count: number) {
   if (trackIndex < FIRST_REAL_INDEX) {
-    return trackIndex - FIRST_REAL_INDEX + SLIDE_COUNT
+    return trackIndex - FIRST_REAL_INDEX + count
   }
-  if (trackIndex > LAST_REAL_INDEX) {
-    return trackIndex - LAST_REAL_INDEX - 1
+  if (trackIndex > lastRealIndex(count)) {
+    return trackIndex - lastRealIndex(count) - 1
   }
   return trackIndex - FIRST_REAL_INDEX
 }
 
-function normalizeTrackIndex(trackIndex: number) {
+function normalizeTrackIndex(trackIndex: number, count: number) {
   if (trackIndex < FIRST_REAL_INDEX) {
-    return trackIndex + SLIDE_COUNT
+    return trackIndex + count
   }
-  if (trackIndex > LAST_REAL_INDEX) {
-    return trackIndex - SLIDE_COUNT
+  if (trackIndex > lastRealIndex(count)) {
+    return trackIndex - count
   }
   return trackIndex
 }
 
-function isBufferIndex(trackIndex: number) {
-  return trackIndex < FIRST_REAL_INDEX || trackIndex > LAST_REAL_INDEX
+function isBufferIndex(trackIndex: number, count: number) {
+  return trackIndex < FIRST_REAL_INDEX || trackIndex > lastRealIndex(count)
 }
 
-export default function GlobalProjectsSection() {
+interface Props {
+  eyebrow: string
+  title: string
+  subtitle: string[]
+  cta: string
+  /** Two or more — the loop clones two either side. */
+  slides: GlobalSlide[]
+}
+
+export default function GlobalProjectsSection({ eyebrow, title, subtitle, cta, slides: SLIDES }: Props) {
+  const SLIDE_COUNT = SLIDES.length
   const [trackIndex, setTrackIndex] = useState(FIRST_REAL_INDEX)
   const [dragOffset, setDragOffset] = useState(0)
   const [isDragging, setIsDragging] = useState(false)
@@ -118,10 +102,10 @@ export default function GlobalProjectsSection() {
         key: 'clone-next-2',
       },
     ],
-    []
+    [SLIDES, SLIDE_COUNT]
   )
 
-  const activeLogicalIndex = toLogicalIndex(trackIndex)
+  const activeLogicalIndex = toLogicalIndex(trackIndex, SLIDE_COUNT)
 
   const measureLayout = useCallback(() => {
     const viewport = viewportRef.current
@@ -178,7 +162,7 @@ export default function GlobalProjectsSection() {
         return
       }
 
-      if (isBufferIndex(trackIndexRef.current)) {
+      if (isBufferIndex(trackIndexRef.current, SLIDE_COUNT)) {
         scheduleAutoplay()
         return
       }
@@ -186,7 +170,7 @@ export default function GlobalProjectsSection() {
       next()
       scheduleAutoplay()
     }, AUTOPLAY_MS)
-  }, [clearAutoplay, next, inViewRef])
+  }, [clearAutoplay, next, inViewRef, SLIDE_COUNT])
 
   useEffect(() => {
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
@@ -216,7 +200,7 @@ export default function GlobalProjectsSection() {
     (index: number) => {
       if (snapLockRef.current) return
 
-      const normalized = normalizeTrackIndex(index)
+      const normalized = normalizeTrackIndex(index, SLIDE_COUNT)
       if (normalized === index) return
 
       snapLockRef.current = true
@@ -226,7 +210,7 @@ export default function GlobalProjectsSection() {
       setTrackIndex(normalized)
       setDragOffset(0)
     },
-    []
+    [SLIDE_COUNT]
   )
 
   useEffect(() => {
@@ -250,7 +234,7 @@ export default function GlobalProjectsSection() {
     if (isDraggingRef.current || isSnappingRef.current || snapLockRef.current) return
 
     const index = trackIndexRef.current
-    if (isBufferIndex(index)) {
+    if (isBufferIndex(index, SLIDE_COUNT)) {
       snapToRealIndex(index)
     }
   }
@@ -300,19 +284,17 @@ export default function GlobalProjectsSection() {
     <section ref={sectionRef} className="global-projects" data-nav="light" aria-label="Global projects">
       <div className="global-projects__header">
         <div className="feature__head reveal">
-          <div className="feature__eyebrow">GLOBAL PROJECTS</div>
-          <h2 className="feature__title">世界が認める品質</h2>
+          <div className="feature__eyebrow">{eyebrow}</div>
+          <h2 className="feature__title">{title}</h2>
           <div className="feature__rule" aria-hidden="true" />
           <p className="feature__subtitle">
-            多岐にわたるプロジェクトに最適なソリューションを提供。五つ星ホテルから国際的な競技会場、
-            <br />
-            世界的なランドマークまで、その実績は世界中で高く評価されています。
+            <Lines lines={subtitle} />
           </p>
           {/* The carousel below only shows five of them; this is the way
               through to the rest. Same pill as デザイナーを見る, so the page
               keeps one kind of call to action. */}
           <a className="global-projects__cta reveal" href="/global-projects">
-            グローバルプロジェクトを見る
+            {cta}
             <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
               <path d="M4 12h15M13 6l6 6-6 6" />
             </svg>
@@ -394,7 +376,7 @@ export default function GlobalProjectsSection() {
         <div className="spotlight__pagination" role="tablist" aria-label="Global project slides">
           {SLIDES.map((slide, index) => (
             <button
-              key={slide.image}
+              key={index}
               type="button"
               role="tab"
               aria-selected={index === activeLogicalIndex}

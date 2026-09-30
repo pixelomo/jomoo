@@ -76,7 +76,7 @@ export const designerPage = defineType({
       title: '受賞ロゴ / Award Logos',
       type: 'array',
       group: 'awards',
-      description: '自動で横に流れます。',
+      description: '自動で横に流れます。トップページの受賞ロゴ一覧にも表示されます。',
       of: [
         defineArrayMember({
           type: 'object',

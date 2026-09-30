@@ -32,7 +32,8 @@ export function imgUrl(source: any, width: number, quality = 82): string {
   const ref: string = source?._ref ?? source?.asset?._ref ?? ''
   // GIF refs end with '-gif'. Converting to WebP strips the animation, and a
   // width wider than the file upscales every frame, so a GIF is served as is.
-  if (ref.endsWith('-gif')) return urlFor(source).url()
+  // An SVG is served as is too: rasterising a vector logo only loses it.
+  if (ref.endsWith('-gif') || ref.endsWith('-svg')) return urlFor(source).url()
   return urlFor(source).width(width).format('webp').quality(quality).url()
 }
 
@@ -570,5 +571,110 @@ export const getAfterSalesPage = cache(() =>
     `description, title, lead, termsTitle,
      termGroups[] { _key, clauses[] { _key, text, spaced, subClauses[] { _key, marker, text } } },
      termsClosing`
+  )
+)
+
+type Img = { asset?: AssetRef }
+
+export interface HomePageData {
+  description?: string
+  heroProduct?: {
+    image?: Img
+    eyebrow?: string
+    logo?: Img
+    logoAlt?: string
+    subtitle?: string
+    tagline?: string
+    awards?: Array<{ _key: string; image?: Img; alt?: string }>
+    footnotes?: string
+  }
+  heroVideo?: { videoUrl?: string; eyebrow?: string; title?: string; tagline?: string }
+  heroBrand?: { background?: Img; foreground?: Img; note?: string }
+  worldEyebrow?: string
+  worldTitle?: string
+  worldBody?: string[]
+  worldClosing?: string
+  worldMain?: Img
+  worldForest?: Img
+  worldShower?: Img
+  worldBathroom?: Img
+  expandImage?: Img
+  expandAlt?: string
+  expandLabel?: string
+  spotlightSlides?: Array<{
+    _key: string
+    label?: string
+    title?: string
+    body?: string
+    media?: 'image' | 'video' | 'turntable'
+    image?: Img
+    videoUrl?: string
+    playLabel?: string
+  }>
+  lineupEyebrow?: string
+  lineupTitle?: string
+  lineupSubtitle?: string
+  lineupProducts?: Array<{
+    _id: string
+    slug?: string
+    series?: string
+    name?: string
+    tagline?: string
+    heroTitle?: string
+    heroEyebrow?: string
+    thumbnail?: AssetRef
+    card?: ProductCard
+  }>
+  projectsEyebrow?: string
+  projectsTitle?: string
+  projectsSubtitle?: string
+  projectsCta?: string
+  projectSlides?: Array<{ _key: string; image?: Img; title: string; meta?: string }>
+  stats?: Array<{ _key: string; label: string; softBreak?: boolean; value: number; suffix?: string; icon?: Img }>
+  designEyebrow?: string
+  designTitle?: string
+  designSubtitle?: string
+  designButton?: string
+  designLane1?: Array<{ _key: string; image?: Img; onBackdrop?: boolean }>
+  designLane2?: Array<{ _key: string; image?: Img; onBackdrop?: boolean }>
+  /** The award marks, read from the デザイナー page so there is one list. */
+  awardLogos?: Array<{ _key: string; name?: string; logo?: Img }>
+}
+
+export const getHomePage = cache(() =>
+  getSingleton<HomePageData>(
+    'homePage',
+    `
+    ...,
+    heroVideo { eyebrow, title, tagline, "videoUrl": video.asset->url },
+    spotlightSlides[] { _key, label, title, body, media, image, playLabel, "videoUrl": video.asset->url },
+    lineupProducts[]-> {
+      _id, "slug": slug.current, series, name, tagline,
+      "heroTitle": hero.title, "heroEyebrow": hero.eyebrow,
+      "thumbnail": images[0].asset,
+      card { image, hoverImage, tagline, description }
+    },
+    "awardLogos": *[_id == "designerPage"][0].awards[] { _key, name, logo }
+  `
+  )
+)
+
+export interface SiteCtaCard {
+  image?: Img
+  eyebrow?: string
+  title?: string
+  button?: string
+}
+
+export interface SiteCtaData {
+  catalog?: SiteCtaCard & { pdfUrl?: string }
+  contact?: SiteCtaCard
+}
+
+export const getSiteCta = cache(() =>
+  getSingleton<SiteCtaData>(
+    'siteCta',
+    `catalog { image, eyebrow, title, button, "pdfUrl": pdf.asset->url },
+     contact { image, eyebrow, title, button }`
   )
 )
