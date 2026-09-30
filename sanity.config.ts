@@ -19,12 +19,15 @@ export default defineConfig({
     structureTool({
       structure: (S) =>
         S.list()
+          .id('root')
           .title('コンテンツ')
           .items([
             S.listItem()
+              .id('pages')
               .title('ページ / Pages')
               .child(
                 S.list()
+                  .id('pages')
                   .title('ページ / Pages')
                   .items(
                     SINGLETONS.map(({ type, title }) =>
