@@ -1,3 +1,4 @@
+import { cache } from 'react'
 import { createClient, type SanityClient } from '@sanity/client'
 import imageUrlBuilder from '@sanity/image-url'
 
@@ -27,12 +28,12 @@ export function urlFor(source: any) {
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function imgUrl(source: any, width: number, quality = 82): string {
-  const ref: string = source?._ref ?? ''
-  const builder = urlFor(source).width(width)
-  // GIF refs end with '-gif'; converting to WebP strips animation
-  return ref.endsWith('-gif')
-    ? builder.url()
-    : builder.format('webp').quality(quality).url()
+  // Either a bare asset reference or an image field holding one.
+  const ref: string = source?._ref ?? source?.asset?._ref ?? ''
+  // GIF refs end with '-gif'. Converting to WebP strips the animation, and a
+  // width wider than the file upscales every frame, so a GIF is served as is.
+  if (ref.endsWith('-gif')) return urlFor(source).url()
+  return urlFor(source).width(width).format('webp').quality(quality).url()
 }
 
 // Fetch all active products for the model dropdown
@@ -307,3 +308,177 @@ export async function getLegalLinks(): Promise<{ slug: string; label: string }[]
     return []
   }
 }
+
+/* ── Page singletons ─────────────────────────────────────────
+   会社情報, デザイナー and グローバルプロジェクト, one document each, stored
+   under their type name as the id. Seeded by scripts/seed-cms-pages.mjs.
+
+   Multi-line copy is one string, split on \n where it is drawn. */
+
+/** Multi-line copy from the Studio, one entry per line. */
+export function lines(text?: string): string[] {
+  return text ? text.split('\n').map((line) => line.trim()).filter(Boolean) : []
+}
+
+/** An image field, with the file's pixel size read off the asset. */
+export interface SizedImage {
+  asset?: AssetRef
+  alt?: string
+  width?: number
+  height?: number
+}
+
+const SIZED_IMAGE = `{
+  asset, alt, hotspot, crop,
+  "width": asset->metadata.dimensions.width,
+  "height": asset->metadata.dimensions.height
+}`
+
+async function getSingleton<T>(type: string, projection: string): Promise<T | null> {
+  try {
+    const result = await getSanityClient().fetch<T | null>(
+      `*[_id == $type][0] { ${projection} }`,
+      { type }
+    )
+    return result ?? null
+  } catch {
+    return null
+  }
+}
+
+export interface CompanyEra {
+  _key: string
+  from: string
+  to?: string
+  tint?: 'none' | 'top' | 'bottom'
+  eyebrow?: string
+  subtitle?: string
+  images?: Array<SizedImage & { _key: string }>
+  entries?: Array<{ _key: string; year: string; text?: string }>
+}
+
+export interface CompanyBrand {
+  _key: string
+  name: string
+  photo?: { asset?: AssetRef }
+  logo?: { asset?: AssetRef }
+  logoHeight?: number
+  logoAlt?: string
+  copy?: string
+}
+
+export interface CompanyStat {
+  _key: string
+  label: string
+  value: number
+  suffix?: string
+  icon?: { asset?: AssetRef }
+}
+
+export interface CompanyPageData {
+  description?: string
+  heroTitle?: string
+  heroVideoUrl?: string
+  heroPoster?: { asset?: AssetRef }
+  about?: { eyebrow?: string; title?: string; paragraphs?: string[] }
+  historyEyebrow?: string
+  historyTitle?: string
+  eras?: CompanyEra[]
+  brandsEyebrow?: string
+  brandsTitle?: string
+  brandsIntro?: string
+  brands?: CompanyBrand[]
+  globalEyebrow?: string
+  globalTitle?: string
+  globalIntro?: string
+  stats?: CompanyStat[]
+}
+
+export const getCompanyPage = cache(() =>
+  getSingleton<CompanyPageData>(
+    'companyPage',
+    `
+    description,
+    heroTitle,
+    "heroVideoUrl": heroVideo.asset->url,
+    heroPoster,
+    about { eyebrow, title, paragraphs },
+    historyEyebrow, historyTitle,
+    eras[] {
+      _key, from, to, tint, eyebrow, subtitle,
+      images[] { _key, ...${SIZED_IMAGE} },
+      entries[] { _key, year, text }
+    },
+    brandsEyebrow, brandsTitle, brandsIntro,
+    brands[] { _key, name, photo, logo, logoHeight, logoAlt, copy },
+    globalEyebrow, globalTitle, globalIntro,
+    stats[] { _key, label, value, suffix, icon }
+  `
+  )
+)
+
+export interface Designer {
+  _key: string
+  name: string
+  watermark?: string
+  role?: string
+  photo?: { asset?: AssetRef }
+  body?: string
+}
+
+export interface DesignerPageData {
+  description?: string
+  heroImage?: { asset?: AssetRef }
+  heroEyebrow?: string
+  heroTitle?: string
+  intro?: string
+  designers?: Designer[]
+  awardsEyebrow?: string
+  awardsTitle?: string
+  awards?: Array<{ _key: string; name?: string; logo?: { asset?: AssetRef } }>
+}
+
+export const getDesignerPage = cache(() =>
+  getSingleton<DesignerPageData>(
+    'designerPage',
+    `
+    description,
+    heroImage, heroEyebrow, heroTitle, intro,
+    designers[] { _key, name, watermark, role, photo, body },
+    awardsEyebrow, awardsTitle,
+    awards[] { _key, name, logo }
+  `
+  )
+)
+
+export interface GlobalProject {
+  _key: string
+  title: string
+  image?: { asset?: AssetRef }
+  description?: string
+  country?: string
+  category?: string
+}
+
+export interface GlobalProjectsPageData {
+  description?: string
+  heroImage?: { asset?: AssetRef }
+  heroEyebrow?: string
+  heroTitle?: string
+  intro?: string
+  countries?: string[]
+  categories?: string[]
+  projects?: GlobalProject[]
+}
+
+export const getGlobalProjectsPage = cache(() =>
+  getSingleton<GlobalProjectsPageData>(
+    'globalProjectsPage',
+    `
+    description,
+    heroImage, heroEyebrow, heroTitle, intro,
+    countries, categories,
+    projects[] { _key, title, image, description, country, category }
+  `
+  )
+)

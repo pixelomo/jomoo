@@ -1,12 +1,16 @@
 import type { Metadata } from 'next'
+import { notFound } from 'next/navigation'
 import CompanyProfilePage from '@/components/company/CompanyProfilePage'
+import { getCompanyPage } from '@/lib/sanity'
 
-export const metadata: Metadata = {
-  title: '会社情報',
-  description:
-    '1990年設立のJOMOOは、研究開発から製造、販売、アフターサービスまでをワンストップで担うグローバルなスマートバスルームブランドです。20,000名を超えるチームと120カ国の市場ネットワークで、スマートキッチン&バスルーム製品を届けています。',
+export async function generateMetadata(): Promise<Metadata> {
+  const data = await getCompanyPage()
+  return { title: '会社情報', description: data?.description }
 }
 
-export default function CompanyInformationPage() {
-  return <CompanyProfilePage />
+export default async function CompanyInformationPage() {
+  const data = await getCompanyPage()
+  if (!data) notFound()
+
+  return <CompanyProfilePage data={data} />
 }

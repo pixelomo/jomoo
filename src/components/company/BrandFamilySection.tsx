@@ -3,82 +3,35 @@
 import { useRef } from 'react'
 import { useScrollReveal } from './useScrollReveal'
 
-interface Brand {
+export interface Brand {
+  key: string
   name: string
   photo: string
   logo: string
-  /** Height the logo is drawn at, in px — see the note on the array below. */
+  /**
+   * Height the logo is drawn at, in px. Each logo has its own rather than one
+   * shared value: the wordmarks are different shapes — JOMOO is a single line,
+   * THG carries PARIS beneath it, poggenpohl is stacked over two — and the
+   * design sizes them optically. Every file is cropped to its ink, so the
+   * heights are the wordmarks' own and the logos share a left edge with the
+   * copy. Every logo sits in a box as tall as the tallest one, so the copy
+   * under it starts on the same line in every card.
+   */
   logoHeight: number
   /** What the logo itself reads, when that is not the brand's name. */
   logoAlt?: string
   lines: string[]
 }
 
-/**
- * The six brands, in the order the design lays them out.
- *
- * Each logo has its own height rather than one shared value: the wordmarks are
- * different shapes — JOMOO is a single line, THG carries PARIS beneath it,
- * poggenpohl is stacked over two — and the design sizes them optically, so the
- * heights here are the ones measured off it rather than a rule. Every file is
- * cropped to its ink, so the heights are the wordmarks' own and the logos
- * share a left edge with the copy. Every logo
- * sits in a box as tall as the tallest one, so the copy under it starts on the
- * same line in every card.
- */
-const BRANDS: Brand[] = [
-  {
-    name: 'JOMOO',
-    photo: '/images/companyprofile/brand1.jpg',
-    logo: '/images/companyprofile/brandlogo1.png',
-    logoHeight: 37,
-    lines: ['先進技術と洗練された', 'デザインを融合した、', '高機能バスルームブランド。'],
-  },
-  {
-    name: 'THG PARIS',
-    photo: '/images/companyprofile/brand2.jpg',
-    logo: '/images/companyprofile/brandlogo2.png',
-    logoHeight: 63,
-    lines: ['パリの美意識が息づく、', 'ラグジュアリーな', '水まわりブランド。'],
-  },
-  {
-    name: 'poggenpohl',
-    photo: '/images/companyprofile/brand3.jpg',
-    logo: '/images/companyprofile/brandlogo3.png',
-    logoHeight: 68,
-    lines: ['130年以上の歴史を誇る、', 'ドイツ発のプレミアム', 'キッチンブランド。'],
-  },
-  {
-    name: '小牧卫浴',
-    photo: '/images/companyprofile/brand4.jpg',
-    logo: '/images/companyprofile/brandlogo4.png',
-    logoAlt: 'SyncMood',
-    logoHeight: 49,
-    lines: ['先進技術を搭載した、', 'ハイエンドスマート', 'シャワーブランド。'],
-  },
-  {
-    name: 'URBAIN THG',
-    photo: '/images/companyprofile/brand5.jpg',
-    logo: '/images/companyprofile/brandlogo5.png',
-    logoHeight: 40,
-    lines: ['パリの美意識が息づく、', 'ラグジュアリーな', '水まわりブランド。'],
-  },
-  {
-    name: 'Goldreif poggenpohl',
-    photo: '/images/companyprofile/brand6.jpg',
-    logo: '/images/companyprofile/brandlogo6.png',
-    logoHeight: 37,
-    lines: ['上質なキャビネットと', 'ワードローブを展開する、', 'ハイエンド収納ブランド。'],
-  },
-]
+interface Props {
+  eyebrow: string
+  title: string
+  intro: string[]
+  brands: Brand[]
+}
 
-const INTRO = [
-  'JOMOOグループは、',
-  'キッチン・バスルーム領域における複数の個性あるブランドを保有・展開しています。',
-]
-
-/** ブランドファミリー — the group's six brands, three to a row. */
-export default function BrandFamilySection() {
+/** ブランドファミリー — the group's brands, three to a row. */
+export default function BrandFamilySection({ eyebrow, title, intro, brands }: Props) {
   const sectionRef = useRef<HTMLElement>(null)
 
   useScrollReveal(
@@ -98,43 +51,47 @@ export default function BrandFamilySection() {
       aria-labelledby="cp-brands-title"
     >
       <header className="cp-brands__head">
-        <p className="cp-eyebrow cp-eyebrow--display">BRAND FAMILY</p>
+        <p className="cp-eyebrow cp-eyebrow--display">{eyebrow}</p>
         <h2 className="cp-section-title" id="cp-brands-title">
-          ブランドファミリー
+          {title}
         </h2>
         <span className="cp-rule" aria-hidden="true" />
         <div className="cp-lede">
-          {INTRO.map((line) => (
+          {intro.map((line) => (
             <p key={line}>{line}</p>
           ))}
         </div>
       </header>
 
       <ul className="cp-brands__grid">
-        {BRANDS.map((brand) => (
-          <li className="cp-brand" key={brand.name}>
+        {brands.map((brand) => (
+          <li className="cp-brand" key={brand.key}>
             <figure className="cp-brand__frame">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                className="cp-brand__photo"
-                src={brand.photo}
-                alt={`${brand.name}の製品`}
-                loading="lazy"
-              />
+              {brand.photo && (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  className="cp-brand__photo"
+                  src={brand.photo}
+                  alt={`${brand.name}の製品`}
+                  loading="lazy"
+                />
+              )}
             </figure>
             <div className="cp-brand__body">
               <div className="cp-brand__logo">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={brand.logo}
-                  alt={brand.logoAlt ?? brand.name}
-                  loading="lazy"
-                  style={{ height: `${brand.logoHeight}px` }}
-                />
+                {brand.logo && (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={brand.logo}
+                    alt={brand.logoAlt ?? brand.name}
+                    loading="lazy"
+                    style={{ height: `${brand.logoHeight}px` }}
+                  />
+                )}
               </div>
               <p className="cp-brand__copy">
-                {brand.lines.map((line) => (
-                  <span className="cp-brand__line" key={line}>
+                {brand.lines.map((line, i) => (
+                  <span className="cp-brand__line" key={i}>
                     {line}
                   </span>
                 ))}

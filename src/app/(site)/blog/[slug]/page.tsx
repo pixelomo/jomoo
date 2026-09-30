@@ -1,19 +1,21 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
+import { PortableText, type PortableTextComponents } from '@portabletext/react'
 import { BlogGrid } from '@/components/blog/BlogIndex'
 import {
-  BLOG_POSTS,
   formatBlogDate,
   getNeighbours,
   getPost,
+  getPosts,
   getRelated,
-  type BlogBlock,
+  type BlogImage,
 } from '@/lib/blog/posts'
+import { imgUrl } from '@/lib/sanity'
 import '@/components/blog/blog.css'
 
-export function generateStaticParams() {
-  return BLOG_POSTS.map((post) => ({ slug: post.slug }))
+export async function generateStaticParams() {
+  return (await getPosts()).map((post) => ({ slug: post.slug }))
 }
 
 export async function generateMetadata({
@@ -21,7 +23,7 @@ export async function generateMetadata({
 }: {
   params: Promise<{ slug: string }>
 }): Promise<Metadata> {
-  const post = getPost((await params).slug)
+  const post = await getPost((await params).slug)
   if (!post) return {}
 
   return {
@@ -53,44 +55,39 @@ function Arrow({ direction }: { direction: 'prev' | 'next' }) {
   )
 }
 
-function Block({ block }: { block: BlogBlock }) {
-  switch (block.type) {
-    case 'h2':
-      return <h2 className="blog-post__h2">{block.text}</h2>
-    case 'quote':
-      return <blockquote className="blog-post__quote">{block.text}</blockquote>
-    case 'list':
-      return (
-        <ul className="blog-post__list">
-          {block.items.map((item) => (
-            <li key={item}>{item}</li>
-          ))}
-        </ul>
-      )
-    case 'img': {
-      // Landscape pictures run full-bleed in a fixed band, as they do on the
-      // global site. A picture that is square or taller loses most of itself to
-      // that crop, so it keeps its own proportions and stands taller instead.
-      const portrait = block.height >= block.width
-      return (
-        <figure className={`blog-post__figure${portrait ? ' blog-post__figure--portrait' : ''}`}>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={block.src}
-            width={block.width}
-            height={block.height}
-            alt={block.alt}
-            loading="lazy"
-          />
-          {block.caption && (
-            <figcaption className="blog-post__caption">{block.caption}</figcaption>
-          )}
-        </figure>
-      )
-    }
-    default:
-      return <p className="blog-post__text">{block.text}</p>
-  }
+function Figure({ value }: { value: BlogImage }) {
+  if (!value.asset) return null
+  // Landscape pictures run full-bleed in a fixed band, as they do on the
+  // global site. A picture that is square or taller loses most of itself to
+  // that crop, so it keeps its own proportions and stands taller instead.
+  const portrait = value.height >= value.width
+  return (
+    <figure className={`blog-post__figure${portrait ? ' blog-post__figure--portrait' : ''}`}>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={imgUrl(value, 1800)}
+        width={value.width}
+        height={value.height}
+        alt={value.alt ?? ''}
+        loading="lazy"
+      />
+      {value.caption && <figcaption className="blog-post__caption">{value.caption}</figcaption>}
+    </figure>
+  )
+}
+
+const components: PortableTextComponents = {
+  block: {
+    normal: ({ children }) => <p className="blog-post__text">{children}</p>,
+    h2: ({ children }) => <h2 className="blog-post__h2">{children}</h2>,
+    blockquote: ({ children }) => <blockquote className="blog-post__quote">{children}</blockquote>,
+  },
+  list: {
+    bullet: ({ children }) => <ul className="blog-post__list">{children}</ul>,
+  },
+  types: {
+    image: Figure,
+  },
 }
 
 export default async function BlogPostPage({
@@ -99,11 +96,10 @@ export default async function BlogPostPage({
   params: Promise<{ slug: string }>
 }) {
   const { slug } = await params
-  const post = getPost(slug)
+  const post = await getPost(slug)
   if (!post) notFound()
 
-  const { prev, next } = getNeighbours(slug)
-  const related = getRelated(slug)
+  const [{ prev, next }, related] = await Promise.all([getNeighbours(slug), getRelated(slug)])
 
   return (
     <main className="flex-1 blog-post">
@@ -135,9 +131,10 @@ export default async function BlogPostPage({
 
       <article className="blog-post__body">
         <p className="blog-post__lede">{post.excerpt}</p>
-        {post.body.map((block, index) => (
-          <Block block={block} key={index} />
-        ))}
+        <PortableText
+          value={post.body as Parameters<typeof PortableText>[0]['value']}
+          components={components}
+        />
       </article>
 
       <div className="blog-post__foot">

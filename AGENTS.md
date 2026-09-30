@@ -23,6 +23,16 @@ arrive as a 法人 sign-up. `npx tsx scripts/seed-trust-dealer.mts` writes it fr
 the details printed on that page, and `--email … --password …` also gives it the
 法人 account that owns it.
 
+# CMS pages
+
+ブログ, 会社情報, デザイナー and グローバルプロジェクト render from Sanity: one
+`blogPost` document per post, and one singleton each for the other three
+(`companyPage`, `designerPage`, `globalProjectsPage` — the type name is the
+document id, and the Studio lists them under ページ). There is no fallback copy
+in the source; a missing singleton 404s its page.
+`node scripts/seed-cms-pages.mjs --apply` writes them from
+`scripts/cms-pages.json` (create-only; `--replace` overwrites Studio edits).
+
 # Admin portal accounts
 
 `ADMIN_ACCOUNTS` entries are `username:password:role[:department]`. The role

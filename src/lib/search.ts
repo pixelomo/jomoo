@@ -1,13 +1,12 @@
 // Site-wide search over the two things the public site actually publishes:
-// products (Sanity) and blog posts (the build-time array in lib/blog/posts).
+// products and blog posts, both in Sanity.
 //
 // Sanity's GROQ `match` is word-prefix based and tokenises on whitespace, which
 // does nothing useful for Japanese — 「トイレ」 inside 「スマートトイレ」 is not a
-// word boundary. So products are fetched once (there are a few dozen) and
-// filtered here with plain substring matching, the same way the posts are.
+// word boundary. So both are fetched whole (a few dozen products, a handful of
+// posts) and filtered here with plain substring matching.
 
-import { getSanityClient, type AssetRef } from '@/lib/sanity'
-import { BLOG_POSTS, type BlogPost } from '@/lib/blog/posts'
+import { getSanityClient, imgUrl, type AssetRef } from '@/lib/sanity'
 
 export interface ProductHit {
   kind: 'product'
@@ -86,14 +85,35 @@ function matches(terms: string[], fields: Array<string | undefined>): boolean {
   return terms.every((term) => haystack.includes(term))
 }
 
-function blockText(post: BlogPost): string {
-  return post.body
-    .map((block) => {
-      if (block.type === 'list') return block.items.join(' ')
-      if (block.type === 'img') return block.alt
-      return block.text
-    })
-    .join(' ')
+interface SearchablePost {
+  slug: string
+  title: string
+  date: string
+  author?: string
+  excerpt?: string
+  cover?: { asset?: AssetRef }
+  /** The body as plain text, with the pictures' alt text alongside. */
+  text?: string
+  alts?: string[]
+}
+
+async function getSearchablePosts(): Promise<SearchablePost[]> {
+  try {
+    return await getSanityClient().fetch(
+      `*[_type == "blogPost" && defined(slug.current) && defined(date)] | order(date desc) {
+        "slug": slug.current,
+        title,
+        date,
+        author,
+        excerpt,
+        cover,
+        "text": pt::text(body),
+        "alts": body[_type == "image"].alt
+      }`
+    )
+  } catch {
+    return []
+  }
 }
 
 export async function search(rawQuery: string, limit?: number): Promise<SearchResults> {
@@ -126,10 +146,10 @@ export async function search(rawQuery: string, limit?: number): Promise<SearchRe
       thumbnail: p.thumbnail,
     }))
 
-  const posts = BLOG_POSTS.filter((post) =>
-    matches(terms, [post.title, post.excerpt, post.author, blockText(post)])
-  )
-    .sort((a, b) => b.date.localeCompare(a.date))
+  const posts = (await getSearchablePosts())
+    .filter((post) =>
+      matches(terms, [post.title, post.excerpt, post.author, post.text, ...(post.alts ?? [])])
+    )
     .map<PostHit>((post) => ({
       kind: 'post',
       id: post.slug,
@@ -137,7 +157,7 @@ export async function search(rawQuery: string, limit?: number): Promise<SearchRe
       subtitle: post.excerpt,
       href: `/blog/${post.slug}`,
       date: post.date,
-      cover: post.cover,
+      cover: post.cover?.asset ? imgUrl(post.cover, 400) : undefined,
     }))
 
   const total = products.length + posts.length

@@ -99,7 +99,9 @@ export default function DesignerProfile({ side, tone, watermark, name, role, pho
 
       <div className="dz-profile__inner">
         <div className="dz-profile__media">
-          <img className="dz-profile__photo" src={photo} alt={name} loading="lazy" decoding="async" />
+          {photo && (
+            <img className="dz-profile__photo" src={photo} alt={name} loading="lazy" decoding="async" />
+          )}
         </div>
 
         <div className="dz-profile__text">

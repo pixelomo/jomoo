@@ -1,14 +1,7 @@
 'use client'
 
-import { useEffect, useRef, type ReactNode } from 'react'
+import { useEffect, useRef } from 'react'
 import { useScrollReveal } from './useScrollReveal'
-
-const INTRO = [
-  '世界とつながり、日々の暮らしのすぐそばに。',
-  'JOMOOの歩みは世界各地に広がり、様々な市場へと発展を続けています。',
-  '世界で培ってきた技術、デザイン、サービスの知見を、',
-  'それぞれの土地の暮らしに寄り添った水まわりソリューションへと高めています。',
-]
 
 /**
  * A showroom facade, traced from the design screen.
@@ -16,6 +9,7 @@ const INTRO = [
  * The other two stats reuse the homepage's icon set; this one has no asset in
  * it, so it is drawn here in the same hand — one weight of blue line, square
  * ends, no fill — rather than borrowed from a stat that means something else.
+ * A figure given no icon in the Studio falls back to it.
  */
 function ShowroomIcon() {
   return (
@@ -34,30 +28,21 @@ function ShowroomIcon() {
   )
 }
 
-interface Stat {
+export interface Stat {
+  key: string
   label: string
   value: number
   suffix: string
-  icon: ReactNode
+  /** An uploaded icon's URL; without one the showroom drawing is used. */
+  icon?: string
 }
 
-const STATS: Stat[] = [
-  { label: '高級ショールーム', value: 10000, suffix: '+', icon: <ShowroomIcon /> },
-  {
-    label: '展開国・地域数',
-    value: 120,
-    suffix: '+',
-    // eslint-disable-next-line @next/next/no-img-element
-    icon: <img src="/images/icon/icon_00001.png" alt="" />,
-  },
-  {
-    label: '販売拠点数',
-    value: 300000,
-    suffix: '+',
-    // eslint-disable-next-line @next/next/no-img-element
-    icon: <img src="/images/icon/icon_00002.png" alt="" />,
-  },
-]
+interface Props {
+  eyebrow: string
+  title: string
+  intro: string[]
+  stats: Stat[]
+}
 
 /**
  * One stat, counted up the way the homepage counts its own: the whole row is
@@ -128,7 +113,10 @@ function StatCard({ stat, index, rowRef }: { stat: Stat; index: number; rowRef: 
   return (
     <li className="cp-stat">
       <div className="cp-stat__top">
-        <span className="cp-stat__icon">{stat.icon}</span>
+        <span className="cp-stat__icon">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          {stat.icon ? <img src={stat.icon} alt="" /> : <ShowroomIcon />}
+        </span>
         <span className="cp-stat__label">{stat.label}</span>
       </div>
       <p className="cp-stat__num">
@@ -141,8 +129,8 @@ function StatCard({ stat, index, rowRef }: { stat: Stat; index: number; rowRef: 
   )
 }
 
-/** グローバル展開 — the map, and the three figures under it. */
-export default function GlobalPresenceSection() {
+/** グローバル展開 — the map, and the figures under it. */
+export default function GlobalPresenceSection({ eyebrow, title, intro, stats }: Props) {
   const sectionRef = useRef<HTMLElement>(null)
   const rowRef = useRef<HTMLUListElement>(null)
 
@@ -160,13 +148,13 @@ export default function GlobalPresenceSection() {
       aria-labelledby="cp-global-title"
     >
       <header className="cp-global__head">
-        <p className="cp-eyebrow cp-eyebrow--display">GLOBAL PRESENCE</p>
+        <p className="cp-eyebrow cp-eyebrow--display">{eyebrow}</p>
         <h2 className="cp-section-title" id="cp-global-title">
-          グローバル展開
+          {title}
         </h2>
         <span className="cp-rule" aria-hidden="true" />
         <div className="cp-lede">
-          {INTRO.map((line) => (
+          {intro.map((line) => (
             <p key={line}>{line}</p>
           ))}
         </div>
@@ -212,8 +200,8 @@ export default function GlobalPresenceSection() {
       </noscript>
 
       <ul className="cp-stats" ref={rowRef}>
-        {STATS.map((stat, i) => (
-          <StatCard key={stat.label} stat={stat} index={i} rowRef={rowRef} />
+        {stats.map((stat, i) => (
+          <StatCard key={stat.key} stat={stat} index={i} rowRef={rowRef} />
         ))}
       </ul>
     </section>

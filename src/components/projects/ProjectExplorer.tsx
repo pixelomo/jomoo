@@ -2,12 +2,17 @@
 'use client'
 
 import { useMemo, useRef, useState } from 'react'
-import {
-  GLOBAL_PROJECTS,
-  PROJECT_CATEGORIES,
-  PROJECT_COUNTRIES,
-  type GlobalProject,
-} from '@/data/global-projects'
+
+export interface Project {
+  key: string
+  title: string
+  image: string
+  description: string
+  /** One of the page's country chips — the Studio checks this on publish. */
+  country: string
+  /** One of the page's category chips, likewise. */
+  category: string
+}
 
 function toggle(list: string[], value: string) {
   return list.includes(value) ? list.filter((item) => item !== value) : [...list, value]
@@ -18,7 +23,7 @@ function toggle(list: string[], value: string) {
  * two rows are an AND, so 中国 + 教育機関 means "schools in China" rather than
  * "anything Chinese plus every school".
  */
-function matches(project: GlobalProject, countries: string[], categories: string[]) {
+function matches(project: Project, countries: string[], categories: string[]) {
   const countryOk = countries.length === 0 || countries.includes(project.country)
   const categoryOk = categories.length === 0 || categories.includes(project.category)
   return countryOk && categoryOk
@@ -38,15 +43,40 @@ function SearchGlyph() {
   )
 }
 
-export default function ProjectExplorer() {
+/**
+ * The chips in the order the editor set, plus any value a project carries that
+ * is missing from them. The Studio refuses to publish such a project, but a
+ * chip removed after the fact would otherwise leave its projects unreachable
+ * by the filter — the problem that once kept 交通拠点 off the page.
+ */
+function chipsFor(listed: string[], used: string[]) {
+  return [...listed, ...used.filter((value, i) => value && !listed.includes(value) && used.indexOf(value) === i)]
+}
+
+interface Props {
+  projects: Project[]
+  countries: string[]
+  categories: string[]
+}
+
+export default function ProjectExplorer({ projects, countries: countryChips, categories: categoryChips }: Props) {
   const [countries, setCountries] = useState<string[]>([])
   const [categories, setCategories] = useState<string[]>([])
   const [panelOpen, setPanelOpen] = useState(true)
   const resultsRef = useRef<HTMLDivElement>(null)
 
+  const countryList = useMemo(
+    () => chipsFor(countryChips, projects.map((p) => p.country)),
+    [countryChips, projects]
+  )
+  const categoryList = useMemo(
+    () => chipsFor(categoryChips, projects.map((p) => p.category)),
+    [categoryChips, projects]
+  )
+
   const results = useMemo(
-    () => GLOBAL_PROJECTS.filter((project) => matches(project, countries, categories)),
-    [countries, categories]
+    () => projects.filter((project) => matches(project, countries, categories)),
+    [projects, countries, categories]
   )
 
   // Every chip filters on click, so 検索する has nothing left to submit; it
@@ -72,7 +102,7 @@ export default function ProjectExplorer() {
           {panelOpen && (
             <div className="gp-filter__body">
               <div className="gp-filter__chips" role="group" aria-label="国から絞り込む">
-                {PROJECT_COUNTRIES.map((country) => (
+                {countryList.map((country) => (
                   <button
                     key={country}
                     type="button"
@@ -90,7 +120,7 @@ export default function ProjectExplorer() {
                 role="group"
                 aria-label="カテゴリーから絞り込む"
               >
-                {PROJECT_CATEGORIES.map((category) => (
+                {categoryList.map((category) => (
                   <button
                     key={category}
                     type="button"
@@ -131,14 +161,16 @@ export default function ProjectExplorer() {
           {results.length > 0 ? (
             <div className="gp-grid">
               {results.map((project) => (
-                <article key={project.slug} className="gp-card">
+                <article key={project.key} className="gp-card">
                   <h2 className="gp-card__title">{project.title}</h2>
-                  <img
-                    className="gp-card__image"
-                    src={project.image}
-                    alt={project.title}
-                    loading="lazy"
-                  />
+                  {project.image && (
+                    <img
+                      className="gp-card__image"
+                      src={project.image}
+                      alt={project.title}
+                      loading="lazy"
+                    />
+                  )}
                   <p className="gp-card__body">{project.description}</p>
                   <div className="gp-card__tags">
                     <span className="gp-tag">{project.country}</span>

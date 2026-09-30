@@ -1,26 +1,50 @@
 /* eslint-disable @next/next/no-img-element */
+import { Fragment } from 'react'
 import type { Metadata } from 'next'
-import ProjectExplorer from '@/components/projects/ProjectExplorer'
+import { notFound } from 'next/navigation'
+import ProjectExplorer, { type Project } from '@/components/projects/ProjectExplorer'
+import { getGlobalProjectsPage, imgUrl, lines } from '@/lib/sanity'
 import '@/components/projects/global-projects.css'
 
-export const metadata: Metadata = {
-  title: 'グローバルプロジェクト',
-  description:
-    '世界で活躍するデザイナーたちが手がけた、魅力あふれるプロジェクトをご紹介します。洗練された製品が生み出す美しさと、空間にもたらす新たな価値をご覧ください。',
+export async function generateMetadata(): Promise<Metadata> {
+  const data = await getGlobalProjectsPage()
+  return { title: 'グローバルプロジェクト', description: data?.description }
 }
 
-export default function GlobalProjectsPage() {
+/** Breaks between the lines the editor wrote, and nowhere else. */
+function Lines({ text }: { text?: string }) {
+  return lines(text).map((line, i) => (
+    <Fragment key={i}>
+      {i > 0 && <br />}
+      {line}
+    </Fragment>
+  ))
+}
+
+export default async function GlobalProjectsPage() {
+  const data = await getGlobalProjectsPage()
+  if (!data) notFound()
+
+  const projects: Project[] = (data.projects ?? []).map((project) => ({
+    key: project._key,
+    title: project.title,
+    image: project.image?.asset ? imgUrl(project.image, 1000) : '',
+    description: project.description ?? '',
+    country: project.country ?? '',
+    category: project.category ?? '',
+  }))
+
   return (
     <main className="gp">
-      <section className="gp-hero" aria-label="グローバルプロジェクト">
-        <img className="gp-hero__image" src="/images/global1-hero.webp" alt="" />
+      <section className="gp-hero" aria-label={lines(data.heroTitle).join('')}>
+        {data.heroImage?.asset && (
+          <img className="gp-hero__image" src={imgUrl(data.heroImage, 2400)} alt="" />
+        )}
         <div className="gp-hero__scrim" aria-hidden="true" />
         <div className="gp-hero__inner gp__container">
-          <p className="gp-hero__eyebrow">GLOBAL PROJECTS</p>
+          <p className="gp-hero__eyebrow">{data.heroEyebrow}</p>
           <h1 className="gp-hero__title">
-            グローバル
-            <br />
-            プロジェクト
+            <Lines text={data.heroTitle} />
           </h1>
         </div>
       </section>
@@ -28,15 +52,17 @@ export default function GlobalProjectsPage() {
       <section className="gp-intro" data-nav="light">
         <div className="gp__container">
           <p className="gp-intro__text">
-            世界で活躍するデザイナーたちが手がけた、魅力あふれるプロジェクトをご紹介します。
-            <br />
-            洗練された製品が生み出す美しさと、空間にもたらす新たな価値をご覧ください。
+            <Lines text={data.intro} />
           </p>
           <div className="gp-intro__rule" aria-hidden="true" />
         </div>
       </section>
 
-      <ProjectExplorer />
+      <ProjectExplorer
+        projects={projects}
+        countries={data.countries ?? []}
+        categories={data.categories ?? []}
+      />
     </main>
   )
 }

@@ -1,12 +1,16 @@
 import type { Metadata } from 'next'
+import { notFound } from 'next/navigation'
 import DesignerPage from '@/components/designer/DesignerPage'
+import { getDesignerPage } from '@/lib/sanity'
 
-export const metadata: Metadata = {
-  title: 'デザイナー',
-  description:
-    'JOMOOは世界を代表するデザインパートナーとの協業により、新たな価値を創造しています。ヨハン・デュック、マティアス・レーナー、ダニエル・ジェメッケ — 国際的なデザイン賞に評価されたJOMOOのデザインチームを紹介します。',
+export async function generateMetadata(): Promise<Metadata> {
+  const data = await getDesignerPage()
+  return { title: 'デザイナー', description: data?.description }
 }
 
-export default function Designer() {
-  return <DesignerPage />
+export default async function Designer() {
+  const data = await getDesignerPage()
+  if (!data) notFound()
+
+  return <DesignerPage data={data} />
 }

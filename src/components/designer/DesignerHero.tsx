@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 'use client'
 
-import { useRef } from 'react'
+import { Fragment, useRef } from 'react'
 import { useScrollReveal } from '@/components/company/useScrollReveal'
 
 /**
@@ -12,7 +12,14 @@ import { useScrollReveal } from '@/components/company/useScrollReveal'
  * `fetchPriority="high"` and drawn from the first paint — it is the LCP of the
  * page and there is only one size of it.
  */
-export default function DesignerHero() {
+interface Props {
+  image?: string
+  eyebrow: string
+  /** The title's lines, as the design breaks them. */
+  title: string[]
+}
+
+export default function DesignerHero({ image, eyebrow, title }: Props) {
   const heroRef = useRef<HTMLElement>(null)
 
   useScrollReveal(heroRef, [
@@ -22,21 +29,26 @@ export default function DesignerHero() {
 
   return (
     <section className="dz-hero" ref={heroRef} aria-labelledby="dz-hero-title">
-      <img
-        className="dz-hero__media"
-        src="/images/designer/herosketch.webp"
-        alt=""
-        fetchPriority="high"
-        decoding="async"
-      />
+      {image && (
+        <img
+          className="dz-hero__media"
+          src={image}
+          alt=""
+          fetchPriority="high"
+          decoding="async"
+        />
+      )}
       <div className="dz-hero__scrim" aria-hidden="true" />
 
       <div className="dz-hero__inner">
-        <p className="dz-hero__eyebrow">Designing the future</p>
+        <p className="dz-hero__eyebrow">{eyebrow}</p>
         <h1 className="dz-hero__title" id="dz-hero-title">
-          世界をリードする
-          <br />
-          デザインとの共創
+          {title.map((line, i) => (
+            <Fragment key={i}>
+              {i > 0 && <br />}
+              {line}
+            </Fragment>
+          ))}
         </h1>
       </div>
     </section>

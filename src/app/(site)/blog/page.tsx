@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import BlogIndex from '@/components/blog/BlogIndex'
-import { BLOG_POSTS_BY_DATE } from '@/lib/blog/posts'
+import { getPosts } from '@/lib/blog/posts'
 import '@/components/blog/blog.css'
 
 export const metadata: Metadata = {
@@ -10,7 +10,9 @@ export const metadata: Metadata = {
     'バスルームにまつわる知見とアイデア。JOMOO のスマートバスルーム技術、公共空間のスマート化、製品開発の裏側をお届けします。',
 }
 
-export default function BlogPage() {
+export default async function BlogPage() {
+  const posts = await getPosts()
+
   return (
     <main className="flex-1 blog">
       <div className="blog__container">
@@ -22,7 +24,7 @@ export default function BlogPage() {
           <span className="blog__crumbs-current">ブログ</span>
         </nav>
 
-        <BlogIndex posts={BLOG_POSTS_BY_DATE} />
+        <BlogIndex posts={posts} />
       </div>
     </main>
   )

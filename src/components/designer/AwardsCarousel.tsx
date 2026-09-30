@@ -4,24 +4,18 @@
 import { useEffect, useRef, useState } from 'react'
 import { useScrollReveal } from '@/components/company/useScrollReveal'
 
-/**
- * The same seven award marks the homepage sets in its logo row, in the order
- * the design lays them out. Named here rather than generated from the index:
- * on the homepage they are one decorative strip, but this section is *about*
- * them, so each one carries the award it stands for.
- */
-const AWARD_LOGOS = [
-  'iF DESIGN AWARD',
-  'reddot winner — best of the best',
-  'GOOD DESIGN',
-  'GOLD AWARD 2023',
-  'GERMAN DESIGN AWARD',
-  'GERMAN INNOVATION AWARD',
-  'ICONIC AWARDS 2025',
-].map((name, i) => ({
-  name,
-  src: `/images/icon/jomoo_design_logo_${String(i + 1).padStart(5, '0')}.png`,
-}))
+interface AwardLogo {
+  /** The award the mark stands for — this section is *about* them, so each
+   *  one is announced rather than treated as decoration. */
+  name: string
+  src: string
+}
+
+interface Props {
+  eyebrow: string
+  title: string
+  logos: AwardLogo[]
+}
 
 /** Pixels per second the strip travels when nothing is holding it. */
 const SPEED = 150
@@ -42,7 +36,7 @@ const RESUME_DELAY = 2200
  * moment the first mark returns to where it started — no part-filled reset —
  * and stays honest whether the strip is drifting or being dragged.
  */
-export default function AwardsCarousel() {
+export default function AwardsCarousel({ eyebrow, title, logos }: Props) {
   const sectionRef = useRef<HTMLElement>(null)
   const trackRef = useRef<HTMLDivElement>(null)
   const barRef = useRef<HTMLSpanElement>(null)
@@ -104,7 +98,7 @@ export default function AwardsCarousel() {
     // scrollbar thumb (rail ÷ content) would be over 80% of the rule here,
     // because one copy of the strip barely overflows the screen, and a thumb
     // that size nudging back and forth tells the viewer nothing.
-    const thumb = 1 / AWARD_LOGOS.length
+    const thumb = 1 / Math.max(logos.length, 1)
 
     function paintBar(half: number) {
       if (!bar || half <= 0) return
@@ -181,14 +175,14 @@ export default function AwardsCarousel() {
       track.removeEventListener('touchstart', hold)
       track.removeEventListener('touchmove', hold)
     }
-  }, [copies])
+  }, [copies, logos.length])
 
   return (
     <section className="dz-awards" ref={sectionRef} data-nav="light" aria-labelledby="dz-awards-title">
       <div className="dz-awards__head">
-        <p className="dz-awards__eyebrow">Design awards</p>
+        <p className="dz-awards__eyebrow">{eyebrow}</p>
         <h2 className="dz-awards__title" id="dz-awards-title">
-          受賞歴
+          {title}
         </h2>
         <span className="dz-awards__rule" aria-hidden="true" />
       </div>
@@ -196,8 +190,8 @@ export default function AwardsCarousel() {
       <div className="dz-awards__track" ref={trackRef} tabIndex={0} role="group" aria-label="受賞歴のロゴ">
         {Array.from({ length: copies }, (_, copy) => (
           <div className="dz-awards__run" key={copy} aria-hidden={copy > 0 ? true : undefined}>
-            {AWARD_LOGOS.map((logo) => (
-              <div className="dz-awards__card" key={logo.src}>
+            {logos.map((logo, i) => (
+              <div className="dz-awards__card" key={i}>
                 <img
                   src={logo.src}
                   alt={copy === 0 ? logo.name : ''}

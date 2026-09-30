@@ -1,6 +1,6 @@
 import type { MetadataRoute } from 'next'
 import { getProductSlugs, getLegalLinks } from '@/lib/sanity'
-import { BLOG_POSTS } from '@/lib/blog/posts'
+import { getPosts } from '@/lib/blog/posts'
 import { SITE_ROUTES } from '@/lib/site-routes.generated'
 
 /**
@@ -65,9 +65,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // URLs that 404. Legal documents are fetched for the same reason: the two
   // that ship have static routes, but the sitemap should say so only while the
   // document behind them is actually published.
-  const [bySeries, legalLinks] = await Promise.all([
+  const [bySeries, legalLinks, posts] = await Promise.all([
     Promise.all(SERIES.map(async series => ({ series, slugs: await getProductSlugs(series) }))),
     getLegalLinks(),
+    getPosts(),
   ])
 
   const productPages = bySeries.flatMap(({ series, slugs }) =>
@@ -79,10 +80,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }))
   )
 
-  // Posts are a module rather than a CMS collection, so each one can carry its
-  // own publication date instead of today's — a sitemap that claims every page
-  // changed this morning tells a crawler nothing.
-  const blogPages = BLOG_POSTS.map(post => ({
+  // Each post carries its own publication date instead of today's — a sitemap
+  // that claims every page changed this morning tells a crawler nothing.
+  const blogPages = posts.map(post => ({
     url: `${baseUrl}/blog/${post.slug}`,
     lastModified: new Date(post.date),
     changeFrequency: 'yearly' as ChangeFreq,

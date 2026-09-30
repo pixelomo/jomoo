@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
-import { formatBlogDate, type BlogPost } from '@/lib/blog/posts'
+import { formatBlogDate, type BlogPostSummary as BlogPost } from '@/lib/blog/format'
 
 const PER_PAGE = 9
 

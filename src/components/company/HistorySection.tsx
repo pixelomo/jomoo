@@ -8,7 +8,8 @@ import { useScrollReveal } from './useScrollReveal'
  *  Mirrors --cp-rail-gap in the stylesheet. */
 const RAIL_GAP = 0.1
 
-interface Era {
+export interface Era {
+  key: string
   from: string
   to: string
   /** Which half of timelinebg.jpg tints the era, if any. */
@@ -16,126 +17,15 @@ interface Era {
   eyebrow: string
   subtitle: string
   images: { src: string; alt: string; width: number; height: number }[]
-  /** Each event keeps the line structure it was designed with. */
-  entries: { year: string; lines: string[] }[]
+  /** Each event keeps the line structure it was written with. */
+  entries: { key: string; year: string; lines: string[] }[]
 }
 
-const ERAS: Era[] = [
-  {
-    from: '1990',
-    to: '1999',
-    eyebrow: 'THE FOUNDING YEARS',
-    subtitle: '創業期',
-    images: [
-      {
-        src: '/images/companyprofile/founding.jpg',
-        alt: '創業当時のJOMOO',
-        width: 660,
-        height: 450,
-      },
-    ],
-    entries: [
-      { year: '1990', lines: ['JOMOO創業'] },
-      { year: '1991', lines: ['シャワースプレー用の除じん（ホコリ除去）システムを開発'] },
-      { year: '1993', lines: ['中国発のセラミックカートリッジ水栓を発売'] },
-      { year: '1999', lines: ['センサー水栓を開発'] },
-    ],
-  },
-  {
-    from: '2000',
-    to: '2009',
-    tint: 'top',
-    eyebrow: 'THE EXPANSION YEARS',
-    subtitle: '本格展開期',
-    images: [
-      {
-        src: '/images/companyprofile/expansion.jpg',
-        alt: 'JOMOOのショールーム',
-        width: 2000,
-        height: 1125,
-      },
-    ],
-    entries: [
-      { year: '2006', lines: ['セラミック製品を発売、', '衛生陶器製品を発売'] },
-      { year: '2007', lines: ['国際的なキッチン・バス金物の標準策定者に'] },
-      { year: '2008', lines: ['バスルーム製品ライン全体を新たに展開'] },
-    ],
-  },
-  {
-    from: '2010',
-    to: '2019',
-    eyebrow: 'THE INNOVATION YEARS',
-    subtitle: 'イノベーション期',
-    images: [
-      {
-        src: '/images/companyprofile/innovation.jpg',
-        alt: 'JOMOO groupのオフィス',
-        width: 2000,
-        height: 1500,
-      },
-    ],
-    entries: [
-      { year: '2010', lines: ['初のスマートトイレを発売'] },
-      { year: '2016', lines: ['「中国ハイエンドバスルーム業界リーディングブランド」に選出'] },
-      {
-        year: '2017',
-        lines: [
-          'グローバル・スマートホーム戦略を開始し、',
-          'JOMOO欧州オペレーションセンターを設立',
-        ],
-      },
-    ],
-  },
-  {
-    from: '2020',
-    to: 'NOW',
-    tint: 'bottom',
-    eyebrow: 'THE SMART LIVING ERA',
-    subtitle: 'テクノロジー期',
-    images: [
-      {
-        src: '/images/companyprofile/smart1.jpg',
-        alt: 'JOMOOのスマートショールーム',
-        width: 2400,
-        height: 1599,
-      },
-      {
-        src: '/images/companyprofile/smart2.jpg',
-        alt: 'JOMOOの本社キャンパス',
-        width: 2000,
-        height: 1125,
-      },
-    ],
-    entries: [
-      { year: '2020', lines: ['故宮・万里の長城・ポタラ宮など世界的文化遺産へ導入'] },
-      { year: '2021', lines: ['THG ParisとPoggenpohlを買収'] },
-      { year: '2022', lines: ['「中国No.1インテリジェントバスルームブランド」に選出'] },
-      { year: '2023', lines: ['世界初の「環境配慮型ダークファクトリー」を実現'] },
-      {
-        year: '2024',
-        lines: [
-          '国連開発計画（UNDP）と共同で国際トイレフォーラムを開催',
-          '10月にJOMOO日本研究開発センターを設立',
-        ],
-      },
-      {
-        year: '2025',
-        lines: [
-          'スペインのCasa Decorアートデザイン展に出展。',
-          'ゲイツ財団と共同で「汚物ゼロ・無水トイレ」プロジェクトを世界発表',
-        ],
-      },
-      {
-        year: '2026',
-        lines: [
-          'JOMOOが正式に日本市場へ参入。',
-          '東京に初のショールームをオープンし、',
-          'スマートトイレを同時発売。',
-        ],
-      },
-    ],
-  },
-]
+interface Props {
+  eyebrow: string
+  title: string
+  eras: Era[]
+}
 
 /**
  * JOMOOの歩み — the timeline, one grid per era.
@@ -148,7 +38,7 @@ const ERAS: Era[] = [
  * One rail runs the length of all four eras, so the dot reads as progress
  * through the whole timeline rather than through whichever era is in view.
  */
-export default function HistorySection() {
+export default function HistorySection({ eyebrow, title, eras }: Props) {
   const sectionRef = useRef<HTMLElement>(null)
   const bodyRef = useRef<HTMLDivElement>(null)
 
@@ -186,9 +76,9 @@ export default function HistorySection() {
       aria-labelledby="cp-history-title"
     >
       <header className="cp-history__head">
-        <p className="cp-eyebrow">OUR HISTORY</p>
+        <p className="cp-eyebrow">{eyebrow}</p>
         <h2 className="cp-history__title" id="cp-history-title">
-          JOMOOの歩み
+          {title}
         </h2>
       </header>
 
@@ -200,15 +90,15 @@ export default function HistorySection() {
         </div>
 
         <div className="cp-history__eras">
-          {ERAS.map((era) => (
+          {eras.map((era) => (
             <article
               className={`cp-era${era.tint ? ` cp-era--tint cp-era--tint-${era.tint}` : ''}`}
-              key={era.from}
+              key={era.key}
             >
               <div className="cp-era__head">
                 <h3 className="cp-era__years">
                   {era.from}
-                  <span className="cp-era__years-to">-{era.to}</span>
+                  {era.to && <span className="cp-era__years-to">-{era.to}</span>}
                 </h3>
                 <p className="cp-eyebrow cp-era__eyebrow">{era.eyebrow}</p>
               </div>
@@ -236,11 +126,11 @@ export default function HistorySection() {
 
               <ol className="cp-era__entries">
                 {era.entries.map((entry) => (
-                  <li key={entry.year} className="cp-entry">
+                  <li key={entry.key} className="cp-entry">
                     <p className="cp-entry__year">{entry.year}</p>
                     <p className="cp-entry__event">
-                      {entry.lines.map((line) => (
-                        <span className="cp-entry__line" key={line}>
+                      {entry.lines.map((line, i) => (
+                        <span className="cp-entry__line" key={i}>
                           {line}
                         </span>
                       ))}

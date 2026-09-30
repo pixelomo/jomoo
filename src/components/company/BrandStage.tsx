@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
+import { Fragment, useEffect, useRef } from 'react'
 import { useCssScrollProgress } from './useCssScrollProgress'
 
 const REDUCED_MOTION = '(prefers-reduced-motion: reduce)'
@@ -14,7 +14,15 @@ const REDUCED_MOTION = '(prefers-reduced-motion: reduce)'
  * `--cp-focus` runs 0→1 across that first panel and the stylesheet does the
  * rest.
  */
-export default function BrandStage() {
+interface Props {
+  title: string
+  videoUrl?: string
+  poster?: string
+  /** Each paragraph as its lines — a line break inside a paragraph is a <br>. */
+  about: { eyebrow: string; title: string; paragraphs: string[][] }
+}
+
+export default function BrandStage({ title, videoUrl, poster, about }: Props) {
   const stageRef = useRef<HTMLElement>(null)
   const videoRef = useRef<HTMLVideoElement>(null)
 
@@ -61,8 +69,8 @@ export default function BrandStage() {
         <video
           ref={videoRef}
           className="cp-stage__video"
-          src="/images/companyprofile/profile.mp4"
-          poster="/images/companyprofile/profile-poster.jpg"
+          src={videoUrl}
+          poster={poster}
           muted
           loop
           playsInline
@@ -76,24 +84,26 @@ export default function BrandStage() {
       <div className="cp-stage__panels">
         <div className="cp-panel cp-panel--hero">
           <h1 className="cp-hero__title" id="cp-hero-title">
-            Welcome to JOMOO
+            {title}
           </h1>
         </div>
 
         <div className="cp-panel cp-panel--about">
           <div className="cp-about">
-            <p className="cp-about__eyebrow">JOMOO BRAND</p>
-            <h2 className="cp-about__title">JOMOOについて</h2>
+            <p className="cp-about__eyebrow">{about.eyebrow}</p>
+            <h2 className="cp-about__title">{about.title}</h2>
             <span className="cp-about__rule" aria-hidden="true" />
             <div className="cp-about__body">
-              <p>
-                1990年設立のJOMOOは、ユーザーにスマートキッチン&amp;バスルーム製品を提供する、グローバルなスマートバスルームブランドです。
-                <br />
-                研究開発から製造、販売、アフターサービスまでをワンストップで担う企業として20,000名を超える多様なチームと、120カ国に広がる市場ネットワークがあります。
-              </p>
-              <p>
-                JOMOOは「Start Your Smart Life」というコンセプトのもと世界有数のテクロノジー企業やヨーロッパの著名デザインスタジオとの継続的なパートナーシップを通じて、革新を推進し続けています。
-              </p>
+              {about.paragraphs.map((paragraph, i) => (
+                <p key={i}>
+                  {paragraph.map((line, j) => (
+                    <Fragment key={j}>
+                      {j > 0 && <br />}
+                      {line}
+                    </Fragment>
+                  ))}
+                </p>
+              ))}
             </div>
           </div>
         </div>
