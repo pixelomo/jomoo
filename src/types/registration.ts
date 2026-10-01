@@ -8,6 +8,7 @@ export const Step1Schema = z.object({
   modelSeries: z.string().optional(),
   installationDate: z.string().min(1, 'validation.required'),
   installationAddressState: z.string().min(1, 'validation.required'),
+  installationAddressCity: z.string().trim().min(1, 'validation.required').max(60),
   installationAddressDetail: z.string().min(1, 'validation.required'),
   contactPerson: z.string().min(1, 'validation.required'),
   phoneNumber: z.string().optional(),

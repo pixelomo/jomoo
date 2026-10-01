@@ -119,6 +119,22 @@ export default function Step1BasicInfo({ defaultValues, models, dealers = [], on
       </FormField>
 
       <FormField
+        label={t('installationAddressCity')}
+        required
+        error={errors.installationAddressCity?.message ? tc('required') : undefined}
+        htmlFor="installationAddressCity"
+      >
+        <input
+          id="installationAddressCity"
+          type="text"
+          className={inputClass}
+          placeholder={t('installationAddressCityPlaceholder')}
+          autoComplete="address-level2"
+          {...register('installationAddressCity')}
+        />
+      </FormField>
+
+      <FormField
         label={t('installationAddressDetail')}
         required
         error={errors.installationAddressDetail?.message ? tc('required') : undefined}

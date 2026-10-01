@@ -120,6 +120,8 @@ export const productRegistration = pgTable('product_registrations', {
   modelName: text('model_name').notNull(),
   installationDate: date('installation_date').notNull(),
   installationAddressState: text('installation_address_state').notNull(),
+  /** 市区町村. Asked for on its own since 2026-10; null on older registrations. */
+  installationAddressCity: text('installation_address_city'),
   installationAddressDetail: text('installation_address_detail').notNull(),
   contactPerson: text('contact_person').notNull(),
   phoneNumber: text('phone_number'),

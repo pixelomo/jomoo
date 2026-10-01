@@ -18,6 +18,7 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
       modelName: productRegistration.modelName,
       installationDate: productRegistration.installationDate,
       installationAddressState: productRegistration.installationAddressState,
+      installationAddressCity: productRegistration.installationAddressCity,
       installationAddressDetail: productRegistration.installationAddressDetail,
       contactPerson: productRegistration.contactPerson,
       phoneNumber: productRegistration.phoneNumber,

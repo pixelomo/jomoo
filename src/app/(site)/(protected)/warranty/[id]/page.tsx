@@ -54,7 +54,7 @@ export default async function WarrantyPage({ params }: Props) {
         expiryDate={String(warranty.expiryDate)}
         extended={extended}
         customerName={reg.contactPerson || session.user.name}
-        addressState={reg.installationAddressState}
+        addressState={[reg.installationAddressState, reg.installationAddressCity].filter(Boolean).join('')}
         addressDetail={reg.installationAddressDetail}
         phoneNumber={reg.phoneNumber}
         dealerName={reg.dealerName}

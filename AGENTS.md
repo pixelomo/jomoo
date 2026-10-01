@@ -16,7 +16,7 @@ The tables `serial_numbers`, `serial_audit_logs`, `email_templates` and `dealer_
 
 `push` compares the whole schema and can propose destructive statements, so check what it plans before applying it to a database holding real data. Purely additive changes are easier to ship as a re-runnable script instead — `scripts/add-dealer-branches.mjs` is the pattern.
 
-Dealer branches (`dealer_branches`, `user.member_type`, `user.branch_id`, `product_registrations.branch_id`) are applied with `node scripts/add-dealer-branches.mjs`, then `node scripts/backfill-dealer-branches.mjs --apply` gives accounts created before the feature a member type and a branch. `dealer_branches.phone` / `.email` come from `node scripts/add-dealer-contact.mjs`.
+Dealer branches (`dealer_branches`, `user.member_type`, `user.branch_id`, `product_registrations.branch_id`) are applied with `node scripts/add-dealer-branches.mjs`, then `node scripts/backfill-dealer-branches.mjs --apply` gives accounts created before the feature a member type and a branch. `dealer_branches.phone` / `.email` come from `node scripts/add-dealer-contact.mjs`, and `product_registrations.installation_address_city` (市区町村) from `node scripts/add-installation-city.mjs`.
 
 株式会社TRUST — the dealer on the ショールーム page — is the one branch that did not
 arrive as a 法人 sign-up. `npx tsx scripts/seed-trust-dealer.mts` writes it from

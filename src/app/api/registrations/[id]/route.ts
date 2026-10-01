@@ -8,6 +8,7 @@ import { z } from 'zod'
 const EditableFieldsSchema = z.object({
   installation_date: z.string().optional(),
   installation_address_state: z.string().optional(),
+  installation_address_city: z.string().trim().min(1).max(60).optional(),
   installation_address_detail: z.string().optional(),
   contact_person: z.string().min(1).optional(),
   phone_number: z.string().nullable().optional(),
@@ -73,6 +74,7 @@ export async function PATCH(
   await db.update(productRegistration).set({
     ...(d.installation_date !== undefined && { installationDate: d.installation_date }),
     ...(d.installation_address_state !== undefined && { installationAddressState: d.installation_address_state }),
+    ...(d.installation_address_city !== undefined && { installationAddressCity: d.installation_address_city }),
     ...(d.installation_address_detail !== undefined && { installationAddressDetail: d.installation_address_detail }),
     ...(d.contact_person !== undefined && { contactPerson: d.contact_person }),
     ...(d.phone_number !== undefined && { phoneNumber: d.phone_number }),

@@ -76,6 +76,7 @@ export async function POST(req: Request) {
       modelName: data.modelName,
       installationDate: data.installationDate,
       installationAddressState: data.installationAddressState,
+      installationAddressCity: data.installationAddressCity,
       installationAddressDetail: data.installationAddressDetail,
       contactPerson: data.contactPerson,
       phoneNumber: data.phoneNumber ?? null,

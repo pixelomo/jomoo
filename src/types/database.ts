@@ -28,6 +28,7 @@ export interface DbProductRegistration {
   modelName: string
   installationDate: string
   installationAddressState: string
+  installationAddressCity: string | null
   installationAddressDetail: string
   contactPerson: string
   phoneNumber: string | null

@@ -36,6 +36,7 @@ export async function GET(req: Request) {
       registrationStatus: productRegistration.status,
       registeredAt: productRegistration.submittedAt,
       installPrefecture: productRegistration.installationAddressState,
+      installCity: productRegistration.installationAddressCity,
       installAddress: productRegistration.installationAddressDetail,
       dealerName: productRegistration.dealerName,
       createdBy: serialNumberEntry.createdBy,
@@ -58,7 +59,7 @@ export async function GET(req: Request) {
       r.serialNumber, r.series, r.modelName, r.batch,
       isSerialStatus(r.status) ? SERIAL_STATUS_META[r.status].label : r.status,
       r.note, r.registrationId, r.boundAt, r.userName, r.userEmail, r.registrationStatus,
-      r.registeredAt, r.installPrefecture, cityFromAddress(r.installAddress), r.dealerName,
+      r.registeredAt, r.installPrefecture, r.installCity ?? cityFromAddress(r.installAddress), r.dealerName,
       r.createdBy, r.createdAt,
     ])
   )

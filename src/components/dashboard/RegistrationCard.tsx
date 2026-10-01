@@ -120,7 +120,7 @@ export default function RegistrationCard({
 
             <dt>{tr('installationAddressState')}</dt>
             <dd>
-              {[reg.installationAddressState, reg.installationAddressDetail]
+              {[`${reg.installationAddressState}${reg.installationAddressCity ?? ''}`, reg.installationAddressDetail]
                 .filter(Boolean)
                 .join(' ') || '—'}
             </dd>
@@ -280,6 +280,7 @@ function EditModal({
   const [fields, setFields] = useState({
     installation_date: registration.installationDate ?? '',
     installation_address_state: registration.installationAddressState ?? '',
+    installation_address_city: registration.installationAddressCity ?? '',
     installation_address_detail: registration.installationAddressDetail ?? '',
     contact_person: registration.contactPerson ?? '',
     phone_number: registration.phoneNumber ?? '',
@@ -301,6 +302,8 @@ function EditModal({
         phone_number: fields.phone_number || null,
         purchase_date: fields.purchase_date || null,
         dealer_name: fields.dealer_name || null,
+        // Older registrations have no city; leave it unset rather than send ''.
+        installation_address_city: fields.installation_address_city.trim() || undefined,
       }
       const res = await fetch(`/api/registrations/${registration.id}`, {
         method: 'PATCH',
@@ -336,6 +339,10 @@ function EditModal({
               </option>
             ))}
           </select>
+        </label>
+        <label className="block">
+          <span className="text-xs text-zinc-500 mb-1 block">{tr('installationAddressCity')}</span>
+          <input type="text" value={fields.installation_address_city} onChange={set('installation_address_city')} placeholder={tr('installationAddressCityPlaceholder')} className={inputClass} />
         </label>
         <label className="block">
           <span className="text-xs text-zinc-500 mb-1 block">{tr('installationAddressDetail')}</span>
