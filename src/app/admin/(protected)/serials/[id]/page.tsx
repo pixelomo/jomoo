@@ -1,3 +1,4 @@
+import { listSeriesOptions } from '@/lib/catalogDrafts'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { desc, eq } from 'drizzle-orm'
@@ -202,6 +203,7 @@ export default async function SerialDetailPage({
             note: record.note,
           }}
           permissions={permissions}
+          seriesOptions={await listSeriesOptions()}
         />
       </div>
     </div>

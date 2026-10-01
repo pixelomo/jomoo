@@ -6,6 +6,14 @@ import { db } from '@/lib/db'
 import { serialNumberEntry, user } from '@/lib/db/schema'
 import { hasValidSerialFormat, normaliseSerialNumber } from '@/lib/serialValidation'
 import { SERIAL_STATUSES, recordAudit, serialFilters } from '@/lib/serialLibrary'
+import {
+  SERIES_ID_PATTERN,
+  createCatalogDrafts,
+  findProduct,
+  findSeries,
+  loadCatalog,
+  type CreatedDraft,
+} from '@/lib/catalogDrafts'
 
 const CreateSchema = z.object({
   serialNumber: z.string().min(1).max(64),
@@ -14,6 +22,12 @@ const CreateSchema = z.object({
   batch: z.string().max(120).nullish(),
   status: z.enum(SERIAL_STATUSES).default('UNUSED'),
   note: z.string().max(1000).nullish(),
+  /** A series the CMS does not have yet — created as a draft, and the serial filed under it. */
+  newSeries: z
+    .object({ seriesId: z.string().regex(SERIES_ID_PATTERN).max(60), name: z.string().trim().min(1).max(100) })
+    .nullish(),
+  /** Start a draft product for a model the CMS does not have yet. */
+  createProduct: z.boolean().default(false),
 })
 
 export async function GET(req: Request) {
@@ -79,6 +93,34 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'INVALID_FORMAT' }, { status: 422 })
   }
 
+  // Refuse a duplicate before touching the CMS, so a serial that is already
+  // in the library cannot leave a stray draft series behind it.
+  const [taken] = await db
+    .select({ id: serialNumberEntry.id })
+    .from(serialNumberEntry)
+    .where(eq(serialNumberEntry.serialNumber, serial))
+    .limit(1)
+  if (taken) return NextResponse.json({ error: 'SERIAL_EXISTS' }, { status: 409 })
+
+  // New series and models become drafts in the CMS; staff publish them there.
+  let seriesId = data.series?.trim() || null
+  let drafts: CreatedDraft[] = []
+  const model = data.modelName?.trim() || null
+  if (data.newSeries || (data.createProduct && model)) {
+    try {
+      const catalog = await loadCatalog()
+      if (data.newSeries) seriesId = data.newSeries.seriesId
+      else if (seriesId) seriesId = findSeries(catalog, seriesId)?.seriesId ?? seriesId
+      drafts = await createCatalogDrafts(catalog, {
+        series: data.newSeries ? [data.newSeries] : [],
+        products: data.createProduct && model && !findProduct(catalog, model) ? [{ model, seriesId }] : [],
+      })
+    } catch (err) {
+      console.error('[serials] could not create CMS drafts', err)
+      return NextResponse.json({ error: 'CMS_WRITE_FAILED' }, { status: 502 })
+    }
+  }
+
   // onConflictDoNothing rather than a lookup-then-insert: two admins adding the
   // same serial at once would slip past a lookup and hit the unique index as a
   // 500, where this returns the same 409 to whichever one loses.
@@ -86,8 +128,8 @@ export async function POST(req: Request) {
     .insert(serialNumberEntry)
     .values({
       serialNumber: serial,
-      series: data.series?.trim() || null,
-      modelName: data.modelName?.trim() || null,
+      series: seriesId,
+      modelName: model,
       batch: data.batch?.trim() || null,
       status: data.status,
       note: data.note?.trim() || null,
@@ -107,12 +149,12 @@ export async function POST(req: Request) {
     serialNumber: serial,
     details: `Added manually with status ${data.status}`,
     changes: {
-      series: data.series ?? null,
-      modelName: data.modelName ?? null,
+      series: seriesId,
+      modelName: model,
       batch: data.batch ?? null,
       status: data.status,
     },
   })
 
-  return NextResponse.json({ id: created.id }, { status: 201 })
+  return NextResponse.json({ id: created.id, drafts }, { status: 201 })
 }

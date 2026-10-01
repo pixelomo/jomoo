@@ -13,6 +13,11 @@ function createSanityClient(): SanityClient {
     apiVersion: '2024-01-01',
     useCdn: true,
     token: process.env.SANITY_API_TOKEN,
+    // The token can read drafts, and the default perspective returns them
+    // alongside published documents. The site must only ever show what has been
+    // published — the serial import creates draft series and products that
+    // staff finish in the Studio, and none of that may leak onto a page.
+    perspective: 'published',
   })
 }
 
@@ -205,6 +210,32 @@ const SERIES_PROJECTION = `
   lineup { eyebrow, title, subtitle },
   productDefaults { heroEyebrow, heroCatchphrase, heroImage, nameSuffix }
 `
+
+/** A published series, as the menu, the sitemap and the route list it. */
+export interface PublishedSeries {
+  seriesId: string
+  name: string
+  showInNavigation: boolean
+}
+
+/**
+ * Every published series, in menu order. A series created by the serial import
+ * starts as a draft, so it is absent here — and from its route, the menu and
+ * the sitemap — until someone publishes it in the Studio.
+ */
+export const getPublishedSeries = cache(async (): Promise<PublishedSeries[]> => {
+  try {
+    return await getSanityClient().fetch(
+      `*[_type == "productSeries" && defined(seriesId)] | order(coalesce(navOrder, 999) asc, _createdAt asc) {
+        seriesId,
+        "name": coalesce(name, seriesId),
+        "showInNavigation": showInNavigation != false
+      }`
+    )
+  } catch {
+    return []
+  }
+})
 
 export async function getSeriesPage(seriesId: string): Promise<SeriesPageData | null> {
   try {
@@ -702,11 +733,32 @@ export async function getSiteNavigation(): Promise<SiteNav> {
     return value as SiteNav[K]
   }
   const shown = <T extends { href: string }>(links?: T[] | null) => (links ?? []).filter((l) => !isHiddenRoute(l.href))
+
+  // Published series marked for the menu join the 商品情報 links on their own,
+  // so a series added through the serial import appears the moment it is
+  // published. Links already in the document keep their place and label.
+  const seriesLinks = (await getPublishedSeries())
+    .filter((series) => series.showInNavigation)
+    .map((series) => ({ href: `/products/${series.seriesId}`, label: series.name }))
+  const isProducts = (href: string) => href.startsWith('/products/')
+  const withSeries = <T extends { href: string; label: string }>(links: T[]): (T | { href: string; label: string })[] => [
+    ...links,
+    ...seriesLinks.filter((link) => !links.some((l) => l.href === link.href)),
+  ]
+
   return {
-    menu: shown(pick('menu')).map((item) => ({ ...item, children: item.children ? shown(item.children) : item.children })),
+    menu: shown(pick('menu')).map((item) => {
+      const children = item.children ? shown(item.children) : item.children
+      // One series is the 商品情報 link itself; a dropdown starts at two.
+      if (!isProducts(item.href) || seriesLinks.length < 2) return { ...item, children }
+      return { ...item, children: withSeries(children ?? []) }
+    }),
     contactLabel: pick('contactLabel'),
     globalSite: pick('globalSite'),
-    footerColumns: pick('footerColumns').map((column) => ({ ...column, links: shown(column.links) })),
+    footerColumns: pick('footerColumns').map((column) => {
+      const links = shown(column.links)
+      return { ...column, links: links.some((l) => isProducts(l.href)) ? withSeries(links) : links }
+    }),
     social: pick('social'),
     copyright: pick('copyright'),
   }

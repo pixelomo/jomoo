@@ -23,6 +23,18 @@ arrive as a 法人 sign-up. `npx tsx scripts/seed-trust-dealer.mts` writes it fr
 the details printed on that page, and `--email … --password …` also gives it the
 法人 account that owns it.
 
+# Product series
+
+Series live only in Sanity: `/products/[series]` renders any **published**
+`productSeries`, and the menu, footer and sitemap list published series with
+「メニューに表示」 on (a dropdown under 商品情報 appears from two). The site client
+reads the `published` perspective, so drafts never reach a page.
+
+The serial library's add and import can start a series: names the CMS lacks are
+confirmed by staff and written as **draft** `productSeries` / `product` documents
+(`lib/catalogDrafts.ts`), with Studio links to publish them. Nothing shows on
+the site until they are published.
+
 # Test serial numbers
 
 Until the factory's real list arrives (X40 stock: November 2026) the serial

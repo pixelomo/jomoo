@@ -13,10 +13,6 @@ export const SITE_ROUTES = [
   '/faq',
   '/global-projects',
   '/privacy-policy',
-  '/products/faucets',
-  '/products/shower-set',
-  '/products/smart-toilet',
-  '/products/washstand',
   '/showroom',
   '/terms-of-use',
 ] as const

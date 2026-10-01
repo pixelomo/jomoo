@@ -12,6 +12,7 @@ import SerialTable, { type SerialRow } from '@/components/admin/SerialTable'
 import SerialAddButton from '@/components/admin/SerialAddButton'
 import SerialImportButton from '@/components/admin/SerialImportButton'
 import SerialTabs from '@/components/admin/SerialTabs'
+import { listSeriesOptions } from '@/lib/catalogDrafts'
 
 export const metadata = { title: 'Serial Numbers | JOMOO Admin' }
 
@@ -33,7 +34,7 @@ export default async function SerialLibraryPage({
   if (params.batch) query.set('batch', params.batch)
   const where = serialFilters(query)
 
-  const [rows, [{ total }], counts] = await Promise.all([
+  const [rows, [{ total }], counts, seriesOptions] = await Promise.all([
     db
       .select({
         id: serialNumberEntry.id,
@@ -66,6 +67,7 @@ export default async function SerialLibraryPage({
         abnormal: sql<number>`count(*) filter (where ${serialNumberEntry.status} = 'ABNORMAL')::int`,
       })
       .from(serialNumberEntry),
+    listSeriesOptions(),
   ])
 
   const byStatus = counts[0] ?? { all: 0, unused: 0, bound: 0, revoked: 0, abnormal: 0 }
@@ -96,7 +98,7 @@ export default async function SerialLibraryPage({
         </h1>
         {/* Three actions do not fit beside the heading on a phone. */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
-          <SerialAddButton />
+          <SerialAddButton seriesOptions={seriesOptions} />
           <SerialImportButton />
           {permissions.export ? (
             <DownloadButton href={`/api/admin/export/serials?${query}`} label="Download CSV" />

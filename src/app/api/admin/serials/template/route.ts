@@ -1,6 +1,7 @@
 import { getAdminSession } from '@/lib/admin-auth'
 import { csvResponse } from '@/lib/csv'
 import { serialImportTemplateCsv } from '@/lib/serialImportTemplate'
+import { listSeriesOptions } from '@/lib/catalogDrafts'
 
 /**
  * The bulk-import template.
@@ -12,5 +13,6 @@ export async function GET() {
   const session = await getAdminSession()
   if (!session) return new Response('Unauthorized', { status: 401 })
 
-  return csvResponse('jomoo-serial-import-template', serialImportTemplateCsv())
+  const series = (await listSeriesOptions()).map((s) => s.seriesId)
+  return csvResponse('jomoo-serial-import-template', serialImportTemplateCsv(series))
 }

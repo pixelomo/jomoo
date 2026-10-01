@@ -1,6 +1,5 @@
 import { toCsv } from '@/lib/csv'
 import { SERIAL_STATUSES } from '@/lib/serialStatus'
-import { SERIAL_SERIES } from '@/lib/serialValidation'
 
 /**
  * The blank form the factory fills in before sending a delivery note back.
@@ -14,7 +13,8 @@ import { SERIAL_SERIES } from '@/lib/serialValidation'
  * stay free of commas: a cell containing one would be quoted on the way out,
  * and the "#" would no longer be the first character of the line.
  */
-export function serialImportTemplateCsv(): string {
+/** `seriesIds` are the series the CMS has now, listed in the guidance. */
+export function serialImportTemplateCsv(seriesIds: string[]): string {
   return toCsv(
     ['serial_number', 'series', 'model_name', 'status', 'note'],
     [
@@ -22,7 +22,9 @@ export function serialImportTemplateCsv(): string {
       ['# serial_number は必須です。X40 は J＋19桁（計20文字）・その他の製品は J＋20桁（計21文字）です'],
       ['# 製品ごとに桁数が異なっていても 1つのファイルにまとめて取り込めます'],
       ['# ここに取り込まれた番号が 製品登録時に照合される正規の番号になります'],
-      [`# series は任意です。使えるキー：${SERIAL_SERIES.join(' / ')}`],
+      [`# series は任意です。登録済みのシリーズ：${seriesIds.join(' / ') || '（なし）'}`],
+      ['# 新しいシリーズ名や型番を入れると 取り込み時に確認画面が表示され CMSに下書きのシリーズページ・製品を作成できます'],
+      ['# 下書きはCMSで公開するまでサイトに表示されません'],
       [`# status に使える値：${SERIAL_STATUSES.join(' / ')}（空欄は UNUSED）`],
       ['# バッチ名はアップロードしたファイル名がそのまま使われます'],
       ['# 日本語のヘッダー（製造番号 / シリーズ / 型番 / ステータス / 備考）も使えます'],

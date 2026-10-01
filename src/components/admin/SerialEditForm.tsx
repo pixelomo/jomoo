@@ -3,9 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { SERIAL_STATUSES, SERIAL_STATUS_META, type SerialStatus } from '@/lib/serialStatus'
-import { SERIAL_SERIES } from '@/lib/serialValidation'
-
-const SERIES = SERIAL_SERIES
+import type { SeriesOption } from '@/components/admin/SerialAddButton'
 
 interface Props {
   id: string
@@ -18,9 +16,11 @@ interface Props {
     note: string | null
   }
   permissions: { delete: boolean }
+  /** The series in the CMS, drafts included. */
+  seriesOptions: SeriesOption[]
 }
 
-export default function SerialEditForm({ id, serialNumber, initial, permissions }: Props) {
+export default function SerialEditForm({ id, serialNumber, initial, permissions, seriesOptions }: Props) {
   const router = useRouter()
   const [series, setSeries] = useState(initial.series ?? '')
   const [modelName, setModelName] = useState(initial.modelName ?? '')
@@ -133,9 +133,16 @@ export default function SerialEditForm({ id, serialNumber, initial, permissions 
         <Field label="Series">
           <select value={series} onChange={(e) => setSeries(e.target.value)} style={input}>
             <option value="">— Not specified —</option>
-            {SERIES.map((s) => (
-              <option key={s} value={s}>{s}</option>
+            {seriesOptions.map((s) => (
+              <option key={s.seriesId} value={s.seriesId}>
+                {s.name} ({s.seriesId}){s.published ? '' : ' — 下書き'}
+              </option>
             ))}
+            {/* A value the CMS no longer lists stays selectable, so saving
+                another field does not quietly blank the series. */}
+            {initial.series && !seriesOptions.some((s) => s.seriesId === initial.series) && (
+              <option value={initial.series}>{initial.series}</option>
+            )}
           </select>
         </Field>
 

@@ -14,22 +14,44 @@ export const productSeries = defineType({
   fields: [
     defineField({
       name: 'seriesId',
-      title: 'シリーズ / Series',
+      title: 'シリーズID（URL） / Series ID',
       type: 'string',
       group: 'identity',
-      description: '製品ドキュメントおよび URL のシリーズ名と一致させてください',
-      options: {
-        list: [
-          { title: 'スマートトイレ / Smart Toilet', value: 'smart-toilet' },
-          { title: '洗面化粧台 / Washstand',        value: 'washstand'    },
-          { title: '水栓金具 / Faucets',            value: 'faucets'      },
-          { title: 'シャワーセット / Shower Set',   value: 'shower-set'   },
-        ],
-        layout: 'radio',
-      },
-      validation: (Rule) => Rule.required(),
+      description:
+        'シリーズページの URL になります（例：smart-toilet → /products/smart-toilet）。半角英小文字・数字・ハイフンのみ。公開後に変更すると URL が変わり、製品と製造番号のシリーズも合わせて変更が必要です。',
+      validation: (Rule) =>
+        Rule.required().custom(async (value, context) => {
+          if (!value) return true
+          if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(value)) {
+            return '半角英小文字・数字・ハイフンのみで入力してください（例：bath-tub）'
+          }
+          const id = (context.document?._id ?? '').replace(/^drafts\./, '')
+          const taken = await context
+            .getClient({ apiVersion: '2024-01-01' })
+            .fetch<number>(
+              'count(*[_type == "productSeries" && seriesId == $value && !(_id in [$id, $draft])])',
+              { value, id, draft: `drafts.${id}` }
+            )
+          return taken > 0 ? 'このシリーズIDは別のシリーズで使われています' : true
+        }),
     }),
 
+    defineField({
+      name: 'showInNavigation',
+      title: 'メニューに表示 / Show in Menu',
+      type: 'boolean',
+      group: 'identity',
+      description:
+        '公開中のシリーズをヘッダーの「商品情報」とフッターに自動で表示します。製品がまだないシリーズはオフにしてください。',
+      initialValue: true,
+    }),
+    defineField({
+      name: 'navOrder',
+      title: 'メニューの並び順 / Menu Order',
+      type: 'number',
+      group: 'identity',
+      description: '小さい順に表示されます。空欄のシリーズは最後に、作成順で並びます。',
+    }),
     defineField({
       name: 'name',
       title: 'シリーズ名 / Series Name',

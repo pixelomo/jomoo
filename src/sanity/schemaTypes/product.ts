@@ -29,16 +29,16 @@ export const product = defineType({
       title: 'シリーズ / Product Series',
       type: 'string',
       group: 'identity',
-      options: {
-        list: [
-          { title: 'スマートトイレ / Smart Toilet', value: 'smart-toilet' },
-          { title: '洗面化粧台 / Washstand',        value: 'washstand'    },
-          { title: '水栓金具 / Faucets',            value: 'faucets'      },
-          { title: 'シャワーセット / Shower Set',   value: 'shower-set'   },
-        ],
-        layout: 'radio',
-      },
-      validation: (Rule) => Rule.required(),
+      description:
+        '「製品シリーズ」のシリーズID を入力してください（例：smart-toilet）。製品ページの URL と、製造番号のシリーズに使われます。',
+      validation: (Rule) =>
+        Rule.required().custom(async (value, context) => {
+          if (!value) return true
+          const exists = await context
+            .getClient({ apiVersion: '2024-01-01' })
+            .fetch<number>('count(*[_type == "productSeries" && seriesId == $value])', { value })
+          return exists > 0 ? true : 'このシリーズIDの「製品シリーズ」がありません。先にシリーズを作成してください。'
+        }),
     }),
     defineField({
       name: 'name',
@@ -52,7 +52,7 @@ export const product = defineType({
       title: 'URL スラッグ / URL Slug',
       type: 'slug',
       group: 'identity',
-      description: '製品ページの URL に使われます（例：x40-b → /products/smart-toilet/x40-b）',
+      description: '製品ページの URL に使われます（例：x40-b → /products/smart-toilet/x40-b）。半角英小文字・数字・ハイフン',
       options: { source: 'name', maxLength: 96 },
       validation: (Rule) => Rule.required(),
     }),

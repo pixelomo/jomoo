@@ -21,13 +21,6 @@
  */
 
 /**
- * The product lines, for the admin dropdowns. Purely a label on the row now —
- * the series says which catalogue a serial belongs to, and no longer implies
- * anything about its shape.
- */
-export const SERIAL_SERIES = ['smart-toilet', 'shower-set', 'washstand', 'faucets'] as const
-
-/**
  * Bounds wide enough to hold anything the factory has sent or plausibly will.
  * They exist to catch an empty field or a pasted sentence, not to describe a
  * product — nothing should ever be rejected for its length alone.

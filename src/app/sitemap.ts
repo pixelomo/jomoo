@@ -1,5 +1,5 @@
 import type { MetadataRoute } from 'next'
-import { getProductSlugs, getLegalLinks } from '@/lib/sanity'
+import { getProductSlugs, getLegalLinks, getPublishedSeries } from '@/lib/sanity'
 import { getPosts } from '@/lib/blog/posts'
 import { SITE_ROUTES } from '@/lib/site-routes.generated'
 import { isHiddenRoute } from '@/components/layout/siteLinks'
@@ -22,9 +22,13 @@ const baseUrl =
       ? `https://${process.env.VERCEL_URL}`
       : 'http://localhost:3000')
 
-type ChangeFreq = 'always' | 'hourly' | 'daily' | 'weekly' | 'monthly' | 'yearly' | 'never'
+/**
+ * Rebuilt hourly rather than frozen at deploy, so a series or product published
+ * in the Studio is listed without waiting for the next release.
+ */
+export const revalidate = 3600
 
-const SERIES = ['smart-toilet', 'washstand', 'faucets', 'shower-set'] as const
+type ChangeFreq = 'always' | 'hourly' | 'daily' | 'weekly' | 'monthly' | 'yearly' | 'never'
 
 /**
  * How often a page changes and how much it matters, for the pages where the
@@ -40,13 +44,10 @@ const RANK: Record<string, { priority: number; changeFrequency: ChangeFreq }> = 
   '/contact-us': { priority: 0.6, changeFrequency: 'yearly' },
   '/privacy-policy': { priority: 0.3, changeFrequency: 'yearly' },
   '/terms-of-use': { priority: 0.3, changeFrequency: 'yearly' },
-  ...Object.fromEntries(
-    SERIES.map((series) => [
-      `/products/${series}`,
-      { priority: 0.9, changeFrequency: 'weekly' as ChangeFreq },
-    ])
-  ),
 }
+
+/** Series lineups — one per published series, so a new one is listed once live. */
+const SERIES_RANK = { priority: 0.9, changeFrequency: 'weekly' as ChangeFreq }
 
 const DEFAULT_RANK = { priority: 0.7, changeFrequency: 'monthly' as ChangeFreq }
 
@@ -66,11 +67,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // URLs that 404. Legal documents are fetched for the same reason: the two
   // that ship have static routes, but the sitemap should say so only while the
   // document behind them is actually published.
-  const [bySeries, legalLinks, posts] = await Promise.all([
-    Promise.all(SERIES.map(async series => ({ series, slugs: await getProductSlugs(series) }))),
+  const [seriesIds, legalLinks, posts] = await Promise.all([
+    getPublishedSeries().then((list) => list.map((s) => s.seriesId)),
     getLegalLinks(),
     getPosts(),
   ])
+  const bySeries = await Promise.all(
+    seriesIds.map(async series => ({ series, slugs: await getProductSlugs(series) }))
+  )
 
   const productPages = bySeries.flatMap(({ series, slugs }) =>
     slugs.map(slug => ({
@@ -111,6 +115,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         return legalSlugs.has(slug)
       })
       .map((route) => ({ path: route, ...(RANK[route] ?? DEFAULT_RANK) })),
+    ...seriesIds.map((series) => ({ path: `/products/${series}`, ...SERIES_RANK })),
     ...EXTRA,
   ]
 
