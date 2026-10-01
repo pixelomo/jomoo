@@ -149,7 +149,7 @@ export default function Step2SerialPhoto({ defaultValues, onSubmit, onBack }: Pr
     }
   }
 
-  const canProceed = validationState === 'valid' || validationState === 'invalid'
+  const canProceed = validationState === 'valid'
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -198,7 +198,7 @@ export default function Step2SerialPhoto({ defaultValues, onSubmit, onBack }: Pr
         </div>
 
         {error && (
-          <p className="rounded-md bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">
+          <p className="rounded-md bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700 whitespace-pre-line">
             {error}
           </p>
         )}
@@ -291,17 +291,17 @@ export default function Step2SerialPhoto({ defaultValues, onSubmit, onBack }: Pr
         </p>
       )}
       {validationState === 'invalid' && (
-        <p className="rounded-md bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">
+        <p className="rounded-md bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700 whitespace-pre-line">
           {t('invalid')}
         </p>
       )}
       {validationState === 'duplicate' && (
-        <p className="rounded-md bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">
+        <p className="rounded-md bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700 whitespace-pre-line">
           {t('duplicate')}
         </p>
       )}
       {validationState === 'blocked' && (
-        <p className="rounded-md bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">
+        <p className="rounded-md bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700 whitespace-pre-line">
           {t('blocked')}
         </p>
       )}
@@ -311,7 +311,7 @@ export default function Step2SerialPhoto({ defaultValues, onSubmit, onBack }: Pr
         </p>
       )}
       {error && (
-        <p className="rounded-md bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">
+        <p className="rounded-md bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700 whitespace-pre-line">
           {error}
         </p>
       )}

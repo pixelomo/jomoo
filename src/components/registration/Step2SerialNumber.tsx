@@ -78,11 +78,11 @@ export default function Step2SerialNumber({ defaultValues, onSubmit, onBack }: P
     }
   }
 
-  // 'invalid' means the imported library does not have this number. Those may
-  // still be submitted — they are flagged for staff instead, because a serial
-  // can be genuine and simply belong to a batch nobody has imported yet.
-  // A duplicate is a hard stop: that product already has a registration.
-  const canProceed = validationState === 'valid' || validationState === 'invalid'
+  // Only a serial the library confirms goes on. Anything else — not on the
+  // list, withdrawn, already registered — stops here, and the message sends the
+  // member to the after-sales line rather than letting a number nobody can
+  // vouch for through to a warranty.
+  const canProceed = validationState === 'valid'
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
@@ -131,7 +131,7 @@ export default function Step2SerialNumber({ defaultValues, onSubmit, onBack }: P
       )}
 
       {validationState === 'invalid' && (
-        <div className="rounded-md bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">
+        <div className="rounded-md bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700 whitespace-pre-line">
           {t('invalid')}
         </div>
       )}

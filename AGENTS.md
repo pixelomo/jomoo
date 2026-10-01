@@ -23,6 +23,15 @@ arrive as a 法人 sign-up. `npx tsx scripts/seed-trust-dealer.mts` writes it fr
 the details printed on that page, and `--email … --password …` also gives it the
 法人 account that owns it.
 
+# Test serial numbers
+
+Until the factory's real list arrives (X40 stock: November 2026) the serial
+library holds 80 test serials, batch `TEST-2026-10`, from
+`node scripts/seed-test-serials.mjs` — X40-B / X40-C are J + 19 (20 characters),
+every other line J + 20 (21). `--remove` deletes them and any registration that
+used one; **run it before importing the real list.** The registration form only
+lets a serial the library confirms continue.
+
 # CMS pages
 
 The top page and ブログ, 会社情報, デザイナー, グローバルプロジェクト, ショールーム,
@@ -42,6 +51,10 @@ row is `designerPage.awards`. The catalog/contact cards that close the top page,
 会社情報 and the product pages are the `siteCta` singleton, read by
 `FooterCtaSection` itself (an async server component, so a client component that
 ends on it takes it as a prop).
+
+Q&A (`/faq`) is hidden for now: `HIDDEN_ROUTES` in `components/layout/siteLinks.ts`
+404s the page and drops its links and sitemap entry; remove it from that list to
+bring it back.
 
 Header and footer links are the `siteNavigation` singleton, fetched in
 `(site)/layout.tsx`. `DEFAULT_NAV` in `components/layout/siteLinks.ts` is what

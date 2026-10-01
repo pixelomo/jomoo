@@ -123,7 +123,7 @@ export default function WarrantyDocument(props: Props) {
             <br />
             受付時間：8：00 AM -18：00 PM 、365日
             <br />
-            ホットライン番号：12*********
+            ホットライン番号：0120-580-999
           </p>
         </div>
       </article>

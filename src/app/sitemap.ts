@@ -2,6 +2,7 @@ import type { MetadataRoute } from 'next'
 import { getProductSlugs, getLegalLinks } from '@/lib/sanity'
 import { getPosts } from '@/lib/blog/posts'
 import { SITE_ROUTES } from '@/lib/site-routes.generated'
+import { isHiddenRoute } from '@/components/layout/siteLinks'
 
 /**
  * The origin every URL in the sitemap is written against.
@@ -99,6 +100,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   const staticPages = [
     ...SITE_ROUTES
+      .filter(route => !isHiddenRoute(route))
       // A legal route whose document is unpublished renders an empty page, so
       // it is left out until there is something to read on it. Sanity being
       // unreachable returns no links at all, which would drop both — so an

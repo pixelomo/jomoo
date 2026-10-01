@@ -3,6 +3,7 @@ import { can, getAdminSession } from '@/lib/admin-auth'
 import { db } from '@/lib/db'
 import { productRegistration, serialNumberEntry, user } from '@/lib/db/schema'
 import { csvResponse, toCsv } from '@/lib/csv'
+import { cityFromAddress } from '@/lib/addressCity'
 import { SERIAL_STATUS_META, isSerialStatus, recordAudit, serialFilters } from '@/lib/serialLibrary'
 
 /**
@@ -33,6 +34,10 @@ export async function GET(req: Request) {
       userName: user.name,
       userEmail: user.email,
       registrationStatus: productRegistration.status,
+      registeredAt: productRegistration.submittedAt,
+      installPrefecture: productRegistration.installationAddressState,
+      installAddress: productRegistration.installationAddressDetail,
+      dealerName: productRegistration.dealerName,
       createdBy: serialNumberEntry.createdBy,
       createdAt: serialNumberEntry.createdAt,
     })
@@ -46,12 +51,14 @@ export async function GET(req: Request) {
     [
       '製造番号', 'シリーズ', '型番', 'バッチ', 'ステータス', '備考',
       '登録ID', '紐付け日時', '会員名', 'メールアドレス', '登録状態',
-      '登録者', '登録日時',
+      '製品登録日', '設置都道府県', '設置市区町村', '販売店名',
+      'ライブラリ登録者', 'ライブラリ登録日時',
     ],
     rows.map((r) => [
       r.serialNumber, r.series, r.modelName, r.batch,
       isSerialStatus(r.status) ? SERIAL_STATUS_META[r.status].label : r.status,
       r.note, r.registrationId, r.boundAt, r.userName, r.userEmail, r.registrationStatus,
+      r.registeredAt, r.installPrefecture, cityFromAddress(r.installAddress), r.dealerName,
       r.createdBy, r.createdAt,
     ])
   )

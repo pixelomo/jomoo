@@ -1,5 +1,5 @@
 import { cache } from 'react'
-import { DEFAULT_NAV, type SiteNav } from '@/components/layout/siteLinks'
+import { DEFAULT_NAV, isHiddenRoute, type SiteNav } from '@/components/layout/siteLinks'
 import { createClient, type SanityClient } from '@sanity/client'
 import imageUrlBuilder from '@sanity/image-url'
 
@@ -701,11 +701,12 @@ export async function getSiteNavigation(): Promise<SiteNav> {
     if (value == null || value === '' || (Array.isArray(value) && value.length === 0)) return DEFAULT_NAV[key]
     return value as SiteNav[K]
   }
+  const shown = <T extends { href: string }>(links?: T[] | null) => (links ?? []).filter((l) => !isHiddenRoute(l.href))
   return {
-    menu: pick('menu'),
+    menu: shown(pick('menu')).map((item) => ({ ...item, children: item.children ? shown(item.children) : item.children })),
     contactLabel: pick('contactLabel'),
     globalSite: pick('globalSite'),
-    footerColumns: pick('footerColumns'),
+    footerColumns: pick('footerColumns').map((column) => ({ ...column, links: shown(column.links) })),
     social: pick('social'),
     copyright: pick('copyright'),
   }
