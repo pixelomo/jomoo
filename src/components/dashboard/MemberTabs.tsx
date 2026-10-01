@@ -99,7 +99,7 @@ export default function MemberTabs({ products, branch, contract, profile, produc
                   <div className="member-card__copy">
                     <h2 className="member-card__title member-card__title--sub">保証延長</h2>
                     <p className="member-card__body">
-                      当社の定める対象製品を登録すると保証期間が3年に延長されます。引渡／購入日から6か月以内であれば、さらに安心が長く続く長期保証サービス（有料）へのお申し込みもできます。
+                      当社の定める対象製品を引渡／購入日から3か月以内に登録すると、2年間の標準保証に3年間が加わり、保証期間が5年に延長されます。引渡／購入日から3か月以内であれば、さらに安心が長く続く長期保証サービス（有料）へのお申し込みもできます。
                     </p>
                   </div>
                 </div>

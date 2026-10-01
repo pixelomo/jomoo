@@ -1,7 +1,7 @@
 'use client'
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { Suspense, useState } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import Link from 'next/link'
 import { authClient } from '@/lib/auth-client'
@@ -12,7 +12,7 @@ import '@/components/dashboard/member-portal.css'
 
 type Step = 'credentials' | 'totp'
 
-export default function SignInPage() {
+function SignInForm() {
   const t = useTranslations('auth')
   const tc = useTranslations('common')
   const router = useRouter()
@@ -25,6 +25,8 @@ export default function SignInPage() {
   const [error, setError] = useState<string | null>(null)
   const [needsVerification, setNeedsVerification] = useState(false)
   const [resendNotice, setResendNotice] = useState<string | null>(null)
+  // /reset-password sends people back here with ?reset=1.
+  const resetDone = useSearchParams().get('reset') === '1'
 
   const handleCredentials = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -111,6 +113,10 @@ export default function SignInPage() {
           <h1 className="account-form__title">{t('signInTitle')}</h1>
           <p className="account-form__intro">{t('signInDescription')}</p>
 
+          {resetDone && !error && (
+            <p className="account-alert account-alert--done" role="status">{t('passwordReset')}</p>
+          )}
+
           {error && <p className="account-alert" role="alert">{error}</p>}
 
           {needsVerification && (
@@ -141,7 +147,12 @@ export default function SignInPage() {
               />
             </AccountField>
 
-            <AccountField label={t('password')} required htmlFor="signin-password">
+            <AccountField
+              label={t('password')}
+              required
+              htmlFor="signin-password"
+              hint={<Link href="/forgot-password">{t('forgotPasswordLink')}</Link>}
+            >
               <input
                 id="signin-password"
                 className="account-input"
@@ -214,5 +225,14 @@ export default function SignInPage() {
         {t('noAccount')} <Link href="/sign-up">{t('signUpLink')}</Link>
       </p>
     </main>
+  )
+}
+
+// useSearchParams needs a boundary, or the whole page drops out of prerendering.
+export default function SignInPage() {
+  return (
+    <Suspense fallback={null}>
+      <SignInForm />
+    </Suspense>
   )
 }

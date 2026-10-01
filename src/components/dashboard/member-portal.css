@@ -1066,6 +1066,13 @@
   color: var(--member-ink-soft);
 }
 
+/* パスワードをお忘れの方 under the sign-in password. */
+.account-hint a {
+  color: var(--member-ink);
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
 .account-error {
   margin: 0;
   font-size: 1rem;

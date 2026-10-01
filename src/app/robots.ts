@@ -42,6 +42,7 @@ export default function robots(): MetadataRoute.Robots {
           '/account',
           '/warranty/',
           '/verify',
+          '/reset-password',
           // A build demo that lives in the public tree but is not part of the
           // site; /search is a view of pages that are indexed in their own right.
           '/video-scroll-demo',

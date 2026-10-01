@@ -123,7 +123,7 @@ export async function linkMemberToBranch(userId: string, source: BranchSource) {
   }
 }
 
-/** The 販売店 select on the product registration form. */
+/** The 販売店 suggestions on the product registration form. */
 export async function listBranchOptions(): Promise<BranchOption[]> {
   const rows = await db
     .select({
@@ -141,7 +141,7 @@ export async function listBranchOptions(): Promise<BranchOption[]> {
     .orderBy(asc(dealerBranch.name))
 
   // The whole branch comes back rather than just a label, so picking one in the
-  // 販売店 select can fill in its address and contact without another request.
+  // 販売店 suggestions can fill in its address and contact without another request.
   return rows.map((row) => ({
     id: row.id,
     name: row.name,

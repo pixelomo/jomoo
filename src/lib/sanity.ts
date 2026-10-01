@@ -562,7 +562,9 @@ export interface AfterSalesPageData {
   title?: string
   lead?: string
   termsTitle?: string
-  termGroups?: Array<{ _key: string; clauses?: TermClause[] }>
+  /** One per section of the policy; each title is also its button in the row
+   *  of links above the terms. */
+  termGroups?: Array<{ _key: string; title?: string; clauses?: TermClause[] }>
   termsClosing?: string
 }
 
@@ -570,7 +572,7 @@ export const getAfterSalesPage = cache(() =>
   getSingleton<AfterSalesPageData>(
     'afterSalesPage',
     `description, title, lead, termsTitle,
-     termGroups[] { _key, clauses[] { _key, text, spaced, subClauses[] { _key, marker, text } } },
+     termGroups[] { _key, title, clauses[] { _key, text, spaced, subClauses[] { _key, marker, text } } },
      termsClosing`
   )
 )

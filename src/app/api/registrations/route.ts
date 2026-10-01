@@ -6,7 +6,7 @@ import { eq } from 'drizzle-orm'
 import { RegistrationSchema } from '@/types/registration'
 import { findRegistrationBySerial, isDuplicateSerialError } from '@/lib/serialRegistry'
 import { bindSerialToRegistration, validateSerialNumber } from '@/lib/serialLibrary'
-import { warrantyExpiryFrom } from '@/lib/warranty'
+import { warrantyTermFor } from '@/lib/warranty'
 import { getBranch } from '@/lib/dealerBranches'
 import { sendRegistrationConfirmation, sendWarrantyIssuedEmail } from '@/lib/resend'
 
@@ -108,8 +108,11 @@ export async function POST(req: Request) {
 
   let finalStatus = 'PENDING'
 
+  // 5 years if registered within 3 months of the 設置 / 引渡日, else the
+  // standard 2 — decided by when the registration arrived, not when it is read.
+  const warranty = warrantyTermFor(data.installationDate)
+
   if (serialCheck.valid) {
-    const expiryStr = warrantyExpiryFrom(data.installationDate)
 
     await Promise.all([
       db.update(productRegistration)
@@ -117,7 +120,7 @@ export async function POST(req: Request) {
         .where(eq(productRegistration.id, id)),
       db.insert(warrantyRecord).values({
         registrationId: id,
-        expiryDate: expiryStr,
+        expiryDate: warranty.expiryDate,
         cardGenerated: true,
       }),
     ])
@@ -131,7 +134,7 @@ export async function POST(req: Request) {
       name: sessionUser.name,
       modelName: data.modelName,
       registrationId: id,
-      expiryDate: warrantyExpiryFrom(data.installationDate),
+      expiryDate: warranty.expiryDate,
     }).catch(err => console.error('Warranty email error:', err))
   } else {
     sendRegistrationConfirmation({

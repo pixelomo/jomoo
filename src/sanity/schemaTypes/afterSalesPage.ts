@@ -32,12 +32,20 @@ export const afterSalesPage = defineType({
       title: '条項 / Clauses',
       type: 'array',
       group: 'terms',
-      description: '番号付きリストのまとまりごとに1項目。番号はまとまりごとに1から振られます。',
+      description:
+        '規定の章ごとに1項目。各章の見出しは規定の上にボタンとして並び、押すとその章へ移動します。番号は章ごとに1から振られ、条項が1つだけの章は番号なしで表示されます。',
       of: [
         defineArrayMember({
           type: 'object',
           name: 'termGroup',
           fields: [
+            defineField({
+              name: 'title',
+              title: '章の見出し / Section Title',
+              type: 'string',
+              description: '例: 無料修理について。上部のボタンにも同じ文言が表示されます。',
+              validation: (Rule) => Rule.required(),
+            }),
             defineField({
               name: 'clauses',
               title: '条項 / Clauses',
@@ -86,8 +94,8 @@ export const afterSalesPage = defineType({
             }),
           ],
           preview: {
-            select: { first: 'clauses.0.text', clauses: 'clauses' },
-            prepare: ({ first, clauses }) => ({ title: first, subtitle: `${clauses?.length ?? 0} 条項` }),
+            select: { title: 'title', first: 'clauses.0.text', clauses: 'clauses' },
+            prepare: ({ title, first, clauses }) => ({ title: title || first, subtitle: `${clauses?.length ?? 0} 条項` }),
           },
         }),
       ],

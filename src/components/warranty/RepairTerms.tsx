@@ -14,39 +14,71 @@ import './repair-terms.css'
 
 /**
  * The terms come from the afterSalesPage document in Sanity, so this is an
- * async server component: both pages that print it fetch it themselves. Each
- * group is its own numbered list, restarting at 1, as the source copy has it.
- * A sub-clause's marker, when it has one, is set in bold as its heading; one
- * without carries its number inside the sentence, unemphasised.
+ * async server component: both pages that print it fetch it themselves.
+ *
+ * The policy is split into sections, each with its own heading and a button in
+ * the row above that jumps to it. Each section is its own numbered list,
+ * restarting at 1; a section of a single clause drops the number, since "1." on
+ * its own counts nothing. A sub-clause's marker, when it has one, is set in bold
+ * as its heading; one without carries its number inside the sentence.
  */
 export default async function RepairTerms() {
   const data = await getAfterSalesPage()
   if (!data?.termGroups?.length) return null
+
+  const sections = data.termGroups.map((group, i) => ({ ...group, anchor: `warranty-terms-${i + 1}` }))
+  const titled = sections.filter((s) => s.title)
 
   return (
     <section className="warranty-section">
       <div className="warranty-section__inner warranty-terms">
         {data.termsTitle && <h2 className="warranty-section__title">{data.termsTitle}</h2>}
 
-        {data.termGroups.map((group) => (
-          <ol key={group._key}>
-            {(group.clauses ?? []).map((clause) => (
-              <li key={clause._key}>
-                {clause.text}
-                {clause.subClauses?.length ? (
-                  <ol className={clause.spaced ? 'warranty-terms__sub--gap' : undefined}>
-                    {clause.subClauses.map((sub) => (
-                      <li key={sub._key}>
-                        {sub.marker && <span className="warranty-terms__marker">{sub.marker}</span>}
-                        {sub.text}
-                      </li>
-                    ))}
-                  </ol>
-                ) : null}
-              </li>
+        {titled.length > 1 && (
+          <nav className="warranty-terms__nav" aria-label="保証規定の目次">
+            {titled.map((section, i) => (
+              <a key={section._key} className="warranty-terms__nav-link" href={`#${section.anchor}`}>
+                <span className="warranty-terms__nav-num">{String(i + 1).padStart(2, '0')}</span>
+                {section.title}
+              </a>
             ))}
-          </ol>
-        ))}
+          </nav>
+        )}
+
+        {sections.map((section) => {
+          const clauses = section.clauses ?? []
+          return (
+            <section
+              key={section._key}
+              id={section.anchor}
+              className="warranty-terms__section"
+              aria-labelledby={section.title ? `${section.anchor}-title` : undefined}
+            >
+              {section.title && (
+                <h3 id={`${section.anchor}-title`} className="warranty-terms__heading">
+                  {section.title}
+                </h3>
+              )}
+              <ol className={clauses.length === 1 ? 'warranty-terms__single' : undefined}>
+                {clauses.map((clause) => (
+                  <li key={clause._key}>
+                    {clause.text}
+                    {clause.subClauses?.length ? (
+                      <ol className={clause.spaced ? 'warranty-terms__sub--gap' : undefined}>
+                        {clause.subClauses.map((sub) => (
+                          <li key={sub._key}>
+                            {sub.marker && <span className="warranty-terms__marker">{sub.marker}</span>}
+                            {sub.text}
+                          </li>
+                        ))}
+                      </ol>
+                    ) : null}
+                  </li>
+                ))}
+              </ol>
+            </section>
+          )
+        })}
 
         {data.termsClosing && <p className="warranty-terms__closing">{data.termsClosing}</p>}
       </div>

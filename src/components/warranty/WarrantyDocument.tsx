@@ -8,6 +8,11 @@ interface Props {
   serialNumber: string
   /** ISO date; the printed form calls this 引き渡し日. */
   installationDate: string
+  /** ISO date the warranty runs to — 2 years from 引き渡し日, or 5 when the
+   *  product was registered within 3 months of it. */
+  expiryDate: string
+  /** Whether the JOMOO Club extension was earned. */
+  extended: boolean
   customerName: string
   addressState: string
   addressDetail: string
@@ -44,6 +49,10 @@ export default function WarrantyDocument(props: Props) {
         <p className="warranty-doc__body">
           JOMOOスマートトイレの本体保証期間は、お引き渡し日から2年間です。
           <br />
+          {props.extended
+            ? '引き渡し日から3か月以内に製品登録をいただいたため、3年間の延長保証が加わり、本製品の保証期間は5年間となります。'
+            : '本製品は引き渡し日から3か月を過ぎて登録されたため、保証期間は2年間となります。'}
+          <br />
           保証期間内に製品に不具合が生じた場合は、本保証書をご提示のうえ、販売店またはJOMOOサービスホットラインまで修理をご依頼ください。
         </p>
 
@@ -68,12 +77,14 @@ export default function WarrantyDocument(props: Props) {
             <tr>
               <th scope="col" style={{ width: '22%' }}>型番</th>
               <th scope="col">機能部製造番号</th>
-              <th scope="col" style={{ width: '28%' }}>引き渡し日</th>
+              <th scope="col" style={{ width: '22%' }}>引き渡し日</th>
+              <th scope="col" style={{ width: '22%' }}>保証期限</th>
             </tr>
             <tr>
               <td>{props.modelName}</td>
               <td>{props.serialNumber}</td>
               <td>{formatDate(props.installationDate)}</td>
+              <td>{formatDate(props.expiryDate)}</td>
             </tr>
           </tbody>
         </table>

@@ -6,6 +6,7 @@ import { productRegistration, warrantyRecord } from '@/lib/db/schema'
 import { eq, and } from 'drizzle-orm'
 import WarrantyDocument from '@/components/warranty/WarrantyDocument'
 import WarrantyTerms from '@/components/warranty/WarrantyTerms'
+import { STANDARD_WARRANTY_YEARS } from '@/lib/warranty'
 
 interface Props {
   params: Promise<{ id: string }>
@@ -37,12 +38,21 @@ export default async function WarrantyPage({ params }: Props) {
 
   if (!warranty) notFound()
 
+  // The record holds only the expiry; anything past the standard term means the
+  // extension was earned at registration.
+  const installed = String(reg.installationDate)
+  const standardEnd = new Date(installed)
+  standardEnd.setUTCFullYear(standardEnd.getUTCFullYear() + STANDARD_WARRANTY_YEARS)
+  const extended = new Date(String(warranty.expiryDate)) > standardEnd
+
   return (
     <main className="flex-1 warranty-page">
       <WarrantyDocument
         modelName={reg.modelName}
         serialNumber={reg.serialNumber}
-        installationDate={String(reg.installationDate)}
+        installationDate={installed}
+        expiryDate={String(warranty.expiryDate)}
+        extended={extended}
         customerName={reg.contactPerson || session.user.name}
         addressState={reg.installationAddressState}
         addressDetail={reg.installationAddressDetail}

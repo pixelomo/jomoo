@@ -19,7 +19,8 @@ const optionalGender = z.preprocess(
   z.enum(['male', 'female', 'other', 'prefer_not_to_say']).optional()
 )
 
-const passwordField = z
+/** Shared with the reset-password form, so a reset cannot set a password sign-up would refuse. */
+export const passwordField = z
   .string()
   .min(8, 'passwordMinLength')
   .regex(

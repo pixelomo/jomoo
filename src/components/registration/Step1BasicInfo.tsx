@@ -1,6 +1,5 @@
 'use client'
 
-import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useTranslations } from 'next-intl'
@@ -8,17 +7,13 @@ import { Step1Schema, type Step1Data } from '@/types/registration'
 import { JP_PREFECTURES } from '@/data/jp-prefectures'
 import FormField, { inputClass } from '@/components/ui/FormField'
 import type { BranchOption } from '@/lib/dealerBranches'
-
-/** Chosen from the select when the member's dealer is not on the list yet —
- *  the list only holds dealers who have registered as 法人 members, so typing
- *  one in has to stay possible. */
-const OTHER_DEALER = '__other__'
+import DealerNameInput from './DealerNameInput'
 
 interface Props {
   defaultValues?: Partial<Step1Data>
   models: { _id: string; name: string; modelCode: string; series: string }[]
-  /** Registered dealer branches. Empty until the first 法人 signs up, in which
-   *  case the field falls back to the free-text box it has always been. */
+  /** Registered dealer branches, offered as suggestions under the 販売店 box
+   *  once what is typed matches one. */
   dealers?: BranchOption[]
   onSubmit: (data: Step1Data) => void
 }
@@ -38,32 +33,14 @@ export default function Step1BasicInfo({ defaultValues, models, dealers = [], on
     defaultValues,
   })
 
-  // Coming back from step 2 with a name but no branch means it was typed, so
-  // the box stays open rather than silently dropping what was entered.
-  const [dealerChoice, setDealerChoice] = useState<string>(() => {
-    if (defaultValues?.branchId) return defaultValues.branchId
-    if (defaultValues?.dealerName) return OTHER_DEALER
-    return ''
-  })
+  const dealerName = watch('dealerName') ?? ''
+  const branchId = watch('branchId')
 
-  const selectedDealer =
-    dealerChoice && dealerChoice !== OTHER_DEALER
-      ? dealers.find((d) => d.id === dealerChoice) ?? null
-      : null
-
-  const handleDealerChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const choice = e.target.value
-    setDealerChoice(choice)
-
-    if (choice === OTHER_DEALER) {
-      setValue('branchId', undefined)
-      return
-    }
-
-    setValue('branchId', choice || undefined)
+  const handleDealerChange = (name: string, id: string | undefined) => {
     // The name is stored alongside the id so the warranty card and the admin
     // export keep reading a name rather than a UUID.
-    setValue('dealerName', dealers.find((d) => d.id === choice)?.name ?? '')
+    setValue('dealerName', name)
+    setValue('branchId', id)
   }
 
   const handleModelChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -115,6 +92,9 @@ export default function Step1BasicInfo({ defaultValues, models, dealers = [], on
           max={new Date().toISOString().split('T')[0]}
           {...register('installationDate')}
         />
+        <p className="whitespace-pre-line text-xs leading-relaxed text-zinc-500">
+          {t('installationDateNote')}
+        </p>
       </FormField>
 
       <FormField
@@ -194,91 +174,14 @@ export default function Step1BasicInfo({ defaultValues, models, dealers = [], on
         />
       </FormField>
 
-      <FormField
-        label={t('dealerName')}
-        htmlFor={dealers.length > 0 ? 'dealerBranch' : 'dealerName'}
-      >
-        {dealers.length > 0 ? (
-          <div className="space-y-2">
-            <select
-              id="dealerBranch"
-              className={inputClass}
-              value={dealerChoice}
-              onChange={handleDealerChange}
-            >
-              <option value="">{t('dealerSelectPlaceholder')}</option>
-              {dealers.map((d) => (
-                <option key={d.id} value={d.id}>
-                  {d.locality ? `${d.name}（${d.locality}）` : d.name}
-                </option>
-              ))}
-              <option value={OTHER_DEALER}>{t('dealerOther')}</option>
-            </select>
-            {dealerChoice === OTHER_DEALER && (
-              <input
-                id="dealerName"
-                type="text"
-                className={inputClass}
-                placeholder={t('dealerNamePlaceholder')}
-                {...register('dealerName')}
-              />
-            )}
-            {/* Picking a branch fills its address and contact in straight away:
-                the customer confirms they chose the right shop before going on,
-                and the details they will need for a warranty call are in front
-                of them without a search. */}
-            {selectedDealer && (
-              <dl className="rounded-lg border border-zinc-200 bg-zinc-50 px-4 py-3 text-sm">
-                <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-zinc-500">
-                  {t('dealerDetailsTitle')}
-                </p>
-                <div className="font-medium text-zinc-900">{selectedDealer.name}</div>
-                {selectedDealer.address && (
-                  <div className="mt-1.5 flex gap-2">
-                    <dt className="w-12 shrink-0 text-zinc-500">{t('dealerAddress')}</dt>
-                    <dd className="text-zinc-700">
-                      {selectedDealer.postalCode ? `〒${selectedDealer.postalCode} ` : ''}
-                      {selectedDealer.address}
-                    </dd>
-                  </div>
-                )}
-                {selectedDealer.phone && (
-                  <div className="mt-1 flex gap-2">
-                    <dt className="w-12 shrink-0 text-zinc-500">{t('dealerPhone')}</dt>
-                    <dd className="text-zinc-700">
-                      <a href={`tel:${selectedDealer.phone}`} className="hover:underline">
-                        {selectedDealer.phone}
-                      </a>
-                    </dd>
-                  </div>
-                )}
-                {selectedDealer.email && (
-                  <div className="mt-1 flex gap-2">
-                    <dt className="w-12 shrink-0 text-zinc-500">{t('dealerEmail')}</dt>
-                    <dd className="text-zinc-700">
-                      <a href={`mailto:${selectedDealer.email}`} className="hover:underline">
-                        {selectedDealer.email}
-                      </a>
-                    </dd>
-                  </div>
-                )}
-                <p className="mt-2 text-xs text-zinc-500">{t('dealerDetailsNote')}</p>
-              </dl>
-            )}
-            {/* Keeps the chosen branch in the form state while the visible
-                control is the select above. */}
-            <input type="hidden" {...register('branchId')} />
-            {dealerChoice !== OTHER_DEALER && <input type="hidden" {...register('dealerName')} />}
-          </div>
-        ) : (
-          <input
-            id="dealerName"
-            type="text"
-            className={inputClass}
-            placeholder={t('dealerNamePlaceholder')}
-            {...register('dealerName')}
-          />
-        )}
+      <FormField label={t('dealerName')} htmlFor="dealerName">
+        <DealerNameInput
+          id="dealerName"
+          dealers={dealers}
+          name={dealerName}
+          branchId={branchId}
+          onChange={handleDealerChange}
+        />
       </FormField>
 
       <div className="pt-2">

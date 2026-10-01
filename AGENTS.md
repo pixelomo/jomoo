@@ -31,7 +31,9 @@ document per post, and one singleton per page (`homePage`, `companyPage`, `desig
 `globalProjectsPage`, `showroomPage`, `careersPage`, `faqPage`,
 `afterSalesPage` — the type name is the document id, and the Studio lists them
 under ページ). The 無料修理規定 on the warranty certificate is read from
-`afterSalesPage` too, so the two cannot disagree.
+`afterSalesPage` too, so the two cannot disagree. Each `termGroups` entry is one titled
+section of that policy, and its title is also the jump button above the terms
+(`scripts/split-warranty-terms.mjs` made the four that exist).
 
 On the top page only words and pictures are in the CMS — the sections, their
 order and their motion stay in code. Its lineup cards are references to

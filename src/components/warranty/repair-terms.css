@@ -92,6 +92,70 @@
   margin-right: 0.35rem;
 }
 
+/* The section buttons: one per chapter of the policy, jumping to it. Four
+   across at full width, two on a phone, so the row never scrolls sideways. */
+.warranty-terms__nav {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.75rem;
+  margin: 0 0 3rem;
+}
+
+.warranty-terms__nav-link {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 0.9rem 1rem;
+  border: 1px solid #d4d4d8;
+  border-radius: 0.5rem;
+  background: #ffffff;
+  color: #0a0a0a;
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.5;
+  text-decoration: none;
+  transition: border-color 0.15s, background-color 0.15s, color 0.15s;
+}
+
+.warranty-terms__nav-link:hover,
+.warranty-terms__nav-link:focus-visible {
+  border-color: #0a0a0a;
+  background: #0a0a0a;
+  color: #ffffff;
+}
+
+.warranty-terms__nav-num {
+  font-size: 0.8rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  opacity: 0.6;
+}
+
+.warranty-terms__section {
+  /* Clears the fixed site header when a button scrolls here. */
+  scroll-margin-top: 7rem;
+  padding-top: 2.5rem;
+  border-top: 1px solid #e4e4e7;
+}
+
+.warranty-terms__section:first-of-type {
+  padding-top: 0;
+  border-top: 0;
+}
+
+.warranty-terms__heading {
+  margin: 0 0 1.25rem;
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1.6;
+  color: #0a0a0a;
+}
+
+/* A section of one clause has nothing to count. */
+.warranty-terms ol.warranty-terms__single > li {
+  list-style: none;
+}
+
 .warranty-terms__closing {
   margin: 0;
   padding-top: 1.5rem;
@@ -104,5 +168,34 @@
 @media (max-width: 1100px) {
   .warranty-section {
     padding: 4rem 1.5rem;
+  }
+}
+
+@media (max-width: 720px) {
+  .warranty-terms__nav {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 480px) {
+  .warranty-section {
+    padding: 3rem 1rem;
+  }
+
+  .warranty-terms {
+    font-size: 1rem;
+  }
+
+  .warranty-section__title {
+    font-size: 1.75rem;
+  }
+
+  .warranty-terms__heading {
+    font-size: 1.25rem;
+  }
+
+  .warranty-terms__nav-link {
+    padding: 0.75rem;
+    font-size: 0.875rem;
   }
 }

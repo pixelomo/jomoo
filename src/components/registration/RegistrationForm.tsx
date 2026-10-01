@@ -13,7 +13,7 @@ import type { BranchOption } from '@/lib/dealerBranches'
 
 interface Props {
   models: { _id: string; name: string; modelCode: string; series: string }[]
-  /** Registered dealer branches for the 販売店 select. */
+  /** Registered dealer branches, suggested under the 販売店 box. */
   dealers?: BranchOption[]
   /**
    * Photograph-first serial entry, from /register?auto=true. Off by default —
