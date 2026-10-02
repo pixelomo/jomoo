@@ -269,7 +269,7 @@ export default function ProductTabs({
                         {row.subgroup && row.subgroup !== group.rows[ri - 1]?.subgroup && (
                           // In a group with no title of its own, a sub-heading
                           // is the nearest thing to one, so it wears the black
-                          // title-row style (X40's 便器部 under the opening rows).
+                          // title-row style (X40's 給水圧力 among the opening rows).
                           <tr className="pdp-specs__subrow">
                             <th
                               colSpan={2}

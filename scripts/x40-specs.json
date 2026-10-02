@@ -17,12 +17,12 @@
             "value": "瞬間加熱式"
           },
           {
-            "subgroup": "便器部",
+            "subgroup": "給水圧力",
             "label": "最低必要水圧",
             "value": "0.065MPa（動水圧）"
           },
           {
-            "subgroup": "便器部",
+            "subgroup": "給水圧力",
             "label": "最高許容水圧",
             "value": "0.75MPa（静水圧）"
           },
@@ -198,12 +198,12 @@
             "value": "瞬間加熱式"
           },
           {
-            "subgroup": "便器部",
+            "subgroup": "給水圧力",
             "label": "最低必要水圧",
             "value": "0.065MPa（動水圧）"
           },
           {
-            "subgroup": "便器部",
+            "subgroup": "給水圧力",
             "label": "最高許容水圧",
             "value": "0.75MPa（静水圧）"
           },
