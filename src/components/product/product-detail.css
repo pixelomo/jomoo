@@ -254,9 +254,12 @@
   scroll-margin-top: calc(var(--nav-height) + 5.5rem);
 }
 
+/* Capped well under the page width: YouTube starts an embed at low quality
+   and its poster frame is small, and both look soft stretched edge to edge. */
 .pdp-tabs__intro-video {
   width: 100%;
-  margin: 0 0 4rem;
+  max-width: 800px;
+  margin: 0 auto 4rem;
 }
 
 .pdp-tabs__panel:first-of-type {
