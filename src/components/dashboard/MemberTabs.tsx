@@ -17,13 +17,15 @@ const TAB_LABELS: Record<MemberTabId, string> = {
 interface Props {
   /** Rendered inside the ご登録製品 panel, above the 保証延長 card. */
   products?: ReactNode
-  /** 法人 members only — every registration filed against their branch. The
-   *  tab is absent entirely for everyone else. */
+  /** Approved パートナー members only — every registration filed against their
+   *  branch. The tab is absent entirely for everyone else. */
   branch?: ReactNode
   contract?: ReactNode
   profile?: ReactNode
   /** Drives both the heading's count and the empty state. */
   productCount: number
+  /** Shown above the tabs — a パートナー application's review status. */
+  notice?: ReactNode
 }
 
 /**
@@ -31,7 +33,7 @@ interface Props {
  * anchors — so they are buttons in a tablist, not links, and the inactive
  * panels leave the document entirely.
  */
-export default function MemberTabs({ products, branch, contract, profile, productCount }: Props) {
+export default function MemberTabs({ products, branch, contract, profile, productCount, notice }: Props) {
   const [active, setActive] = useState<MemberTabId>('products')
   const base = useId()
   const isEmpty = productCount === 0
@@ -45,6 +47,7 @@ export default function MemberTabs({ products, branch, contract, profile, produc
 
   return (
     <>
+      {notice}
       <div className="member-tabs" role="tablist" aria-label="マイページ">
         {tabs.map((tab) => (
           <button

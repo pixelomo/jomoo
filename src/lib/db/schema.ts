@@ -19,10 +19,16 @@ export const user = pgTable('user', {
   postalCode: text('postal_code'),
   companyName: text('company_name'),
   companyNameKana: text('company_name_kana'),
-  /** 'corporate' (法人) or 'individual' (個人), chosen at step 1 of sign-up.
-   *  Null on accounts created before the two were told apart. */
+  /** 'partner' (パートナー), 'corporate' (法人) or 'individual' (個人), chosen
+   *  at step 1 of sign-up. Null on accounts created before they were told apart. */
   memberType: text('member_type'),
-  /** Corporate members only: the branch whose registrations they may read. */
+  /** Partner members only: 'pending' until staff review the application, then
+   *  'approved' or 'rejected'. Nothing a dealer can do is open before approval. */
+  partnerStatus: text('partner_status'),
+  partnerReviewedAt: timestamp('partner_reviewed_at'),
+  /** The admin username that approved or rejected the application. */
+  partnerReviewedBy: text('partner_reviewed_by'),
+  /** Approved partners only: the branch whose registrations they may read. */
   branchId: text('branch_id').references(() => dealerBranch.id, { onDelete: 'set null' }),
   lastName: text('last_name'),
   firstName: text('first_name'),

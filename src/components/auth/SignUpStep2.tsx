@@ -12,6 +12,7 @@ import {
   CorporateSignupSchema,
   GENDER_OPTIONS,
   IndividualSignupSchema,
+  isCompanyMembership,
   type MembershipType,
   type SignupData,
 } from '@/types/membership-signup'
@@ -57,7 +58,8 @@ export default function SignUpStep2({
   submitError = null,
 }: Props) {
   const t = useTranslations('auth.membership')
-  const isCorporate = membershipType === 'corporate'
+  // パートナー fills in the same company form as 法人.
+  const isCorporate = isCompanyMembership(membershipType)
   const alertRef = useRef<HTMLDivElement>(null)
 
   // The alert sits at the foot of a form several screens long. Submitting from

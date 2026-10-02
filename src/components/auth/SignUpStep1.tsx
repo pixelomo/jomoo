@@ -41,10 +41,15 @@ export default function SignUpStep1({ value, onSubmit }: Props) {
             }}
           >
             <option value="">{t('selectPlaceholder')}</option>
+            <option value="partner">{t('partner')}</option>
             <option value="corporate">{t('corporate')}</option>
             <option value="individual">{t('individual')}</option>
           </select>
         </SignUpField>
+
+        {/* Said before the form, not after it: a dealer should know the
+            account will not do dealer things straight away. */}
+        {selected === 'partner' && <p className="signup__notice">{t('partnerNotice')}</p>}
       </section>
 
       <div className="signup__actions">

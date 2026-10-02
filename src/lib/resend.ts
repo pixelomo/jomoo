@@ -7,6 +7,7 @@ import {
 import { contactAddressFor } from '@/lib/contactRouting'
 import { notificationConfig, type NotificationKey } from '@/lib/notifications'
 import { buildEmail } from '@/lib/emailTemplates'
+import { MEMBER_TYPE_LABELS } from '@/lib/memberProfile'
 import { appOrigin } from '@/lib/appUrl'
 
 /**
@@ -282,7 +283,12 @@ export async function sendMemberSignupNotice(member: {
     .join(' ')
 
   const rows = [
-    ['会員種別', member.memberType === 'corporate' ? '法人' : member.memberType === 'individual' ? '個人' : '—'],
+    [
+      '会員種別',
+      member.memberType === 'partner'
+        ? 'パートナー（審査待ち — 管理画面のPartnersで承認してください）'
+        : MEMBER_TYPE_LABELS[member.memberType ?? ''] ?? '—',
+    ],
     ['お名前', name],
     ['会社名', member.companyName || '—'],
     ['メールアドレス', member.email],
@@ -300,6 +306,30 @@ export async function sendMemberSignupNotice(member: {
     devLabel: 'new member notice',
     devSummary: { email: member.email, memberType: member.memberType },
     ...(await buildEmail('member_staff', { name, detailsTable })),
+  })
+}
+
+// ─────────────────────────────────────────────
+// パートナー application approved or rejected (fires from the Partners page)
+// ─────────────────────────────────────────────
+export async function sendPartnerReviewResult({
+  to,
+  name,
+  approved,
+}: {
+  to: string
+  name: string
+  approved: boolean
+}) {
+  await deliverEmail({
+    to,
+    notification: 'partner_review',
+    devLabel: approved ? 'partner approved' : 'partner rejected',
+    devSummary: { name },
+    ...(await buildEmail(approved ? 'partner_approved' : 'partner_rejected', {
+      name,
+      dashboardUrl: `${appUrl()}/dashboard`,
+    })),
   })
 }
 

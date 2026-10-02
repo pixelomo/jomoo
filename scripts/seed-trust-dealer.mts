@@ -1,8 +1,8 @@
 /**
  * Puts 株式会社TRUST — the dealer that runs the 東京ショールーム — on the dealer
- * list, and optionally gives it the 法人 account that owns it.
+ * list, and optionally gives it the パートナー account that owns it.
  *
- * Every other branch arrived as a 法人 sign-up. This one already exists in the
+ * Every other branch arrived as a 法人 sign-up (パートナー since 2026-10). This one already exists in the
  * world and its details are printed on /showroom, so rather than wait for
  * somebody to type them in again they are copied here, from that page, as the
  * one source both now read.
@@ -91,7 +91,7 @@ if (existing) {
   console.log(`+ branch ${TRUST.name} (${branchId}) created`)
 }
 
-// ─── The 法人 account ─────────────────────────────────────────────────────────
+// ─── The パートナー account ─────────────────────────────────────────────────────────
 
 if (!email || !password) {
   console.log(
@@ -109,9 +109,17 @@ if (account) {
   // two accounts for one dealer is how a branch ends up split in half.
   await db
     .update(user)
-    .set({ memberType: 'corporate', branchId, companyName: TRUST.name, updatedAt: new Date() })
+    .set({
+      memberType: 'partner',
+      partnerStatus: 'approved',
+      partnerReviewedAt: new Date(),
+      partnerReviewedBy: 'seed-trust-dealer',
+      branchId,
+      companyName: TRUST.name,
+      updatedAt: new Date(),
+    })
     .where(eq(user.id, account.id))
-  console.log(`= account ${email} linked to the branch as 法人`)
+  console.log(`= account ${email} linked to the branch as an approved パートナー`)
   process.exit(0)
 }
 
@@ -122,7 +130,7 @@ await auth.api.signUpEmail({
     email,
     password,
     name: `${TRUST.name} / ご担当者`,
-    memberType: 'corporate',
+    memberType: 'partner',
     companyName: TRUST.name,
     companyNameKana: TRUST.nameKana,
     postalCode: TRUST.postalCode,
@@ -135,20 +143,25 @@ await auth.api.signUpEmail({
   },
 })
 
-// signUpEmail's create hook builds a branch from the account's own fields. It
-// matches on name + postal code, which are the ones seeded above, so it lands
-// on the row this script just wrote rather than making a second one — this
-// asserts that rather than trusting it.
+// signUpEmail files a パートナー as a pending application with no branch. The
+// dealer on the ショールーム page needs no review, so it is approved here and
+// pointed at the branch this script just wrote.
 const [created] = await db
   .select({ id: user.id, branchId: user.branchId })
   .from(user)
   .where(eq(user.email, email))
   .limit(1)
 
-if (created?.branchId !== branchId) {
-  await db.update(user).set({ branchId, updatedAt: new Date() }).where(eq(user.id, created.id))
-  console.log(`  account was linked to ${created?.branchId ?? 'no branch'}; repointed at ${branchId}`)
-}
+await db
+  .update(user)
+  .set({
+    partnerStatus: 'approved',
+    partnerReviewedAt: new Date(),
+    partnerReviewedBy: 'seed-trust-dealer',
+    branchId,
+    updatedAt: new Date(),
+  })
+  .where(eq(user.id, created.id))
 
-console.log(`+ account ${email} created as a 法人 member of ${TRUST.name}`)
+console.log(`+ account ${email} created as an approved パートナー of ${TRUST.name}`)
 process.exit(0)

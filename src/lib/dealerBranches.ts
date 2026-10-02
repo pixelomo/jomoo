@@ -59,8 +59,8 @@ type BranchSource = {
 }
 
 /**
- * Finds the branch a corporate member belongs to, creating it if this is the
- * first person from it to sign up. Returns null when there is no company name
+ * Finds the branch a partner member belongs to, creating it if this is the
+ * first person from it to be approved. Returns null when there is no company name
  * to go on — the account is simply left without a branch rather than given an
  * empty one to share with every other nameless account.
  */
@@ -108,7 +108,7 @@ export async function ensureBranch(source: BranchSource): Promise<string | null>
   }
 }
 
-/** Creates the branch for a newly registered corporate member and links them
+/** Creates the branch for a newly approved partner member and links them
  *  to it. Never throws — an account is worth more than its branch link, which
  *  an admin can repair afterwards. */
 export async function linkMemberToBranch(userId: string, source: BranchSource) {

@@ -26,7 +26,7 @@ export default async function AccountPage() {
     building: str('building'),
   }
 
-  // 法人 accounts are dealer branches as far as the rest of the site is
+  // パートナー accounts are dealer branches as far as the rest of the site is
   // concerned, so their 会社名 and address are set at sign-up and changed by an
   // admin afterwards.
   return <AccountForm initial={initial} locked={isDealerAccount(u.memberType)} />

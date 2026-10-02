@@ -48,7 +48,7 @@ export default function AdminUserEditForm({ userId, initial, branches }: Props) 
           memberType: memberType || null,
           // Sent as null on a 個人 account so the server does not have to infer
           // it from a select the form has already hidden.
-          branchId: memberType === 'corporate' ? branchId || null : null,
+          branchId: memberType === 'partner' ? branchId || null : null,
         }),
       })
       if (!res.ok) { setError('Failed to save.'); return }
@@ -123,14 +123,15 @@ export default function AdminUserEditForm({ userId, initial, branches }: Props) 
           <label style={labelStyle}>Member type</label>
           <select value={memberType} onChange={e => setMemberType(e.target.value)} style={inputStyle}>
             <option value="">— Not set —</option>
-            <option value="corporate">法人 · Dealer</option>
+            <option value="partner">パートナー · Dealer</option>
+            <option value="corporate">法人 · Company</option>
             <option value="individual">個人 · Customer</option>
           </select>
         </div>
-        {/* Only a 法人 account reads a branch, so the select is not offered to
+        {/* Only a パートナー account reads a branch, so the select is not offered to
             anyone else — an individual with a dealer attached would be shown
             other people's registrations. */}
-        {memberType === 'corporate' && (
+        {memberType === 'partner' && (
           <div>
             <label style={labelStyle}>Dealer branch</label>
             <select value={branchId} onChange={e => setBranchId(e.target.value)} style={inputStyle}>
@@ -143,7 +144,7 @@ export default function AdminUserEditForm({ userId, initial, branches }: Props) 
             </select>
             {branches.length === 0 && (
               <p style={{ fontSize: 12, color: 'var(--ink-3)', margin: '6px 0 0' }}>
-                No branches yet — one is created when a 法人 member signs up.
+                No branches yet — one is created when a パートナー application is approved.
               </p>
             )}
           </div>

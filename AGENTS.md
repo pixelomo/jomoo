@@ -18,10 +18,23 @@ The tables `serial_numbers`, `serial_audit_logs`, `email_templates` and `dealer_
 
 Dealer branches (`dealer_branches`, `user.member_type`, `user.branch_id`, `product_registrations.branch_id`) are applied with `node scripts/add-dealer-branches.mjs`, then `node scripts/backfill-dealer-branches.mjs --apply` gives accounts created before the feature a member type and a branch. `dealer_branches.phone` / `.email` come from `node scripts/add-dealer-contact.mjs`, and `product_registrations.installation_address_city` (市区町村) from `node scripts/add-installation-city.mjs`.
 
+# Member types
+
+Sign-up offers three: パートナー (`partner`), 法人 (`corporate`) and 個人
+(`individual`). パートナー and 法人 fill in the same company form, but only a
+パートナー is a dealer: its application waits as `user.partner_status =
+'pending'` until an admin approves it on `/admin/partners` (search, status
+filter, approve/reject, CSV of the filtered or ticked rows). Approval
+(`lib/partners.ts`) creates the dealer branch and opens the 支店の登録製品 tab;
+rejecting unlinks it. A 法人 account works exactly as a 個人 one does — no
+branch, address editable. The partner columns come from
+`node scripts/add-partner-members.mjs`. `scripts/backfill-dealer-branches.mjs`
+predates this and still writes `corporate` — do not re-run it as it stands.
+
 株式会社TRUST — the dealer on the ショールーム page — is the one branch that did not
-arrive as a 法人 sign-up. `npx tsx scripts/seed-trust-dealer.mts` writes it from
+arrive as a sign-up. `npx tsx scripts/seed-trust-dealer.mts` writes it from
 the details printed on that page, and `--email … --password …` also gives it the
-法人 account that owns it.
+approved パートナー account that owns it.
 
 # Product series
 

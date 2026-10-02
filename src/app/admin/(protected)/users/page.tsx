@@ -9,7 +9,8 @@ import AdminFilter from '@/components/admin/AdminFilter'
 import MemberTypeBadge from '@/components/admin/MemberTypeBadge'
 
 const TYPE_OPTIONS = [
-  { value: 'corporate', label: '法人 · Dealer' },
+  { value: 'partner', label: 'パートナー · Dealer' },
+  { value: 'corporate', label: '法人 · Company' },
   { value: 'individual', label: '個人 · Customer' },
   // Accounts that predate member_type. Worth being able to see on purpose:
   // they are the ones a backfill has not reached.

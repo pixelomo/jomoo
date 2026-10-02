@@ -4,7 +4,9 @@ import { auth } from '@/lib/auth'
 import { db } from '@/lib/db'
 import { productRegistration, user as userTable, warrantyRecord } from '@/lib/db/schema'
 import { eq, desc } from 'drizzle-orm'
+import { getTranslations } from 'next-intl/server'
 import { getBranch } from '@/lib/dealerBranches'
+import { isApprovedPartner } from '@/lib/memberProfile'
 import { getBranchRegistrations } from '@/lib/branchRegistrations'
 import MemberTabs from '@/components/dashboard/MemberTabs'
 import BranchRegistrations from '@/components/dashboard/BranchRegistrations'
@@ -23,12 +25,21 @@ export default async function DashboardPage() {
   // written by the sign-up hook after the session was minted, so a session
   // issued at sign-up still carries none.
   const [member] = await db
-    .select({ memberType: userTable.memberType, branchId: userTable.branchId })
+    .select({
+      memberType: userTable.memberType,
+      partnerStatus: userTable.partnerStatus,
+      branchId: userTable.branchId,
+    })
     .from(userTable)
     .where(eq(userTable.id, u.id))
     .limit(1)
 
-  const isCorporate = member?.memberType === 'corporate'
+  // The dealer view opens only once staff approve a パートナー application;
+  // until then the account works exactly as a 個人 or 法人 one does.
+  const isDealer = isApprovedPartner(member)
+  const partnerStatus =
+    member?.memberType === 'partner' ? (member.partnerStatus ?? 'pending') : null
+  const t = await getTranslations('dashboard')
 
   const [registrations, warranties] = await Promise.all([
     db
@@ -58,12 +69,25 @@ export default async function DashboardPage() {
   // tab is what carries the whole feature, so it is absent rather than empty
   // for everybody else.
   const [branch, branchGroups] =
-    isCorporate && member?.branchId
+    isDealer && member?.branchId
       ? await Promise.all([getBranch(member.branchId), getBranchRegistrations(member.branchId)])
       : [null, null]
 
   return (
     <MemberTabs
+      notice={
+        partnerStatus === 'pending' ? (
+          <div className="member-notice" role="status">
+            <p className="member-notice__title">{t('partnerPendingTitle')}</p>
+            <p>{t('partnerPendingBody')}</p>
+          </div>
+        ) : partnerStatus === 'rejected' ? (
+          <div className="member-notice member-notice--muted">
+            <p className="member-notice__title">{t('partnerRejectedTitle')}</p>
+            <p>{t('partnerRejectedBody')}</p>
+          </div>
+        ) : undefined
+      }
       productCount={registrations.length}
       products={registrations.map((reg) => (
         <RegistrationCard
@@ -73,7 +97,7 @@ export default async function DashboardPage() {
         />
       ))}
       branch={
-        isCorporate ? (
+        isDealer ? (
           <BranchRegistrations
             branchName={branch?.name ?? null}
             hasBranch={Boolean(member?.branchId)}

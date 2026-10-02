@@ -1,4 +1,5 @@
 import { betterAuth } from 'better-auth'
+import { eq } from 'drizzle-orm'
 import { drizzleAdapter } from 'better-auth/adapters/drizzle'
 import { twoFactor } from 'better-auth/plugins'
 import { db } from './db'
@@ -67,9 +68,23 @@ export const auth = betterAuth({
             building?: string | null
           }
 
-          if (member.memberType === 'corporate') {
-            const { linkMemberToBranch } = await import('./dealerBranches')
-            await linkMemberToBranch(createdUser.id, member)
+          // memberType arrives from the browser, so anything outside the three
+          // tiers is filed as 個人 rather than trusted. A パートナー sign-up is an
+          // application: it waits for staff, and its branch is only created
+          // when an admin approves it (lib/partners.ts).
+          if (!['partner', 'corporate', 'individual'].includes(member.memberType ?? '')) {
+            member.memberType = 'individual'
+          }
+          try {
+            await db
+              .update(schema.user)
+              .set({
+                memberType: member.memberType,
+                partnerStatus: member.memberType === 'partner' ? 'pending' : null,
+              })
+              .where(eq(schema.user.id, createdUser.id))
+          } catch (err) {
+            console.error('[auth] could not record member type', { userId: createdUser.id, err })
           }
 
           // Staff hear about every sign-up at creation, verified or not.
@@ -177,7 +192,7 @@ export const auth = betterAuth({
         required: false,
         input: true,
       },
-      // 'corporate' or 'individual'. Written at sign-up because nothing else
+      // 'partner', 'corporate' or 'individual'. Written at sign-up because nothing else
       // records it — a company name is a hint, not an answer.
       memberType: {
         type: 'string',

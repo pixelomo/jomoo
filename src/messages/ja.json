@@ -82,6 +82,7 @@
     "membership": {
       "title": "JOMOOクラブ会員登録",
       "subtitle": "JOMOOクラブに登録して、延長保証や各種サービスをご利用いただけます。",
+      "partner": "パートナー",
       "corporate": "法人",
       "individual": "個人",
       "steps": {
@@ -92,7 +93,7 @@
       "stepStatusActive": "入力中",
       "stepStatusComplete": "完了",
       "typeSection": "会員種別選択",
-      "typeLabel": "法人・個人",
+      "typeLabel": "会員種別",
       "selectPlaceholder": "選択してください",
       "memberInfo": "会員情報登録",
       "addressSection": "住所登録",
@@ -147,7 +148,10 @@
         "passwordComplexity": "パスワードは、大文字、小文字、数字もしくは記号を含めてください",
         "passwordMismatch": "パスワードが一致しません",
         "phoneFormat": "半角数字（ハイフン可）で入力してください"
-      }
+      },
+      "partnerNotice": "パートナー会員のお申し込みは、当社にて内容を確認のうえ承認いたします。審査には最大48時間ほどお時間をいただきます。承認後、販売店としての機能（支店の登録製品・製造番号の確認）がご利用いただけるようになります。",
+      "partnerCompleteTitle": "パートナー会員のお申し込みを受け付けました。",
+      "partnerCompleteBody": "現在、当社にてお申し込み内容を審査しております。審査には最大48時間ほどお時間をいただきます。結果はご登録のメールアドレスへお知らせいたします。"
     }
   },
   "dashboard": {
@@ -215,7 +219,11 @@
     "branchNoBranch": "アカウントに販売店が紐づいていません。お手数ですがJOMOOサービスホットラインまでお問い合わせください。",
     "branchCount": "{count}件",
     "branchCustomerCount": "お客様 {customers}名 ・ 登録製品 {products}件",
-    "branchUnnamedCustomer": "お名前未登録のお客様"
+    "branchUnnamedCustomer": "お名前未登録のお客様",
+    "partnerPendingTitle": "パートナー会員　審査中",
+    "partnerPendingBody": "お申し込みいただいたパートナー会員の審査を行っております。審査には最大48時間ほどお時間をいただきます。承認後、「支店の登録製品」から貴社を販売店として登録された製品と製造番号をご確認いただけます。",
+    "partnerRejectedTitle": "パートナー会員のお申し込みについて",
+    "partnerRejectedBody": "誠に恐れ入りますが、今回はパートナー会員としてのご登録を見送らせていただきました。製品登録や保証書の確認は引き続きご利用いただけます。ご不明な点はお問い合わせフォームよりご連絡ください。"
   },
   "registration": {
     "title": "製品登録",

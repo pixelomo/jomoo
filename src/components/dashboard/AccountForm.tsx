@@ -41,7 +41,7 @@ export default function AccountForm({
   locked = false,
 }: {
   initial: AccountValues
-  /** 法人 members: 会社名 and address are the branch other members register
+  /** パートナー members: 会社名 and address are the branch other members register
    *  products against, so they are shown but not editable. The API drops them
    *  too — see lib/memberProfile.ts. */
   locked?: boolean

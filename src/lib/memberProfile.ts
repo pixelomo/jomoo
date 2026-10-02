@@ -1,7 +1,7 @@
 /**
  * What a dealer account may no longer change about itself.
  *
- * A 法人 account's 会社名 and address are not just its own contact details —
+ * A パートナー account's 会社名 and address are not just its own contact details —
  * they are the branch row other people register products against
  * (lib/dealerBranches.ts keys a branch on the folded name plus the postal
  * code). Letting one employee rename the company or move it would either
@@ -23,10 +23,32 @@ export const DEALER_LOCKED_FIELDS = [
 
 export type DealerLockedField = (typeof DEALER_LOCKED_FIELDS)[number]
 
-/** 法人 members. `memberType` is null on accounts that predate the two being
- *  told apart; the backfill script gives those one. */
+/** パートナー members, whether or not the application has been approved: the
+ *  company details are what staff review, so they are locked from the start.
+ *  法人 members fill in the same form but are customers, not dealers. */
 export function isDealerAccount(memberType: unknown): boolean {
-  return memberType === 'corporate'
+  return memberType === 'partner'
+}
+
+export type PartnerStatus = 'pending' | 'approved' | 'rejected'
+
+/** Whether the dealer features — the branch, its 支店の登録製品 tab and the
+ *  serials filed against it — are open to this account. A partner with no
+ *  status yet is an application nobody has looked at. */
+export function isApprovedPartner(member: { memberType?: unknown; partnerStatus?: unknown } | null | undefined) {
+  return member?.memberType === 'partner' && member.partnerStatus === 'approved'
+}
+
+export const MEMBER_TYPE_LABELS: Record<string, string> = {
+  partner: 'パートナー',
+  corporate: '法人',
+  individual: '個人',
+}
+
+export const PARTNER_STATUS_LABELS: Record<PartnerStatus, string> = {
+  pending: '審査中',
+  approved: '承認済み',
+  rejected: '否認',
 }
 
 export function isDealerLockedField(key: string): key is DealerLockedField {

@@ -1,4 +1,4 @@
-/** 法人 or 個人 at a glance. Null on accounts created before the two were told
+/** パートナー, 法人 or 個人 at a glance. Null on accounts created before the two were told
  *  apart — shown as a dash rather than guessed at from a 会社名. */
 export default function MemberTypeBadge({ type }: { type: string | null }) {
   const style: React.CSSProperties = {
@@ -10,6 +10,9 @@ export default function MemberTypeBadge({ type }: { type: string | null }) {
     whiteSpace: 'nowrap',
   }
 
+  if (type === 'partner') {
+    return <span style={{ ...style, color: '#6d28d9', background: '#f5f3ff' }}>パートナー</span>
+  }
   if (type === 'corporate') {
     return <span style={{ ...style, color: '#1d4ed8', background: '#eff6ff' }}>法人</span>
   }

@@ -3,6 +3,7 @@ import { can, getAdminSession } from '@/lib/admin-auth'
 import { db } from '@/lib/db'
 import { user, productRegistration, dealerBranch } from '@/lib/db/schema'
 import { csvResponse, toCsv } from '@/lib/csv'
+import { MEMBER_TYPE_LABELS } from '@/lib/memberProfile'
 
 /** Every member with their profile and registration count, as a spreadsheet. */
 export async function GET() {
@@ -52,7 +53,7 @@ export async function GET() {
     ],
     rows.map((r) => [
       r.id, r.name, r.email, r.emailVerified ? 'はい' : 'いいえ',
-      r.memberType === 'corporate' ? '法人' : r.memberType === 'individual' ? '個人' : '',
+      MEMBER_TYPE_LABELS[r.memberType ?? ''] ?? '',
       r.branchName,
       r.companyName, r.companyNameKana, r.lastName, r.firstName, r.lastNameKana, r.firstNameKana,
       r.gender, r.dateOfBirth, r.phoneNumber, r.postalCode, r.prefecture, r.city, r.streetAddress, r.building,

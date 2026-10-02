@@ -4,6 +4,7 @@ import { eq, desc, asc } from 'drizzle-orm'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import AdminUserEditForm from '@/components/admin/AdminUserEditForm'
+import { PARTNER_STATUS_LABELS, type PartnerStatus } from '@/lib/memberProfile'
 import MemberTypeBadge from '@/components/admin/MemberTypeBadge'
 
 export default async function AdminUserDetailPage({
@@ -71,6 +72,16 @@ export default async function AdminUserDetailPage({
             {[
               { label: 'User ID', value: u.id },
               { label: 'Member type', value: <MemberTypeBadge type={u.memberType} /> },
+              ...(u.memberType === 'partner'
+                ? [{
+                    label: 'Partner review',
+                    value: (
+                      <Link href="/admin/partners" style={{ color: 'var(--accent)', textDecoration: 'none' }}>
+                        {PARTNER_STATUS_LABELS[(u.partnerStatus ?? 'pending') as PartnerStatus]} →
+                      </Link>
+                    ),
+                  }]
+                : []),
               {
                 label: 'Dealer',
                 value: branch ? (

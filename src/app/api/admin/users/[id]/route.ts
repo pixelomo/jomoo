@@ -11,7 +11,7 @@ const UpdateSchema = z.object({
   email: z.string().email().optional(),
   gender: z.enum(['male', 'female', 'other', 'prefer_not_to_say']).nullable().optional(),
   dateOfBirth: z.string().nullable().optional(),
-  memberType: z.enum(['corporate', 'individual']).nullable().optional(),
+  memberType: z.enum(['partner', 'corporate', 'individual']).nullable().optional(),
   branchId: z.string().nullable().optional(),
 })
 
@@ -72,15 +72,32 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
     if (!branch) return NextResponse.json({ error: 'NO_SUCH_BRANCH' }, { status: 422 })
   }
 
+  // Approval lives on the Partners page; here a move into パートナー starts as
+  // an application, and a move out of it drops the status with the branch.
+  let partnerStatus: { partnerStatus: string | null } | undefined
+  if (d.memberType !== undefined) {
+    if (d.memberType === 'partner') {
+      const [current] = await db
+        .select({ memberType: user.memberType, partnerStatus: user.partnerStatus })
+        .from(user)
+        .where(eq(user.id, id))
+        .limit(1)
+      if (current?.memberType !== 'partner' || !current.partnerStatus) partnerStatus = { partnerStatus: 'pending' }
+    } else {
+      partnerStatus = { partnerStatus: null }
+    }
+  }
+
   await db.update(user).set({
+    ...partnerStatus,
     ...(d.name !== undefined && { name: d.name }),
     ...(d.email !== undefined && { email: d.email }),
     ...(d.gender !== undefined && { gender: d.gender }),
     ...(d.dateOfBirth !== undefined && { dateOfBirth: d.dateOfBirth }),
     ...(d.memberType !== undefined && { memberType: d.memberType }),
-    // The branch is only meaningful on a 法人 account, so switching an account
-    // to 個人 lets it go rather than leaving a link nothing reads.
-    ...(d.memberType === 'individual'
+    // The branch is only meaningful on a パートナー account, so switching an
+    // account to anything else lets it go rather than leaving a link nothing reads.
+    ...(d.memberType !== undefined && d.memberType !== 'partner'
       ? { branchId: null }
       : d.branchId !== undefined && { branchId: d.branchId }),
   }).where(eq(user.id, id))

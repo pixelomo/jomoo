@@ -36,6 +36,7 @@ export default async function AdminDashboard() {
       .select({
         users: sql<number>`(select count(*) from ${user})::int`,
         dealers: sql<number>`(select count(*) from ${dealerBranch})::int`,
+        pendingPartners: sql<number>`(select count(*) from ${user} where ${user.memberType} = 'partner' and coalesce(${user.partnerStatus}, 'pending') = 'pending')::int`,
         withWarranty: sql<number>`count(*) filter (where ${productRegistration.status} = 'REGISTERED_WITH_WARRANTY')::int`,
         noWarranty: sql<number>`count(*) filter (where ${productRegistration.status} = 'REGISTERED_NO_WARRANTY')::int`,
       })
@@ -59,6 +60,7 @@ export default async function AdminDashboard() {
 
   const stats = [
     { label: 'Total Users', value: counts.users, href: '/admin/users' },
+    { label: 'Partners to review', value: counts.pendingPartners, href: '/admin/partners?status=pending' },
     { label: 'Dealers', value: counts.dealers, href: '/admin/dealers' },
     { label: 'With Warranty', value: counts.withWarranty, href: '/admin/registrations?filter=warranty' },
     { label: 'No Warranty', value: counts.noWarranty, href: '/admin/registrations?filter=no_warranty' },

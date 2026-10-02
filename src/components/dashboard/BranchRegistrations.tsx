@@ -13,7 +13,7 @@ interface Props {
 }
 
 /**
- * What a 法人 member sees that a 個人 member does not: every product registered
+ * What an approved パートナー member sees that nobody else does: every product registered
  * against their branch, whoever filed it, split by customer.
  *
  * The cards are read-only. A dealer is being shown a customer's registration so

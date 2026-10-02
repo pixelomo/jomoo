@@ -14,7 +14,8 @@ export interface DbUser {
   emailVerified: boolean
   gender: Gender | null
   dateOfBirth: string | null
-  memberType: 'corporate' | 'individual' | null
+  memberType: 'partner' | 'corporate' | 'individual' | null
+  partnerStatus: 'pending' | 'approved' | 'rejected' | null
   branchId: string | null
   twoFactorEnabled: boolean | null
   createdAt: string

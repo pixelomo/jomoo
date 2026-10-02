@@ -65,7 +65,7 @@ export const DEFAULT_NAV: SiteNav = {
     {
       heading: 'お問い合わせ',
       links: [
-        { href: '/contact-us', label: 'お客様相談窓口' },
+        { href: '/contact-us', label: 'お問い合わせ' },
         { href: '/after-sales', label: 'アフターサービス' },
         { href: '/faq', label: 'Q&A' },
       ],

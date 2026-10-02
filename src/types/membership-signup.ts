@@ -2,7 +2,13 @@ import { z } from 'zod'
 import type { Gender } from '@/types/database'
 import { japanesePhone } from '@/types/phone'
 
-export type MembershipType = 'corporate' | 'individual'
+export type MembershipType = 'partner' | 'corporate' | 'individual'
+
+/** パートナー and 法人 fill in the same company form; only what the account may
+ *  do afterwards differs. */
+export function isCompanyMembership(type: MembershipType | null | undefined) {
+  return type === 'partner' || type === 'corporate'
+}
 
 /** The design draws 性別 as a free-text box, but the dashboard and admin forms
  *  render it as a select over exactly these four, so a value outside the list
@@ -56,7 +62,7 @@ function withPasswordMatch<T extends z.ZodObject<z.ZodRawShape>>(schema: T) {
   )
 }
 
-/** Corporate: the address is part of the company record, so every line of it is
+/** Corporate and partner: the address is part of the company record, so every line of it is
  *  required — 建物名 included. No phone number is collected. */
 export const CorporateSignupSchema = withPasswordMatch(
   z.object({
@@ -95,7 +101,7 @@ export type SignupData = Partial<CorporateSignupData & IndividualSignupData>
 
 export function buildDisplayName(type: MembershipType, data: SignupData) {
   const fullName = [data.lastName, data.firstName].filter(Boolean).join(' ')
-  if (type === 'corporate' && data.companyName) {
+  if (isCompanyMembership(type) && data.companyName) {
     return `${data.companyName} / ${fullName}`
   }
   return fullName

@@ -267,8 +267,15 @@ export default function ProductTabs({
                     {group.rows.map((row, ri) => (
                       <Fragment key={ri}>
                         {row.subgroup && row.subgroup !== group.rows[ri - 1]?.subgroup && (
+                          // In a group with no title of its own, a sub-heading
+                          // is the nearest thing to one, so it wears the black
+                          // title-row style (X40's 便器部 under the opening rows).
                           <tr className="pdp-specs__subrow">
-                            <th colSpan={2} scope="rowgroup" className="pdp-specs__subgroup">
+                            <th
+                              colSpan={2}
+                              scope="rowgroup"
+                              className={group.title ? 'pdp-specs__subgroup' : 'pdp-specs__group'}
+                            >
                               {row.subgroup}
                             </th>
                           </tr>

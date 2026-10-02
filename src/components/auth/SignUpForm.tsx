@@ -121,7 +121,7 @@ export default function SignUpForm() {
       />
 
       {isComplete ? (
-        <SignUpStep3 />
+        <SignUpStep3 isPartner={membershipType === 'partner'} />
       ) : (
         <>
           <div className="signup__card">

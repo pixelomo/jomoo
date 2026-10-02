@@ -859,7 +859,7 @@
   }
 }
 
-/* 法人 / 個人 — the one choice on sign-up step 1. */
+/* パートナー / 法人 / 個人 — the one choice on sign-up step 1. */
 .account-choice {
   display: flex;
   gap: 1rem;
@@ -1437,6 +1437,57 @@
   margin: 0;
 }
 
+/* パートナー: the account exists, the dealer features wait for review. */
+.signup__notice,
+.signup__partner-notice,
+.member-notice {
+  border: 1px solid #e5c07b;
+  background: #fffaf0;
+  border-radius: 0.75rem;
+  padding: 1.25rem 1.5rem;
+  font-size: 0.95rem;
+  font-weight: 400;
+  line-height: 1.8;
+  text-align: left;
+  color: #3a3f45;
+}
+
+.signup__notice {
+  margin: 1.5rem 0 0;
+}
+
+.signup__partner-notice {
+  max-width: 40rem;
+  margin: 2.5rem auto 0;
+}
+
+.signup__complete .signup__partner-notice p + p {
+  margin-top: 0.5rem;
+}
+
+.signup__partner-notice-title,
+.member-notice__title {
+  font-weight: 700;
+}
+
+.member-notice {
+  width: 100%;
+  margin-bottom: 1.5rem;
+}
+
+.member-notice p {
+  margin: 0;
+}
+
+.member-notice p + p {
+  margin-top: 0.4rem;
+}
+
+.member-notice--muted {
+  border-color: #d4d7db;
+  background: #f6f7f8;
+}
+
 .signup__signin {
   margin-top: 2.5rem;
   text-align: center;
@@ -1509,7 +1560,7 @@
   }
 }
 
-/* ─── 支店の登録製品 (法人 members only) ─────────────────────────────────────── */
+/* ─── 支店の登録製品 (approved パートナー members only) ─────────────────────────────────────── */
 
 .member-branch__name {
   margin: -0.5rem 0 0;
