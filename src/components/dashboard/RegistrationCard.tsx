@@ -129,6 +129,14 @@ export default function RegistrationCard({
             <dd style={{ fontFamily: 'monospace' }}>{reg.serialNumber || '—'}</dd>
           </dl>
 
+          {reg.status === 'RETURNED' && reg.reviewNotes && (
+            <p className="member-product__notice">
+              <strong>{t('returnedReason')}</strong>
+              {reg.reviewNotes}
+              {!readOnly && `\n${t('returnedHint')}`}
+            </p>
+          )}
+
           {(reg.warrantyCardUrl || reg.serialNumberImageUrl) && (
             <div className="member-product__thumbs">
               {reg.warrantyCardUrl && (

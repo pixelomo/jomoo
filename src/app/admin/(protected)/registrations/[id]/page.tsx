@@ -4,7 +4,8 @@ import { branchAddress } from '@/lib/dealerBranches'
 import { eq } from 'drizzle-orm'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
-import Image from 'next/image'
+import RegistrationReview from '@/components/admin/RegistrationReview'
+import { REVIEWABLE_STATUSES } from '@/lib/registrationReview'
 
 export default async function AdminRegistrationDetailPage({
   params,
@@ -42,6 +43,9 @@ export default async function AdminRegistrationDetailPage({
       serialNumberImageUrl: productRegistration.serialNumberImageUrl,
       status: productRegistration.status,
       submittedAt: productRegistration.submittedAt,
+      reviewedAt: productRegistration.reviewedAt,
+      reviewerId: productRegistration.reviewerId,
+      reviewNotes: productRegistration.reviewNotes,
       userName: user.name,
       userEmail: user.email,
       warrantyExpiry: warrantyRecord.expiryDate,
@@ -127,8 +131,24 @@ export default async function AdminRegistrationDetailPage({
           </dl>
         </div>
 
-        {/* User + images */}
+        {/* Review, user + images */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          {REVIEWABLE_STATUSES.includes(reg.status) ? (
+            <RegistrationReview
+              registrationId={reg.id}
+              status={reg.status}
+              previousNote={reg.reviewNotes}
+            />
+          ) : reg.reviewerId ? (
+            <div style={{ background: 'var(--paper)', border: '1px solid var(--line)', borderRadius: 10, padding: '16px 20px', fontSize: 13, color: 'var(--ink-2)' }}>
+              Reviewed by <strong>{reg.reviewerId}</strong>
+              {reg.reviewedAt && ` on ${new Date(reg.reviewedAt).toLocaleString('en-AU', { timeZone: 'Asia/Tokyo' })} JST`}
+              {reg.reviewNotes && (
+                <p style={{ margin: '8px 0 0', whiteSpace: 'pre-wrap', color: 'var(--ink-3)' }}>{reg.reviewNotes}</p>
+              )}
+            </div>
+          ) : null}
+
           {/* User card */}
           <div style={{ background: 'var(--paper)', border: '1px solid var(--line)', borderRadius: 10, padding: '20px' }}>
             <h2 style={{ fontSize: 15, fontWeight: 600, color: 'var(--ink)', margin: '0 0 12px' }}>Account</h2>

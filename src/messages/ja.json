@@ -162,6 +162,8 @@
     "registeredAt": "登録日",
     "warrantyPeriod": "保証期間",
     "warrantyNotIssued": "未発行",
+    "returnedReason": "修正が必要な内容",
+    "returnedHint": "内容をご確認の上、「編集」から修正してください。",
     "noProducts": "まだ製品が登録されていません",
     "registerFirst": "製品を登録する",
     "status": {

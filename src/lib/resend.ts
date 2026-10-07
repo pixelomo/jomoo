@@ -408,11 +408,14 @@ export async function sendReviewStatusUpdate({
   name,
   status,
   registrationId,
+  reviewNote = '',
 }: {
   to: string
   name: string
   status: 'RETURNED' | 'REGISTERED_NO_WARRANTY' | 'REGISTERED_WITH_WARRANTY'
   registrationId?: string
+  /** The reviewer's reason; shown in the 差し戻し email. */
+  reviewNote?: string
 }) {
   const dashboardUrl = `${appUrl()}/dashboard`
 
@@ -422,13 +425,14 @@ export async function sendReviewStatusUpdate({
     REGISTERED_WITH_WARRANTY: 'review_with_warranty',
   }
 
-  await deliverEmail({
+  return deliverEmail({
     to,
     notification: 'registration',
     devLabel: `review outcome (${status})`,
     devSummary: { status, registrationId },
     ...(await buildEmail(templateFor[status], {
       name,
+      reviewNote,
       dashboardUrl,
       // Falls back to the dashboard when there is no registration to link to,
       // so the button in the template never points at /warranty/undefined.

@@ -322,6 +322,22 @@
 .member-product__status--registered { color: #15803d; background: #f0fdf4; }
 .member-product__status--warranty { color: var(--member-primary); background: #f1f7fb; }
 
+.member-product__notice {
+  margin: 0;
+  padding: 0.75rem 1rem;
+  border-radius: 6px;
+  background: #fef2f2;
+  color: #7f1d1d;
+  font-size: 0.875rem;
+  line-height: 1.7;
+  white-space: pre-wrap;
+}
+
+.member-product__notice strong {
+  display: block;
+  color: #dc2626;
+}
+
 .member-product__thumbs {
   display: flex;
   gap: 0.75rem;

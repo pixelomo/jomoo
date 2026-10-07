@@ -80,6 +80,9 @@ export async function PATCH(
     ...(d.phone_number !== undefined && { phoneNumber: d.phone_number }),
     ...(d.purchase_date !== undefined && { purchaseDate: d.purchase_date }),
     ...(d.dealer_name !== undefined && { dealerName: d.dealer_name }),
+    // Correcting a returned registration resubmits it, so it is back in the
+    // reviewers' queue rather than sitting as 要修正 after it has been fixed.
+    ...(reg.status === 'RETURNED' && { status: 'PENDING' }),
     updatedAt: new Date(),
   }).where(eq(productRegistration.id, id))
 

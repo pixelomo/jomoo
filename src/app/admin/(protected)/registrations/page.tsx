@@ -5,11 +5,15 @@ import Link from 'next/link'
 
 const FILTERS = [
   { key: 'all', label: 'All' },
+  { key: 'pending', label: 'Pending review' },
+  { key: 'returned', label: 'Returned' },
   { key: 'warranty', label: 'With Warranty' },
   { key: 'no_warranty', label: 'No Warranty' },
 ]
 
 const STATUS_MAP: Record<string, string> = {
+  pending: 'PENDING',
+  returned: 'RETURNED',
   warranty: 'REGISTERED_WITH_WARRANTY',
   no_warranty: 'REGISTERED_NO_WARRANTY',
 }
