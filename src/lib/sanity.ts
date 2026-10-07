@@ -717,6 +717,29 @@ export const getSiteCta = cache(() =>
 
 type Loose<T> = { [K in keyof T]?: T[K] | null }
 
+/** The CMS pages that carry their own title, keyed by their path. */
+const TITLED_PAGES: Record<string, string> = {
+  '/after-sales': 'afterSalesPage',
+  '/faq': 'faqPage',
+}
+
+const getPageTitles = cache(async (): Promise<Record<string, string>> => {
+  try {
+    const rows = await getSanityClient().fetch<{ _id: string; title?: string | null }[]>(
+      `*[_id in $ids] { _id, title }`,
+      { ids: Object.values(TITLED_PAGES) }
+    )
+    return Object.fromEntries(
+      Object.entries(TITLED_PAGES).flatMap(([path, id]) => {
+        const title = rows.find((row) => row._id === id)?.title?.trim()
+        return title ? [[path, title]] : []
+      })
+    )
+  } catch {
+    return {}
+  }
+})
+
 /** The ヘッダー・フッター document, each field falling back to what shipped. */
 export async function getSiteNavigation(): Promise<SiteNav> {
   const data = await getSingleton<Loose<SiteNav>>(
@@ -732,7 +755,15 @@ export async function getSiteNavigation(): Promise<SiteNav> {
     if (value == null || value === '' || (Array.isArray(value) && value.length === 0)) return DEFAULT_NAV[key]
     return value as SiteNav[K]
   }
-  const shown = <T extends { href: string }>(links?: T[] | null) => (links ?? []).filter((l) => !isHiddenRoute(l.href))
+  // A page with its own タイトル in the Studio names every link to it, so
+  // renaming the page renames the menu and footer with it.
+  const titles = await getPageTitles()
+  const titled = <T extends { href: string; label: string }>(link: T): T => {
+    const title = titles[link.href.replace(/[#?].*$/, '').replace(/\/$/, '')]
+    return title ? { ...link, label: title } : link
+  }
+  const shown = <T extends { href: string; label: string }>(links?: T[] | null) =>
+    (links ?? []).filter((l) => !isHiddenRoute(l.href)).map(titled)
 
   // Published series marked for the menu join the 商品情報 links on their own,
   // so a series added through the serial import appears the moment it is

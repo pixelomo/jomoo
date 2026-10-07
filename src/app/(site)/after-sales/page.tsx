@@ -8,7 +8,7 @@ import '@/components/warranty/after-sales.css'
 
 export async function generateMetadata(): Promise<Metadata> {
   const data = await getAfterSalesPage()
-  return pageMetadata({ title: data?.title || 'アフターサービス', description: data?.description, path: '/after-sales' })
+  return pageMetadata({ title: data?.title || '製品の保証', description: data?.description, path: '/after-sales' })
 }
 
 export default async function AfterSalesPage() {

@@ -78,7 +78,7 @@ export default function FaqList({ data }: { data: FaqPageData }) {
             までお気軽にお問い合わせください。
             <br />
             保証の範囲については
-            <a href="/after-sales">アフターサービス</a>
+            <a href="/after-sales">製品の保証</a>
             をご覧ください。
           </p>
         </div>
