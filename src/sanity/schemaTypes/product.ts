@@ -365,9 +365,10 @@ export const product = defineType({
     defineField({
       name: 'price',
       title: '価格 / Price',
-      type: 'string',
+      type: 'text',
+      rows: 3,
       group: 'settings',
-      description: '「タイプ・価格」タブに表示される文字列（例：000000円（税込000000円））',
+      description: '「タイプ・価格」タブに表示される文字列（例：000000円（税込000000円））。改行はそのまま表示されます（地域別の価格は1行ずつ）',
     }),
 
     defineField({

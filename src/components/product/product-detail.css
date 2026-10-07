@@ -94,6 +94,8 @@
   font-weight: 600;
   line-height: 1.35;
   margin: 0;
+  /* One price per line when the CMS gives several (標準仕様 / 寒冷地仕様). */
+  white-space: pre-line;
   word-break: keep-all;
   overflow-wrap: anywhere;
 }

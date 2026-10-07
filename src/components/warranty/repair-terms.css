@@ -158,6 +158,8 @@
 
 .warranty-terms__closing {
   margin: 0;
+  /* The CMS text field keeps its line breaks; so does the page. */
+  white-space: pre-line;
   padding-top: 1.5rem;
   border-top: 1px solid #d4d4d8;
 }
