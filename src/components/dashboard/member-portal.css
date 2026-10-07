@@ -817,23 +817,6 @@
   background: var(--member-primary);
 }
 
-/* Three steps at full size need about 400px; on a phone the first label ran
-   off the left edge. The markers give up their floor and the lines shorten. */
-@media (max-width: 480px) {
-  .account-steps__marker {
-    min-width: 5.5rem;
-  }
-
-  .account-steps__line {
-    width: 1.5rem;
-    margin: 0 0.25rem 2rem;
-  }
-
-  .account-steps__label {
-    font-size: 0.9rem;
-  }
-}
-
 @media (max-width: 767px) {
   .account-steps__marker {
     min-width: 5rem;
@@ -1542,6 +1525,12 @@
 
   .signup__card {
     padding: 2rem 1.5rem;
+  }
+
+  /* The labels overhang their dots on both sides; at the ends of the row that
+     overhang ran past the screen's edge, so the row keeps it inside. */
+  .account-steps {
+    padding-inline: 1.75rem;
   }
 
   .account-steps__cell {
