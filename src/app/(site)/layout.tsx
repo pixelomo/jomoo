@@ -10,6 +10,7 @@ import Analytics from '@/components/consent/Analytics'
 import { auth } from '@/lib/auth'
 import { getLegalLinks, getSiteNavigation } from '@/lib/sanity'
 import { CONSENT_COOKIE, parseConsent } from '@/lib/cookieConsent'
+import { DEFAULT_TITLE, SITE_NAME, SITE_URL, pageMetadata } from '@/lib/seo'
 import '../globals.css'
 import '@/components/layout/jomoo-chrome.css'
 
@@ -21,24 +22,19 @@ const poppins = Poppins({
 })
 
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
   title: {
     template: '%s | JOMOO',
-    default: 'JOMOO X40 — インテリジェントトイレ | スマートウォシュレット',
+    default: DEFAULT_TITLE,
   },
-  description: 'JOMOO X40 インテリジェントトイレ。UV除菌・プラチナ触媒・サイクロン洗浄・奥行き640mm超コンパクト設計。最先端スマートウォシュレットで快適なバスルーム体験を。',
-  keywords: ['JOMOO', 'X40', 'インテリジェントトイレ', 'スマートトイレ', 'ウォシュレット', 'UV除菌', 'スマートバスルーム', '温水洗浄便座', 'JOMOO JAPAN', 'smart toilet'],
-  openGraph: {
-    title: 'JOMOO X40 — インテリジェントトイレ',
-    description: 'UV除菌・プラチナ触媒・サイクロン洗浄・640mm超コンパクト設計のインテリジェントトイレ',
-    siteName: 'JOMOO JAPAN',
-    locale: 'ja_JP',
-    type: 'website',
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: 'JOMOO X40 — インテリジェントトイレ',
-    description: 'UV除菌・プラチナ触媒・サイクロン洗浄・640mm超コンパクト設計',
-  },
+  applicationName: SITE_NAME,
+  keywords: ['JOMOO', 'JOMOO JAPAN', 'X40', 'X40-B', 'X40-C', 'スマートトイレ', '温水洗浄便座', 'スマートバスルーム', '水栓金具', 'シャワーセット'],
+  formatDetection: { telephone: false, address: false, email: false },
+  appleWebApp: { title: 'JOMOO', statusBarStyle: 'default' },
+  // Every page sets its own; this is what a page without one shares as.
+  // No path: a canonical or og:url here would be inherited by every page
+  // that sets none, and tell crawlers each of them is the top page.
+  ...pageMetadata({}),
 }
 
 // The site is Japanese-only and served without a locale prefix, so this layout

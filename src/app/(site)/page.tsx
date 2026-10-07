@@ -4,10 +4,21 @@ import JomooHomepage, { type HomeContent } from '@/components/home/JomooHomepage
 import FooterCtaSection from '@/components/home/FooterCtaSection'
 import { X40_TURNTABLE, type SpotlightSlide } from '@/components/home/SpotlightCarousel'
 import { getHomePage, imgUrl, lines, type AssetRef } from '@/lib/sanity'
+import { SITE_NAME, SITE_URL, pageMetadata } from '@/lib/seo'
 
 export async function generateMetadata(): Promise<Metadata> {
   const data = await getHomePage()
-  return data?.description ? { description: data.description } : {}
+  return pageMetadata({ description: data?.description, path: '/' })
+}
+
+// Tells Google the brand behind the site, for its name and logo in results.
+const ORGANIZATION = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  name: 'JOMOO',
+  alternateName: SITE_NAME,
+  url: SITE_URL,
+  logo: `${SITE_URL}/icons/icon-512.png`,
 }
 
 /** An image field's URL at a width, or nothing when the field is empty. */
@@ -132,5 +143,13 @@ export default async function HomePage() {
     },
   }
 
-  return <JomooHomepage content={content} closing={<FooterCtaSection />} />
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(ORGANIZATION) }}
+      />
+      <JomooHomepage content={content} closing={<FooterCtaSection />} />
+    </>
+  )
 }

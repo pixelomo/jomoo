@@ -3,11 +3,11 @@ import Link from 'next/link'
 import { search } from '@/lib/search'
 import { imgUrl } from '@/lib/sanity'
 import SearchForm from '@/components/search/SearchForm'
+import { pageMetadata } from '@/lib/seo'
 import '@/components/search/search.css'
 
 export const metadata: Metadata = {
-  title: '検索',
-  description: 'JOMOO の商品情報とブログ記事を検索できます。',
+  ...pageMetadata({ title: '検索', description: 'JOMOO の商品情報とブログ記事を検索できます。', path: '/search' }),
   robots: { index: false },
 }
 

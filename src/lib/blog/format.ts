@@ -19,6 +19,8 @@ export interface BlogPostSummary {
    *  would lose most of itself to it. */
   coverWidth: number
   coverHeight: number
+  /** The Sanity image itself, for the link-preview card (lib/seo.ts). */
+  coverSource?: unknown
 }
 
 /** A picture in the body, with the file's own size so the page can hold its

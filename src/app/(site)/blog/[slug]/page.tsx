@@ -12,6 +12,7 @@ import {
   type BlogImage,
 } from '@/lib/blog/posts'
 import { imgUrl } from '@/lib/sanity'
+import { pageMetadata, sanityShareImage } from '@/lib/seo'
 import '@/components/blog/blog.css'
 
 export async function generateStaticParams() {
@@ -23,20 +24,18 @@ export async function generateMetadata({
 }: {
   params: Promise<{ slug: string }>
 }): Promise<Metadata> {
-  const post = await getPost((await params).slug)
+  const { slug } = await params
+  const post = await getPost(slug)
   if (!post) return {}
 
-  return {
+  return pageMetadata({
     title: post.title,
     description: post.excerpt,
-    openGraph: {
-      title: post.title,
-      description: post.excerpt,
-      images: [post.cover],
-      type: 'article',
-      publishedTime: post.date,
-    },
-  }
+    path: `/blog/${slug}`,
+    images: post.coverSource ? sanityShareImage(post.coverSource, post.title) : undefined,
+    type: 'article',
+    publishedTime: post.date,
+  })
 }
 
 function Arrow({ direction }: { direction: 'prev' | 'next' }) {

@@ -4,11 +4,12 @@ import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import ProjectExplorer, { type Project } from '@/components/projects/ProjectExplorer'
 import { getGlobalProjectsPage, imgUrl, lines } from '@/lib/sanity'
+import { pageMetadata } from '@/lib/seo'
 import '@/components/projects/global-projects.css'
 
 export async function generateMetadata(): Promise<Metadata> {
   const data = await getGlobalProjectsPage()
-  return { title: 'グローバルプロジェクト', description: data?.description }
+  return pageMetadata({ title: 'グローバルプロジェクト', description: data?.description, path: '/global-projects' })
 }
 
 /** Breaks between the lines the editor wrote, and nowhere else. */

@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { getSeriesPage } from '@/lib/sanity'
+import { pageMetadata, sanityShareImage } from '@/lib/seo'
 import SeriesPage from '@/components/product/SeriesPage'
 
 /**
@@ -12,11 +13,14 @@ import SeriesPage from '@/components/product/SeriesPage'
 type Params = Promise<{ series: string }>
 
 export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
-  const series = await getSeriesPage((await params).series)
-  return {
+  const seriesId = (await params).series
+  const series = await getSeriesPage(seriesId)
+  return pageMetadata({
     title: series?.name ?? undefined,
     description: series?.description ?? series?.tagline ?? undefined,
-  }
+    path: `/products/${seriesId}`,
+    images: sanityShareImage(series?.productDefaults?.heroImage, series?.name ?? 'JOMOO'),
+  })
 }
 
 export default async function ProductSeriesPage({ params }: { params: Params }) {

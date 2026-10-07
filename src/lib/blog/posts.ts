@@ -27,6 +27,7 @@ function withCover<T extends BlogPostSummary>(raw: Raw<T>): T {
   return {
     ...raw,
     cover: raw.cover ? imgUrl(raw.cover, COVER_WIDTH) : '',
+    coverSource: raw.cover,
     coverWidth: raw.coverWidth ?? 16,
     coverHeight: raw.coverHeight ?? 9,
   } as T

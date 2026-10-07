@@ -3,11 +3,12 @@ import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import RepairTerms from '@/components/warranty/RepairTerms'
 import { getAfterSalesPage, lines } from '@/lib/sanity'
+import { pageMetadata } from '@/lib/seo'
 import '@/components/warranty/after-sales.css'
 
 export async function generateMetadata(): Promise<Metadata> {
   const data = await getAfterSalesPage()
-  return { title: data?.title || 'アフターサービス', description: data?.description }
+  return pageMetadata({ title: data?.title || 'アフターサービス', description: data?.description, path: '/after-sales' })
 }
 
 export default async function AfterSalesPage() {
