@@ -787,7 +787,13 @@ export async function getSiteNavigation(): Promise<SiteNav> {
     contactLabel: pick('contactLabel'),
     globalSite: pick('globalSite'),
     footerColumns: pick('footerColumns').map((column) => {
-      const links = shown(column.links)
+      let links = shown(column.links)
+      // A link named like its column is the heading itself, not a repeat of it.
+      const same = !column.headingHref && links.find((l) => l.label.trim() === column.heading.trim())
+      if (same) {
+        column = { ...column, headingHref: same.href }
+        links = links.filter((l) => l !== same)
+      }
       return { ...column, links: links.some((l) => isProducts(l.href)) ? withSeries(links) : links }
     }),
     social: pick('social'),
