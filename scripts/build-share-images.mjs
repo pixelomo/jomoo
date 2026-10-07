@@ -9,8 +9,8 @@
  *                            LINE on some layouts, iMessage's small card)
  * Product and blog pages share their own Sanity image instead (lib/seo.ts).
  *
- * Icons — the white JOMOO wordmark on the brand blue (--accent, #0046E5):
- *   src/app/favicon.ico, icon.svg   browser tabs (16, 32, 48 and vector)
+ * Icons — jomoo.com's own favicon, the white J on black (see below):
+ *   src/app/favicon.ico             browser tabs (16, 24, 32, 48, 256)
  *   src/app/apple-icon.png          iOS home screen, 180x180, full bleed (iOS
  *                                   rounds the corners itself)
  *   public/icons/icon-192/512.png   Android home screen, via manifest.ts
@@ -26,15 +26,12 @@ import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
-const BLUE = '#0046E5'
 
 const HERO =
   'https://cdn.sanity.io/images/9f4e5pxd/production/cf68a6f14d13a44ce4210069c323cada671106fb-2752x1536.jpg'
 
-// The wordmark, white and charcoal. Its viewBox is 174.23 x 36.16.
-const whiteLogo = await readFile(path.join(root, 'public/logo.svg'), 'utf8')
+// The wordmark, for the share cards. Its viewBox is 174.23 x 36.16.
 const darkLogo = await readFile(path.join(root, 'public/logo-black.svg'), 'utf8')
-const LOGO_RATIO = 36.16 / 174.23
 
 const logoPng = (svg, width) =>
   sharp(Buffer.from(svg), { density: 1200 }).resize({ width }).png().toBuffer()
@@ -63,21 +60,29 @@ await card('jomoo-x40-1200x630.jpg', 1200, 630, { left: 0, top: 48, width: 2752,
 await card('jomoo-x40-1200x1200.jpg', 1200, 1200, { left: 663, top: 0, width: 1536, height: 1536 })
 
 // ── Icons ───────────────────────────────────────────────────
-/** The wordmark centred on blue, `scale` of the width across. */
-async function icon(size, scale, radius = 0) {
-  const logoWidth = Math.round(size * scale)
-  const logoHeight = Math.round(logoWidth * LOGO_RATIO)
-  const shape = radius
-    ? `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}"><rect width="${size}" height="${size}" rx="${radius}" fill="${BLUE}"/></svg>`
-    : `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}"><rect width="${size}" height="${size}" fill="${BLUE}"/></svg>`
-  return sharp(Buffer.from(shape))
-    .composite([
-      {
-        input: await logoPng(whiteLogo, logoWidth),
-        top: Math.round((size - logoHeight) / 2),
-        left: Math.round((size - logoWidth) / 2),
-      },
-    ])
+// The source is scripts/favicon-jomoo-com.ico, jomoo.com's own favicon: a white
+// J on #111111, nine sizes. Its 16–48 frames and its 256 PNG go into the tab
+// icon as they are (the 64–128 bitmaps are 140kB a tab never asks for); the
+// 256 frame is the master for the home-screen sizes.
+const ICO_SOURCE = path.join(root, 'scripts/favicon-jomoo-com.ico')
+const BLACK = '#111111'
+
+const ico = await readFile(ICO_SOURCE)
+const frames = Array.from({ length: ico.readUInt16LE(4) }, (_, i) => {
+  const o = 6 + 16 * i
+  const size = ico.readUInt32LE(o + 8)
+  const offset = ico.readUInt32LE(o + 12)
+  return { width: ico[o] || 256, entry: ico.subarray(o, o + 16), data: ico.subarray(offset, offset + size) }
+})
+const master = frames.find((f) => f.width === 256)
+if (!master) throw new Error('favicon-jomoo-com.ico has no 256px frame')
+
+/** The J on a full-bleed square, `scale` of the size across — the platforms round the corners. */
+async function icon(size, scale) {
+  const inner = Math.round(size * scale)
+  const j = sharp(master.data).resize(inner, inner)
+  return sharp({ create: { width: size, height: size, channels: 4, background: BLACK } })
+    .composite([{ input: await j.png().toBuffer(), gravity: 'center' }])
     .png()
     .toBuffer()
 }
@@ -85,46 +90,26 @@ async function icon(size, scale, radius = 0) {
 await mkdir(path.join(root, 'public/icons'), { recursive: true })
 const write = async (rel, buf) => {
   await writeFile(path.join(root, rel), buf)
-  console.log(`${rel.padEnd(26)} ${(buf.length / 1024).toFixed(1)}kB`)
+  console.log(`${rel.padEnd(30)} ${(buf.length / 1024).toFixed(1)}kB`)
 }
 
-await write('src/app/apple-icon.png', await icon(180, 0.78))
-await write('public/icons/icon-192.png', await icon(192, 0.78))
-await write('public/icons/icon-512.png', await icon(512, 0.78))
-await write('public/icons/maskable-512.png', await icon(512, 0.66))
+// The source's transparent corners fall on the same black, so they vanish.
+await write('src/app/apple-icon.png', await icon(180, 0.92))
+await write('public/icons/icon-192.png', await icon(192, 0.92))
+await write('public/icons/icon-512.png', await icon(512, 0.92))
+// Android may crop to a circle; the J stays inside the central safe zone.
+await write('public/icons/maskable-512.png', await icon(512, 0.75))
 
-// Tab icons: rounded corners, and the mark as wide as it can go — at 16px
-// every pixel of letter height counts.
-const tabSizes = [16, 32, 48]
-const tabPngs = await Promise.all(tabSizes.map((s) => icon(s, 0.9, Math.round(s * 0.18))))
-
-// An .ico holding PNGs: a 6-byte header, a 16-byte entry per image, then the images.
+const kept = frames.filter((f) => [16, 24, 32, 48, 256].includes(f.width))
 const header = Buffer.alloc(6)
 header.writeUInt16LE(0, 0)
 header.writeUInt16LE(1, 2)
-header.writeUInt16LE(tabPngs.length, 4)
-let offset = 6 + 16 * tabPngs.length
-const entries = tabPngs.map((png, i) => {
-  const e = Buffer.alloc(16)
-  e.writeUInt8(tabSizes[i], 0)
-  e.writeUInt8(tabSizes[i], 1)
-  e.writeUInt16LE(1, 4) // colour planes
-  e.writeUInt16LE(32, 6) // bits per pixel
-  e.writeUInt32LE(png.length, 8)
+header.writeUInt16LE(kept.length, 4)
+let offset = 6 + 16 * kept.length
+const entries = kept.map((f) => {
+  const e = Buffer.from(f.entry)
   e.writeUInt32LE(offset, 12)
-  offset += png.length
+  offset += f.data.length
   return e
 })
-await write('src/app/favicon.ico', Buffer.concat([header, ...entries, ...tabPngs]))
-
-// The vector tab icon, for browsers that take one: the same wordmark paths.
-// Illustrator writes every shape twice, so the duplicates are dropped.
-const paths = [...new Set(whiteLogo.match(/<(?:path|polygon)\b[^>]*\/>/g) ?? [])].join('')
-if (!paths) throw new Error('logo.svg changed shape; update the icon.svg extraction')
-const w = 174.23 * 0.9
-const iconSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 174.23 174.23">
-  <rect width="174.23" height="174.23" rx="31" fill="${BLUE}"/>
-  <g fill="#fff" transform="translate(${(174.23 - w) / 2} ${(174.23 - 36.16 * 0.9) / 2}) scale(0.9)">${paths.replace(/class="cls-1"/g, '')}</g>
-</svg>
-`
-await write('src/app/icon.svg', Buffer.from(iconSvg))
+await write('src/app/favicon.ico', Buffer.concat([header, ...entries, ...kept.map((f) => f.data)]))
