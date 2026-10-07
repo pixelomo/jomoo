@@ -161,6 +161,10 @@
 .cr-band {
   padding-block: var(--cr-band-pad);
   background: #fff;
+  /* The photograph slides in from 40px past the screen's edge (CareersBand);
+     clipped here, that start position no longer widens the page and lets a
+     phone scroll it sideways. clip, not hidden, so no scroll box is made. */
+  overflow-x: clip;
 }
 
 /* The wash under the first and third bands. It is the client's own gradient

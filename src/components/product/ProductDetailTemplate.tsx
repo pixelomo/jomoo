@@ -66,6 +66,7 @@ export default async function ProductDetailTemplate({ product }: Props) {
     getSeriesPage(product.series),
     getProductsInSeries(product.series),
   ])
+  const videos = (product.featureVideos ?? []).filter((v) => v.embedUrl)
 
   const seriesHref = `/products/${product.series}`
   const seriesLabel = series?.name ?? product.series
@@ -172,32 +173,21 @@ export default async function ProductDetailTemplate({ product }: Props) {
         </section>
       )}
 
-      {/* FEATURE VIDEOS */}
-      {product.featureVideos && product.featureVideos.length > 0 && (
+      {/* FEATURE VIDEOS — an entry saved without its link is left out rather
+          than shown as an empty frame. */}
+      {videos.length > 0 && (
         <section className="pdp-section pdp-videos">
           <div className="site-container">
             <div className="pdp-eyebrow">MOVIE</div>
             <h2 className="pdp-title">特長動画</h2>
             <div className="pdp-rule" aria-hidden="true" />
             <div
-              className={`pdp-videos__grid${
-                product.featureVideos.length === 1 ? ' pdp-videos__grid--single' : ''
-              }`}
+              className={`pdp-videos__grid${videos.length === 1 ? ' pdp-videos__grid--single' : ''}`}
             >
-              {product.featureVideos.map((v, i) => (
+              {videos.map((v, i) => (
                 <div key={i} className="pdp-card">
                   <div className="pdp-video__frame">
-                    {v.embedUrl ? (
-                      <ConsentedVideo src={v.embedUrl} title={v.title} />
-                    ) : (
-                      <div className="pdp-video__empty">
-                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" aria-hidden="true">
-                          <circle cx="12" cy="12" r="10" />
-                          <path d="M10 8l6 4-6 4V8z" fill="currentColor" />
-                        </svg>
-                        <span>[ feature video · coming soon ]</span>
-                      </div>
-                    )}
+                    <ConsentedVideo src={v.embedUrl!} title={v.title} />
                   </div>
                   <p className="pdp-video__caption">{v.title}</p>
                 </div>

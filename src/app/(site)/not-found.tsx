@@ -1,42 +1,32 @@
 import { getTranslations } from 'next-intl/server'
-import Link from 'next/link'
+import '@/components/home/jomoo-homepage.css'
 
+/**
+ * Drawn inside the site layout, so a visitor who mistypes a URL still has the
+ * menu and footer to find their way. It wears the section heading and the pill
+ * every other page uses, rather than a look of its own.
+ */
 export default async function NotFound() {
   const t = await getTranslations('notFound')
 
   return (
     <main>
-      <div className="jm-sec-inner" style={{ paddingTop: 120, paddingBottom: 120, minHeight: '60vh', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-        <div style={{ maxWidth: 560 }}>
-          <span style={{ fontFamily: 'var(--font-poppins), sans-serif', fontSize: 11, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--ink-4)', display: 'block', marginBottom: 24 }}>
-            [ ERROR · {t('code')} ]
-          </span>
-          <h1 style={{ fontSize: 'clamp(40px, 6vw, 72px)', fontWeight: 700, lineHeight: 1.05, letterSpacing: '-0.02em', color: 'var(--ink)', margin: '0 0 24px' }}>
-            {t('heading')}
-          </h1>
-          <div style={{ width: 48, height: 3, background: 'var(--accent)', marginBottom: 32 }} />
-          <p style={{ fontSize: 16, lineHeight: 1.8, color: 'var(--ink-2)', margin: '0 0 48px', maxWidth: 400 }}>
-            {t('body')}
-          </p>
-          <Link
-            href="/"
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 8,
-              background: 'var(--accent)',
-              color: '#fff',
-              fontSize: 13,
-              fontWeight: 700,
-              padding: '14px 24px',
-              textDecoration: 'none',
-              letterSpacing: '0.04em',
-            }}
-          >
-            {t('cta')} →
-          </Link>
+      <section className="feature" data-nav="light" style={{ minHeight: '60vh', display: 'flex', alignItems: 'center' }}>
+        <div className="feature__inner" style={{ width: '100%' }}>
+          <div className="feature__head" style={{ marginBottom: 0 }}>
+            <div className="feature__eyebrow">{t('code')} · PAGE NOT FOUND</div>
+            <h1 className="feature__title">{t('heading')}</h1>
+            <div className="feature__rule" aria-hidden="true" />
+            <p className="feature__subtitle">{t('body')}</p>
+            <a className="global-projects__cta" href="/">
+              {t('cta')}
+              <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <path d="M4 12h15M13 6l6 6-6 6" />
+              </svg>
+            </a>
+          </div>
         </div>
-      </div>
+      </section>
     </main>
   )
 }

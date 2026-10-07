@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
-import { getSeriesPage } from '@/lib/sanity'
+import { getProductSlugs, getSeriesPage } from '@/lib/sanity'
 import { pageMetadata, sanityShareImage } from '@/lib/seo'
 import SeriesPage from '@/components/product/SeriesPage'
 
@@ -14,13 +14,17 @@ type Params = Promise<{ series: string }>
 
 export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
   const seriesId = (await params).series
-  const series = await getSeriesPage(seriesId)
-  return pageMetadata({
-    title: series?.name ?? undefined,
-    description: series?.description ?? series?.tagline ?? undefined,
-    path: `/products/${seriesId}`,
-    images: sanityShareImage(series?.productDefaults?.heroImage, series?.name ?? 'JOMOO'),
-  })
+  const [series, slugs] = await Promise.all([getSeriesPage(seriesId), getProductSlugs(seriesId)])
+  return {
+    ...pageMetadata({
+      title: series?.name ?? undefined,
+      description: series?.description ?? series?.tagline ?? undefined,
+      path: `/products/${seriesId}`,
+      images: sanityShareImage(series?.productDefaults?.heroImage, series?.name ?? 'JOMOO'),
+    }),
+    // Kept out of search results until its first product is published.
+    ...(slugs.length === 0 && { robots: { index: false, follow: true } }),
+  }
 }
 
 export default async function ProductSeriesPage({ params }: { params: Params }) {

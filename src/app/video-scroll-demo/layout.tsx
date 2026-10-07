@@ -1,4 +1,5 @@
 import { Poppins } from 'next/font/google'
+import { notFound } from 'next/navigation'
 import '../globals.css'
 
 const poppins = Poppins({
@@ -16,6 +17,10 @@ export const metadata = {
 // Standalone demo page: it carries its own nav and full-bleed canvas, so it sits
 // outside the (site) tree and supplies its own document shell.
 export default function VideoScrollDemoLayout({ children }: { children: React.ReactNode }) {
+  // A design study with placeholder links, not a page for visitors: it stays
+  // reachable locally and on preview deploys, and 404s on the live site.
+  if (process.env.VERCEL_ENV === 'production') notFound()
+
   return (
     <html lang="ja" className={`${poppins.variable} h-full antialiased`}>
       <body className={`${poppins.className} min-h-full bg-white text-zinc-900`}>

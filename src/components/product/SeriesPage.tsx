@@ -106,17 +106,13 @@ export default async function SeriesPage({ series }: Props) {
               ))}
             </div>
           ) : (
-            <p
-              style={{
-                padding: '4rem 0',
-                textAlign: 'center',
-                fontFamily: 'var(--font-en)',
-                fontSize: '1rem',
-                textTransform: 'uppercase',
-                color: '#6e6e73',
-              }}
-            >
-              [ no products published in Sanity for this series ]
+            <p style={{ padding: '2rem 0 4rem', textAlign: 'center' }}>
+              <a className="global-projects__cta" href="/contact-us">
+                製品についてお問い合わせ
+                <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                  <path d="M4 12h15M13 6l6 6-6 6" />
+                </svg>
+              </a>
             </p>
           )}
         </div>

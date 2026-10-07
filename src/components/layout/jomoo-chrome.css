@@ -930,7 +930,8 @@
     gap: 0.5rem;
   }
 
-  .footer__legal a {
+  .footer__legal a,
+  .footer__legal-btn {
     padding: 0;
   }
 }

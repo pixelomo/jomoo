@@ -115,7 +115,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         return legalSlugs.has(slug)
       })
       .map((route) => ({ path: route, ...(RANK[route] ?? DEFAULT_RANK) })),
-    ...seriesIds.map((series) => ({ path: `/products/${series}`, ...SERIES_RANK })),
+    // A lineup with nothing published in it is a teaser, not a page worth
+    // ranking; it joins the sitemap with its first product.
+    ...bySeries
+      .filter(({ slugs }) => slugs.length > 0)
+      .map(({ series }) => ({ path: `/products/${series}`, ...SERIES_RANK })),
     ...EXTRA,
   ]
 
