@@ -603,6 +603,10 @@ export interface AfterSalesPageData {
    *  of links above the terms. */
   termGroups?: Array<{ _key: string; title?: string; clauses?: TermClause[] }>
   termsClosing?: string
+  /** The 保証のご案内 sections /after-sales shows; each title is also its
+   *  button in the row above them. Body is Portable Text with links and
+   *  linkButton blocks. */
+  guideSections?: Array<{ _key: string; title?: string; body?: unknown[] }>
 }
 
 export const getAfterSalesPage = cache(() =>
@@ -610,7 +614,8 @@ export const getAfterSalesPage = cache(() =>
     'afterSalesPage',
     `description, title, lead, termsTitle,
      termGroups[] { _key, title, clauses[] { _key, text, spaced, subClauses[] { _key, marker, text } } },
-     termsClosing`
+     termsClosing,
+     guideSections[] { _key, title, body }`
   )
 )
 

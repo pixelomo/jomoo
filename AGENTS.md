@@ -64,8 +64,10 @@ The top page and ブログ, 会社情報, デザイナー, グローバルプロ
 document per post, and one singleton per page (`homePage`, `companyPage`, `designerPage`,
 `globalProjectsPage`, `showroomPage`, `careersPage`, `faqPage`,
 `afterSalesPage` — the type name is the document id, and the Studio lists them
-under ページ). The 無料修理規定 on the warranty certificate is read from
-`afterSalesPage` too, so the two cannot disagree. Each `termGroups` entry is one titled
+under ページ). `/after-sales` (製品の保証) shows `afterSalesPage.guideSections` —
+Portable Text with links and `linkButton` blocks. The 無料修理規定 on the
+warranty certificate is kept on `afterSalesPage` too, but no longer shown on
+`/after-sales`. Each `termGroups` entry is one titled
 section of that policy, and its title is also the jump button above the terms
 (`scripts/split-warranty-terms.mjs` made the four that exist).
 

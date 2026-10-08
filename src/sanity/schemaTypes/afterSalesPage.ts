@@ -2,9 +2,9 @@ import { defineArrayMember, defineField, defineType } from 'sanity'
 import { LINES, metaDescription, seoGroup } from './shared'
 
 /**
- * アフターサービス — and the 無料修理規定 on it, which the warranty certificate
- * prints too. One copy of the terms, edited here, so the page and the
- * certificate can never disagree.
+ * 製品の保証 (/after-sales) — its 保証のご案内 sections, and the 無料修理規定
+ * that the warranty certificate prints. The terms are kept here so there is one
+ * copy of them; the page itself shows the guide sections.
  */
 export const afterSalesPage = defineType({
   name: 'afterSalesPage',
@@ -12,6 +12,7 @@ export const afterSalesPage = defineType({
   type: 'document',
   groups: [
     { name: 'intro', title: '導入 / Intro', default: true },
+    { name: 'guide', title: '保証のご案内 / Warranty Guide' },
     { name: 'terms', title: '無料修理規定 / Repair Terms' },
     seoGroup,
   ],
@@ -21,11 +22,90 @@ export const afterSalesPage = defineType({
     defineField({ name: 'lead', title: '導入文 / Lead', type: 'text', rows: 3, group: 'intro', description: LINES }),
 
     defineField({
+      name: 'guideSections',
+      title: 'セクション / Sections',
+      type: 'array',
+      group: 'guide',
+      description:
+        '製品の保証ページに表示する章。各章の見出しはページ上部にボタンとして並び、押すとその章へ移動します。',
+      of: [
+        defineArrayMember({
+          type: 'object',
+          name: 'guideSection',
+          fields: [
+            defineField({
+              name: 'title',
+              title: '章の見出し / Section Title',
+              type: 'string',
+              description: '上部のボタンにも同じ文言が表示されます。',
+              validation: (Rule) => Rule.required(),
+            }),
+            defineField({
+              name: 'body',
+              title: '本文 / Body',
+              type: 'array',
+              description:
+                '文字を選んでリンクを付けられます（例: /sign-in、tel:0120580999）。「ボタン」を挿入すると、その位置にボタンが表示されます。',
+              of: [
+                defineArrayMember({
+                  type: 'block',
+                  styles: [{ title: '本文 / Body', value: 'normal' }],
+                  lists: [],
+                  marks: {
+                    decorators: [{ title: '強調 / Strong', value: 'strong' }],
+                    annotations: [
+                      {
+                        name: 'link',
+                        title: 'リンク / Link',
+                        type: 'object',
+                        fields: [
+                          defineField({
+                            name: 'href',
+                            title: 'URL',
+                            type: 'url',
+                            description: 'サイト内は /sign-up のように / から。電話番号は tel:0120580999。',
+                            validation: (Rule) =>
+                              Rule.required().uri({ allowRelative: true, scheme: ['http', 'https', 'mailto', 'tel'] }),
+                          }),
+                        ],
+                      },
+                    ],
+                  },
+                }),
+                defineArrayMember({
+                  type: 'object',
+                  name: 'linkButton',
+                  title: 'ボタン / Button',
+                  fields: [
+                    defineField({ name: 'label', title: 'ボタンの文字 / Label', type: 'string', validation: (Rule) => Rule.required() }),
+                    defineField({
+                      name: 'href',
+                      title: 'URL',
+                      type: 'url',
+                      description: 'サイト内は /sign-up のように / から。',
+                      validation: (Rule) =>
+                        Rule.required().uri({ allowRelative: true, scheme: ['http', 'https', 'mailto', 'tel'] }),
+                    }),
+                  ],
+                  preview: {
+                    select: { label: 'label', href: 'href' },
+                    prepare: ({ label, href }) => ({ title: `［ボタン］${label ?? ''}`, subtitle: href }),
+                  },
+                }),
+              ],
+            }),
+          ],
+          preview: { select: { title: 'title' } },
+        }),
+      ],
+    }),
+
+    defineField({
       name: 'termsTitle',
       title: '規定の見出し / Terms Title',
       type: 'string',
       group: 'terms',
-      description: 'アフターサービスページと保証書の両方に表示されます。',
+      description: '保証書に表示されます。',
     }),
     defineField({
       name: 'termGroups',

@@ -4,17 +4,16 @@ import './repair-terms.css'
 /**
  * 無料修理規定（保証規定）— the free-repair terms.
  *
- * Shared, and deliberately so: they close the warranty certificate and they are
- * the whole of /after-sales. Legal copy that exists twice drifts, and a clause
- * corrected in one place while the other keeps the old wording is worse than
- * either version on its own.
+ * They close the warranty certificate. /after-sales showed them too until it
+ * took the 保証のご案内 sections (WarrantyGuide) instead; the copy still lives on
+ * the afterSalesPage document, so there is one version of it to correct.
  *
  * Wording is the client's, edited under アフターサービス in the Studio.
  */
 
 /**
  * The terms come from the afterSalesPage document in Sanity, so this is an
- * async server component: both pages that print it fetch it themselves.
+ * async server component that fetches it itself.
  *
  * The policy is split into sections, each with its own heading and a button in
  * the row above that jumps to it. Each section is its own numbered list,

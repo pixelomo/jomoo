@@ -1,7 +1,7 @@
 import { Fragment } from 'react'
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
-import RepairTerms from '@/components/warranty/RepairTerms'
+import WarrantyGuide from '@/components/warranty/WarrantyGuide'
 import { getAfterSalesPage, lines } from '@/lib/sanity'
 import { pageMetadata } from '@/lib/seo'
 import '@/components/warranty/after-sales.css'
@@ -29,7 +29,7 @@ export default async function AfterSalesPage() {
         </p>
       </div>
 
-      <RepairTerms />
+      {data.guideSections?.length ? <WarrantyGuide sections={data.guideSections} /> : null}
     </main>
   )
 }

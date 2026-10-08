@@ -201,3 +201,69 @@
     font-size: 0.875rem;
   }
 }
+
+/* ============================================================
+   保証のご案内 — /after-sales (WarrantyGuide). Shares the nav and
+   section rules above; only the prose, links and button are its own.
+   ============================================================ */
+
+.warranty-guide__section {
+  padding-bottom: 2.5rem;
+}
+
+.warranty-guide__section:last-of-type {
+  padding-bottom: 0;
+}
+
+.warranty-guide__text {
+  margin: 0 0 1em;
+}
+
+.warranty-guide__text:last-child {
+  margin-bottom: 0;
+}
+
+.warranty-guide__link {
+  color: var(--color-primary, #1d4ed8);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+.warranty-guide__link:hover,
+.warranty-guide__link:focus-visible {
+  text-decoration-thickness: 2px;
+}
+
+.warranty-guide__action {
+  margin: 0.25rem 0 1.5em;
+}
+
+.warranty-guide__button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 12rem;
+  padding: 0.85rem 2rem;
+  border: 1px solid #0a0a0a;
+  border-radius: 999px;
+  background: #0a0a0a;
+  color: #ffffff;
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.5;
+  text-decoration: none;
+  transition: background-color 0.15s, color 0.15s;
+}
+
+.warranty-guide__button:hover,
+.warranty-guide__button:focus-visible {
+  background: #ffffff;
+  color: #0a0a0a;
+}
+
+@media (max-width: 480px) {
+  .warranty-guide__button {
+    width: 100%;
+  }
+}
