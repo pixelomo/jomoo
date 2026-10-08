@@ -372,6 +372,16 @@ export const product = defineType({
     }),
 
     defineField({
+      name: 'comingSoon',
+      title: '近日発売 / Coming Soon',
+      type: 'boolean',
+      group: 'settings',
+      description:
+        'オンにすると製品ページを非表示にし（サイトマップからも外れます）、トップページ・一覧の製品カードは「近日発売」と表示されリンクしません。オフに戻すとページが公開されます。',
+      initialValue: false,
+    }),
+
+    defineField({
       name: 'isActive',
       title: '製品登録のプルダウンに表示する',
       type: 'boolean',

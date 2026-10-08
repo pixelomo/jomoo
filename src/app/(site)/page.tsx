@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation'
 import JomooHomepage, { type HomeContent } from '@/components/home/JomooHomepage'
 import FooterCtaSection from '@/components/home/FooterCtaSection'
 import { X40_TURNTABLE, type SpotlightSlide } from '@/components/home/SpotlightCarousel'
-import { getHomePage, imgUrl, lines, type AssetRef } from '@/lib/sanity'
+import { COMING_SOON_LABEL, getHomePage, imgUrl, lines, type AssetRef } from '@/lib/sanity'
 import { SITE_NAME, SITE_URL, pageMetadata } from '@/lib/seo'
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -98,13 +98,13 @@ export default async function HomePage() {
         if (!image || !p.slug || !p.series) return []
         return [{
           key: p._id,
-          href: `/products/${p.series}/${p.slug}`,
+          href: p.comingSoon ? undefined : `/products/${p.series}/${p.slug}`,
           pill: p.heroEyebrow || 'SMART TOILET',
           name: p.heroTitle || p.name || '',
           image,
           hover: url(p.card?.hoverImage, 900),
-          tagline: lines(p.card?.tagline),
-          desc: p.card?.description ?? p.tagline ?? '',
+          tagline: p.comingSoon ? [] : lines(p.card?.tagline),
+          desc: p.comingSoon ? COMING_SOON_LABEL : p.card?.description ?? p.tagline ?? '',
         }]
       }),
     },

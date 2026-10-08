@@ -159,7 +159,7 @@ const PRODUCT_DETAIL_PROJECTION = `
 export async function getProductDetail(series: string, slug: string): Promise<ProductDetail | null> {
   try {
     const result = await getSanityClient().fetch(
-      `*[_type == "product" && series == $series && slug.current == $slug][0] {${PRODUCT_DETAIL_PROJECTION}}`,
+      `*[_type == "product" && series == $series && slug.current == $slug && comingSoon != true][0] {${PRODUCT_DETAIL_PROJECTION}}`,
       { series, slug }
     )
     return result ?? null
@@ -171,7 +171,7 @@ export async function getProductDetail(series: string, slug: string): Promise<Pr
 export async function getProductSlugs(series: string): Promise<string[]> {
   try {
     const results = await getSanityClient().fetch(
-      `*[_type == "product" && series == $series && defined(slug.current)] { "slug": slug.current }`,
+      `*[_type == "product" && series == $series && defined(slug.current) && comingSoon != true] { "slug": slug.current }`,
       { series }
     )
     return results.map((r: { slug: string }) => r.slug)
@@ -259,7 +259,12 @@ export interface ProductSummary {
   heroTitle?: string
   heroEyebrow?: string
   card?: ProductCard
+  /** 近日発売: the card shows COMING_SOON_LABEL and no link; the page 404s. */
+  comingSoon?: boolean
 }
+
+/** What a 近日発売 product's card says in place of its tagline and description. */
+export const COMING_SOON_LABEL = '近日発売'
 
 export async function getProductsInSeries(series: string): Promise<ProductSummary[]> {
   try {
@@ -273,7 +278,8 @@ export async function getProductsInSeries(series: string): Promise<ProductSummar
         "thumbnail": images[0].asset,
         "heroTitle": hero.title,
         "heroEyebrow": hero.eyebrow,
-        card { image, hoverImage, tagline, description }
+        card { image, hoverImage, tagline, description },
+        "comingSoon": comingSoon == true
       }`,
       { series }
     )
@@ -658,6 +664,7 @@ export interface HomePageData {
     heroEyebrow?: string
     thumbnail?: AssetRef
     card?: ProductCard
+    comingSoon?: boolean
   }>
   projectsEyebrow?: string
   projectsTitle?: string
@@ -686,7 +693,8 @@ export const getHomePage = cache(() =>
       _id, "slug": slug.current, series, name, tagline,
       "heroTitle": hero.title, "heroEyebrow": hero.eyebrow,
       "thumbnail": images[0].asset,
-      card { image, hoverImage, tagline, description }
+      card { image, hoverImage, tagline, description },
+      "comingSoon": comingSoon == true
     },
     "awardLogos": *[_id == "designerPage"][0].awards[] { _key, name, logo }
   `

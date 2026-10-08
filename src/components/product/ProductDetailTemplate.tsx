@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { PortableText } from '@portabletext/react'
 import ConsentedVideo from '@/components/consent/ConsentedVideo'
 import {
+  COMING_SOON_LABEL,
   getProductsInSeries,
   getSeriesPage,
   imgUrl,
@@ -95,10 +96,10 @@ export default async function ProductDetailTemplate({ product }: Props) {
     if (!image) return []
     return [{
       slug: p.slug,
-      href: `${seriesHref}/${p.slug}`,
+      href: p.comingSoon ? undefined : `${seriesHref}/${p.slug}`,
       eyebrow: p.heroEyebrow || hero.eyebrow,
       name: p.heroTitle || p.name,
-      desc: p.card?.description ?? p.tagline ?? '',
+      desc: p.comingSoon ? COMING_SOON_LABEL : p.card?.description ?? p.tagline ?? '',
       art: { image, hover: url(p.card?.hoverImage?.asset) },
     }]
   })
@@ -212,12 +213,14 @@ export default async function ProductDetailTemplate({ product }: Props) {
                 related.length === 1 ? ' pdp-related__grid--single' : ''
               }`}
             >
-              {related.map(item => (
-                <a
+              {related.map(item => {
+                const Card = item.href ? 'a' : 'div'
+                return (
+                <Card
                   key={item.slug}
                   href={item.href}
                   className="feature__card"
-                  aria-label={`${item.name} の詳細を見る`}
+                  aria-label={item.href ? `${item.name} の詳細を見る` : undefined}
                 >
                   <div className="feature__media">
                     <img
@@ -238,10 +241,11 @@ export default async function ProductDetailTemplate({ product }: Props) {
                     <span className="feature__pill">{item.eyebrow}</span>
                     <h3 className="feature__name">{item.name}</h3>
                     {item.desc && <p className="feature__desc">{item.desc}</p>}
-                    <span className="feature__more">詳しく見る&gt;</span>
+                    {item.href && <span className="feature__more">詳しく見る&gt;</span>}
                   </div>
-                </a>
-              ))}
+                </Card>
+                )
+              })}
             </div>
           </div>
         </section>

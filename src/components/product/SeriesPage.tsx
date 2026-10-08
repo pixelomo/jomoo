@@ -1,5 +1,5 @@
 /* eslint-disable @next/next/no-img-element */
-import { getSeriesPage, getProductsInSeries, imgUrl, type AssetRef } from '@/lib/sanity'
+import { COMING_SOON_LABEL, getSeriesPage, getProductsInSeries, imgUrl, type AssetRef } from '@/lib/sanity'
 import FooterCtaSection from '@/components/home/FooterCtaSection'
 // Reuses the homepage feature grid and footer CTA, so this route needs that
 // stylesheet.
@@ -33,11 +33,12 @@ export default async function SeriesPage({ series }: Props) {
     if (!image) return []
     return [{
       slug: p.slug,
-      href: `/products/${series}/${p.slug}`,
+      // A 近日発売 product has no page yet, so its card is not a link.
+      href: p.comingSoon ? undefined : `/products/${series}/${p.slug}`,
       eyebrow: p.heroEyebrow || fallbackEyebrow,
       name: p.heroTitle || p.name,
-      tagline: (p.card?.tagline ?? '').split('\n').filter(Boolean),
-      desc: p.card?.description ?? p.tagline ?? '',
+      tagline: p.comingSoon ? [] : (p.card?.tagline ?? '').split('\n').filter(Boolean),
+      desc: p.comingSoon ? COMING_SOON_LABEL : p.card?.description ?? p.tagline ?? '',
       art: { image, hover: url(p.card?.hoverImage?.asset) },
     }]
   })
@@ -64,12 +65,14 @@ export default async function SeriesPage({ series }: Props) {
 
           {cards.length > 0 ? (
             <div className="feature__grid">
-              {cards.map(card => (
-                <a
+              {cards.map(card => {
+                const Card = card.href ? 'a' : 'div'
+                return (
+                <Card
                   key={card.slug}
                   href={card.href}
                   className="feature__card"
-                  aria-label={`${card.name} の詳細を見る`}
+                  aria-label={card.href ? `${card.name} の詳細を見る` : undefined}
                 >
                   <div className="feature__media">
                     <img
@@ -100,10 +103,11 @@ export default async function SeriesPage({ series }: Props) {
                       </p>
                     )}
                     {card.desc && <p className="feature__desc">{card.desc}</p>}
-                    <span className="feature__more">詳しく見る&gt;</span>
+                    {card.href && <span className="feature__more">詳しく見る&gt;</span>}
                   </div>
-                </a>
-              ))}
+                </Card>
+                )
+              })}
             </div>
           ) : (
             <p style={{ padding: '2rem 0 4rem', textAlign: 'center' }}>

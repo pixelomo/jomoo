@@ -11,7 +11,8 @@ import './jomoo-homepage.css'
 /** One product card in the lineup — the same card the series page draws. */
 export interface LineupCard {
   key: string
-  href: string
+  /** Absent for a 近日発売 product: the card is not a link. */
+  href?: string
   pill: string
   name: string
   image: string
@@ -628,12 +629,14 @@ export default function JomooHomepage({
           {/* The cards are the products' own 一覧カード in Sanity — the same
               ones /products/smart-toilet draws. Change one, change both. */}
           <div className="feature__grid">
-            {lineup.cards.map((card) => (
-              <a
+            {lineup.cards.map((card) => {
+              const Card = card.href ? 'a' : 'div'
+              return (
+              <Card
                 key={card.key}
                 href={card.href}
                 className="feature__card"
-                aria-label={`${card.name} の詳細を見る`}
+                aria-label={card.href ? `${card.name} の詳細を見る` : undefined}
               >
                 <div className="feature__media">
                   <img
@@ -653,14 +656,17 @@ export default function JomooHomepage({
                 <div className="feature__content">
                   <span className="feature__pill">{card.pill}</span>
                   <h3 className="feature__name">{card.name}</h3>
-                  <p className="feature__tagline">
-                    <Lines lines={card.tagline} />
-                  </p>
+                  {card.tagline.length > 0 && (
+                    <p className="feature__tagline">
+                      <Lines lines={card.tagline} />
+                    </p>
+                  )}
                   <p className="feature__desc">{card.desc}</p>
-                  <span className="feature__more">詳しく見る&gt;</span>
+                  {card.href && <span className="feature__more">詳しく見る&gt;</span>}
                 </div>
-              </a>
-            ))}
+              </Card>
+              )
+            })}
           </div>
         </div>
       </section>
