@@ -9,6 +9,8 @@ export interface FeatureCardView {
   title: string[]
   /** One entry per rendered line. */
   body: string[]
+  /** Smaller-type lines after the body; one entry per rendered line. */
+  note: string[]
   image?: string
   alt: string
 }
@@ -206,6 +208,16 @@ export default function ProductTabs({
                         </span>
                       ))}
                     </p>
+                    {feature.note.length > 0 && (
+                      <p className="pdp-fcard__note">
+                        {feature.note.map((line, j) => (
+                          <span key={line}>
+                            {j > 0 && <br />}
+                            {line}
+                          </span>
+                        ))}
+                      </p>
+                    )}
                   </div>
                 </article>
               ))}

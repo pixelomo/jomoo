@@ -350,6 +350,15 @@
   overflow-wrap: anywhere;
 }
 
+.pdp-fcard__note {
+  font-size: 1.1rem;
+  line-height: 1.8;
+  color: #6a6a6a;
+  margin: 1.25em 0 0;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+}
+
 /* 標準機能 — full-width rows, title + two item columns */
 .pdp-std {
   margin-top: 7rem;
@@ -670,6 +679,10 @@
   .pdp-fcard__body {
     font-size: 1.2rem;
   }
+
+  .pdp-fcard__note {
+    font-size: 0.95rem;
+  }
 }
 
 @media (max-width: 1299px) and (min-width: 1024px) {
@@ -778,6 +791,10 @@
   .pdp-fcard__body {
     font-size: 1.05rem;
     line-height: 1.9;
+  }
+
+  .pdp-fcard__note {
+    font-size: 0.85rem;
   }
 
   .pdp-std {

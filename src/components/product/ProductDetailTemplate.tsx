@@ -76,9 +76,13 @@ export default async function ProductDetailTemplate({ product }: Props) {
 
   const featureCards: FeatureCardView[] = (product.featureCards ?? []).map(card => {
     const title = lines(card.title)
+    // A blank line ends the body; whatever follows is a note in smaller type
+    // (e.g. the test-lab results under 抗菌釉薬).
+    const [body, ...note] = (card.body ?? '').split(/\n\s*\n/)
     return {
       title,
-      body: lines(card.body),
+      body: lines(body),
+      note: lines(note.join('\n')),
       image: url(card.image?.asset),
       alt: title.join('') || product.name,
     }

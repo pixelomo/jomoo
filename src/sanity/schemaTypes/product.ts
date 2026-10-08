@@ -124,7 +124,7 @@ export const product = defineType({
               title: '本文 / Body',
               type: 'text',
               rows: 4,
-              description: LINES_HINT,
+              description: `${LINES_HINT}空行の後の文章は小さい注記として表示されます（試験結果など）。`,
             }),
             defineField({
               name: 'image',

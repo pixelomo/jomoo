@@ -2292,7 +2292,6 @@ img {
   /* The column is a fixed fraction of the viewport, so a vw-based size holds
      the line count steady instead of humping between breakpoints. */
   .spotlight__body p {
-    display: inline;
     font-size: clamp(1rem, 1.15vw, 1.15rem);
     line-height: 1.85;
   }}

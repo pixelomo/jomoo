@@ -38,7 +38,7 @@
   "auth": {
     "signInTitle": "ログイン",
     "signUpTitle": "会員登録",
-    "signInDescription": "会員アカウントにログインしてください",
+    "signInDescription": "会員アカウントにログインしてください。",
     "signUpDescription": "新規会員アカウントを作成します",
     "email": "メールアドレス",
     "password": "パスワード",
