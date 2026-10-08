@@ -103,8 +103,8 @@ export default async function HomePage() {
           name: p.heroTitle || p.name || '',
           image,
           hover: url(p.card?.hoverImage, 900),
-          tagline: p.comingSoon ? [] : lines(p.card?.tagline),
-          desc: p.comingSoon ? COMING_SOON_LABEL : p.card?.description ?? p.tagline ?? '',
+          tagline: p.comingSoon ? [COMING_SOON_LABEL] : lines(p.card?.tagline),
+          desc: p.comingSoon ? '' : p.card?.description ?? p.tagline ?? '',
         }]
       }),
     },

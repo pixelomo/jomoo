@@ -661,7 +661,7 @@ export default function JomooHomepage({
                       <Lines lines={card.tagline} />
                     </p>
                   )}
-                  <p className="feature__desc">{card.desc}</p>
+                  {card.desc && <p className="feature__desc">{card.desc}</p>}
                   {card.href && <span className="feature__more">詳しく見る&gt;</span>}
                 </div>
               </Card>

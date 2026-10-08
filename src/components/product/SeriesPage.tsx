@@ -37,8 +37,9 @@ export default async function SeriesPage({ series }: Props) {
       href: p.comingSoon ? undefined : `/products/${series}/${p.slug}`,
       eyebrow: p.heroEyebrow || fallbackEyebrow,
       name: p.heroTitle || p.name,
-      tagline: p.comingSoon ? [] : (p.card?.tagline ?? '').split('\n').filter(Boolean),
-      desc: p.comingSoon ? COMING_SOON_LABEL : p.card?.description ?? p.tagline ?? '',
+      // 近日発売 takes the tagline's place, so it is set like the other cards' tagline.
+      tagline: p.comingSoon ? [COMING_SOON_LABEL] : (p.card?.tagline ?? '').split('\n').filter(Boolean),
+      desc: p.comingSoon ? '' : p.card?.description ?? p.tagline ?? '',
       art: { image, hover: url(p.card?.hoverImage?.asset) },
     }]
   })
