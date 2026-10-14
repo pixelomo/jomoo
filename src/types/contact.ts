@@ -103,3 +103,8 @@ export const ContactSchema = z
   )
 
 export type ContactData = z.infer<typeof ContactSchema>
+
+/** ショールーム予約 on the contact form, and the ショールーム page's button that
+ *  leads to it. Off for now at the client's request — the column and the
+ *  form code stay, so turning this back on is the whole change. */
+export const SHOWROOM_BOOKING_ENABLED = false

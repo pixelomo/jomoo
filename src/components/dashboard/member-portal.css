@@ -143,6 +143,14 @@
   color: var(--member-ink-soft);
 }
 
+/* A ※ condition under the body copy — set smaller so it reads as a note. */
+.member-card__note {
+  margin: 0.75rem 0 0;
+  font-size: clamp(0.95rem, 1.3vw, 1.15rem);
+  line-height: 1.7;
+  color: var(--member-ink-soft);
+}
+
 /* Artwork on the left, copy on the right; the button gets its own row below. */
 .member-card__row {
   display: flex;

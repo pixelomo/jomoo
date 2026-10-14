@@ -11,6 +11,7 @@ import { PHONE_ERROR, PHONE_PLACEHOLDER } from '@/types/phone'
 import {
   CONTACT_CATEGORIES,
   ContactSchema,
+  SHOWROOM_BOOKING_ENABLED,
   type ContactCategory,
   type ContactData,
 } from '@/types/contact'
@@ -44,7 +45,7 @@ export default function ContactForm() {
   // ?showroom=1 ticks the reservation box, so the ショールーム page's
   // ショールーム予約へ button lands on the form already asking for what it
   // promised rather than on a section the visitor has to find.
-  const presetShowroom = searchParams.get('showroom') === '1'
+  const presetShowroom = SHOWROOM_BOOKING_ENABLED && searchParams.get('showroom') === '1'
 
   const {
     register,
@@ -180,6 +181,7 @@ export default function ContactForm() {
               </SignUpField>
             </section>
 
+            {SHOWROOM_BOOKING_ENABLED && (
             <section className="signup__section" id="showroom-reservation">
               <h2 className="signup__legend">ショールーム予約</h2>
 
@@ -210,6 +212,7 @@ export default function ContactForm() {
                 </SignUpField>
               )}
             </section>
+            )}
           </div>
 
           {/* Sits directly above 次へ, where it is on screen when it appears. */}

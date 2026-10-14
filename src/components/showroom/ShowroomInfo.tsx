@@ -2,6 +2,7 @@
 
 import { useRef } from 'react'
 import ConsentedMap from '@/components/consent/ConsentedMap'
+import { SHOWROOM_BOOKING_ENABLED } from '@/types/contact'
 import { useScrollReveal } from '@/components/company/useScrollReveal'
 
 // z=16 is the framing the design draws — close enough to read the street the
@@ -87,9 +88,11 @@ export default function ShowroomInfo({ title, rows, mapQuery, ctaLabel }: Props)
           it on arrival so the visitor lands on the form already asking for what
           this button promised. No #hash — that dropped the visitor at the
           bottom of the form, past the fields they still have to fill in. */}
-      <a className="sh-info__cta" href="/contact-us?showroom=1">
-        {ctaLabel}
-      </a>
+      {SHOWROOM_BOOKING_ENABLED && (
+        <a className="sh-info__cta" href="/contact-us?showroom=1">
+          {ctaLabel}
+        </a>
+      )}
     </section>
   )
 }

@@ -193,7 +193,9 @@ export default function SignUpStep2({
                 {...register('gender')}
               >
                 <option value="">{t('selectPlaceholder')}</option>
-                {GENDER_OPTIONS.map((option) => (
+                {/* その他 is not offered at sign-up; it stays in GENDER_OPTIONS so
+                    an account that already holds it still displays. */}
+                {GENDER_OPTIONS.filter((option) => option !== 'other').map((option) => (
                   <option key={option} value={option}>
                     {t(`gender_${option}`)}
                   </option>
