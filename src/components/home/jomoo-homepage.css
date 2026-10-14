@@ -1389,8 +1389,9 @@ img {
   inset: 0;
   opacity: 0;
 }
-.feature__card:hover .feature__img--default,
-.feature__card:focus-within .feature__img--default {
+/* Only a card with a hover image swaps — one without keeps its picture. */
+.feature__card:hover .feature__img--default:has(+ .feature__img--hover),
+.feature__card:focus-within .feature__img--default:has(+ .feature__img--hover) {
   opacity: 0;
 }
 .feature__card:hover .feature__img--hover,
