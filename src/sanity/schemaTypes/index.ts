@@ -6,6 +6,7 @@ import { designerPage } from './designerPage'
 import { faqPage } from './faqPage'
 import { globalProjectsPage } from './globalProjectsPage'
 import { homePage } from './homePage'
+import { jobPosition } from './jobPosition'
 import { legalDocumentTypes } from './legalDocument'
 import { product } from './product'
 import { productSeries } from './productSeries'
@@ -40,6 +41,7 @@ export const schemaTypes = [
   globalProjectsPage,
   showroomPage,
   careersPage,
+  jobPosition,
   faqPage,
   afterSalesPage,
   ...legalDocumentTypes,

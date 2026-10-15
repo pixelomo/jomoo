@@ -92,6 +92,53 @@ export const afterSalesPage = defineType({
                     prepare: ({ label, href }) => ({ title: `［ボタン］${label ?? ''}`, subtitle: href }),
                   },
                 }),
+                defineArrayMember({
+                  type: 'object',
+                  name: 'seriesWarranty',
+                  title: '製品別保証期間 / Warranty by Series',
+                  fields: [
+                    defineField({
+                      name: 'rows',
+                      title: '製品シリーズ / Series',
+                      type: 'array',
+                      description: '1シリーズにつき1行。保証期間が空欄の行はページに表示されません。',
+                      of: [
+                        defineArrayMember({
+                          type: 'object',
+                          name: 'seriesWarrantyRow',
+                          fields: [
+                            defineField({
+                              name: 'series',
+                              title: 'シリーズ名 / Series',
+                              type: 'string',
+                              description: '例: スマートトイレ',
+                              validation: (Rule) => Rule.required(),
+                            }),
+                            defineField({ name: 'period', title: '保証期間 / Period', type: 'string', description: '例: 2年' }),
+                            defineField({
+                              name: 'note',
+                              title: '補足 / Note',
+                              type: 'text',
+                              rows: 3,
+                              description: '保証範囲や対象外の部品など、このシリーズだけの説明。',
+                            }),
+                          ],
+                          preview: {
+                            select: { series: 'series', period: 'period' },
+                            prepare: ({ series, period }) => ({ title: series, subtitle: period ? `保証期間：${period}` : '（未入力・非表示）' }),
+                          },
+                        }),
+                      ],
+                    }),
+                  ],
+                  preview: {
+                    select: { rows: 'rows' },
+                    prepare: ({ rows }) => ({
+                      title: '［製品別保証期間］',
+                      subtitle: (rows ?? []).map((r: { series?: string }) => r.series).join('・'),
+                    }),
+                  },
+                }),
               ],
             }),
           ],

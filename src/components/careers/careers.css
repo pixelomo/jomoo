@@ -317,3 +317,221 @@
     padding-inline: var(--cr-side);
   }
 }
+
+/* ---- 募集職種 ---------------------------------------------------------------
+   After jomoo.com/about/career's Find A Job: four dropdowns and a search
+   button on one line, then a table whose rows open to the description. */
+
+.cr-jobs {
+  padding: var(--cr-band-pad) var(--cr-side);
+  background: #fff;
+}
+
+.cr-jobs__inner {
+  max-width: 72rem;
+  margin: 0 auto;
+}
+
+.cr-jobs__title {
+  margin: 0;
+  font-size: clamp(1.5rem, 2.78vw, 2.5rem);
+  font-weight: 700;
+  line-height: 1.4;
+  text-align: center;
+}
+
+.cr-jobs__title::after {
+  content: '';
+  display: block;
+  width: var(--cr-rule-w);
+  height: 2px;
+  margin: 1.25rem auto 0;
+  background: var(--cr-blue);
+}
+
+.cr-jobs__lead {
+  margin: 1.5rem 0 0;
+  line-height: 1.9;
+  text-align: center;
+  white-space: pre-line;
+}
+
+.cr-jobs__filters {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr)) auto;
+  gap: 0.75rem;
+  margin-top: clamp(2rem, 3.5vw, 3rem);
+}
+
+.cr-jobs__field {
+  min-width: 0;
+}
+
+.cr-jobs__sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.cr-jobs__select {
+  width: 100%;
+  height: 3.25rem;
+  padding: 0 2.5rem 0 1rem;
+  border: 1px solid #d4d4d4;
+  border-radius: 6px;
+  background: #fff
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%232f2d2c' stroke-width='1.5'/%3E%3C/svg%3E")
+    no-repeat right 1rem center;
+  color: var(--cr-ink);
+  font: inherit;
+  font-size: 0.95rem;
+  appearance: none;
+  cursor: pointer;
+}
+
+.cr-jobs__select:focus-visible,
+.cr-jobs__search:focus-visible,
+.cr-jobs__row:focus-visible,
+.cr-jobs__more:focus-visible {
+  outline: 2px solid var(--cr-blue);
+  outline-offset: 2px;
+}
+
+.cr-jobs__search,
+.cr-jobs__apply,
+.cr-jobs__more {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 8rem;
+  height: 3.25rem;
+  padding: 0 2rem;
+  border: 1px solid var(--cr-ink);
+  border-radius: 999px;
+  background: var(--cr-ink);
+  color: #fff;
+  font: inherit;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 0.15s, color 0.15s;
+}
+
+.cr-jobs__search:hover,
+.cr-jobs__apply:hover,
+.cr-jobs__more:hover {
+  background: #fff;
+  color: var(--cr-ink);
+}
+
+.cr-jobs__table {
+  margin-top: 2rem;
+  border-top: 2px solid var(--cr-ink);
+}
+
+.cr-jobs__head,
+.cr-jobs__row {
+  display: grid;
+  grid-template-columns: 2fr repeat(4, minmax(0, 1fr));
+  gap: 1rem;
+  padding: 1.1rem 1rem;
+  text-align: left;
+}
+
+.cr-jobs__head {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #6b6b6b;
+  border-bottom: 1px solid #e5e5e5;
+}
+
+.cr-jobs__item {
+  border-bottom: 1px solid #e5e5e5;
+}
+
+.cr-jobs__row {
+  width: 100%;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.cr-jobs__row:hover,
+.cr-jobs__item.is-open .cr-jobs__row {
+  background: #f6f8fb;
+}
+
+.cr-jobs__position {
+  font-weight: 600;
+}
+
+.cr-jobs__panel {
+  padding: 0.5rem 1rem 1.75rem;
+  background: #f6f8fb;
+}
+
+.cr-jobs__description {
+  margin: 0 0 1.5rem;
+  line-height: 1.9;
+}
+
+.cr-jobs__empty {
+  margin: 0;
+  padding: 3rem 1rem;
+  text-align: center;
+  color: #6b6b6b;
+  border-bottom: 1px solid #e5e5e5;
+  white-space: pre-line;
+}
+
+.cr-jobs__more {
+  display: flex;
+  margin: 2rem auto 0;
+  background: #fff;
+  color: var(--cr-ink);
+}
+
+.cr-jobs__more:hover {
+  background: var(--cr-ink);
+  color: #fff;
+}
+
+@media (max-width: 900px) {
+  .cr-jobs__filters {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .cr-jobs__search {
+    grid-column: 1 / -1;
+  }
+
+  /* The table folds into cards: the column headings move beside each value. */
+  .cr-jobs__head {
+    display: none;
+  }
+
+  .cr-jobs__row {
+    grid-template-columns: 1fr;
+    gap: 0.35rem;
+  }
+
+  .cr-jobs__cell {
+    font-size: 0.9rem;
+  }
+
+  .cr-jobs__cell::before {
+    content: attr(data-label) '：';
+    color: #6b6b6b;
+  }
+}
+
+@media (max-width: 480px) {
+  .cr-jobs__filters {
+    grid-template-columns: 1fr;
+  }
+}

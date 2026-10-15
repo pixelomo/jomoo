@@ -267,3 +267,43 @@
     width: 100%;
   }
 }
+
+/* 製品別保証期間 — one row per series, the series on the left and its period
+   (and any note of its own) beside it; stacked on a phone. */
+.warranty-series {
+  margin: 0.5rem 0 1.5em;
+  border-top: 1px solid #e5e5e5;
+}
+
+.warranty-series__row {
+  display: grid;
+  grid-template-columns: minmax(8rem, 14rem) 1fr;
+  gap: 0.5rem 1.5rem;
+  padding: 1rem 0;
+  border-bottom: 1px solid #e5e5e5;
+}
+
+.warranty-series__name {
+  font-weight: 600;
+}
+
+.warranty-series__detail {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.warranty-series__period {
+  font-weight: 600;
+}
+
+.warranty-series__note {
+  white-space: pre-line;
+}
+
+@media (max-width: 640px) {
+  .warranty-series__row {
+    grid-template-columns: 1fr;
+  }
+}

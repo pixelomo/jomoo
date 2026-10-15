@@ -549,13 +549,33 @@ export interface CareersPageData {
   heroTitle?: string
   intro?: string
   bands?: Array<{ _key: string; title: string; body?: string; photo?: { asset?: AssetRef }; alt?: string }>
+  jobsTitle?: string
+  jobsLead?: string
+  jobsEmpty?: string
+  /** Every published jobPosition, in the Studio's 表示順 then newest first. */
+  jobs?: JobPosition[]
+}
+
+export interface JobPosition {
+  _id: string
+  title: string
+  experience?: string
+  field?: string
+  location?: string
+  employmentType?: string
+  description?: string
+  applyUrl?: string
 }
 
 export const getCareersPage = cache(() =>
   getSingleton<CareersPageData>(
     'careersPage',
     `description, heroImage, heroEyebrow, heroTitle, intro,
-     bands[] { _key, title, body, photo, alt }`
+     bands[] { _key, title, body, photo, alt },
+     jobsTitle, jobsLead, jobsEmpty,
+     "jobs": *[_type == "jobPosition" && defined(title)] | order(coalesce(order, 1e9) asc, _createdAt desc) {
+       _id, title, experience, field, location, employmentType, description, applyUrl
+     }`
   )
 )
 

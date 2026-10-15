@@ -1,6 +1,7 @@
 import CareersHero from './CareersHero'
 import CareersIntro from './CareersIntro'
 import CareersBand from './CareersBand'
+import CareersJobs from './CareersJobs'
 import { imgUrl, lines, type CareersPageData } from '@/lib/sanity'
 import './careers.css'
 
@@ -10,7 +11,8 @@ import './careers.css'
  * edge, starting on the right, and the wash under every other band.
  *
  * Content is the careersPage document in Sanity; the rhythm is positional, so
- * a theme added or reordered in the Studio keeps it.
+ * a theme added or reordered in the Studio keeps it. The open positions close
+ * the page, from the Studio's 求人 documents.
  */
 export default function CareersPage({ data }: { data: CareersPageData }) {
   return (
@@ -33,6 +35,13 @@ export default function CareersPage({ data }: { data: CareersPageData }) {
           alt={band.alt ?? ''}
         />
       ))}
+
+      <CareersJobs
+        title={data.jobsTitle || '募集職種'}
+        lead={data.jobsLead}
+        empty={data.jobsEmpty || '現在、募集中の職種はありません。'}
+        jobs={data.jobs ?? []}
+      />
     </main>
   )
 }

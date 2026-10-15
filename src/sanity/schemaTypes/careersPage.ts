@@ -13,6 +13,7 @@ export const careersPage = defineType({
   groups: [
     { name: 'hero', title: 'オープニング / Opening', default: true },
     { name: 'bands', title: 'テーマ / Themes' },
+    { name: 'jobs', title: '募集職種 / Open Positions' },
     seoGroup,
   ],
   fields: [
@@ -50,6 +51,23 @@ export const careersPage = defineType({
           preview: { select: { title: 'title', subtitle: 'body', media: 'photo' } },
         }),
       ],
+    }),
+    defineField({
+      name: 'jobsTitle',
+      title: '見出し / Title',
+      type: 'string',
+      group: 'jobs',
+      initialValue: '募集職種',
+      description: '求人そのものは「求人 / Job Openings」で追加・編集します。',
+    }),
+    defineField({ name: 'jobsLead', title: '導入文 / Lead', type: 'text', rows: 3, group: 'jobs' }),
+    defineField({
+      name: 'jobsEmpty',
+      title: '求人がないときの文 / No Openings Text',
+      type: 'text',
+      rows: 3,
+      group: 'jobs',
+      initialValue: '現在、募集中の職種はありません。',
     }),
   ],
   preview: { prepare: () => ({ title: '採用情報' }) },
