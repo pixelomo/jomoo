@@ -5,8 +5,8 @@
  * replaced by the block, their text kept as that row's note.
  *
  * Only スマートトイレ (2年) and シャワーセット (5年) are known; the other
- * series are added with the period blank, which keeps them off the page until
- * staff fill them in under アフターサービス in the Studio.
+ * series are listed with お問い合わせください as their period until staff
+ * enter the real one under アフターサービス in the Studio.
  *
  * Re-runnable: a section that already has the block is left alone.
  *
@@ -42,8 +42,8 @@ const ROWS = [
     note: '製品保証範囲は製品本体および付属部品となります。フィルター、発泡剤、電池などの消耗品は保証対象外となります。',
   },
   { series: 'シャワーセット', period: '5年' },
-  { series: '水栓金具', period: '' },
-  { series: '洗面化粧台', period: '' },
+  { series: '水栓金具', period: 'お問い合わせください' },
+  { series: '洗面化粧台', period: 'お問い合わせください' },
 ]
 
 for (const id of ['afterSalesPage', 'drafts.afterSalesPage']) {

@@ -49,10 +49,10 @@ const components: PortableTextComponents = {
           </SmartLink>
         </p>
       ) : null,
-    // One row per series, since each carries its own period. A row whose
-    // period is still blank stays off the page until staff fill it in.
+    // One row per series, since each carries its own period. Every series is
+    // listed, published on the site or not; a blank period just omits that line.
     seriesWarranty: ({ value }: { value: { rows?: Array<{ _key: string; series?: string; period?: string; note?: string }> } }) => {
-      const rows = (value.rows ?? []).filter((row) => row.series?.trim() && row.period?.trim())
+      const rows = (value.rows ?? []).filter((row) => row.series?.trim())
       if (!rows.length) return null
       return (
         <dl className="warranty-series">
@@ -60,7 +60,7 @@ const components: PortableTextComponents = {
             <div key={row._key} className="warranty-series__row">
               <dt className="warranty-series__name">{row.series}</dt>
               <dd className="warranty-series__detail">
-                <span className="warranty-series__period">保証期間：{row.period}</span>
+                {row.period?.trim() && <span className="warranty-series__period">保証期間：{row.period}</span>}
                 {row.note?.trim() && <span className="warranty-series__note">{row.note}</span>}
               </dd>
             </div>

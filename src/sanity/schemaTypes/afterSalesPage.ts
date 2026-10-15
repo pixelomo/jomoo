@@ -101,7 +101,7 @@ export const afterSalesPage = defineType({
                       name: 'rows',
                       title: '製品シリーズ / Series',
                       type: 'array',
-                      description: '1シリーズにつき1行。保証期間が空欄の行はページに表示されません。',
+                      description: '1シリーズにつき1行。サイト未公開のシリーズも含め、すべてページに表示されます。',
                       of: [
                         defineArrayMember({
                           type: 'object',
@@ -125,7 +125,7 @@ export const afterSalesPage = defineType({
                           ],
                           preview: {
                             select: { series: 'series', period: 'period' },
-                            prepare: ({ series, period }) => ({ title: series, subtitle: period ? `保証期間：${period}` : '（未入力・非表示）' }),
+                            prepare: ({ series, period }) => ({ title: series, subtitle: period ? `保証期間：${period}` : '（保証期間 未入力）' }),
                           },
                         }),
                       ],
