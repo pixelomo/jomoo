@@ -4,8 +4,7 @@
  * own period. The two paragraphs that held the スマートトイレ wording are
  * replaced by the block, their text kept as that row's note.
  *
- * Only スマートトイレ (2年) and シャワーセット (5年) are known; the other
- * series are listed with お問い合わせください as their period until staff
+ * Only スマートトイレ (2年) is known; the other series are listed with お問い合わせください as their period until staff
  * enter the real one under アフターサービス in the Studio.
  *
  * Re-runnable: a section that already has the block is left alone.
@@ -39,9 +38,9 @@ const ROWS = [
   {
     series: 'スマートトイレ',
     period: '2年',
-    note: '製品保証範囲は製品本体および付属部品となります。フィルター、発泡剤、電池などの消耗品は保証対象外となります。',
+    note: '製品保証の対象は、製品本体および付属部品です。フィルター、発泡剤、電池などの消耗品は保証対象外となります。',
   },
-  { series: 'シャワーセット', period: '5年' },
+  { series: 'シャワーセット', period: 'お問い合わせください' },
   { series: '水栓金具', period: 'お問い合わせください' },
   { series: '洗面化粧台', period: 'お問い合わせください' },
 ]
