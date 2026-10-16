@@ -269,7 +269,9 @@ export const COMING_SOON_LABEL = '近日発売'
 export async function getProductsInSeries(series: string): Promise<ProductSummary[]> {
   try {
     return await getSanityClient().fetch(
-      `*[_type == "product" && series == $series && defined(slug.current)] | order(slug.current asc) {
+      // Available products first, 近日発売 after them — the order the homepage
+      // lineup shows. Lower-cased so a capitalised slug does not jump the queue.
+      `*[_type == "product" && series == $series && defined(slug.current)] | order((comingSoon == true) asc, lower(slug.current) asc) {
         _id,
         "slug": slug.current,
         name,
