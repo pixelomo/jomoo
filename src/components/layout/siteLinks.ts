@@ -84,11 +84,11 @@ export const DEFAULT_NAV: SiteNav = {
   // The group's international accounts. WeChat is deliberately absent: the
   // client asked for it to come off the Japanese site.
   social: [
-    { platform: 'facebook', url: 'https://www.facebook.com/jomoointernational' },
+    { platform: 'x', url: 'https://x.com/Jomoointer' },
     { platform: 'instagram', url: 'https://www.instagram.com/jomoointer/' },
+    { platform: 'facebook', url: 'https://www.facebook.com/jomoointernational' },
     { platform: 'youtube', url: 'https://www.youtube.com/@JOMOOJapan' },
     { platform: 'linkedin', url: 'https://www.linkedin.com/company/jomoo-group/' },
-    { platform: 'x', url: 'https://x.com/Jomoointer' },
   ],
   copyright: 'JOMOO KITCHEN & BATH CO., LTD. All Rights Reserved.',
 }
