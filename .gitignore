@@ -64,3 +64,6 @@ design/
 # comps has no business being served in production.
 public/images/screens/
 .env*
+
+# Database dumps — customer data, never commit
+backups/
