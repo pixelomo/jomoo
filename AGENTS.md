@@ -79,9 +79,9 @@ row is `designerPage.awards`. The catalog/contact cards that close the top page,
 `FooterCtaSection` itself (an async server component, so a client component that
 ends on it takes it as a prop).
 
-Q&A (`/faq`) is hidden for now: `HIDDEN_ROUTES` in `components/layout/siteLinks.ts`
-404s the page and drops its links and sitemap entry; remove it from that list to
-bring it back.
+Q&A (`/faq`) and ショールーム (`/showroom`) are hidden for now: `HIDDEN_ROUTES` in `components/layout/siteLinks.ts`
+404s each page and drops its links and sitemap entry; remove a route from that
+list to bring it back.
 
 Header and footer links are the `siteNavigation` singleton, fetched in
 `(site)/layout.tsx`. `DEFAULT_NAV` in `components/layout/siteLinks.ts` is what

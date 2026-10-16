@@ -8,10 +8,11 @@ export type SiteLink = { href: string; label: string }
 /**
  * Pages taken off the site for now: their route 404s, and every header and
  * footer link to them — from Sanity or from DEFAULT_NAV — is dropped. Q&A is
- * hidden at the client's request until its content is ready; take it out of
+ * hidden at the client's request until its content is ready, and ショールーム
+ * until the client is ready to show it; take a route out of
  * this list to bring the page and its links back.
  */
-export const HIDDEN_ROUTES: readonly string[] = ['/faq']
+export const HIDDEN_ROUTES: readonly string[] = ['/faq', '/showroom']
 
 export const isHiddenRoute = (href: string) =>
   HIDDEN_ROUTES.some((route) => href === route || href.startsWith(`${route}#`) || href.startsWith(`${route}/`))

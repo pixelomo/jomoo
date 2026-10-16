@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import ShowroomPage from '@/components/showroom/ShowroomPage'
 import { getShowroomPage } from '@/lib/sanity'
+import { isHiddenRoute } from '@/components/layout/siteLinks'
 import { pageMetadata } from '@/lib/seo'
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -10,6 +11,8 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function Showroom() {
+  // Hidden for now — see HIDDEN_ROUTES.
+  if (isHiddenRoute('/showroom')) notFound()
   const data = await getShowroomPage()
   if (!data) notFound()
 
