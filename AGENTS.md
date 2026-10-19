@@ -114,7 +114,7 @@ deletes them — **run `--remove` before launch**.
 # Cookie consent
 
 The banner in `src/components/consent/` stores one cookie, `jomoo_consent`, holding
-a version and one bit per optional category (`v2.10` — analytics yes, external
+a version and one bit per optional category (`v3.10` — analytics yes, external
 media no). `src/lib/cookieConsent.ts` is the shared model, read on the server in
 `(site)/layout.tsx` so the bar never flashes, and written in the browser.
 
