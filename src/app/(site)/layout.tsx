@@ -35,6 +35,13 @@ export const metadata: Metadata = {
   // No path: a canonical or og:url here would be inherited by every page
   // that sets none, and tell crawlers each of them is the top page.
   ...pageMetadata({}),
+  // Search Console ownership for the https://jomoo.jp URL-prefix property: a
+  // <meta name="google-site-verification"> tag, since the domain's DNS can't
+  // take a TXT record. The tag must stay up for as long as the site is
+  // verified — removing it un-verifies the property.
+  ...(process.env.GOOGLE_SITE_VERIFICATION && {
+    verification: { google: process.env.GOOGLE_SITE_VERIFICATION },
+  }),
 }
 
 // The site is Japanese-only and served without a locale prefix, so this layout
