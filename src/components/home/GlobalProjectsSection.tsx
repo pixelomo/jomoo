@@ -281,7 +281,7 @@ export default function GlobalProjectsSection({ eyebrow, title, subtitle, cta, s
   void layoutVersion
 
   return (
-    <section ref={sectionRef} className="global-projects" data-nav="light" aria-label="Global projects">
+    <section ref={sectionRef} className="global-projects" data-nav="light" aria-label="Global projects" data-track-section="home_projects">
       <div className="global-projects__header">
         <div className="feature__head reveal">
           <div className="feature__eyebrow">{eyebrow}</div>
@@ -293,7 +293,7 @@ export default function GlobalProjectsSection({ eyebrow, title, subtitle, cta, s
           {/* The carousel below only shows five of them; this is the way
               through to the rest. Same pill as デザイナーを見る, so the page
               keeps one kind of call to action. */}
-          <a className="global-projects__cta reveal" href="/global-projects">
+          <a className="global-projects__cta reveal" href="/global-projects" data-track="global_projects">
             {cta}
             <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
               <path d="M4 12h15M13 6l6 6-6 6" />
@@ -309,6 +309,7 @@ export default function GlobalProjectsSection({ eyebrow, title, subtitle, cta, s
             className="global-projects__nav global-projects__nav--prev"
             onClick={() => handleManualNav(prev)}
             aria-label="Previous slide"
+            data-track="carousel_prev"
           >
             <svg viewBox="0 0 24 24" aria-hidden="true">
               <path d="M15 18l-6-6 6-6" />
@@ -366,6 +367,7 @@ export default function GlobalProjectsSection({ eyebrow, title, subtitle, cta, s
             className="global-projects__nav global-projects__nav--next"
             onClick={() => handleManualNav(next)}
             aria-label="Next slide"
+            data-track="carousel_next"
           >
             <svg viewBox="0 0 24 24" aria-hidden="true">
               <path d="M9 18l6-6-6-6" />
@@ -381,6 +383,8 @@ export default function GlobalProjectsSection({ eyebrow, title, subtitle, cta, s
               role="tab"
               aria-selected={index === activeLogicalIndex}
               aria-label={`Go to slide ${index + 1}`}
+              data-track="carousel_dot"
+              data-track-item={index + 1}
               className={`spotlight__pagination-line${index === activeLogicalIndex ? ' is-active' : ''}`}
               onClick={() => handleManualNav(() => goTo(index))}
             />

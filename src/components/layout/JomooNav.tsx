@@ -152,6 +152,7 @@ export default function JomooNav({ isSignedIn, nav }: Props) {
 
   return (
     <nav
+      data-track-section="header"
       className={`nav${menuOpen ? ' is-menu-open' : ''}${
         searchOpen ? ' is-search-open' : ''
       }`}
@@ -230,6 +231,7 @@ export default function JomooNav({ isSignedIn, nav }: Props) {
           <a
             href="/contact-us"
             className="nav__btn nav__btn--white nav__btn--contact"
+            data-track="contact"
           >
             {nav.contactLabel}
           </a>
@@ -255,10 +257,11 @@ export default function JomooNav({ isSignedIn, nav }: Props) {
               <a
                 href="/sign-up"
                 className="nav__btn nav__btn--black nav__btn--signup"
+                data-track="sign_up"
               >
                 会員登録
               </a>
-              <a href="/sign-in" className="nav__auth-icon nav__auth-icon--signin">
+              <a href="/sign-in" className="nav__auth-icon nav__auth-icon--signin" data-track="sign_in">
                 <AuthGlyph direction="in" />
                 ログイン
               </a>
@@ -286,7 +289,7 @@ export default function JomooNav({ isSignedIn, nav }: Props) {
 
       <NavSearchPanel open={searchOpen} onClose={() => setSearchOpen(false)} />
 
-      <div className="nav__drawer" id="nav-drawer">
+      <div className="nav__drawer" id="nav-drawer" data-track-section="mobile_menu">
         <ul className="nav__drawer-menu">
           {NAV_LINKS.map((item) => (
             <li key={item.href}>
@@ -311,6 +314,7 @@ export default function JomooNav({ isSignedIn, nav }: Props) {
           <a
             href="/contact-us"
             className="nav__drawer-btn nav__drawer-btn--contact"
+            data-track="contact"
             onClick={closeMenu}
           >
             {nav.contactLabel}
@@ -320,11 +324,12 @@ export default function JomooNav({ isSignedIn, nav }: Props) {
               <a
                 href="/sign-up"
                 className="nav__drawer-btn nav__drawer-btn--signup"
+                data-track="sign_up"
                 onClick={closeMenu}
               >
                 会員登録
               </a>
-              <a href="/sign-in" className="nav__drawer-btn nav__drawer-narrow" onClick={closeMenu}>
+              <a href="/sign-in" className="nav__drawer-btn nav__drawer-narrow" onClick={closeMenu} data-track="sign_in">
                 <AuthGlyph direction="in" />
                 ログイン
               </a>

@@ -47,7 +47,7 @@ export default function JomooFooter({
   const legal = orderLegalLinks(legalLinks)
 
   return (
-    <footer className="footer">
+    <footer className="footer" data-track-section="footer">
       <div className="footer__inner">
         <div className="footer__brand">
           <div className="footer__logo">

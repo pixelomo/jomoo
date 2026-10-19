@@ -46,7 +46,7 @@ export default async function SeriesPage({ series }: Props) {
 
   return (
     <main>
-      <section className="feature" data-nav="light">
+      <section className="feature" data-nav="light" data-track-section="series_lineup">
         <div className="feature__inner">
           <div className="feature__head">
             <div className="feature__eyebrow">{lineup.eyebrow}</div>
@@ -74,6 +74,8 @@ export default async function SeriesPage({ series }: Props) {
                   href={card.href}
                   className="feature__card"
                   aria-label={card.href ? `${card.name} の詳細を見る` : undefined}
+                  data-track="product_card"
+                  data-track-item={card.name}
                 >
                   <div className="feature__media">
                     <img
@@ -112,7 +114,7 @@ export default async function SeriesPage({ series }: Props) {
             </div>
           ) : (
             <p style={{ padding: '2rem 0 4rem', textAlign: 'center' }}>
-              <a className="global-projects__cta" href="/contact-us">
+              <a className="global-projects__cta" href="/contact-us" data-track="contact">
                 製品についてお問い合わせ
                 <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
                   <path d="M4 12h15M13 6l6 6-6 6" />

@@ -17,6 +17,7 @@ function Card({
     <a
       className={`footer-cta__card footer-cta__card--${modifier}`}
       href={href}
+      data-track={modifier === 'catalog' ? 'catalog_download' : 'contact'}
       {...(external && { target: '_blank', rel: 'noopener noreferrer' })}
     >
       <div
@@ -56,7 +57,7 @@ export default async function FooterCtaSection() {
   if (!data) return null
 
   return (
-    <section className="footer-cta" data-nav="light" aria-label="Catalog and contact">
+    <section className="footer-cta" data-nav="light" aria-label="Catalog and contact" data-track-section="footer_cta">
       <div className="footer-cta__inner">
         {data.catalog && (
           <Card card={data.catalog} modifier="catalog" href={data.catalog.pdfUrl ?? '#'} external />

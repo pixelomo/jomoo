@@ -8,6 +8,7 @@ import Step1BasicInfo from './Step1BasicInfo'
 import Step2SerialNumber from './Step2SerialNumber'
 import Step2SerialPhoto from './Step2SerialPhoto'
 import Step3Attachments from './Step3Attachments'
+import { track } from '@/lib/analytics'
 import type { Step1Data, Step2Data, Step3Data } from '@/types/registration'
 import type { BranchOption } from '@/lib/dealerBranches'
 
@@ -75,6 +76,9 @@ export default function RegistrationForm({ models, dealers = [], auto = false }:
       const result: { id: string; status: string } = await res.json()
       setRegistrationId(result.id)
       setAutoApproved(result.status === 'REGISTERED_WITH_WARRANTY')
+      track('product_registration', {
+        warranty_auto_approved: result.status === 'REGISTERED_WITH_WARRANTY',
+      })
       setDone(true)
     } catch (err) {
       setSubmitError(err instanceof Error ? err.message : 'Unknown error')

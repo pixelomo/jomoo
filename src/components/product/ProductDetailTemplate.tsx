@@ -112,7 +112,7 @@ export default async function ProductDetailTemplate({ product }: Props) {
   return (
     <main className="pdp">
       {/* HERO — full-bleed lifestyle image, model name on the right */}
-      <header className="pdp-hero">
+      <header className="pdp-hero" data-track-section="product_hero">
         <img className="pdp-hero__media" src={hero.image} alt="" />
         <div className="pdp-hero__scrim" aria-hidden="true" />
         <div className="site-container pdp-hero__inner">
@@ -134,7 +134,7 @@ export default async function ProductDetailTemplate({ product }: Props) {
       </header>
 
       <div className="site-container">
-        <nav className="pdp-crumbs" aria-label="パンくずリスト">
+        <nav className="pdp-crumbs" aria-label="パンくずリスト" data-track-section="breadcrumb">
           <Link href="/">ホーム</Link>
           <span aria-hidden="true">/</span>
           <Link href={seriesHref}>{seriesLabel}</Link>
@@ -204,7 +204,7 @@ export default async function ProductDetailTemplate({ product }: Props) {
 
       {/* RELATED PRODUCTS — homepage lineup card */}
       {related.length > 0 && (
-        <section className="pdp-section pdp-related">
+        <section className="pdp-section pdp-related" data-track-section="related_products">
           <div className="site-container">
             <h2 className="pdp-title pdp-title--center">関連商品</h2>
             <div className="pdp-rule pdp-rule--center" aria-hidden="true" />
@@ -221,6 +221,8 @@ export default async function ProductDetailTemplate({ product }: Props) {
                   href={item.href}
                   className="feature__card"
                   aria-label={item.href ? `${item.name} の詳細を見る` : undefined}
+                  data-track="product_card"
+                  data-track-item={item.name}
                 >
                   <div className="feature__media">
                     <img

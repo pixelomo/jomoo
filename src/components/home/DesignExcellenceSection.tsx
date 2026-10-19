@@ -49,7 +49,7 @@ interface Props {
 
 export default function DesignExcellenceSection({ eyebrow, title, subtitle, button, lane1, lane2 }: Props) {
   return (
-    <section className="design-excellence" data-nav="light" id="design">
+    <section className="design-excellence" data-nav="light" id="design" data-track-section="home_designer">
       <div className="design-excellence__inner">
         <div className="design-excellence__layout">
           <div className="design-excellence__carousels" aria-hidden="true">
@@ -68,7 +68,7 @@ export default function DesignExcellenceSection({ eyebrow, title, subtitle, butt
             </p>
             {/* The section names the designers without naming them, so it ends
                 on the way through to the page that does. */}
-            <a className="design-excellence__btn reveal" href="/designer">
+            <a className="design-excellence__btn reveal" href="/designer" data-track="designer">
               {button}
               <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
                 <path d="M4 12h15M13 6l6 6-6 6" />

@@ -1,6 +1,8 @@
 'use client'
 
+import { useEffect } from 'react'
 import Script from 'next/script'
+import { handleTrackedClick } from '@/lib/analytics'
 import { useConsentFor } from './useConsent'
 
 // Nothing is measured until someone sets this, and the 分析Cookie row is
@@ -15,7 +17,23 @@ export const GA_MEASUREMENT_ID = process.env.NEXT_PUBLIC_GA_ID ?? ''
  */
 export default function Analytics() {
   const consented = useConsentFor('analytics')
-  if (!GA_MEASUREMENT_ID || !consented) return null
+  const enabled = Boolean(GA_MEASUREMENT_ID) && consented
+
+  // A loaded gtag stays loaded after consent is withdrawn and would go on
+  // sending page views as the visitor navigates; this is Google's own off switch.
+  useEffect(() => {
+    if (!GA_MEASUREMENT_ID) return
+    ;(window as unknown as Record<string, unknown>)[`ga-disable-${GA_MEASUREMENT_ID}`] = !consented
+  }, [consented])
+
+  // Capture phase, so the click is recorded before a link navigates away.
+  useEffect(() => {
+    if (!enabled) return
+    document.addEventListener('click', handleTrackedClick, true)
+    return () => document.removeEventListener('click', handleTrackedClick, true)
+  }, [enabled])
+
+  if (!enabled) return null
 
   return (
     <>

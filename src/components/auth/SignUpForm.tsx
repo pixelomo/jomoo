@@ -4,6 +4,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { useTranslations } from 'next-intl'
 import { authClient } from '@/lib/auth-client'
+import { track } from '@/lib/analytics'
 import MembershipStepIndicator from './MembershipStepIndicator'
 import SignUpStep1 from './SignUpStep1'
 import SignUpStep2 from './SignUpStep2'
@@ -96,6 +97,7 @@ export default function SignUpForm() {
       // shortest path the client could have — when EMAIL_VERIFICATION_REQUIRED
       // is off, better-auth signs the member straight in, and when it is on the
       // sign-in page is what tells them to confirm and offers the resend.
+      track('sign_up', { method: 'email', member_type: membershipType })
       setStep(3)
     } catch {
       setError(t('signUpFailed'))

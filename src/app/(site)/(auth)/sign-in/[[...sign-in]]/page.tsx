@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import Link from 'next/link'
 import { authClient } from '@/lib/auth-client'
+import { track } from '@/lib/analytics'
 import AccountField from '@/components/ui/AccountField'
 // Wears the member portal's form styling, so signing in and editing your
 // details look like the same product.
@@ -44,6 +45,7 @@ function SignInForm() {
         setLoading(false)
         return
       }
+      track('login', { method: 'email' })
       router.push('/dashboard')
       router.refresh()
       return
@@ -97,6 +99,7 @@ function SignInForm() {
     const { error: err } = await authClient.twoFactor.verifyTotp({ code: totp })
 
     if (!err) {
+      track('login', { method: 'email' })
       router.push('/dashboard')
       router.refresh()
       return

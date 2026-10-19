@@ -266,7 +266,7 @@ export default function SpotlightCarousel({ slides: SLIDES }: { slides: Spotligh
   void layoutVersion
 
   return (
-    <section ref={sectionRef} className="spotlight" data-nav="light" aria-label="Smart toilet features">
+    <section ref={sectionRef} className="spotlight" data-nav="light" aria-label="Smart toilet features" data-track-section="home_spotlight">
       <div className="site-container spotlight__frame">
         <div className="spotlight__stage">
           <button
@@ -275,6 +275,7 @@ export default function SpotlightCarousel({ slides: SLIDES }: { slides: Spotligh
             onClick={prev}
             disabled={activeIndex === 0}
             aria-label="Previous slide"
+            data-track="carousel_prev"
           >
             <svg viewBox="0 0 24 24" aria-hidden="true">
               <path d="M15 18l-6-6 6-6" />
@@ -351,6 +352,8 @@ export default function SpotlightCarousel({ slides: SLIDES }: { slides: Spotligh
                         .join(' ')}
                       onPointerDown={(event) => event.stopPropagation()}
                       onClick={() => toggleMedia(index)}
+                      data-track={playingIndex === index ? 'video_pause' : 'video_play'}
+                      data-track-item={index + 1}
                       aria-label={
                         playingIndex === index ? 'Pause video' : 'Play video'
                       }
@@ -411,6 +414,7 @@ export default function SpotlightCarousel({ slides: SLIDES }: { slides: Spotligh
             onClick={next}
             disabled={activeIndex === slideCount - 1}
             aria-label="Next slide"
+            data-track="carousel_next"
           >
             <svg viewBox="0 0 24 24" aria-hidden="true">
               <path d="M9 18l6-6-6-6" />
@@ -426,6 +430,8 @@ export default function SpotlightCarousel({ slides: SLIDES }: { slides: Spotligh
               role="tab"
               aria-selected={index === activeIndex}
               aria-label={`Go to slide ${index + 1}`}
+              data-track="carousel_dot"
+              data-track-item={index + 1}
               className={`spotlight__pagination-line${index === activeIndex ? ' is-active' : ''}`}
               onClick={() => goTo(index)}
             />

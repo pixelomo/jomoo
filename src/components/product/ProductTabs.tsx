@@ -152,7 +152,7 @@ export default function ProductTabs({
 
   return (
     <section className="pdp-tabs">
-      <nav className="pdp-tabs__nav" aria-label="製品情報">
+      <nav className="pdp-tabs__nav" aria-label="製品情報" data-track-section="product_tabs">
         {SECTIONS.map(section => (
           <a
             key={section.id}

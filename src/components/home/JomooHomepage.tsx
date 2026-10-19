@@ -435,6 +435,7 @@ export default function JomooHomepage({
 
       {/* HERO */}
       <header
+        data-track-section="home_hero"
         className={['hero', heroSlide === 1 && 'hero--control']
           .filter(Boolean)
           .join(' ')}
@@ -549,6 +550,8 @@ export default function JomooHomepage({
               role="tab"
               aria-selected={index === heroSlide}
               aria-label={`スライド ${index + 1} を表示`}
+              data-track="hero_slide"
+              data-track-item={index + 1}
               className={`hero__pagination-line${index === heroSlide ? ' is-active' : ''}`}
               onClick={() => setHeroSlide(index)}
             />
@@ -557,7 +560,7 @@ export default function JomooHomepage({
       </header>
 
       {/* WORLD OF JOMOO */}
-      <section className="world world--animate" id="world" data-nav="light">
+      <section className="world world--animate" id="world" data-nav="light" data-track-section="home_world">
         <div className="site-container">
           <div className="world__stage">
             <div className="world__upper">
@@ -605,7 +608,7 @@ export default function JomooHomepage({
       </section>
 
       {/* SMART TOILET SCROLL-EXPAND */}
-      <section className="expand expand--animate" ref={expandRef}>
+      <section className="expand expand--animate" ref={expandRef} data-track-section="home_expand">
         <div className="expand__stage">
           {expand.image && <img className="expand__media" src={expand.image} alt={expand.alt} />}
           <div className="expand__label">{expand.label}</div>
@@ -615,7 +618,7 @@ export default function JomooHomepage({
       <SpotlightCarousel slides={content.spotlight} />
 
       {/* FEATURE ROW */}
-      <section className="feature feature--animate" data-nav="light" id="feature">
+      <section className="feature feature--animate" data-nav="light" id="feature" data-track-section="home_lineup">
         <div className="feature__inner">
           <div className="feature__head reveal">
             <div className="feature__eyebrow">{lineup.eyebrow}</div>
@@ -637,6 +640,8 @@ export default function JomooHomepage({
                 href={card.href}
                 className="feature__card"
                 aria-label={card.href ? `${card.name} の詳細を見る` : undefined}
+                data-track="product_card"
+                data-track-item={card.name}
               >
                 <div className="feature__media">
                   <img
@@ -676,7 +681,7 @@ export default function JomooHomepage({
       <GlobalProjectsSection {...content.projects} />
 
       {/* STATS */}
-      <section className="stats stats--animate" data-nav="light">
+      <section className="stats stats--animate" data-nav="light" data-track-section="home_stats">
         <div className="stats__inner">
           <div className="stats__grid" ref={statsGridRef}>
             {stats.map((stat) => (
@@ -711,7 +716,7 @@ export default function JomooHomepage({
         </div>
       </section>
 
-      <section className="design-logos" data-nav="light" aria-label="Design awards">
+      <section className="design-logos" data-nav="light" aria-label="Design awards" data-track-section="home_awards">
         <div className="design-logos__inner">
           <div className="design-logos__card">
             {content.awardLogos.map((src, index) => (

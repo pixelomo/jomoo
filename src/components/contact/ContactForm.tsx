@@ -7,6 +7,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import SignUpField from '@/components/auth/SignUpField'
 import NextCaret from '@/components/auth/NextCaret'
 import ContactStepIndicator from './ContactStepIndicator'
+import { track } from '@/lib/analytics'
 import { PHONE_ERROR, PHONE_PLACEHOLDER } from '@/types/phone'
 import {
   CONTACT_CATEGORIES,
@@ -77,6 +78,7 @@ export default function ContactForm() {
         throw new Error('send_failed')
       }
 
+      track('generate_lead', { form: 'contact', contact_category: data.category })
       setStep(2)
     } catch {
       setSubmitError(SUBMIT_ERROR_MESSAGE)
