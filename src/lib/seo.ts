@@ -25,7 +25,7 @@ export const DEFAULT_TITLE = 'JOMOO JAPAN | スマートトイレ X40シリー�
 
 /** The top page's, until トップページ › 検索 in the Studio says otherwise. */
 export const DEFAULT_DESCRIPTION =
-  '1990年設立、世界120カ国で展開するスマートバスルームブランドJOMOO。セルフクリーニングとUV除菌のX40-B、白金脱臭と超静音フラッシュのX40-C — スマートトイレX40シリーズが、毎日のバスルームをもっと快適に。'
+  '1990年設立、世界120カ国で展開する水回り住宅設備ブランドJOMOO。自動泡洗浄とノズルUV除菌、プラチナ脱臭と超静音洗浄のX40 — スマートトイレ。'
 
 type ShareImage = { url: string; width: number; height: number; alt: string }
 
