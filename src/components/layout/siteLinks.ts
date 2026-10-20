@@ -86,7 +86,7 @@ export const DEFAULT_NAV: SiteNav = {
   social: [
     { platform: 'x', url: 'https://x.com/Jomoointer' },
     { platform: 'instagram', url: 'https://www.instagram.com/jomoointer/' },
-    { platform: 'facebook', url: 'https://www.facebook.com/jomoointernational' },
+    { platform: 'facebook', url: 'https://www.facebook.com/profile.php?id=61590771449142' },
     { platform: 'youtube', url: 'https://www.youtube.com/@JOMOOJapan' },
     { platform: 'linkedin', url: 'https://www.linkedin.com/company/jomoo-group/' },
   ],
