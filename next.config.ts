@@ -15,7 +15,7 @@ const globalSecurityHeaders = [
   // Only send origin in Referer; suppress full URL to third parties
   { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
   // Disable unused browser APIs that could be abused
-  { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=(), interest-cohort=()' },
+  { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=()' },
   // Belt-and-suspenders XSS protection for legacy browsers
   { key: 'X-XSS-Protection', value: '1; mode=block' },
 ]
