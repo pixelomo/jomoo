@@ -7,6 +7,7 @@ import JomooNav from '@/components/layout/JomooNav'
 import JomooFooter from '@/components/layout/JomooFooter'
 import CookieConsent from '@/components/consent/CookieConsent'
 import Analytics from '@/components/consent/Analytics'
+import MetaPixel from '@/components/consent/MetaPixel'
 import { auth } from '@/lib/auth'
 import { getLegalLinks, getSiteNavigation } from '@/lib/sanity'
 import { CONSENT_COOKIE, parseConsent } from '@/lib/cookieConsent'
@@ -76,6 +77,7 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
           <JomooFooter legalLinks={legalLinks} nav={nav} />
           <CookieConsent initial={consent} />
           <Analytics />
+          <MetaPixel />
         </NextIntlClientProvider>
       </body>
     </html>

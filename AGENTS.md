@@ -114,8 +114,8 @@ deletes them — **run `--remove` before launch**.
 # Cookie consent
 
 The banner in `src/components/consent/` stores one cookie, `jomoo_consent`, holding
-a version and one bit per optional category (`v3.10` — analytics yes, external
-media no). `src/lib/cookieConsent.ts` is the shared model, read on the server in
+a version and one bit per optional category (`v4.100` — analytics yes, external
+media and advertising no). `src/lib/cookieConsent.ts` is the shared model, read on the server in
 `(site)/layout.tsx` so the bar never flashes, and written in the browser.
 
 **Bump `CONSENT_VERSION` whenever the categories change**, or whenever what sits
@@ -127,6 +127,13 @@ Nothing optional runs without consent. YouTube embeds go through
 requests the frame at all until 外部メディア is allowed. Google Analytics loads only when `NEXT_PUBLIC_GA_ID` is set **and**
 分析Cookie is agreed to — with no id the analytics row is hidden entirely, since
 a category that gates nothing should not be offered.
+
+The Meta pixel (`MetaPixel.tsx`) works the same way under 広告Cookie: it loads
+only when `NEXT_PUBLIC_META_PIXEL_ID` is set **and** 広告Cookie is agreed to, and
+the row is hidden with no id. The id comes from JOMOO's own Meta business
+account (Events Manager), never one of ours. Besides page views it receives the
+conversions mapped in `META_EVENTS` in `lib/analytics.ts` — `track()` sends each
+of those to GA and Meta under their own consent.
 
 # Deploying
 

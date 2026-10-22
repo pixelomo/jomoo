@@ -46,6 +46,7 @@ export function readConsentCookie(): Consent | null {
 const CATEGORY_COOKIES: Record<ConsentCategory, string[]> = {
   analytics: ['_ga', '_gid', '_gat'],
   media: [],
+  marketing: ['_fbp', '_fbc'],
 }
 
 /** Expire every cookie whose name starts with one of these. */

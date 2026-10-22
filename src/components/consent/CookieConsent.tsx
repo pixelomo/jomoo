@@ -10,6 +10,7 @@ import {
 } from '@/lib/cookieConsent'
 import { onConsentOpen, readConsentCookie, saveConsent } from './useConsent'
 import { GA_MEASUREMENT_ID } from './Analytics'
+import { META_PIXEL_ID } from './MetaPixel'
 import './cookie-consent.css'
 
 // The cookies each row is answering for, shown in the details panel so the
@@ -18,14 +19,17 @@ const COOKIE_NAMES: Record<'necessary' | ConsentCategory, string> = {
   necessary: 'better-auth.session_token, jomoo_consent',
   analytics: '_ga, _gid, _gat',
   media: 'youtube.com / google.com',
+  marketing: '_fbp, _fbc',
 }
 
 // Only ask about what the site actually uses. Analytics appears once a
-// measurement id is configured; until then there is nothing to consent to, and
-// すべて許可 must not quietly grant it in advance.
-const OFFERED = OPTIONAL_CATEGORIES.filter(
-  (category) => category !== 'analytics' || GA_MEASUREMENT_ID !== ''
-)
+// measurement id is configured, advertising once a pixel id is; until then
+// there is nothing to consent to, and すべて許可 must not quietly grant it in advance.
+const CONFIGURED: Partial<Record<ConsentCategory, boolean>> = {
+  analytics: GA_MEASUREMENT_ID !== '',
+  marketing: META_PIXEL_ID !== '',
+}
+const OFFERED = OPTIONAL_CATEGORIES.filter((category) => CONFIGURED[category] ?? true)
 
 function acceptEverythingOffered(): Consent {
   const consent = { ...DECLINE_ALL }

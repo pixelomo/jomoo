@@ -12,7 +12,8 @@ export const CONSENT_COOKIE = 'jomoo_consent'
 // answer given when the category meant YouTube alone no longer stands for it.
 // v3: 分析Cookie now loads Google Analytics (it gated nothing, and was hidden,
 // before NEXT_PUBLIC_GA_ID was set), so earlier answers are asked again.
-export const CONSENT_VERSION = 3
+// v4: 広告Cookie added for the Meta pixel.
+export const CONSENT_VERSION = 4
 
 // Six months. Long enough not to nag, short enough that a stale choice expires
 // on its own — the common reading of "consent does not last forever".
@@ -20,15 +21,15 @@ export const CONSENT_MAX_AGE = 60 * 60 * 24 * 180
 
 // Order matters: it is the bit order in the stored value. Append, never insert,
 // and bump CONSENT_VERSION when you do.
-export const OPTIONAL_CATEGORIES = ['analytics', 'media'] as const
+export const OPTIONAL_CATEGORIES = ['analytics', 'media', 'marketing'] as const
 
 export type ConsentCategory = (typeof OPTIONAL_CATEGORIES)[number]
 export type Consent = Record<ConsentCategory, boolean>
 
 // The starting point for everything: nothing optional until they say so.
-export const DECLINE_ALL: Consent = { analytics: false, media: false }
+export const DECLINE_ALL: Consent = { analytics: false, media: false, marketing: false }
 
-/** e.g. `v3.10` — analytics on, external media off. */
+/** e.g. `v4.100` — analytics on, external media and advertising off. */
 export function serializeConsent(consent: Consent): string {
   const bits = OPTIONAL_CATEGORIES.map((key) => (consent[key] ? '1' : '0')).join('')
   return `v${CONSENT_VERSION}.${bits}`

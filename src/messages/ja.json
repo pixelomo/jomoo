@@ -594,6 +594,8 @@
     "analyticsDesc": "どのページがどのように見られているかを集計し、サイトの改善に役立てるためのCookieです。個人を特定する目的では使用しません。",
     "mediaTitle": "外部メディアCookie",
     "mediaDesc": "製品ページのYouTube動画やショールームのGoogleマップなど、外部サービスの埋め込みコンテンツを表示するためのCookieです。許可しない場合、動画や地図は表示前に確認を表示します。",
+    "marketingTitle": "広告Cookie",
+    "marketingDesc": "Meta（Facebook・Instagram）の広告の効果を測定し、関心に合った広告を表示するためのCookieです。許可しない場合、Metaに閲覧情報は送信されません。",
     "footerLink": "Cookie設定",
     "videoBlocked": "この動画はYouTubeから配信され、再生にあたりYouTubeのCookieが使用されます。",
     "videoLoadOnce": "この動画を読み込む",

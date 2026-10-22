@@ -1,6 +1,7 @@
 // Custom Google Analytics events. Every call is a no-op unless 分析Cookie is
 // agreed to right now and gtag has loaded (components/consent/Analytics.tsx),
-// so callers never check consent themselves.
+// so callers never check consent themselves. The conversions in META_EVENTS
+// also go to the Meta pixel, under 広告Cookie (components/consent/MetaPixel.tsx).
 
 import { readConsentCookie } from '@/components/consent/useConsent'
 
@@ -12,11 +13,28 @@ declare global {
 
 export type EventParams = Record<string, string | number | boolean | undefined>
 
+// GA event → Meta standard event (or a custom one, for what Meta has no name
+// for). Only the event goes to Meta, never its parameters: they can carry a
+// member type or a contact category, and ad targeting needs neither.
+const META_EVENTS: Record<string, { name: string; custom?: boolean }> = {
+  generate_lead: { name: 'Lead' },
+  sign_up: { name: 'CompleteRegistration' },
+  product_registration: { name: 'ProductRegistration', custom: true },
+}
+
 export function track(event: string, params: EventParams = {}): void {
-  if (typeof window === 'undefined' || typeof window.gtag !== 'function') return
-  // gtag outlives a withdrawal for the rest of the visit; the cookie does not.
-  if (!readConsentCookie()?.analytics) return
-  window.gtag('event', event, params)
+  if (typeof window === 'undefined') return
+  // Both tags outlive a withdrawal for the rest of the visit; the cookie does not.
+  const consent = readConsentCookie()
+
+  if (consent?.analytics && typeof window.gtag === 'function') {
+    window.gtag('event', event, params)
+  }
+
+  const meta = META_EVENTS[event]
+  if (meta && consent?.marketing && typeof window.fbq === 'function') {
+    window.fbq(meta.custom ? 'trackCustom' : 'track', meta.name)
+  }
 }
 
 // Member pages show names, addresses and serials in their links, so a click
