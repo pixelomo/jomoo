@@ -688,8 +688,10 @@
   display: block;
 }
 
+/* As wide as the logo, so the icon row can centre under it. */
 .footer__brand {
-  width: 100%;
+  width: fit-content;
+  max-width: 100%;
   min-width: 0;
 }
 
@@ -706,6 +708,7 @@
   justify-content: space-between;
   width: 100%;
   max-width: 220px;
+  margin: 0 auto;
 }
 
 .footer__social a {
@@ -902,10 +905,6 @@
   .footer__inner {
     grid-template-columns: 1fr;
     gap: 2.5rem;
-  }
-
-  .footer__brand {
-    width: 100%;
   }
 
   .footer__cols {
