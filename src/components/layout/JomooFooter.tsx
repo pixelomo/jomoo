@@ -51,7 +51,7 @@ export default function JomooFooter({
       <div className="footer__inner">
         <div className="footer__brand">
           <div className="footer__logo">
-            <img src="/logo.svg" alt="JOMOO" />
+            <img src="/logo-cropped.svg" alt="JOMOO" />
           </div>
           <div className="footer__social">
             {nav.social.map(({ platform, url }) => {
