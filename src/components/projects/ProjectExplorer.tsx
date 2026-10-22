@@ -8,9 +8,7 @@ export interface Project {
   title: string
   image: string
   description: string
-  /** One of the page's country chips — the Studio checks this on publish. */
-  country: string
-  /** One of the page's category chips, likewise. */
+  /** One of the page's category chips — the Studio checks this on publish. */
   category: string
 }
 
@@ -18,15 +16,9 @@ function toggle(list: string[], value: string) {
   return list.includes(value) ? list.filter((item) => item !== value) : [...list, value]
 }
 
-/**
- * Within a row the chips are an OR — pick two countries and you get both. The
- * two rows are an AND, so 中国 + 教育機関 means "schools in China" rather than
- * "anything Chinese plus every school".
- */
-function matches(project: Project, countries: string[], categories: string[]) {
-  const countryOk = countries.length === 0 || countries.includes(project.country)
-  const categoryOk = categories.length === 0 || categories.includes(project.category)
-  return countryOk && categoryOk
+/** The chips are an OR — pick two categories and you get both. */
+function matches(project: Project, categories: string[]) {
+  return categories.length === 0 || categories.includes(project.category)
 }
 
 function SearchGlyph() {
@@ -55,28 +47,22 @@ function chipsFor(listed: string[], used: string[]) {
 
 interface Props {
   projects: Project[]
-  countries: string[]
   categories: string[]
 }
 
-export default function ProjectExplorer({ projects, countries: countryChips, categories: categoryChips }: Props) {
-  const [countries, setCountries] = useState<string[]>([])
+export default function ProjectExplorer({ projects, categories: categoryChips }: Props) {
   const [categories, setCategories] = useState<string[]>([])
   const [panelOpen, setPanelOpen] = useState(true)
   const resultsRef = useRef<HTMLDivElement>(null)
 
-  const countryList = useMemo(
-    () => chipsFor(countryChips, projects.map((p) => p.country)),
-    [countryChips, projects]
-  )
   const categoryList = useMemo(
     () => chipsFor(categoryChips, projects.map((p) => p.category)),
     [categoryChips, projects]
   )
 
   const results = useMemo(
-    () => projects.filter((project) => matches(project, countries, categories)),
-    [projects, countries, categories]
+    () => projects.filter((project) => matches(project, categories)),
+    [projects, categories]
   )
 
   // Every chip filters on click, so 検索する has nothing left to submit; it
@@ -101,20 +87,6 @@ export default function ProjectExplorer({ projects, countries: countryChips, cat
 
           {panelOpen && (
             <div className="gp-filter__body">
-              <div className="gp-filter__chips" role="group" aria-label="国から絞り込む">
-                {countryList.map((country) => (
-                  <button
-                    key={country}
-                    type="button"
-                    className="gp-chip"
-                    aria-pressed={countries.includes(country)}
-                    onClick={() => setCountries((list) => toggle(list, country))}
-                  >
-                    {country}
-                  </button>
-                ))}
-              </div>
-
               <div
                 className="gp-filter__chips"
                 role="group"
@@ -141,10 +113,7 @@ export default function ProjectExplorer({ projects, countries: countryChips, cat
                 <button
                   type="button"
                   className="gp-filter__reset"
-                  onClick={() => {
-                    setCountries([])
-                    setCategories([])
-                  }}
+                  onClick={() => setCategories([])}
                 >
                   リセット
                 </button>
@@ -173,7 +142,6 @@ export default function ProjectExplorer({ projects, countries: countryChips, cat
                   )}
                   <p className="gp-card__body">{project.description}</p>
                   <div className="gp-card__tags">
-                    <span className="gp-tag">{project.country}</span>
                     <span className="gp-tag">{project.category}</span>
                   </div>
                 </article>

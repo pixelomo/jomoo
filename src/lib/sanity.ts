@@ -498,7 +498,6 @@ export interface GlobalProject {
   title: string
   image?: { asset?: AssetRef }
   description?: string
-  country?: string
   category?: string
 }
 
@@ -508,7 +507,6 @@ export interface GlobalProjectsPageData {
   heroEyebrow?: string
   heroTitle?: string
   intro?: string
-  countries?: string[]
   categories?: string[]
   projects?: GlobalProject[]
 }
@@ -519,8 +517,8 @@ export const getGlobalProjectsPage = cache(() =>
     `
     description,
     heroImage, heroEyebrow, heroTitle, intro,
-    countries, categories,
-    projects[] { _key, title, image, description, country, category }
+    categories,
+    projects[] { _key, title, image, description, category }
   `
   )
 )

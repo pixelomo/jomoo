@@ -31,7 +31,6 @@ export default async function GlobalProjectsPage() {
     title: project.title,
     image: project.image?.asset ? imgUrl(project.image, 1000) : '',
     description: project.description ?? '',
-    country: project.country ?? '',
     category: project.category ?? '',
   }))
 
@@ -61,7 +60,6 @@ export default async function GlobalProjectsPage() {
 
       <ProjectExplorer
         projects={projects}
-        countries={data.countries ?? []}
         categories={data.categories ?? []}
       />
     </main>

@@ -2,10 +2,10 @@ import { defineArrayMember, defineField, defineType, type StringRule } from 'san
 
 const LINES = '改行した位置がそのままページ上の改行になります。'
 
-/** A project's 国 / カテゴリー has to be one of the page's own chips, or the
- *  filter could never reach it. The chips are in this same document, so the
- *  check reads them directly. */
-function oneOfChips(rule: StringRule, list: 'countries' | 'categories', label: string) {
+/** A project's カテゴリー has to be one of the page's own chips, or the filter
+ *  could never reach it. The chips are in this same document, so the check
+ *  reads them directly. */
+function oneOfChips(rule: StringRule, list: 'categories', label: string) {
   return rule.required().custom((value, context) => {
     const chips = (context.document?.[list] as string[] | undefined) ?? []
     if (!value || chips.includes(value)) return true
@@ -14,11 +14,14 @@ function oneOfChips(rule: StringRule, list: 'countries' | 'categories', label: s
 }
 
 /**
- * グローバルプロジェクト — the hero, the intro, the two rows of filter chips and
+ * グローバルプロジェクト — the hero, the intro, the category filter chips and
  * the projects themselves. The projects live in this document rather than as
  * documents of their own: they have no page each, they are ordered by hand,
- * and each one's country and category are checked against the chips beside
- * them.
+ * and each one's category is checked against the chips beside it.
+ *
+ * 国・地域 is hidden — the page no longer filters or tags by country. The
+ * fields stay so the values already entered survive; drop `hidden` to bring
+ * them back (and restore the filter row in ProjectExplorer).
  */
 export const globalProjectsPage = defineType({
   name: 'globalProjectsPage',
@@ -50,6 +53,7 @@ export const globalProjectsPage = defineType({
       title: '国・地域 / Countries',
       type: 'array',
       group: 'filters',
+      hidden: true,
       description: '絞り込みの1段目。この順に並びます。',
       of: [defineArrayMember({ type: 'string' })],
       validation: (Rule) => Rule.unique(),
@@ -59,7 +63,7 @@ export const globalProjectsPage = defineType({
       title: 'カテゴリー / Categories',
       type: 'array',
       group: 'filters',
-      description: '絞り込みの2段目。この順に並びます。',
+      description: '絞り込みの項目。この順に並びます。',
       of: [defineArrayMember({ type: 'string' })],
       validation: (Rule) => Rule.unique(),
     }),
@@ -82,8 +86,7 @@ export const globalProjectsPage = defineType({
               name: 'country',
               title: '国・地域 / Country',
               type: 'string',
-              description: '「絞り込み」タブの国・地域と同じ表記で入力してください。',
-              validation: (Rule) => oneOfChips(Rule, 'countries', '国・地域'),
+              hidden: true,
             }),
             defineField({
               name: 'category',
@@ -94,12 +97,7 @@ export const globalProjectsPage = defineType({
             }),
           ],
           preview: {
-            select: { title: 'title', country: 'country', category: 'category', media: 'image' },
-            prepare: ({ title, country, category, media }) => ({
-              title,
-              subtitle: [country, category].filter(Boolean).join(' / '),
-              media,
-            }),
+            select: { title: 'title', subtitle: 'category', media: 'image' },
           },
         }),
       ],
